@@ -1,6 +1,12 @@
 from setuptools import setup, find_packages
 
-requires = ["numpy >= 1.18.0", "lenstronomy >= 1.10.4", "jax", "jaxlib"]
+requires = [
+    "lenstronomy>=1.11.0",
+    "numpy>=1.17.0",
+    "scipy>=0.19.1",
+    "jax>=0.4.12",
+    "jaxlib>=0.4.12",
+]
 tests_require = ["pytest"]
 
 setup(
