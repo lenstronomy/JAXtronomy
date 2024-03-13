@@ -1,6 +1,7 @@
 __author__ = "sibirrer"
 
 from jaxtronomy.LensModel.Profiles.p_jaffe import PJaffe
+from lenstronomy.LensModel.Profiles.p_jaffe import PJaffe as Pjaffe_ref
 
 import numpy as np
 import numpy.testing as npt
@@ -15,6 +16,7 @@ class TestP_JAFFW(object):
 
     def setup_method(self):
         self.profile = PJaffe()
+        self.profile_ref = Pjaffe_ref()
 
     def test_function(self):
         x = jnp.array([1])
@@ -23,6 +25,7 @@ class TestP_JAFFW(object):
         Ra, Rs = 0.5, 0.8
         values = self.profile.function(x, y, sigma0, Ra, Rs)
         npt.assert_almost_equal(values[0], 0.87301557036070054, decimal=8)
+
         x = jnp.array([0])
         y = jnp.array([0])
         sigma0 = 1.0
@@ -36,6 +39,29 @@ class TestP_JAFFW(object):
         npt.assert_almost_equal(values[0], 0.87301557036070054, decimal=8)
         npt.assert_almost_equal(values[1], 1.0842781309377669, decimal=8)
         npt.assert_almost_equal(values[2], 1.2588604178849985, decimal=8)
+
+    def test_function_ref(self):
+        x = jnp.array([1])
+        y = jnp.array([2])
+        sigma0 = 1.0
+        Ra, Rs = 0.5, 0.8
+        values = self.profile.function(x, y, sigma0, Ra, Rs)
+        values_ref = self.profile_ref.function(x, y, sigma0, Ra, Rs)
+        npt.assert_almost_equal(values, values_ref, decimal=8)
+
+        x = jnp.array([0])
+        y = jnp.array([0])
+        sigma0 = 1.0
+        Ra, Rs = 0.5, 0.8
+        values = self.profile.function(x, y, sigma0, Ra, Rs)
+        values_ref = self.profile_ref.function(x, y, sigma0, Ra, Rs)
+        npt.assert_almost_equal(values, values_ref, decimal=8)
+
+        x = jnp.array([2, 3, 4])
+        y = jnp.array([1, 1, 1])
+        values = self.profile.function(x, y, sigma0, Ra, Rs)
+        values_ref = self.profile_ref.function(x, y, sigma0, Ra, Rs)
+        npt.assert_almost_equal(values, values_ref, decimal=8)
 
     def test_derivatives(self):
         x = jnp.array([1])
