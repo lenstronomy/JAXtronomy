@@ -20,8 +20,8 @@ def test_cart2polar():
     npt.assert_almost_equal(phi, phi_ref, decimal=8)
 
     # array of 2d coordinates
-    x = jnp.array([1, 2])
-    y = jnp.array([1, 1])
+    x = np.array([1, 2])
+    y = np.array([1, 1])
     r, phi = param_util.cart2polar(x, y, center_x, center_y)
     r_ref, phi_ref = param_util_ref.cart2polar(x, y, center_x, center_y)
     npt.assert_array_almost_equal(r, r_ref, decimal=8)
@@ -30,7 +30,7 @@ def test_cart2polar():
 
 def test_polar2cart():
     # singel 2d coordinate transformation
-    center = jnp.array([0, 0])
+    center = np.array([0, 0])
     r = 1
     phi = np.pi
     x, y = param_util.polar2cart(r, phi, center)
@@ -114,7 +114,7 @@ def test_shear_cartesian2polar():
 
 
 def test_transform_e1e2_square_average():
-    x, y = jnp.array([1, 0]), jnp.array([0, 1])
+    x, y = np.array([1, 0]), np.array([0, 1])
     e1 = 0.1
     e2 = 0
     center_x, center_y = 0, 0
