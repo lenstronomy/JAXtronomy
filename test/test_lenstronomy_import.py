@@ -4,4 +4,4 @@ def test_lenstronomy_version():
     """
     import lenstronomy
 
-    assert lenstronomy.__version__ == "1.10.4"
+    assert lenstronomy.__version__ == "1.11.7"
