@@ -21,12 +21,11 @@ setup(
     tests_require=tests_require,
     keywords="lenstronomy",
     classifiers=[
-        "Development Status :: 1 - Alpha",
+        "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Science/Research",
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.11",
     ],
 )
