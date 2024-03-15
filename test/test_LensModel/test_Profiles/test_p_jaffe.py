@@ -108,6 +108,35 @@ class TestP_JAFFW(object):
         grav_pot_ref = self.profile_ref.grav_pot(r, rho0, Ra, Rs)
         npt.assert_almost_equal(grav_pot, grav_pot_ref, decimal=8)
 
+    def test_density(self):
+        x = 1
+        y = 2
+        rho0 = 1.0
+        r = jnp.sqrt(x**2 + y**2)
+        Ra, Rs = 0.5, 0.8
+        density = self.profile.density(r, rho0, Ra, Rs)
+        density_ref = self.profile_ref.density(r, rho0, Ra, Rs)
+        npt.assert_almost_equal(density, density_ref, decimal=8)
+
+    def test_density_2d(self):
+        x = 1
+        y = 2
+        rho0 = 1.0
+        Ra, Rs = 0.5, 0.8
+        density2d = self.profile.density_2d(x, y, rho0, Ra, Rs)
+        density2d_ref = self.profile_ref.density_2d(x, y, rho0, Ra, Rs)
+        npt.assert_almost_equal(density2d, density2d_ref, decimal=8)
+
+    def test_mass_2d(self):
+        x = 1
+        y = 2
+        rho0 = 1.0
+        r = jnp.sqrt(x**2 + y**2)
+        Ra, Rs = 0.5, 0.8
+        mass2d = self.profile.mass_2d(r, rho0, Ra, Rs)
+        mass2d_ref = self.profile_ref.mass_2d(r, rho0, Ra, Rs)
+        npt.assert_almost_equal(mass2d, mass2d_ref, decimal=8)
+
     def test_jax_jit(self):
         x = jnp.array([1])
         y = jnp.array([2])

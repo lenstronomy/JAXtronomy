@@ -347,13 +347,11 @@ class PJaffe(LensProfileBase):
         :param Rs:
         :return: Ra, Rs in conventions used
         """
-        # TODO: re-ordering of variable is not JAX-friendly, so the current 
-        # alternative is to ensure meaningful priors on these parameters
+        # makes sure these parameters do not go below some small values
+        Ra = jnp.where(Ra < 1e-4, 1e-4, Ra)
+        Rs = jnp.where(Rs < 1e-4, 1e-4, Rs)
+        # NOTE: the following swap of values *may* cause issues with JAX autodiff
+        Ra = jnp.where(Rs < Ra, Rs, Ra)
+        Rs = jnp.where(Rs < Ra, Ra, Rs)
         return Ra, Rs
-        if Ra >= Rs:
-            Ra, Rs = Rs, Ra
-        if Ra < 0.0001:
-            Ra = 0.0001
-        if Rs < Ra + 0.0001:
-            Rs += 0.0001
-        return Ra, Rs
+    
