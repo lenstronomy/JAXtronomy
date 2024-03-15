@@ -32,7 +32,7 @@ jobs:
           python -m pip install .
 
           user_config_dir="~/.config/lenstronomy"
-          if [ -d "$user_config_dir" ]; then mkdir $user_config_dir; fi
+          if [ ! -d "$user_config_dir" ]; then mkdir $user_config_dir; fi
           cp test/test_Conf/config.yaml $user_config_dir
 
       #- name: Lint with flake8
