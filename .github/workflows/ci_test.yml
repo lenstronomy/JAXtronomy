@@ -30,6 +30,11 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f test_requirements.txt ]; then pip install -r test_requirements.txt; fi
           python -m pip install .
+
+          user_config_dir="~/.config/lenstronomy"
+          if [ -d "$user_config_dir" ]; then mkdir $user_config_dir; fi
+          cp test/test_Conf/config.yaml $user_config_dir
+
       #- name: Lint with flake8
       #  run: |
           # stop the build if there are Python syntax errors or undefined names

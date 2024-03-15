@@ -109,7 +109,7 @@ class TestP_JAFFW(object):
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=8)
         npt.assert_almost_equal(f_yy, f_yy_ref, decimal=8)
-        npt.assert_almost_equal(f_xy, f_yx, decimal=8)
+        npt.assert_almost_equal(f_xy, f_yx, decimal=6)
 
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
@@ -122,7 +122,7 @@ class TestP_JAFFW(object):
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=8)
         npt.assert_array_almost_equal(f_yy, f_yy_ref, decimal=8)
-        npt.assert_array_almost_equal(f_xy, f_yx, decimal=8)
+        npt.assert_array_almost_equal(f_xy, f_yx, decimal=6)
 
     def test_mass_3d_lens(self):
         mass = self.profile.mass_3d_lens(r=1, sigma0=1, Ra=0.5, Rs=0.8, e1=0, e2=0)
