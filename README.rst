@@ -20,7 +20,8 @@ JAXtronomy
 .. image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
     :target: https://www.sphinx-doc.org/en/master/usage/index.html
 
-
+.. image:: https://img.shields.io/pypi/v/jaxtronomy?label=PyPI&logo=pypi
+    :target: https://pypi.python.org/pypi/jaxtronomy
 
 **JAX port of lenstronomy, for parallelized, GPU accelerated, and differentiable gravitational lensing and image simulations.**
 
@@ -47,7 +48,7 @@ The following lensing software packages do use JAX-accelerated computing that in
 - Herculens_
 - GIGA-lens_
 
-.. _Herculens: https://github.com/austinpeel/herculens
+.. _Herculens: https://github.com/herculens/herculens
 .. _GIGA-lens: https://github.com/giga-lens/gigalens
 
 
