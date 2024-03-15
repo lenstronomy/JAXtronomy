@@ -2,14 +2,17 @@ __author__ = "sibirrer"
 
 
 from jaxtronomy.LensModel.Profiles.p_jaffe_ellipse import PJaffe_Ellipse
-from lenstronomy.LensModel.Profiles.p_jaffe_ellipse import PJaffe_Ellipse as PJaffe_Ellipse_ref
+from lenstronomy.LensModel.Profiles.p_jaffe_ellipse import (
+    PJaffe_Ellipse as PJaffe_Ellipse_ref,
+)
 import jaxtronomy.Util.param_util as param_util
 
 import numpy as np
 import numpy.testing as npt
 import pytest
 import jax
-jax.config.update('jax_enable_x64', True)  # 64-bit floats, consistent with numpy
+
+jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 import jax.numpy as jnp
 
 
@@ -126,7 +129,9 @@ class TestP_JAFFW(object):
 
     def test_mass_3d_lens(self):
         mass = self.profile.mass_3d_lens(r=1, sigma0=1, Ra=0.5, Rs=0.8, e1=0, e2=0)
-        mass_ref = self.profile_ref.mass_3d_lens(r=1, sigma0=1, Ra=0.5, Rs=0.8, e1=0, e2=0)
+        mass_ref = self.profile_ref.mass_3d_lens(
+            r=1, sigma0=1, Ra=0.5, Rs=0.8, e1=0, e2=0
+        )
         npt.assert_almost_equal(mass, mass_ref, decimal=8)
 
     def test_jax_jit(self):
@@ -137,16 +142,25 @@ class TestP_JAFFW(object):
         q, phi_G = 0.8, 0.1
         e1, e2 = param_util.phi_q2_ellipticity(phi_G, q)
         jitted = jax.jit(self.profile.function)
-        npt.assert_almost_equal(self.profile.function(x, y, sigma0, Ra, Rs, e1, e2), 
-                                jitted(x, y, sigma0, Ra, Rs, e1, e2), decimal=8)
+        npt.assert_almost_equal(
+            self.profile.function(x, y, sigma0, Ra, Rs, e1, e2),
+            jitted(x, y, sigma0, Ra, Rs, e1, e2),
+            decimal=8,
+        )
 
         jitted = jax.jit(self.profile.derivatives)
-        npt.assert_array_almost_equal(self.profile.derivatives(x, y, sigma0, Ra, Rs, e1, e2), 
-                                      jitted(x, y, sigma0, Ra, Rs, e1, e2), decimal=8)
+        npt.assert_array_almost_equal(
+            self.profile.derivatives(x, y, sigma0, Ra, Rs, e1, e2),
+            jitted(x, y, sigma0, Ra, Rs, e1, e2),
+            decimal=8,
+        )
 
         jitted = jax.jit(self.profile.hessian)
-        npt.assert_array_almost_equal(self.profile.hessian(x, y, sigma0, Ra, Rs, e1, e2), 
-                                      jitted(x, y, sigma0, Ra, Rs, e1, e2), decimal=8)
+        npt.assert_array_almost_equal(
+            self.profile.hessian(x, y, sigma0, Ra, Rs, e1, e2),
+            jitted(x, y, sigma0, Ra, Rs, e1, e2),
+            decimal=8,
+        )
 
 
 if __name__ == "__main__":
