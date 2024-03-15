@@ -8,6 +8,18 @@ JAXtronomy
 .. image:: https://img.shields.io/badge/License-BSD_3--Clause-blue.svg
     :target: https://github.com/lenstronomy/lenstronomy/blob/main/LICENSE
 
+.. image:: https://codecov.io/gh/lenstronomy/JAXtronomy/graph/badge.svg?token=6EJAX8CF62 
+    :target: https://codecov.io/gh/lenstronomy/JAXtronomy
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
+.. image:: https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg
+    :target: https://github.com/PyCQA/docformatter
+
+.. image:: https://img.shields.io/badge/%20style-sphinx-0a507a.svg
+    :target: https://www.sphinx-doc.org/en/master/usage/index.html
+
 
 
 **JAX port of lenstronomy, for parallelized, GPU accelerated, and differentiable gravitational lensing and image simulations.**

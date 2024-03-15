@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: [3.11]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -27,7 +27,8 @@ jobs:
           echo "NUMBA_DISABLE_JIT=false" >> $GITHUB_ENV  # disable numba.jit as it causes issues with JAX
           python -m pip install --upgrade pip
           python -m pip install --upgrade pytest
-          python -m pip install flake8 pytest pytest-cov coveralls
+          python -m pip install flake8 pytest pytest-cov
+          python -m pip install codecov
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f test_requirements.txt ]; then pip install -r test_requirements.txt; fi
           python -m pip install .
@@ -40,10 +41,36 @@ jobs:
       #    flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
-          pytest --cov=jaxtronomy
+          pytest --cov=./ --cov-report=xml
+          codecov
 
-      - name: Coveralls
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          coveralls --service=github
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: ./coverage.xml
+
+#      - name: Coveralls
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          coveralls --service=github
+
+      # from this source for coveralls: https://github.com/marketplace/actions/coveralls-github-action
+      #- uses: actions/checkout@v1
+
+      #- name: Use Node.js 10.x
+      #  uses: actions/setup-node@v1
+      #  with:
+      #    node-version: 10.x
+
+      #- name: npm install, make test-coverage
+      #  run: |
+      #    npm install
+      #    make test-coverage
+
+      #- name: Coveralls
+      #  uses: coverallsapp/github-action@master
+      #  with:
+      #    github-token: ${{ secrets.GITHUB_TOKEN }}

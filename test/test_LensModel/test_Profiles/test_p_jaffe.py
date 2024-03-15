@@ -7,7 +7,8 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 import jax
-jax.config.update('jax_enable_x64', True)  # 64-bit floats, consistent with numpy
+
+jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 import jax.numpy as jnp
 
 
@@ -71,7 +72,9 @@ class TestP_JAFFW(object):
         sigma0 = 1.0
         Ra, Rs = 0.5, 0.8
         f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, sigma0, Ra, Rs)
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(x, y, sigma0, Ra, Rs)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
+            x, y, sigma0, Ra, Rs
+        )
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=8)
         npt.assert_almost_equal(f_yy, f_yy_ref, decimal=8)
@@ -80,7 +83,9 @@ class TestP_JAFFW(object):
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
         f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, sigma0, Ra, Rs)
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(x, y, sigma0, Ra, Rs)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
+            x, y, sigma0, Ra, Rs
+        )
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=8)
         npt.assert_array_almost_equal(f_yy, f_yy_ref, decimal=8)
@@ -143,16 +148,25 @@ class TestP_JAFFW(object):
         sigma0 = 1.0
         Ra, Rs = 0.5, 0.8
         jitted = jax.jit(self.profile.function)
-        npt.assert_almost_equal(self.profile.function(x, y, sigma0, Ra, Rs), 
-                                jitted(x, y, sigma0, Ra, Rs), decimal=8)
+        npt.assert_almost_equal(
+            self.profile.function(x, y, sigma0, Ra, Rs),
+            jitted(x, y, sigma0, Ra, Rs),
+            decimal=8,
+        )
 
         jitted = jax.jit(self.profile.derivatives)
-        npt.assert_array_almost_equal(self.profile.derivatives(x, y, sigma0, Ra, Rs), 
-                                      jitted(x, y, sigma0, Ra, Rs), decimal=8)
+        npt.assert_array_almost_equal(
+            self.profile.derivatives(x, y, sigma0, Ra, Rs),
+            jitted(x, y, sigma0, Ra, Rs),
+            decimal=8,
+        )
 
         jitted = jax.jit(self.profile.hessian)
-        npt.assert_array_almost_equal(self.profile.hessian(x, y, sigma0, Ra, Rs), 
-                                      jitted(x, y, sigma0, Ra, Rs), decimal=8)
+        npt.assert_array_almost_equal(
+            self.profile.hessian(x, y, sigma0, Ra, Rs),
+            jitted(x, y, sigma0, Ra, Rs),
+            decimal=8,
+        )
 
 
 if __name__ == "__main__":

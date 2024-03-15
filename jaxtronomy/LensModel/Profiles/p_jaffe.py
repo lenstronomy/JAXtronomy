@@ -354,4 +354,3 @@ class PJaffe(LensProfileBase):
         Ra = jnp.where(Rs < Ra, Rs, Ra)
         Rs = jnp.where(Rs < Ra, Ra, Rs)
         return Ra, Rs
-    

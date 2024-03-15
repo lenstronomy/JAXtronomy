@@ -19,7 +19,7 @@ setup(
     license="BSD-3",
     install_requires=requires,
     tests_require=tests_require,
-    keywords='lenstronomy',
+    keywords="lenstronomy",
     classifiers=[
         "Development Status :: 1 - Alpha",
         "Intended Audience :: Science/Research",
