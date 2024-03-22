@@ -10,9 +10,9 @@ requires = [
 tests_require = ["pytest"]
 
 setup(
-    name="JAX-lenstronomy",
+    name="jaxtronomy",
     version="0.0.1rc1",
-    url="https://github.com/lenstronomy/JAX-lenstronomy",
+    url="https://github.com/lenstronomy/JAXtronomy",
     author="lenstronomy developers",
     description="lenstronomy, but in JAX",
     packages=find_packages(),
@@ -21,12 +21,11 @@ setup(
     tests_require=tests_require,
     keywords="lenstronomy",
     classifiers=[
-        "Development Status :: 1 - Alpha",
+        "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Science/Research",
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.11",
     ],
 )
