@@ -47,9 +47,11 @@ The following lensing software packages do use JAX-accelerated computing that in
 
 - Herculens_
 - GIGA-lens_
+- PaltaX_
 
 .. _Herculens: https://github.com/herculens/herculens
 .. _GIGA-lens: https://github.com/giga-lens/gigalens
+.. _PaltaX: https://github.com/swagnercarena/paltax
 
 
 
