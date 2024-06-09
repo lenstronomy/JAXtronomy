@@ -26,10 +26,11 @@ def hyp2f1_series(a, b, c, z, nmax=75):
     series representation of 2F1 diverges and analytic continuation must
     be used.
     """
+    # Allows for lists and scalars to be input as z
+    z = jnp.asarray(z)
     z = jnp.atleast_1d(z)
 
     # Set the first term of the series, A_0 = 1
-    # Allows for the input z to be an array of values
     A_i = 1. * jnp.ones_like(z)
     partial_sum = A_i
 
@@ -61,6 +62,8 @@ def hyp2f1_continuation(a, b, c, z, nmax=75):
     Due to the presence of gamma(b - a) and gamma(a - b), there will always
     be a pole whenever b - a is an integer.
     """
+    # Allows for lists and scalars to be input as z
+    z = jnp.asarray(z)
     z = jnp.atleast_1d(z)
 
     # d0 = 1 and d_{-1} = 0
@@ -72,7 +75,6 @@ def hyp2f1_continuation(a, b, c, z, nmax=75):
     # sum_1 corresponds to the summation on the top line of equation 4.21
     # sum_2 corresponds to the summation on the bottom line of equation 4.21
     # Gamma function prefactors are multiplied at the end
-    # Allows for the input z to be an array of values
     sum_1 = 1. * jnp.ones_like(z)
     sum_2 = 1. * jnp.ones_like(z)
 
@@ -132,6 +134,8 @@ def hyp2f1_near_one(a, b, c, z, nmax=75):
     whenever c - a - b is an integer, one of the two terms will have
     a pole
     """
+    # Allows for lists and scalars to be input as z
+    z = jnp.asarray(z)
     z = jnp.atleast_1d(z)
 
     # The branch cut for the hypergeometric function is on Re(z) >= 1, Im(z) = 0
@@ -156,6 +160,8 @@ def hyp2f1(a,b,c,z, nmax=75):
     step can be skipped and the user can directly call the
     appropriate hyp2f1 function
     """
+    # Allows for lists and scalars to be input as z
+    z = jnp.asarray(z)
     z = jnp.atleast_1d(z)
 
     # Case 0: Whenever |z| < 0.89, hyp2f1_series should be used
