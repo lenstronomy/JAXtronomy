@@ -26,6 +26,7 @@ def hyp2f1_series(a, b, c, z, nmax=75):
     series representation of 2F1 diverges and analytic continuation must
     be used.
     """
+    z = jnp.atleast_1d(z)
 
     # Set the first term of the series, A_0 = 1
     # Allows for the input z to be an array of values
@@ -60,6 +61,7 @@ def hyp2f1_continuation(a, b, c, z, nmax=75):
     Due to the presence of gamma(b - a) and gamma(a - b), there will always
     be a pole whenever b - a is an integer.
     """
+    z = jnp.atleast_1d(z)
 
     # d0 = 1 and d_{-1} = 0
     prev_da = 1.
@@ -130,6 +132,7 @@ def hyp2f1_near_one(a, b, c, z, nmax=75):
     whenever c - a - b is an integer, one of the two terms will have
     a pole
     """
+    z = jnp.atleast_1d(z)
 
     # The branch cut for the hypergeometric function is on Re(z) >= 1, Im(z) = 0
     # If z is on the branch cut, take the value above the branch cut
@@ -153,7 +156,6 @@ def hyp2f1(a,b,c,z, nmax=75):
     step can be skipped and the user can directly call the
     appropriate hyp2f1 function
     """
-
     z = jnp.atleast_1d(z)
 
     # Case 0: Whenever |z| < 0.89, hyp2f1_series should be used
@@ -168,7 +170,7 @@ def hyp2f1(a,b,c,z, nmax=75):
     # checked and its corresponding hyp2f1 evaluated individually
     def body_fun(i, val):
         ith_result = lax.switch(case.at[i].get(), hyp2f1_func, a, b, c, z.at[i].get(), nmax)
-        val = val.at[i].set(ith_result)
+        val = val.at[i].set(ith_result.at[0].get())
         return val
     
     return lax.fori_loop(0, jnp.size(z), body_fun, jnp.zeros_like(z))
