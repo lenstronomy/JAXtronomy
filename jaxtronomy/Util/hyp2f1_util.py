@@ -131,6 +131,10 @@ def hyp2f1_near_one(a, b, c, z, nmax=75):
     a pole
     """
 
+    # The branch cut for the hypergeometric function is on Re(z) >= 1, Im(z) = 0
+    # If z is on the branch cut, take the value above the branch cut
+    z = jnp.where(jnp.imag(z) == 0., jnp.where(jnp.real(z)>=1., z + 0.0000001j, z), z)
+
     term1 = gamma(c) * gamma(c - a - b) / gamma(c - a) / gamma(c - b) \
         * hyp2f1_series(a, b, a + b - c + 1., 1. - z, nmax)
     term2 = (1. - z)**(c - a - b) * gamma(c) * gamma(a + b - c) / gamma(a) / gamma(b) \
