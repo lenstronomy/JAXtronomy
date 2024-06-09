@@ -29,6 +29,7 @@ def test_hyp2f1_series():
     result_ref = hyp2f1_ref(a,b,c,z)
     assert jnp.allclose(result, result_ref), "hyp2f1_series result does not match scipy result"
 
+
 def test_hyp2f1_near_one():
     a,b,c = 0.3, 0.7, 2.2
     # Only tests points inside the circle |1-z| = 1
@@ -52,6 +53,7 @@ def test_hyp2f1_near_one():
     result_ref = hyp2f1_ref(a,b,c,z)
     assert jnp.allclose(result, result_ref), "hyp2f1_near_one result does not match scipy result"
 
+
 def test_hyp2f1_continuation():
     a,b,c = 0.3, 0.7, 2.2
     # Only tests points outside the circle |z-1/2| = 1/2
@@ -73,7 +75,8 @@ def test_hyp2f1_continuation():
     z = 3. + 0.j
     result = hyp2f1_continuation(a,b,c,z)
     result_ref = hyp2f1_ref(a,b,c,z)
-    assert jnp.allclose(result, result_ref), "hyp2f1 result does not match scipy result"
+    assert jnp.allclose(result, result_ref), "hyp2f1_continuation result does not match scipy result"
+
 
 def test_hyp2f1():
     a,b,c = 0.3, 0.7, 2.2
@@ -94,6 +97,12 @@ def test_hyp2f1():
 
     # hyp2f1 supports list inputs but the other hyp2f1 functions dont
     z = [0.605 + 0.65j, 0.609 + 0.65j, 0.6072 + 0.0651j]
+    result = hyp2f1(a,b,c,z)
+    result_ref = hyp2f1_ref(a,b,c,z)
+    assert jnp.allclose(result, result_ref), "hyp2f1 result does not match scipy result"
+
+    # Tests to see if the value above the branch cut is taken
+    z = 3. + 0.j
     result = hyp2f1(a,b,c,z)
     result_ref = hyp2f1_ref(a,b,c,z)
     assert jnp.allclose(result, result_ref), "hyp2f1 result does not match scipy result"
