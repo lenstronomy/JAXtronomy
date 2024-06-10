@@ -10,7 +10,7 @@ import jaxtronomy.Util.util as util
 import jaxtronomy.Util.param_util as param_util
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 from lenstronomy.LensModel.Profiles.spp import SPP
-from jaxtronomy.Util.hyp2f1_util import hyp2f1
+from jaxtronomy.Util.hyp2f1_util import hyp2f1_series as hyp2f1
 
 jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 
@@ -297,10 +297,18 @@ class EPLMajorAxis(LensProfileBase):
         Z = q * x + y * 1j
         R = jnp.abs(Z)
         R = jnp.maximum(R, 0.000000001)
+        f = (1.0 - q) / (1.0 + q)
+        # nmax is the number of iterations required to calculate hyp2f1
+        # In order to maintain high accuracy, the number of iterations
+        # depends on how close -f exp{2 i phi} is to the unit circle
+        nmax = jnp.where(f > 0.95, 300, 
+                         jnp.where(f > 0.9, 250, 
+                                   jnp.where(f > 0.8, 100, 
+                                             jnp.where(f > 0.5, 50, 20))))
 
         # angular dependency with extra factor of R, eq. (23)
         R_omega = Z * hyp2f1(
-            1, t / 2, 2 - t / 2, -(1.0 - q) / (1.0 + q) * Z / jnp.conj(Z)
+            1, t / 2, 2 - t / 2, -f * Z / jnp.conj(Z), nmax
         )
 
         # deflection, eq. (22)
