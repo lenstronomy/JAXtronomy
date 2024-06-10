@@ -299,7 +299,9 @@ class EPLMajorAxis(LensProfileBase):
         R = jnp.maximum(R, 0.000000001)
 
         # angular dependency with extra factor of R, eq. (23)
-        R_omega = Z * hyp2f1(1, t/2, 2 - t/2, -(1. - q) / (1. + q) * Z/jnp.conj(Z))
+        R_omega = Z * hyp2f1(
+            1, t / 2, 2 - t / 2, -(1.0 - q) / (1.0 + q) * Z / jnp.conj(Z)
+        )
 
         # deflection, eq. (22)
         alpha = 2 / (1 + q) * (b / R) ** t * R_omega
