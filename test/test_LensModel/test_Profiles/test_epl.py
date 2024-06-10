@@ -25,13 +25,27 @@ class TestEPL(object):
         gamma, e1, e2 = 1.7, 0.3, -0.2
         self.profile.set_static(theta_E, gamma, e1, e2)
         self.profile_ref.set_static(theta_E, gamma, e1, e2)
-        self.profile._b_static, self._t_static, self._q_static, self._phi_G_static = self.profile.param_conv(theta_E, gamma, e1, e2)
-        self.profile_ref._b_static, self._t_static, self._q_static, self._phi_G_static = self.profile_ref.param_conv(theta_E, gamma, e1, e2)
-        npt.assert_almost_equal(self.profile._b_static, self.profile_ref._b_static, decimal=8)
-        npt.assert_almost_equal(self.profile._t_static, self.profile_ref._t_static, decimal=8)
-        npt.assert_almost_equal(self.profile._q_static, self.profile_ref._q_static, decimal=8)
-        npt.assert_almost_equal(self.profile._phi_G_static, self.profile_ref._phi_G_static, decimal=8)
-
+        self.profile._b_static, self._t_static, self._q_static, self._phi_G_static = (
+            self.profile.param_conv(theta_E, gamma, e1, e2)
+        )
+        (
+            self.profile_ref._b_static,
+            self._t_static,
+            self._q_static,
+            self._phi_G_static,
+        ) = self.profile_ref.param_conv(theta_E, gamma, e1, e2)
+        npt.assert_almost_equal(
+            self.profile._b_static, self.profile_ref._b_static, decimal=8
+        )
+        npt.assert_almost_equal(
+            self.profile._t_static, self.profile_ref._t_static, decimal=8
+        )
+        npt.assert_almost_equal(
+            self.profile._q_static, self.profile_ref._q_static, decimal=8
+        )
+        npt.assert_almost_equal(
+            self.profile._phi_G_static, self.profile_ref._phi_G_static, decimal=8
+        )
 
         theta_E = 11.3
         gamma, e1, e2 = 1.6, 0.2, -0.3
