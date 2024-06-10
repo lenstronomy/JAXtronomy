@@ -10,7 +10,7 @@ import jaxtronomy.Util.util as util
 import jaxtronomy.Util.param_util as param_util
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 from lenstronomy.LensModel.Profiles.spp import SPP
-from jaxtronomy.Util.hyp2f1_util import hyp2f1_series as hyp2f1
+from jaxtronomy.Util.hyp2f1_util import hyp2f1
 
 jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 
