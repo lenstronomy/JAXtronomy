@@ -13,8 +13,9 @@ import jax
 jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 import jax.numpy as jnp
 
+
 class TestEPL(object):
-    
+
     def setup_method(self):
         self.profile = EPL()
         self.profile_ref = EPL_ref()
@@ -23,7 +24,9 @@ class TestEPL(object):
         theta_E = 12.3
         gamma, e1, e2 = 1.7, 0.3, -0.2
         b, t, q, phi_G = self.profile.param_conv(theta_E, gamma, e1, e2)
-        b_ref, t_ref, q_ref, phi_G_ref = self.profile_ref.param_conv(theta_E, gamma, e1, e2)
+        b_ref, t_ref, q_ref, phi_G_ref = self.profile_ref.param_conv(
+            theta_E, gamma, e1, e2
+        )
         npt.assert_almost_equal(b, b_ref, decimal=8)
         npt.assert_almost_equal(t, t_ref, decimal=8)
         npt.assert_almost_equal(q, q_ref, decimal=8)
@@ -129,7 +132,7 @@ class TestEPL(object):
 
 
 class TestEPLMajorAxis(object):
-    
+
     def setup_method(self):
         self.profile = EPLMajorAxis()
         self.profile_ref = EPLMajorAxis_ref()
@@ -172,9 +175,7 @@ class TestEPLMajorAxis(object):
         theta_E = 1.0
         b, t, q = 2.2, 0.6, 0.4
         f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, b, t, q)
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
-            x, y, b, t, q
-        )
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(x, y, b, t, q)
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=7)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=7)
         npt.assert_almost_equal(f_yy, f_yy_ref, decimal=7)
@@ -183,9 +184,7 @@ class TestEPLMajorAxis(object):
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
         f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, b, t, q)
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
-            x, y, b, t, q
-        )
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(x, y, b, t, q)
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=7)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=7)
         npt.assert_array_almost_equal(f_yy, f_yy_ref, decimal=7)
@@ -216,8 +215,9 @@ class TestEPLMajorAxis(object):
             decimal=8,
         )
 
+
 class TestEPLQPhi(object):
-    
+
     def setup_method(self):
         self.profile = EPLQPhi()
         self.profile_ref = EPLQPhi_ref()
@@ -319,6 +319,7 @@ class TestEPLQPhi(object):
             jitted(x, y, theta_E, gamma, q, phi),
             decimal=8,
         )
+
 
 if __name__ == "__main__":
     pytest.main()
