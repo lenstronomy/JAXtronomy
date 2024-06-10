@@ -298,15 +298,21 @@ class EPLMajorAxis(LensProfileBase):
         R = jnp.abs(Z)
         R = jnp.maximum(R, 0.000000001)
         f = (1.0 - q) / (1.0 + q)
-        
+
         # nmax is the number of iterations required to calculate hyp2f1
         # In order to maintain high accuracy, the number of iterations
         # depends on how close -f exp{2 i phi} is to the unit circle
-        nmax = jnp.where(f > 0.97, 1000, 
-                jnp.where(f > 0.95, 300, 
-                    jnp.where(f > 0.9, 175, 
-                        jnp.where(f > 0.71, 100, 
-                            jnp.where(f > 0.3, 50, 20)))))
+        nmax = jnp.where(
+            f > 0.97,
+            1000,
+            jnp.where(
+                f > 0.95,
+                300,
+                jnp.where(
+                    f > 0.9, 175, jnp.where(f > 0.71, 100, jnp.where(f > 0.3, 50, 20))
+                ),
+            ),
+        )
 
         # angular dependency with extra factor of R, eq. (23)
         R_omega = Z * hyp2f1(1, t / 2, 2 - t / 2, -f * Z / jnp.conj(Z), nmax)
