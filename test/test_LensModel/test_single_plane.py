@@ -6,7 +6,7 @@ import pytest
 from jaxtronomy.LensModel.single_plane import SinglePlane
 from lenstronomy.LensModel.single_plane import SinglePlane as SinglePlane_ref
 from jaxtronomy.LensModel.Profiles.sis import SIS
-from lenstronomy.LensModel.Profiles.sis import SIS_ref
+from lenstronomy.LensModel.Profiles.sis import SIS as SIS_ref
 
 import unittest
 
