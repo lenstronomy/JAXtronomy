@@ -1,7 +1,10 @@
 __author__ = "sibirrer"
 
+import jax
 import jax.numpy as jnp
 from jaxtronomy.LensModel.profile_list_base import ProfileListBase
+
+jax.config.update("jax_enable_x64", True)
 
 __all__ = ["SinglePlane"]
 
