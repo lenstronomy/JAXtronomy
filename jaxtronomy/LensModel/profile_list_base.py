@@ -4,6 +4,7 @@ __all__ = ["ProfileListBase"]
 
 _JAXXED_MODELS = [
 "EPL",
+"EPL_Q_PHI"
 "LOS",
 "LOS_MINIMAL",
 "PJAFFE",
@@ -376,7 +377,7 @@ def lens_class(
 
         return EPL_numba()
     elif lens_type == "EPL_Q_PHI":
-        from lenstronomy.LensModel.Profiles.epl import EPLQPhi
+        from jaxtronomy.LensModel.Profiles.epl import EPLQPhi
 
         return EPLQPhi()
     elif lens_type == "ElliSLICE":
