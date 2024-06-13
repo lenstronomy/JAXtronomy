@@ -64,8 +64,8 @@ class TestLensModel(object):
         assert delta_x == 1 + 0.19470019576785122 / (8 * jnp.pi)
         assert delta_y == 1 + 0.19470019576785122 / (8 * jnp.pi)
 
-        assert delta_x = delta_x_ref
-        assert delta_y = delta_y_ref
+        assert delta_x == delta_x_ref
+        assert delta_y == delta_y_ref
 
 
     def test_mass_2d(self):
