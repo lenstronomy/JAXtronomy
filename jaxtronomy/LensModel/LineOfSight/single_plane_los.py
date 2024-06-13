@@ -1,7 +1,7 @@
 __author__ = ["nataliehogg", "pierrefleury", "danjohnson98"]
 
 from jaxtronomy.LensModel.single_plane import SinglePlane
-from lenstronomy.LensModel.profile_list_base import lens_class
+from jaxtronomy.LensModel.profile_list_base import lens_class
 import jax.numpy as jnp
 import copy
 
