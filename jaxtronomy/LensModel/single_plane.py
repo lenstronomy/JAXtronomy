@@ -1,7 +1,7 @@
 __author__ = "sibirrer"
 
 import jax.numpy as jnp
-from lenstronomy.LensModel.profile_list_base import ProfileListBase
+from jaxtronomy.LensModel.profile_list_base import ProfileListBase
 
 __all__ = ["SinglePlane"]
 
