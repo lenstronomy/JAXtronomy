@@ -4,15 +4,18 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 from jaxtronomy.LensModel.lens_model import LensModel
-from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane # NH: no multiplane in jaxtronomy yet
-from lenstronomy.LensModel.Profiles.nfw import NFW # NH: no NFW in jaxtronomy yet
+from lenstronomy.LensModel.MultiPlane.multi_plane import (
+    MultiPlane,
+)  # NH: no multiplane in jaxtronomy yet
+from lenstronomy.LensModel.Profiles.nfw import NFW  # NH: no NFW in jaxtronomy yet
 from lenstronomy.Util.util import make_grid
 import unittest
 
 import jax
 import jax.numpy as jnp
 
-jax.config.update("jax_enable_x64", True) # 64-bit floats
+jax.config.update("jax_enable_x64", True)  # 64-bit floats
+
 
 class TestLensModel(object):
     """Tests the source model routines."""

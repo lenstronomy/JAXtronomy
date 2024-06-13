@@ -7,10 +7,14 @@ import unittest
 
 from jaxtronomy.LensModel.single_plane import SinglePlane
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
-from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane # NH: no multiplane in jaxtronomy yet
+from lenstronomy.LensModel.MultiPlane.multi_plane import (
+    MultiPlane,
+)  # NH: no multiplane in jaxtronomy yet
 from jaxtronomy.LensModel.Profiles.sis import SIS
 from jaxtronomy.LensModel.lens_model import LensModel
-from lenstronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver # NH: no solver in jaxtronomy yet
+from lenstronomy.LensModel.Solver.lens_equation_solver import (
+    LensEquationSolver,
+)  # NH: no solver in jaxtronomy yet
 
 from astropy.cosmology import default_cosmology
 
@@ -19,7 +23,7 @@ cosmo = default_cosmology.get()
 import jax
 import jax.numpy as jnp
 
-jax.config.update("jax_enable_x64", True) # 64-bit floats
+jax.config.update("jax_enable_x64", True)  # 64-bit floats
 
 try:
     import fastell4py
@@ -287,7 +291,9 @@ class TestSinglePlaneLOS(object):
             + Gamma_d
             + Gamma_b
             - jnp.matmul(Gamma_d, Gamma_od)
-            - jnp.matmul(Gamma_b, Gamma_ofb + jnp.matmul(Gamma_odb, Identity - Gamma_od))
+            - jnp.matmul(
+                Gamma_b, Gamma_ofb + jnp.matmul(Gamma_odb, Identity - Gamma_od)
+            )
         )
 
         kappa_os = (Gamma_os[0, 0] + Gamma_os[1, 1]) / 2

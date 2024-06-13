@@ -9,6 +9,7 @@ import numpy.testing as npt
 import pytest
 
 import jax
+
 jax.config.update("jax_enable_x64", True)
 
 import jax.numpy as jnp
@@ -104,6 +105,7 @@ class TestSIS(object):
         theta_E_new_ref = self.SIS_ref.rho2theta(rho0)
         npt.assert_almost_equal(theta_E_new, theta_E, decimal=7)
         npt.assert_almost_equal(theta_E_new, theta_E_new_ref, decimal=7)
+
 
 if __name__ == "__main__":
     pytest.main()

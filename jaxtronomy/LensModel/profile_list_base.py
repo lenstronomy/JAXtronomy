@@ -3,13 +3,12 @@ from lenstronomy.Util.util import convert_bool_list
 __all__ = ["ProfileListBase"]
 
 _JAXXED_MODELS = [
-"EPL",
-"EPL_Q_PHI"
-"LOS",
-"LOS_MINIMAL",
-"PJAFFE",
-"PJAFFE_ELLIPSE",
-"SIS"
+    "EPL",
+    "EPL_Q_PHI" "LOS",
+    "LOS_MINIMAL",
+    "PJAFFE",
+    "PJAFFE_ELLIPSE",
+    "SIS",
 ]
 
 _SUPPORTED_MODELS = [
@@ -252,7 +251,11 @@ def lens_class(
     """
 
     if lens_type not in _JAXXED_MODELS:
-        print('Warning: the {} profile is not currently jaxified; using lenstronomy implementation.'.format(lens_type))
+        print(
+            "Warning: the {} profile is not currently jaxified; using lenstronomy implementation.".format(
+                lens_type
+            )
+        )
     else:
         pass
 

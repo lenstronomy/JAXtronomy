@@ -4,7 +4,7 @@ import jax
 import jax.numpy as jnp
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
-jax.config.update("jax_enable_x64", True) # 64-bit floats
+jax.config.update("jax_enable_x64", True)  # 64-bit floats
 
 __all__ = ["SIS"]
 

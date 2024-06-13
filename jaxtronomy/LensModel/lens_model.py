@@ -1,5 +1,5 @@
 __author__ = "sibirrer"
-from jaxtronomy.LensModel.single_plane import SinglePlane # NH: import from jaxtronomy
+from jaxtronomy.LensModel.single_plane import SinglePlane  # NH: import from jaxtronomy
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane
 from lenstronomy.LensModel.MultiPlane.decoupled_multi_plane import MultiPlaneDecoupled
