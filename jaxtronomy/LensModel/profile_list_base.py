@@ -462,11 +462,15 @@ def lens_class(
 
         return Multipole()
     elif lens_type == "MULTI_GAUSSIAN_KAPPA":
-        from lenstronomy.LensModel.Profiles.multi_gaussian_kappa import MultiGaussianKappa
+        from lenstronomy.LensModel.Profiles.multi_gaussian_kappa import (
+            MultiGaussianKappa,
+        )
 
         return MultiGaussianKappa()
     elif lens_type == "MULTI_GAUSSIAN_KAPPA_ELLIPSE":
-        from lenstronomy.LensModel.Profiles.multi_gaussian_kappa import MultiGaussianKappaEllipse
+        from lenstronomy.LensModel.Profiles.multi_gaussian_kappa import (
+            MultiGaussianKappaEllipse,
+        )
 
         return MultiGaussianKappaEllipse()
     elif lens_type == "NFW":
