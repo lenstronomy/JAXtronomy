@@ -286,9 +286,7 @@ class TestSinglePlaneLOS(object):
             + Gamma_d
             + Gamma_b
             - np.matmul(Gamma_d, Gamma_od)
-            - np.matmul(
-                Gamma_b, Gamma_ofb + np.matmul(Gamma_odb, Identity - Gamma_od)
-            )
+            - np.matmul(Gamma_b, Gamma_ofb + np.matmul(Gamma_odb, Identity - Gamma_od))
         )
 
         kappa_os = (Gamma_os[0, 0] + Gamma_os[1, 1]) / 2

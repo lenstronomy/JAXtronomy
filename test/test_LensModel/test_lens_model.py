@@ -33,7 +33,7 @@ class TestLensModel(object):
         ]
 
     def test_init(self):
-        lens_model_list = [ # NH: removing non-jaxxed profiles for now
+        lens_model_list = [  # NH: removing non-jaxxed profiles for now
             "PJAFFE",
             "PJAFFE_ELLIPSE",
         ]
