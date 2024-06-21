@@ -2,7 +2,7 @@ __author__ = "sibirrer"
 from jaxtronomy.LensModel.single_plane import SinglePlane  # NH: import from jaxtronomy
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane
-from lenstronomy.LensModel.MultiPlane.decoupled_multi_plane import MultiPlaneDecoupled
+# from lenstronomy.LensModel.MultiPlane.decoupled_multi_plane import MultiPlaneDecoupled
 from lenstronomy.Cosmo.lens_cosmo import LensCosmo
 from lenstronomy.Util import constants as const
 
@@ -110,21 +110,22 @@ class LensModel(object):
                 )
 
             if decouple_multi_plane:
-                self.lens_model = MultiPlaneDecoupled(
-                    z_source,
-                    lens_model_list,
-                    lens_redshift_list,
-                    cosmo=cosmo,
-                    numerical_alpha_class=numerical_alpha_class,
-                    observed_convention_index=observed_convention_index,
-                    z_source_convention=z_source_convention,
-                    cosmo_interp=cosmo_interp,
-                    z_interp_stop=z_interp_stop,
-                    num_z_interp=num_z_interp,
-                    kwargs_interp=kwargs_interp,
-                    kwargs_synthesis=kwargs_synthesis,
-                    **kwargs_multiplane_model
-                )
+                print('Not in pip release yet (?)')
+                # self.lens_model = MultiPlaneDecoupled(
+                #     z_source,
+                #     lens_model_list,
+                #     lens_redshift_list,
+                #     cosmo=cosmo,
+                #     numerical_alpha_class=numerical_alpha_class,
+                #     observed_convention_index=observed_convention_index,
+                #     z_source_convention=z_source_convention,
+                #     cosmo_interp=cosmo_interp,
+                #     z_interp_stop=z_interp_stop,
+                #     num_z_interp=num_z_interp,
+                #     kwargs_interp=kwargs_interp,
+                #     kwargs_synthesis=kwargs_synthesis,
+                #     **kwargs_multiplane_model
+                # )
             else:
                 self.lens_model = MultiPlane(
                     z_source,
