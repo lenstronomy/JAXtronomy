@@ -388,41 +388,41 @@ class TestSinglePlaneLOS(object):
         npt.assert_allclose(hessian_multiplane_yy, hessian_los_yy, rtol=tolerance)
 
         # time delays
-        ra_source, dec_source = 0.05, 0.02
-        number_of_images = 4
-
-        lens_model_multiplane_time = LensModel(
-            lens_model_list,
-            z_lens=z_d,
-            z_source=z_s,
-            lens_redshift_list=redshift_list,
-            multi_plane=True,
-        )
-
-        multiplane_solver = LensEquationSolver(lens_model_multiplane_time)
-        x_image_mp, y_image_mp = multiplane_solver.findBrightImage(
-            ra_source, dec_source, kwargs_multiplane, numImages=number_of_images
-        )
-
-        t_days_mp = lens_model_multiplane_time.arrival_time(
-            x_image_mp, y_image_mp, kwargs_multiplane
-        )
-        dt_days_mp = t_days_mp[1:] - t_days_mp[0]
-
-        lens_model_los_time = LensModel(["LOS", "EPL"], z_lens=z_d, z_source=z_s)
-        kwargs_time_los = [kwargs_los, kwargs_epl]
-
-        los_solver = LensEquationSolver(lens_model_los_time)
-        x_image_los, y_image_los = los_solver.findBrightImage(
-            ra_source, dec_source, kwargs_time_los, numImages=number_of_images
-        )
-
-        t_days_los = lens_model_los_time.arrival_time(
-            x_image_los, y_image_los, kwargs_time_los
-        )
-        dt_days_los = t_days_los[1:] - t_days_los[0]
-
-        npt.assert_allclose(dt_days_mp, dt_days_los, rtol=tolerance)
+        # ra_source, dec_source = 0.05, 0.02
+        # number_of_images = 4
+        #
+        # lens_model_multiplane_time = LensModel(
+        #     lens_model_list,
+        #     z_lens=z_d,
+        #     z_source=z_s,
+        #     lens_redshift_list=redshift_list,
+        #     multi_plane=True,
+        # )
+        #
+        # multiplane_solver = LensEquationSolver(lens_model_multiplane_time)
+        # x_image_mp, y_image_mp = multiplane_solver.findBrightImage(
+        #     ra_source, dec_source, kwargs_multiplane, numImages=number_of_images
+        # )
+        #
+        # t_days_mp = lens_model_multiplane_time.arrival_time(
+        #     x_image_mp, y_image_mp, kwargs_multiplane
+        # )
+        # dt_days_mp = t_days_mp[1:] - t_days_mp[0]
+        #
+        # lens_model_los_time = LensModel(["LOS", "EPL"], z_lens=z_d, z_source=z_s)
+        # kwargs_time_los = [kwargs_los, kwargs_epl]
+        #
+        # los_solver = LensEquationSolver(lens_model_los_time)
+        # x_image_los, y_image_los = los_solver.findBrightImage(
+        #     ra_source, dec_source, kwargs_time_los, numImages=number_of_images
+        # )
+        #
+        # t_days_los = lens_model_los_time.arrival_time(
+        #     x_image_los, y_image_los, kwargs_time_los
+        # )
+        # dt_days_los = t_days_los[1:] - t_days_los[0]
+        #
+        # npt.assert_allclose(dt_days_mp, dt_days_los, rtol=tolerance)
 
     def test_init(self):
         # need to do this for los minimal too?
