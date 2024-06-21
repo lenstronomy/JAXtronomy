@@ -2,6 +2,7 @@ __author__ = "sibirrer"
 from jaxtronomy.LensModel.single_plane import SinglePlane  # NH: import from jaxtronomy
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane
+
 # from lenstronomy.LensModel.MultiPlane.decoupled_multi_plane import MultiPlaneDecoupled
 from lenstronomy.Cosmo.lens_cosmo import LensCosmo
 from lenstronomy.Util import constants as const
@@ -110,7 +111,7 @@ class LensModel(object):
                 )
 
             if decouple_multi_plane:
-                print('Not in pip release yet (?)')
+                print("Not in pip release yet (?)")
                 # self.lens_model = MultiPlaneDecoupled(
                 #     z_source,
                 #     lens_model_list,
