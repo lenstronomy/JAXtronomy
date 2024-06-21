@@ -1,4 +1,4 @@
-lenstronomy==1.11.7
+lenstronomy==1.10.11
 numpy>=1.17.0
 scipy>=0.19.1
 jax>=0.4.12
