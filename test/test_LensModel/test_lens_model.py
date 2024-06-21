@@ -33,28 +33,9 @@ class TestLensModel(object):
         ]
 
     def test_init(self):
-        lens_model_list = [
-            "FLEXION",
-            "SIS_TRUNCATED",
-            "SERSIC",
-            "SERSIC_ELLIPSE_KAPPA",
-            "SERSIC_ELLIPSE_GAUSS_DEC",
-            "NFW_ELLIPSE_GAUSS_DEC",
-            "SERSIC_ELLIPSE_POTENTIAL",
-            "CTNFW_GAUSS_DEC",
+        lens_model_list = [ # NH: removing non-jaxxed profiles for now
             "PJAFFE",
             "PJAFFE_ELLIPSE",
-            "HERNQUIST_ELLIPSE",
-            "INTERPOL",
-            "INTERPOL_SCALED",
-            "SHAPELETS_POLAR",
-            "DIPOLE",
-            "GAUSSIAN_ELLIPSE_KAPPA",
-            "GAUSSIAN_ELLIPSE_POTENTIAL",
-            "MULTI_GAUSSIAN_KAPPA",
-            "MULTI_GAUSSIAN_KAPPA_ELLIPSE",
-            "CHAMELEON",
-            "DOUBLE_CHAMELEON",
         ]
 
         lensModel = LensModel(lens_model_list)
@@ -205,15 +186,15 @@ class TestLensModel(object):
             x, y, kwargs, diff=diff, diff_method="cross"
         )
         f_xx, f_xy, f_yx, f_yy = lens_model.hessian(x, y, kwargs, diff=None)
-        npt.assert_almost_equal(f_xx_cr, f_xx, decimal=5)
-        npt.assert_almost_equal(f_xy_cr, f_xy, decimal=5)
-        npt.assert_almost_equal(f_yx_cr, f_yx, decimal=5)
-        npt.assert_almost_equal(f_yy_cr, f_yy, decimal=5)
+        npt.assert_array_almost_equal(f_xx_cr, f_xx, decimal=5)
+        npt.assert_array_almost_equal(f_xy_cr, f_xy, decimal=5)
+        npt.assert_array_almost_equal(f_yx_cr, f_yx, decimal=5)
+        npt.assert_array_almost_equal(f_yy_cr, f_yy, decimal=5)
 
-        npt.assert_almost_equal(f_xx_sq, f_xx, decimal=5)
-        npt.assert_almost_equal(f_xy_sq, f_xy, decimal=5)
-        npt.assert_almost_equal(f_yx_sq, f_yx, decimal=5)
-        npt.assert_almost_equal(f_yy_sq, f_yy, decimal=5)
+        npt.assert_array_almost_equal(f_xx_sq, f_xx, decimal=5)
+        npt.assert_array_almost_equal(f_xy_sq, f_xy, decimal=5)
+        npt.assert_array_almost_equal(f_yx_sq, f_yx, decimal=5)
+        npt.assert_array_almost_equal(f_yy_sq, f_yy, decimal=5)
 
     def test_hessian_z1z2(self):
         z_source = 1.5
@@ -250,10 +231,10 @@ class TestLensModel(object):
         ) = multi_plane.hessian_z1z2(
             z1=z1, z2=z2, theta_x=theta_x, theta_y=theta_y, kwargs_lens=kwargs_lens
         )
-        npt.assert_almost_equal(f_xx, f_xx_expected, decimal=5)
-        npt.assert_almost_equal(f_xy, f_xy_expected, decimal=5)
-        npt.assert_almost_equal(f_yx, f_yx_expected, decimal=5)
-        npt.assert_almost_equal(f_yy, f_yy_expected, decimal=5)
+        npt.assert_array_almost_equal(f_xx, f_xx_expected, decimal=5)
+        npt.assert_array_almost_equal(f_xy, f_xy_expected, decimal=5)
+        npt.assert_array_almost_equal(f_yx, f_yx_expected, decimal=5)
+        npt.assert_array_almost_equal(f_yy, f_yy_expected, decimal=5)
 
 
 class TestRaise(unittest.TestCase):

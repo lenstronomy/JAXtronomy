@@ -20,11 +20,6 @@ from astropy.cosmology import default_cosmology
 
 cosmo = default_cosmology.get()
 
-import jax
-import jax.numpy as jnp
-
-jax.config.update("jax_enable_x64", True)  # 64-bit floats
-
 try:
     import fastell4py
 
@@ -268,21 +263,21 @@ class TestSinglePlaneLOS(object):
         gamma2_d = gamma2_os - gamma2_f - gamma2_b
 
         # compute non-linear correction to os term
-        Identity = jnp.identity(2)
+        Identity = np.identity(2)
 
-        Gamma_f = jnp.array([[gamma1_f, gamma2_f], [gamma2_f, -gamma1_f]])
+        Gamma_f = np.array([[gamma1_f, gamma2_f], [gamma2_f, -gamma1_f]])
 
-        Gamma_d = jnp.array([[gamma1_d, gamma2_d], [gamma2_d, -gamma1_d]])
+        Gamma_d = np.array([[gamma1_d, gamma2_d], [gamma2_d, -gamma1_d]])
 
-        Gamma_b = jnp.array([[gamma1_b, gamma2_b], [gamma2_b, -gamma1_b]])
+        Gamma_b = np.array([[gamma1_b, gamma2_b], [gamma2_b, -gamma1_b]])
 
-        Gamma_od = jnp.array([[gamma1_od, gamma2_od], [gamma2_od, -gamma1_od]])
+        Gamma_od = np.array([[gamma1_od, gamma2_od], [gamma2_od, -gamma1_od]])
 
-        Gamma_ofb = jnp.array(Gamma_f) * (
+        Gamma_ofb = np.array(Gamma_f) * (
             (d(z_o, z_s) * d(z_f, z_b)) / (d(z_o, z_b) * d(z_f, z_s))
         )
 
-        Gamma_odb = jnp.array(Gamma_d) * (
+        Gamma_odb = np.array(Gamma_d) * (
             (d(z_o, z_s) * d(z_d, z_b)) / (d(z_o, z_b) * d(z_d, z_s))
         )
 
@@ -290,9 +285,9 @@ class TestSinglePlaneLOS(object):
             Gamma_f
             + Gamma_d
             + Gamma_b
-            - jnp.matmul(Gamma_d, Gamma_od)
-            - jnp.matmul(
-                Gamma_b, Gamma_ofb + jnp.matmul(Gamma_odb, Identity - Gamma_od)
+            - np.matmul(Gamma_d, Gamma_od)
+            - np.matmul(
+                Gamma_b, Gamma_ofb + np.matmul(Gamma_odb, Identity - Gamma_od)
             )
         )
 
@@ -302,7 +297,7 @@ class TestSinglePlaneLOS(object):
         gamma2_os = (Gamma_os[0, 1] + Gamma_os[1, 0]) / 2
 
         # test three image positions
-        x, y = jnp.array([3, 4, 5]), jnp.array([2, 1, 0])
+        x, y = np.array([3, 4, 5]), np.array([2, 1, 0])
 
         lens_model_list = ["EPL", "SHEAR", "SHEAR", "SHEAR"]
 

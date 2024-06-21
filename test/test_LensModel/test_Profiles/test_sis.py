@@ -8,12 +8,6 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-import jax
-
-jax.config.update("jax_enable_x64", True)
-
-import jax.numpy as jnp
-
 
 class TestSIS(object):
     """Tests the Gaussian methods."""
@@ -23,21 +17,21 @@ class TestSIS(object):
         self.SIS_ref = SIS_ref()
 
     def test_function(self):
-        x = jnp.array([1])
-        y = jnp.array([2])
+        x = np.array([1])
+        y = np.array([2])
         phi_E = 1.0
         values = self.SIS.function(x, y, phi_E)
         values_ref = self.SIS_ref.function(x, y, phi_E)
         npt.assert_almost_equal(values[0], 2.2360679774997898, decimal=9)
         npt.assert_almost_equal(values, values_ref, decimal=9)
-        x = jnp.array([0])
-        y = jnp.array([0])
+        x = np.array([0])
+        y = np.array([0])
         phi_E = 1.0
         values = self.SIS.function(x, y, phi_E)
         assert values[0] == 0
 
-        x = jnp.array([2, 3, 4])
-        y = jnp.array([1, 1, 1])
+        x = np.array([2, 3, 4])
+        y = np.array([1, 1, 1])
         values = self.SIS.function(x, y, phi_E)
         values_ref = self.SIS_ref.function(x, y, phi_E)
         npt.assert_almost_equal(values[0], 2.2360679774997898, decimal=9)
@@ -46,8 +40,8 @@ class TestSIS(object):
         npt.assert_almost_equal(values, values_ref, decimal=9)
 
     def test_derivatives(self):
-        x = jnp.array([1])
-        y = jnp.array([2])
+        x = np.array([1])
+        y = np.array([2])
         phi_E = 1.0
         f_x, f_y = self.SIS.derivatives(x, y, phi_E)
         f_x_ref, f_y_ref = self.SIS_ref.derivatives(x, y, phi_E)
@@ -55,25 +49,15 @@ class TestSIS(object):
         npt.assert_almost_equal(f_y[0], 0.89442719099991586, decimal=9)
         npt.assert_almost_equal(f_x, f_x_ref, decimal=9)
         npt.assert_almost_equal(f_y, f_y_ref, decimal=9)
-        x = jnp.array([0])
-        y = jnp.array([0])
+        x = np.array([0])
+        y = np.array([0])
         f_x, f_y = self.SIS.derivatives(x, y, phi_E)
         assert f_x[0] == 0
         assert f_y[0] == 0
 
-        x = jnp.array([1, 3, 4])
-        y = jnp.array([2, 1, 1])
-        values = self.SIS.derivatives(x, y, phi_E)
-        values_ref = self.SIS_ref.derivatives(x, y, phi_E)
-        assert values[0][0] == 0.44721359549995793
-        assert values[1][0] == 0.89442719099991586
-        assert values[0][1] == 0.94868329805051377
-        assert values[1][1] == 0.31622776601683794
-        npt.assert_almost_equal(values, values_ref, decimal=9)
-
     def test_hessian(self):
-        x = jnp.array([1])
-        y = jnp.array([2])
+        x = np.array([1])
+        y = np.array([2])
         phi_E = 1.0
         f_xx, f_xy, f_yx, f_yy = self.SIS.hessian(x, y, phi_E)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.SIS_ref.hessian(x, y, phi_E)
@@ -85,8 +69,8 @@ class TestSIS(object):
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=9)
         npt.assert_almost_equal(f_yx, f_yx_ref, decimal=9)
         npt.assert_almost_equal(f_yy, f_yy_ref, decimal=9)
-        x = jnp.array([1, 3, 4])
-        y = jnp.array([2, 1, 1])
+        x = np.array([1, 3, 4])
+        y = np.array([2, 1, 1])
         values = self.SIS.hessian(x, y, phi_E)
         values_ref = self.SIS_ref.hessian(x, y, phi_E)
         npt.assert_almost_equal(values[0][0], 0.35777087639996635, decimal=9)

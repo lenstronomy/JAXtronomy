@@ -134,7 +134,7 @@ class TestLensModel(object):
         alphax_full, alphay_full = lensModel.alpha(1, 1, kwargs, k=None)
 
         alphax_1_1_ref, alphay_1_1_ref = lensModel_ref.alpha(1, 1, kwargs, k=0)
-        alphax_1_2_ref, alphay_1_2_ref = lensModel_ref_ref.alpha(1, 1, kwargs, k=1)
+        alphax_1_2_ref, alphay_1_2_ref = lensModel_ref.alpha(1, 1, kwargs, k=1)
         alphax_full_ref, alphay_full_ref = lensModel_ref.alpha(1, 1, kwargs, k=None)
 
         npt.assert_almost_equal(
