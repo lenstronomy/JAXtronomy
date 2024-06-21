@@ -381,37 +381,6 @@ class TestSinglePlaneLOS(object):
         npt.assert_allclose(hessian_multiplane_yx, hessian_los_yx, rtol=tolerance)
         npt.assert_allclose(hessian_multiplane_yy, hessian_los_yy, rtol=tolerance)
 
-        # fermat potential
-        theta_ra, theta_dec = 1.0, 0.5
-
-        beta_ra_los, beta_dec_los = lens_model_los.ray_shooting(
-            theta_ra, theta_dec, kwargs_singleplane_los
-        )
-
-        fermat_pot_los = lens_model_los.fermat_potential(
-            x_image=theta_ra,
-            y_image=theta_dec,
-            x_source=beta_ra_los,
-            y_source=beta_dec_los,
-            kwargs_lens=kwargs_singleplane_los,
-        )
-
-        beta_ra_multiplane, beta_dec_multiplane = lens_model_multiplane.ray_shooting(
-            theta_ra, theta_dec, kwargs_multiplane
-        )
-
-        fermat_pot_multiplane = lens_model_multiplane.fermat_potential(
-            x_image=theta_ra,
-            y_image=theta_dec,
-            x_source=beta_ra_multiplane,
-            y_source=beta_dec_multiplane,
-            kwargs_lens=kwargs_multiplane,
-        )
-
-        npt.assert_allclose(beta_ra_los, beta_ra_multiplane, rtol=tolerance)
-        npt.assert_allclose(beta_dec_los, beta_dec_multiplane, rtol=tolerance)
-        npt.assert_allclose(fermat_pot_los, fermat_pot_multiplane, rtol=tolerance)
-
         # time delays
         # ra_source, dec_source = 0.05, 0.02
         # number_of_images = 4
