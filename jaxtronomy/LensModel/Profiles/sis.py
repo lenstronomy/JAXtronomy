@@ -40,8 +40,8 @@ class SIS(LensProfileBase):
             a = jnp.empty_like(R)
             r = R[R > 0]  # in the SIS regime
             # instead of x[idx] = y, use x = x.at[idx].set(y)
-            a = a.at[R==0].set(0)
-            a = a.at[R > 0].set(theta_E/r)
+            a = a.at[R == 0].set(0)
+            a = a.at[R > 0].set(theta_E / r)
         f_x = a * x_shift
         f_y = a * y_shift
         return f_x, f_y
@@ -58,8 +58,8 @@ class SIS(LensProfileBase):
             prefac = jnp.empty_like(R)
             r = R[R > 0]  # in the SIS regime
             # instead of x[idx] = y, use x = x.at[idx].set(y)
-            prefac = prefac.at[R==0].set(0)
-            prefac = prefac.at[R > 0].set(theta_E/r)
+            prefac = prefac.at[R == 0].set(0)
+            prefac = prefac.at[R > 0].set(theta_E / r)
 
         f_xx = y_shift * y_shift * prefac
         f_yy = x_shift * x_shift * prefac
