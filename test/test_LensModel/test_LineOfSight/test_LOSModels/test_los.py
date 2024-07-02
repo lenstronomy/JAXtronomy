@@ -90,6 +90,13 @@ class TestLOS(object):
         npt.assert_almost_equal(f_yx, f_yx_ref)
         npt.assert_almost_equal(f_yy, f_yy_ref)
 
+    def test_set_static(self):
+
+        p = self.LOS.set_static()
+
+    def test_set_dynamic(self):
+
+        d = self.LOS.set_dynamic()
 
 if __name__ == "__main__":
     pytest.main("-k TestLOS")

@@ -185,6 +185,98 @@ class TestLensModel(object):
         lensModel = SinglePlane(lens_model_list=lens_model_list)
         assert lensModel.func_list[0].param_names[0] == "Rs"
 
+    def test_profile_list_base(self):
+        # this tests the giant elif statement in profile_list_base
+        # profiles which break this test for various reasons are commented
+        lens_model_list = [
+            "ARC_PERT",
+            "BLANK_PLANE",
+            "CHAMELEON",
+            "CNFW",
+            "CNFW_ELLIPSE",
+            "CONST_MAG",
+            "CONVERGENCE",
+            "coreBURKERT",
+            "CORED_DENSITY",
+            "CORED_DENSITY_2",
+            "CORED_DENSITY_2_MST",
+            "CORED_DENSITY_EXP",
+            "CORED_DENSITY_EXP_MST",
+            "CORED_DENSITY_MST",
+            "CORED_DENSITY_ULDM_MST",
+            "CSE",
+            "CTNFW_GAUSS_DEC",
+            "CURVED_ARC_CONST",
+            "CURVED_ARC_CONST_MST",
+            "CURVED_ARC_SIS_MST",
+            "CURVED_ARC_SPP",
+            "CURVED_ARC_SPT",
+            "CURVED_ARC_TAN_DIFF",
+            "DIPOLE",
+            "DOUBLE_CHAMELEON",
+            "EPL",
+            "EPL_BOXYDISKY",
+            "EPL_MULTIPOLE_M3M4",
+            "EPL_NUMBA",
+            "EPL_Q_PHI",
+            "ElliSLICE",
+            "FLEXION",
+            "FLEXIONFG",
+            "GAUSSIAN",
+            "GAUSSIAN_ELLIPSE_KAPPA",
+            "GAUSSIAN_ELLIPSE_POTENTIAL",
+            "GAUSSIAN_KAPPA",
+            "GNFW",
+            "HERNQUIST",
+            "HERNQUIST_ELLIPSE",
+            "HERNQUIST_ELLIPSE_CSE",
+            "HESSIAN",
+            "INTERPOL",
+            "INTERPOL_SCALED",
+            "RADIAL_INTERPOL",
+            # "LOS", # can't use SinglePlane
+            # "LOS_MINIMAL", # can't use SinglePlane
+            "MULTIPOLE",
+            "MULTI_GAUSSIAN_KAPPA",
+            "MULTI_GAUSSIAN_KAPPA_ELLIPSE",
+            "NFW",
+            "NFW_ELLIPSE",
+            "NFW_ELLIPSE_CSE",
+            "NFW_ELLIPSE_GAUSS_DEC",
+            "NFW_MC",
+            "NFW_MC_ELLIPSE",
+            "NIE",
+            "NIE_POTENTIAL",
+            "NIE_SIMPLE",
+            "POINT_MASS",
+            "PSEUDO_DPL",
+            "SERSIC",
+            "SERSIC_ELLIPSE_GAUSS_DEC",
+            "SERSIC_ELLIPSE_KAPPA",
+            "SERSIC_ELLIPSE_POTENTIAL",
+            "SHAPELETS_CART",
+            "SHAPELETS_POLAR",
+            "SHEAR",
+            "SHEAR_GAMMA_PSI",
+            "SHEAR_REDUCED",
+            "SHIFT",
+            "SIE",
+            "SIS",
+            "SIS_TRUNCATED",
+            #"SPEMD", # needs fastell to pass (fails locally)
+            "SPEP",
+            "SPL_CORE",
+            "SPP",
+            #"SYNTHESIS", # needs other arguments
+            "TABULATED_DEFLECTIONS",
+            "TNFW",
+            "TNFWC",
+            "TNFW_ELLIPSE",
+            "TRIPLE_CHAMELEON",
+            "ULDM",
+            "EPL_MULTIPOLE_M3M4"]
+
+        lensModel = SinglePlane(lens_model_list=lens_model_list)
 
 class TestRaise(unittest.TestCase):
     def test_raise(self):
@@ -199,6 +291,9 @@ class TestRaise(unittest.TestCase):
                 SinglePlane(lens_model_list=["SPEMD"])
         else:
             SinglePlane(lens_model_list=["PEMD", "SPEMD"])
+
+        with self.assertRaises(ValueError):
+            SinglePlane(lens_model_list=['MY_FAKE_PROFILE'])        
 
 
 if __name__ == "__main__":

@@ -82,6 +82,56 @@ class TestSIS(object):
         npt.assert_almost_equal(theta_E_new, theta_E, decimal=7)
         npt.assert_almost_equal(theta_E_new, theta_E_new_ref, decimal=7)
 
+    def test_mass_3d(self):
+        r = 2.5
+        theta_E = 1.3
+        mass3d = self.SIS.mass_3d(r, theta_E)
+        mass3d_ref = self.SIS_ref.mass_3d(r, theta_E)
+
+        npt.assert_almost_equal(mass3d, mass3d_ref)
+
+    def test_mass_3d_lens(self):
+        r = 2.5
+        theta_E = 1.3
+        mass3d_lens = self.SIS.mass_3d_lens(r, theta_E)
+        mass3d_lens_ref = self.SIS_ref.mass_3d_lens(r, theta_E)
+
+        npt.assert_almost_equal(mass3d_lens, mass3d_lens_ref)
+
+    def test_mass_2d(self):
+        r = 2.5
+        rho0 = 1.3
+        mass2d = self.SIS.mass_2d(r, rho0)
+        mass2d_ref = self.SIS_ref.mass_2d(r, rho0)
+
+        npt.assert_almost_equal(mass2d, mass2d_ref)
+
+    def test_mass_2d_lens(self):
+        r = 2.5
+        theta_E = 1.3
+        mass2d_lens = self.SIS.mass_2d_lens(r, theta_E)
+        mass2d_lens_ref = self.SIS_ref.mass_2d_lens(r, theta_E)
+
+        npt.assert_almost_equal(mass2d_lens, mass2d_lens_ref)
+
+    def test_grav_pot(self):
+        x = 0.5
+        y = -0.3
+        rho0 = 1.3
+        grav_pot = self.SIS.grav_pot(x, y, rho0)
+        grav_pot_ref = self.SIS_ref.grav_pot(x, y, rho0)
+
+        npt.assert_almost_equal(grav_pot, grav_pot_ref)
+
+    def test_density_2d(self):
+        x = 0.5
+        y = -0.3
+        rho0 = 1.3
+        density_2d = self.SIS.density_2d(x, y, rho0)
+        density_2d_ref = self.SIS_ref.density_2d(x, y, rho0)
+
+        npt.assert_almost_equal(density_2d, density_2d_ref)
+
 
 if __name__ == "__main__":
     pytest.main()

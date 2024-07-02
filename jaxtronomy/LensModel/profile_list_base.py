@@ -4,7 +4,8 @@ __all__ = ["ProfileListBase"]
 
 _JAXXED_MODELS = [
     "EPL",
-    "EPL_Q_PHI" "LOS",
+    "EPL_Q_PHI",
+    "LOS",
     "LOS_MINIMAL",
     "PJAFFE",
     "PJAFFE_ELLIPSE",
@@ -30,6 +31,7 @@ _SUPPORTED_MODELS = [
     "CSE",
     "CTNFW_GAUSS_DEC",
     "CURVED_ARC_CONST",
+    "CURVED_ARC_CONST_MST",
     "CURVED_ARC_SIS_MST",
     "CURVED_ARC_SPP",
     "CURVED_ARC_SPT",
@@ -594,11 +596,11 @@ def lens_class(
 
         return SIE()
     elif lens_type == "SIS":
-        from lenstronomy.LensModel.Profiles.sis import SIS
+        from jaxtronomy.LensModel.Profiles.sis import SIS
 
         return SIS()
     elif lens_type == "SIS_TRUNCATED":
-        from jaxtronomy.LensModel.Profiles.sis_truncate import SIS_truncate
+        from lenstronomy.LensModel.Profiles.sis_truncate import SIS_truncate
 
         return SIS_truncate()
     elif lens_type == "SPEMD":
