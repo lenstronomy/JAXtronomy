@@ -263,20 +263,22 @@ class TestLensModel(object):
             "SIE",
             "SIS",
             "SIS_TRUNCATED",
-            #"SPEMD", # needs fastell to pass (fails locally)
+            # "SPEMD", # needs fastell to pass (fails locally)
             "SPEP",
             "SPL_CORE",
             "SPP",
-            #"SYNTHESIS", # needs other arguments
+            # "SYNTHESIS", # needs other arguments
             "TABULATED_DEFLECTIONS",
             "TNFW",
             "TNFWC",
             "TNFW_ELLIPSE",
             "TRIPLE_CHAMELEON",
             "ULDM",
-            "EPL_MULTIPOLE_M3M4"]
+            "EPL_MULTIPOLE_M3M4",
+        ]
 
         lensModel = SinglePlane(lens_model_list=lens_model_list)
+
 
 class TestRaise(unittest.TestCase):
     def test_raise(self):
@@ -293,7 +295,7 @@ class TestRaise(unittest.TestCase):
             SinglePlane(lens_model_list=["PEMD", "SPEMD"])
 
         with self.assertRaises(ValueError):
-            SinglePlane(lens_model_list=['MY_FAKE_PROFILE'])        
+            SinglePlane(lens_model_list=["MY_FAKE_PROFILE"])
 
 
 if __name__ == "__main__":

@@ -50,10 +50,10 @@ class TestLensModel(object):
         value_interp_lookup = nfw_interp.function(x, y, **kwargs[0])
         npt.assert_almost_equal(value, value_interp_lookup, decimal=4)
 
-        lens_model_list = ['SIS', 'SIS']
+        lens_model_list = ["SIS", "SIS"]
         lensModel = LensModel(lens_model_list, decouple_multi_plane=True)
 
-        lens_model_list = ['SIS', 'LOS']
+        lens_model_list = ["SIS", "LOS"]
         lensModel = LensModel(lens_model_list)
 
     def test_kappa(self):
@@ -107,7 +107,9 @@ class TestLensModel(object):
         npt.assert_almost_equal(f_xyy, g3, decimal=8)
         npt.assert_almost_equal(f_yyy, g4, decimal=8)
 
-        f_xxx, f_xxy, f_xyy, f_yyy = lensModel.flexion(x=1.0, y=1.0, kwargs=kwargs, hessian_diff=False)
+        f_xxx, f_xxy, f_xyy, f_yyy = lensModel.flexion(
+            x=1.0, y=1.0, kwargs=kwargs, hessian_diff=False
+        )
 
     def test_ray_shooting(self):
         delta_x, delta_y = self.lensModel.ray_shooting(x=1.0, y=1.0, kwargs=self.kwargs)
@@ -125,12 +127,21 @@ class TestLensModel(object):
         z_source = 1.5
         x_image, y_image = 1.0, 0.0
         lensModel = LensModel(
-            lens_model_list=["EPL"], # NH: jax error when testing on SIS; to be fixed
+            lens_model_list=["EPL"],  # NH: jax error when testing on SIS; to be fixed
             multi_plane=True,
             lens_redshift_list=[z_lens],
             z_source=z_source,
         )
-        kwargs = [{"theta_E": 1.0, 'gamma': 2, "center_x": 0.0, "center_y": 0.0, 'e1': 0, 'e2': 0}]
+        kwargs = [
+            {
+                "theta_E": 1.0,
+                "gamma": 2,
+                "center_x": 0.0,
+                "center_y": 0.0,
+                "e1": 0,
+                "e2": 0,
+            }
+        ]
         arrival_time_mp = lensModel.arrival_time(x_image, y_image, kwargs)
         lensModel_sp = LensModel(
             lens_model_list=["EPL"], z_source=z_source, z_lens=z_lens
@@ -243,6 +254,7 @@ class TestLensModel(object):
         npt.assert_array_almost_equal(f_xy, f_xy_expected, decimal=5)
         npt.assert_array_almost_equal(f_yx, f_yx_expected, decimal=5)
         npt.assert_array_almost_equal(f_yy, f_yy_expected, decimal=5)
+
 
 class TestRaise(unittest.TestCase):
     def test_raise(self):

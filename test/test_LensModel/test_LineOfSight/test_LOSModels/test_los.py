@@ -98,5 +98,6 @@ class TestLOS(object):
 
         d = self.LOS.set_dynamic()
 
+
 if __name__ == "__main__":
     pytest.main("-k TestLOS")
