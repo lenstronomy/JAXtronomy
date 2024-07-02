@@ -64,7 +64,7 @@ class TestLensModel(object):
         )
 
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.lensModel_ref.hessian(
-        x=1.0, y=1.0, kwargs=self.kwargs
+            x=1.0, y=1.0, kwargs=self.kwargs
         )
 
         npt.assert_almost_equal(f_xx, -0.00581, decimal=6)

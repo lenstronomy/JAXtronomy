@@ -9,8 +9,10 @@ from jaxtronomy.LensModel.LineOfSight.LOSModels.los_minimal import LOSMinimal
 
 
 class TestLOSMinimal(object):
-    """
-    Tests the LOSMinimal profile; inherits from LOS so we can repeat those tests here. This is functionally redundant but boosts coverage.
+    """Tests the LOSMinimal profile; inherits from LOS so we can repeat those tests
+    here.
+
+    This is functionally redundant but boosts coverage.
     """
 
     def setup_method(self):
@@ -21,10 +23,12 @@ class TestLOSMinimal(object):
         gamma1 = 0.2
         gamma2 = 0.1
         omega = 0.2
-        x=1
-        y=1
+        x = 1
+        y = 1
 
-        x_distorted, y_distorted = self.LOSMinimal.distort_vector(x, y, kappa, gamma1, gamma2, omega)
+        x_distorted, y_distorted = self.LOSMinimal.distort_vector(
+            x, y, kappa, gamma1, gamma2, omega
+        )
 
         npt.assert_almost_equal(x_distorted, 0.8, decimal=9)
         npt.assert_almost_equal(y_distorted, 0.4, decimal=9)
@@ -34,12 +38,14 @@ class TestLOSMinimal(object):
         gamma1 = 0.2
         gamma2 = 0.1
         omega = 0.2
-        fxx=1
-        fxy=1
-        fyx=1
-        fyy=1
+        fxx = 1
+        fxy = 1
+        fyx = 1
+        fyy = 1
 
-        f_xx, f_xy, f_yx, f_yy = self.LOSMinimal.left_multiply(fxx, fxy, fyx, fyy, kappa, gamma1, gamma2, omega)
+        f_xx, f_xy, f_yx, f_yy = self.LOSMinimal.left_multiply(
+            fxx, fxy, fyx, fyy, kappa, gamma1, gamma2, omega
+        )
 
         npt.assert_almost_equal(f_xx, 0.8)
         npt.assert_almost_equal(f_xy, 0.8)
@@ -51,17 +57,20 @@ class TestLOSMinimal(object):
         gamma1 = 0.2
         gamma2 = 0.1
         omega = 0.2
-        fxx=1
-        fxy=1
-        fyx=1
-        fyy=1
+        fxx = 1
+        fxy = 1
+        fyx = 1
+        fyy = 1
 
-        f_xx, f_xy, f_yx, f_yy = self.LOSMinimal.right_multiply(fxx, fxy, fyx, fyy, kappa, gamma1, gamma2, omega)
+        f_xx, f_xy, f_yx, f_yy = self.LOSMinimal.right_multiply(
+            fxx, fxy, fyx, fyy, kappa, gamma1, gamma2, omega
+        )
 
         npt.assert_almost_equal(f_xx, 0.8)
         npt.assert_almost_equal(f_xy, 0.8)
         npt.assert_almost_equal(f_yx, 0.4)
         npt.assert_almost_equal(f_yy, 0.4)
+
 
 if __name__ == "__main__":
     pytest.main("-k TestLOSMinimal")
