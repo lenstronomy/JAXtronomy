@@ -58,6 +58,25 @@ class TestLensModel(object):
         assert output1 == output1_ref
         assert output2 == output2_ref
 
+    def test_hessian(self):
+        f_xx, f_xy, f_yx, f_yy = self.lensModel.hessian(
+            x=1.0, y=1.0, kwargs=self.kwargs
+        )
+
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.lensModel_ref.hessian(
+        x=1.0, y=1.0, kwargs=self.kwargs
+        )
+
+        npt.assert_almost_equal(f_xx, -0.00581, decimal=6)
+        npt.assert_almost_equal(f_xy, 0.001937, decimal=6)
+        npt.assert_almost_equal(f_yx, 0.001937, decimal=6)
+        npt.assert_almost_equal(f_yy, -0.00581, decimal=6)
+
+        npt.assert_almost_equal(f_xx, f_xx_ref, decimal=6)
+        npt.assert_almost_equal(f_xy, f_xy_ref, decimal=6)
+        npt.assert_almost_equal(f_yx, f_yx_ref, decimal=6)
+        npt.assert_almost_equal(f_yy, f_yy_ref, decimal=6)
+
     def test_ray_shooting(self):
         delta_x, delta_y = self.lensModel.ray_shooting(x=1.0, y=1.0, kwargs=self.kwargs)
         delta_x_ref, delta_y_ref = self.lensModel_ref.ray_shooting(
