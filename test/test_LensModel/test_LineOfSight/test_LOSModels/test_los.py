@@ -32,7 +32,7 @@ class TestLOS(object):
         )
 
         npt.assert_almost_equal(x_distorted, 0.8, decimal=9)
-        npt.assert_almost_equal(y_distorted, 0.4, decimal=9)
+        npt.assert_almost_equal(y_distorted, 0.8, decimal=9)
         npt.assert_almost_equal(x_distorted, x_distorted_ref, decimal=9)
         npt.assert_almost_equal(y_distorted, y_distorted_ref, decimal=9)
 
@@ -55,8 +55,8 @@ class TestLOS(object):
 
         npt.assert_almost_equal(f_xx, 0.8)
         npt.assert_almost_equal(f_xy, 0.8)
-        npt.assert_almost_equal(f_yx, 0.4)
-        npt.assert_almost_equal(f_yy, 0.4)
+        npt.assert_almost_equal(f_yx, 0.6)
+        npt.assert_almost_equal(f_yy, 0.6)
 
         npt.assert_almost_equal(f_xx, f_xx_ref)
         npt.assert_almost_equal(f_xy, f_xy_ref)
@@ -80,10 +80,10 @@ class TestLOS(object):
             fxx, fxy, fyx, fyy, kappa, gamma1, gamma2, omega
         )
 
-        npt.assert_almost_equal(f_xx, 0.8)
-        npt.assert_almost_equal(f_xy, 0.8)
+        npt.assert_almost_equal(f_xx, 0.4)
+        npt.assert_almost_equal(f_xy, 1.0)
         npt.assert_almost_equal(f_yx, 0.4)
-        npt.assert_almost_equal(f_yy, 0.4)
+        npt.assert_almost_equal(f_yy, 1.0)
 
         npt.assert_almost_equal(f_xx, f_xx_ref)
         npt.assert_almost_equal(f_xy, f_xy_ref)
