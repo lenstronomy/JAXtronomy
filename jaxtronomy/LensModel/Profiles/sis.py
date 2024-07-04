@@ -23,6 +23,9 @@ class SIS(LensProfileBase):
     lower_limit_default = {"theta_E": 0, "center_x": -100, "center_y": -100}
     upper_limit_default = {"theta_E": 100, "center_x": 100, "center_y": 100}
 
+    def __init__(self):
+        self._epsilon = 0.000001
+
     def function(self, x, y, theta_E, center_x=0, center_y=0):
         x_shift = x - center_x
         y_shift = y - center_y
@@ -34,14 +37,16 @@ class SIS(LensProfileBase):
         x_shift = x - center_x
         y_shift = y - center_y
         R = jnp.sqrt(x_shift * x_shift + y_shift * y_shift)
-        if isinstance(R, int) or isinstance(R, float):
-            a = theta_E / max(0.000001, R)
-        else:
-            a = jnp.empty_like(R)
-            r = R[R > 0]  # in the SIS regime
-            # instead of x[idx] = y, use x = x.at[idx].set(y)
-            a = a.at[R == 0].set(0)
-            a = a.at[R > 0].set(theta_E / r)
+        # if isinstance(R, int) or isinstance(R, float):
+        #     a = theta_E / max(0.000001, R)
+        # else:
+        #     a = jnp.empty_like(R)
+        #     r = R[R > 0]  # in the SIS regime
+        #     # instead of x[idx] = y, use x = x.at[idx].set(y)
+        #     a = a.at[R == 0].set(0)
+        #     a = a.at[R > 0].set(theta_E / r)
+        R = jnp.where(R < self._epsilon, self._epsilon, R)
+        a = theta_E / jnp.maximum(R, self._epsilon)
         f_x = a * x_shift
         f_y = a * y_shift
         return f_x, f_y
@@ -52,15 +57,16 @@ class SIS(LensProfileBase):
         x_shift = x - center_x
         y_shift = y - center_y
         R = (x_shift * x_shift + y_shift * y_shift) ** (3.0 / 2)
-        if isinstance(R, int) or isinstance(R, float):
-            prefac = theta_E / max(0.000001, R)
-        else:
-            prefac = jnp.empty_like(R)
-            r = R[R > 0]  # in the SIS regime
-            # instead of x[idx] = y, use x = x.at[idx].set(y)
-            prefac = prefac.at[R == 0].set(0)
-            prefac = prefac.at[R > 0].set(theta_E / r)
-
+        # if isinstance(R, int) or isinstance(R, float):
+        #     prefac = theta_E / max(0.000001, R)
+        # else:
+        #     prefac = jnp.empty_like(R)
+        #     r = R[R > 0]  # in the SIS regime
+        #     # instead of x[idx] = y, use x = x.at[idx].set(y)
+        #     prefac = prefac.at[R == 0].set(0)
+        #     prefac = prefac.at[R > 0].set(theta_E / r)
+        R = jnp.where(R < self._epsilon, self._epsilon, R)
+        prefac = theta_E / jnp.maximum(self._epsilon, R)
         f_xx = y_shift * y_shift * prefac
         f_yy = x_shift * x_shift * prefac
         f_xy = -x_shift * y_shift * prefac
