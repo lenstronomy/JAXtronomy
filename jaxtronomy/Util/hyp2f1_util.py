@@ -3,7 +3,6 @@
 import jax.numpy as jnp
 from jax import jit, lax
 from jax.scipy.special import gamma
-from functools import partial
 
 # TODO: The analytic continuation formula used in hyp2f1_continuation only works
 #       whenever b - a is not an integer. Additionally, hyp2f1_near_one only works
@@ -11,7 +10,6 @@ from functools import partial
 #       for these situations.
 
 
-#@partial(jit, static_argnums=4)
 def hyp2f1_series(a, b, c, z, nmax=75):
     """This computation uses the well known relation between successive terms in the
     hypergeometric series hyp2f1(z) = sum_i A_i where.
