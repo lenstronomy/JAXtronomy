@@ -1,5 +1,3 @@
-import numpy as np
-import numpy.testing as npt
 import pytest
 from scipy.special import hyp2f1 as hyp2f1_ref
 
@@ -7,9 +5,9 @@ import jax
 
 jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 import jax.numpy as jnp
-from jax import jit
 from jaxtronomy.Util.hyp2f1_util import (
-    hyp2f1,
+    hyp2f1_scalar,
+    hyp2f1_array,
     hyp2f1_series,
     hyp2f1_near_one,
     hyp2f1_continuation,
@@ -45,6 +43,7 @@ def test_hyp2f1_series():
     assert jnp.allclose(
         result, result_ref
     ), "hyp2f1_series result does not match scipy result"
+    assert result.ndim == 0
 
 
 def test_hyp2f1_near_one():
@@ -117,26 +116,26 @@ def test_hyp2f1():
     x = jnp.array([-0.8, 1.3, 0.6, -1.6])
     y = jnp.array([0.3, 0.1, 0.6, -2.2])
     z = x + y * 1j
-    result = hyp2f1(a, b, c, z)
+    result = hyp2f1_array(a, b, c, z)
     result_ref = hyp2f1_ref(a, b, c, z)
     assert jnp.allclose(result, result_ref), "hyp2f1 result does not match scipy result"
 
     # Points that are problematic for specific cases should not be
     # problematic here in the general case
     z = jnp.array([1.01 + 0.0001j, 0.05 + 0.001j, 0.99 + 0.001j])
-    result = hyp2f1(a, b, c, z)
+    result = hyp2f1_array(a, b, c, z)
     result_ref = hyp2f1_ref(a, b, c, z)
     assert jnp.allclose(result, result_ref), "hyp2f1 result does not match scipy result"
 
     # Supports list inputs
     z = [0.605 + 0.65j, 0.609 + 0.65j, 0.6072 + 0.0651j]
-    result = hyp2f1(a, b, c, z)
+    result = hyp2f1_array(a, b, c, z)
     result_ref = hyp2f1_ref(a, b, c, z)
     assert jnp.allclose(result, result_ref), "hyp2f1 result does not match scipy result"
 
     # Tests to see if the value above the branch cut is taken
     # Also supports scalar inputs
     z = 3.0 + 0.0j
-    result = hyp2f1(a, b, c, z)
+    result = hyp2f1_scalar(a, b, c, z)
     result_ref = hyp2f1_ref(a, b, c, z)
     assert jnp.allclose(result, result_ref), "hyp2f1 result does not match scipy result"

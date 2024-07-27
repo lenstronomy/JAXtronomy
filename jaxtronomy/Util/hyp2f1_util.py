@@ -10,7 +10,6 @@ from jax.scipy.special import gamma
 #       for these situations.
 
 
-@jit
 def hyp2f1_series(a, b, c, z, nmax=75):
     """This computation uses the well known relation between successive terms in the
     hypergeometric series hyp2f1(z) = sum_i A_i where.
@@ -26,9 +25,7 @@ def hyp2f1_series(a, b, c, z, nmax=75):
     series representation of 2F1 diverges and analytic continuation must
     be used.
     """
-    # Allows for lists and scalars to be input as z
     z = jnp.asarray(z)
-    z = jnp.atleast_1d(z)
 
     # Set the first term of the series, A_0 = 1
     A_i = 1.0 * jnp.ones_like(z)
@@ -62,9 +59,7 @@ def hyp2f1_continuation(a, b, c, z, nmax=75):
     Due to the presence of gamma(b - a) and gamma(a - b), there will always
     be a pole whenever b - a is an integer.
     """
-    # Allows for lists and scalars to be input as z
     z = jnp.asarray(z)
-    z = jnp.atleast_1d(z)
 
     # d0 = 1 and d_{-1} = 0
     prev_da = 1.0
@@ -152,9 +147,7 @@ def hyp2f1_near_one(a, b, c, z, nmax=75):
     whenever c - a - b is an integer, one of the two terms will have
     a pole
     """
-    # Allows for lists and scalars to be input as z
     z = jnp.asarray(z)
-    z = jnp.atleast_1d(z)
 
     # The branch cut for the hypergeometric function is on Re(z) >= 1, Im(z) = 0
     # If z is on the branch cut, take the value above the branch cut
@@ -181,17 +174,16 @@ def hyp2f1_near_one(a, b, c, z, nmax=75):
 
 
 @jit
-def hyp2f1(a, b, c, z, nmax=75):
+def hyp2f1_scalar(a, b, c, z, nmax=75):
     """This function looks at where z is located on the complex plane and chooses the
     appropriate hyp2f1 function to use in the interest of maintaining optimal runtime
     and accuracy.
 
     If the user already knows which hyp2f1 function to use, this step can be skipped and
-    the user can directly call the appropriate hyp2f1 function
+    the user can directly call the appropriate hyp2f1 function.
+
+    NOTE: This function ONLY works if input z is a scalar or 0d array.
     """
-    # Allows for lists and scalars to be input as z
-    z = jnp.asarray(z)
-    z = jnp.atleast_1d(z)
 
     # Case 0: Whenever |z| < 0.89, hyp2f1_series should be used
     # Case 1: Else if |1 - z| < 0.76, hyp2f1_near_one should be used
@@ -203,11 +195,37 @@ def hyp2f1(a, b, c, z, nmax=75):
 
     # If the input z is an array of values, each element needs to be
     # checked and its corresponding hyp2f1 evaluated individually
+    return lax.switch(case, hyp2f1_func, a, b, c, z, nmax)
+
+
+@jit
+def hyp2f1_array(a, b, c, z, nmax=75):
+    """This function looks at where z is located on the complex plane and chooses the
+    appropriate hyp2f1 function to use in the interest of maintaining optimal runtime
+    and accuracy.
+
+    If the user already knows which hyp2f1 function to use, this step can be skipped and
+    the user can directly call the appropriate hyp2f1 function
+
+    NOTE: This function ONLY works if input z is an array with more than 0 dimensions.
+    """
+    z = jnp.asarray(z)
+
+    # Case 0: Whenever |z| < 0.89, hyp2f1_series should be used
+    # Case 1: Else if |1 - z| < 0.76, hyp2f1_near_one should be used
+    # Case 2: Else, use analytic continuation
+    # A visual representation of these regions can be found at
+    # https://www.desmos.com/calculator/1sympxth2t
+    case = jnp.where(jnp.abs(z) < 0.89, 0, jnp.where(jnp.abs(1.0 - z) < 0.76, 1, 2))
+    hyp2f1_func = [hyp2f1_series, hyp2f1_near_one, hyp2f1_continuation]
+
+    # Since the input z is an array of values, each element needs to be
+    # checked and its corresponding hyp2f1 evaluated individually
     def body_fun(i, val):
         ith_result = lax.switch(
             case.at[i].get(), hyp2f1_func, a, b, c, z.at[i].get(), nmax
         )
-        val = val.at[i].set(ith_result.at[0].get())
+        val = val.at[i].set(ith_result)
         return val
 
     return lax.fori_loop(0, jnp.size(z), body_fun, jnp.zeros_like(z))

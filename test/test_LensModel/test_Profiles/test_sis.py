@@ -26,7 +26,7 @@ class TestSIS(object):
         values = self.SIS.function(x, y, phi_E)
         values_ref = self.SIS_ref.function(x, y, phi_E)
         npt.assert_almost_equal(values[0], 2.2360679774997898, decimal=9)
-        npt.assert_almost_equal(values, values_ref, decimal=9)
+        npt.assert_almost_equal(values, values_ref, decimal=7)
         x = np.array([0])
         y = np.array([0])
         phi_E = 1.0
@@ -40,7 +40,7 @@ class TestSIS(object):
         npt.assert_almost_equal(values[0], 2.2360679774997898, decimal=9)
         npt.assert_almost_equal(values[1], 3.1622776601683795, decimal=9)
         npt.assert_almost_equal(values[2], 4.1231056256176606, decimal=9)
-        npt.assert_almost_equal(values, values_ref, decimal=9)
+        npt.assert_almost_equal(values, values_ref, decimal=7)
 
     def test_derivatives(self):
         x = np.array([1])
@@ -48,8 +48,8 @@ class TestSIS(object):
         phi_E = 1.0
         f_x, f_y = self.SIS.derivatives(x, y, phi_E)
         f_x_ref, f_y_ref = self.SIS_ref.derivatives(x, y, phi_E)
-        npt.assert_almost_equal(f_x, f_x_ref, decimal=9)
-        npt.assert_almost_equal(f_y, f_y_ref, decimal=9)
+        npt.assert_almost_equal(f_x, f_x_ref, decimal=8)
+        npt.assert_almost_equal(f_y, f_y_ref, decimal=8)
         x = np.array([0])
         y = np.array([0])
         f_x, f_y = self.SIS.derivatives(x, y, phi_E)

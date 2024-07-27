@@ -1,11 +1,14 @@
 __author__ = "sibirrer"
 
 
-from jaxtronomy.LensModel.Profiles.p_jaffe_ellipse import PJaffe_Ellipse
-from lenstronomy.LensModel.Profiles.p_jaffe_ellipse import (
-    PJaffe_Ellipse as PJaffe_Ellipse_ref,
+from jaxtronomy.LensModel.Profiles.pseudo_jaffe_ellipse_potential import (
+    PseudoJaffeEllipsePotential,
+)
+from lenstronomy.LensModel.Profiles.pseudo_jaffe_ellipse_potential import (
+    PseudoJaffeEllipsePotential as PJaffe_Ellipse_ref,
 )
 import jaxtronomy.Util.param_util as param_util
+import lenstronomy.Util.param_util as param_util_ref
 
 import numpy as np
 import numpy.testing as npt
@@ -20,7 +23,7 @@ class TestP_JAFFW(object):
     """Tests the Gaussian methods."""
 
     def setup_method(self):
-        self.profile = PJaffe_Ellipse()
+        self.profile = PseudoJaffeEllipsePotential()
         self.profile_ref = PJaffe_Ellipse_ref()
 
     def test_function(self):
@@ -33,6 +36,7 @@ class TestP_JAFFW(object):
         values = self.profile.function(
             x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0
         )
+        e1, e2 = param_util_ref.phi_q2_ellipticity(phi_G, q)
         values_ref = self.profile_ref.function(
             x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0
         )
@@ -68,6 +72,7 @@ class TestP_JAFFW(object):
         f_x, f_y = self.profile.derivatives(
             x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0
         )
+        e1, e2 = param_util_ref.phi_q2_ellipticity(phi_G, q)
         f_x_ref, f_y_ref = self.profile_ref.derivatives(
             x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0
         )
@@ -106,6 +111,7 @@ class TestP_JAFFW(object):
         f_xx, f_xy, f_yx, f_yy = self.profile.hessian(
             x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0
         )
+        e1, e2 = param_util_ref.phi_q2_ellipticity(phi_G, q)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
             x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0
         )

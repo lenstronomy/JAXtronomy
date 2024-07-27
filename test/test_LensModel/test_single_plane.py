@@ -27,8 +27,8 @@ class TestLensModel(object):
     """Tests the source model routines."""
 
     def setup_method(self):
-        self.lensModel = SinglePlane(["GAUSSIAN"])
-        self.lensModel_ref = SinglePlane_ref(["GAUSSIAN"])
+        self.lensModel = SinglePlane(["GAUSSIAN_POTENTIAL"])
+        self.lensModel_ref = SinglePlane_ref(["GAUSSIAN_POTENTIAL"])
 
         self.kwargs = [
             {
@@ -90,8 +90,8 @@ class TestLensModel(object):
         assert delta_y == delta_y_ref
 
     def test_mass_2d(self):
-        lensModel = SinglePlane(["GAUSSIAN_KAPPA"])
-        lensModel_ref = SinglePlane_ref(["GAUSSIAN_KAPPA"])
+        lensModel = SinglePlane(["GAUSSIAN"])
+        lensModel_ref = SinglePlane_ref(["GAUSSIAN"])
         kwargs = [{"amp": 1.0, "sigma": 2.0, "center_x": 0.0, "center_y": 0.0}]
         output = lensModel.mass_2d(r=1, kwargs=kwargs)
         output_ref = lensModel_ref.mass_2d(r=1, kwargs=kwargs)
@@ -177,7 +177,7 @@ class TestLensModel(object):
             "SHEAR_GAMMA_PSI",
             "CURVED_ARC_CONST",
             "NFW_MC",
-            "NFW_MC_ELLIPSE",
+            "NFW_MC_ELLIPSE_POTENTIAL",
             "ARC_PERT",
             "MULTIPOLE",
             "CURVED_ARC_SPP",
@@ -193,7 +193,7 @@ class TestLensModel(object):
             "BLANK_PLANE",
             "CHAMELEON",
             "CNFW",
-            "CNFW_ELLIPSE",
+            "CNFW_ELLIPSE_POTENTIAL",
             "CONST_MAG",
             "CONVERGENCE",
             "coreBURKERT",
@@ -225,10 +225,10 @@ class TestLensModel(object):
             "GAUSSIAN",
             "GAUSSIAN_ELLIPSE_KAPPA",
             "GAUSSIAN_ELLIPSE_POTENTIAL",
-            "GAUSSIAN_KAPPA",
+            "GAUSSIAN_POTENTIAL",
             "GNFW",
             "HERNQUIST",
-            "HERNQUIST_ELLIPSE",
+            "HERNQUIST_ELLIPSE_POTENTIAL",
             "HERNQUIST_ELLIPSE_CSE",
             "HESSIAN",
             "INTERPOL",
@@ -237,14 +237,14 @@ class TestLensModel(object):
             # "LOS", # can't use SinglePlane
             # "LOS_MINIMAL", # can't use SinglePlane
             "MULTIPOLE",
-            "MULTI_GAUSSIAN_KAPPA",
-            "MULTI_GAUSSIAN_KAPPA_ELLIPSE",
+            "MULTI_GAUSSIAN",
+            "MULTI_GAUSSIAN_ELLIPSE_POTENTIAL",
             "NFW",
-            "NFW_ELLIPSE",
+            "NFW_ELLIPSE_POTENTIAL",
             "NFW_ELLIPSE_CSE",
             "NFW_ELLIPSE_GAUSS_DEC",
             "NFW_MC",
-            "NFW_MC_ELLIPSE",
+            "NFW_MC_ELLIPSE_POTENTIAL",
             "NIE",
             "NIE_POTENTIAL",
             "NIE_SIMPLE",
@@ -271,7 +271,7 @@ class TestLensModel(object):
             "TABULATED_DEFLECTIONS",
             "TNFW",
             "TNFWC",
-            "TNFW_ELLIPSE",
+            "TNFW_ELLIPSE_POTENTIAL",
             "TRIPLE_CHAMELEON",
             "ULDM",
             "EPL_MULTIPOLE_M3M4",
