@@ -183,7 +183,7 @@ def hyp2f1_scalar(a, b, c, z, nmax=75):
     If the user already knows which hyp2f1 function to use, this step can be skipped and
     the user can directly call the appropriate hyp2f1 function.
     
-    IMPORT NOTE: This function ONLY works if input z is a scalar.
+    NOTE: This function ONLY works if input z is a scalar or 0d array.
     """
 
     # Case 0: Whenever |z| < 0.89, hyp2f1_series should be used
@@ -208,7 +208,7 @@ def hyp2f1_array(a, b, c, z, nmax=75):
     If the user already knows which hyp2f1 function to use, this step can be skipped and
     the user can directly call the appropriate hyp2f1 function
 
-    IMPORTANT NOTE: This function ONLY works if input z is an array.
+    NOTE: This function ONLY works if input z is an array with more than 0 dimensions.
     """
     z = jnp.asarray(z)
 
