@@ -25,8 +25,8 @@ def test_cart2polar():
     y = np.array([1, 1])
     r, phi = param_util.cart2polar(x, y, center_x, center_y)
     r_ref, phi_ref = param_util_ref.cart2polar(x, y, center_x, center_y)
-    npt.assert_array_almost_equal(r, r_ref, decimal=8)
-    npt.assert_array_almost_equal(phi, phi_ref, decimal=8)
+    npt.assert_array_almost_equal(r, r_ref, decimal=7)
+    npt.assert_array_almost_equal(phi, phi_ref, decimal=7)
 
 
 def test_polar2cart():

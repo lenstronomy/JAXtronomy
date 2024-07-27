@@ -21,7 +21,7 @@ class TestLensModel(object):
     """Tests the source model routines."""
 
     def setup_method(self):
-        self.lensModel = LensModel(["GAUSSIAN"])
+        self.lensModel = LensModel(["GAUSSIAN_POTENTIAL"])
         self.kwargs = [
             {
                 "amp": 1.0,
@@ -35,7 +35,7 @@ class TestLensModel(object):
     def test_init(self):
         lens_model_list = [  # NH: removing non-jaxxed profiles for now
             "PJAFFE",
-            "PJAFFE_ELLIPSE",
+            "PJAFFE_ELLIPSE_POTENTIAL",
         ]
 
         lensModel = LensModel(lens_model_list)

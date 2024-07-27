@@ -35,10 +35,10 @@ class TestSinglePlaneLOS(object):
     """
 
     def setup_method(self):
-        self.lensModel = SinglePlane(["GAUSSIAN"])
-        self.lensModel_los = SinglePlaneLOS(["GAUSSIAN", "LOS"], index_los=1)
+        self.lensModel = SinglePlane(["GAUSSIAN_POTENTIAL"])
+        self.lensModel_los = SinglePlaneLOS(["GAUSSIAN_POTENTIAL", "LOS"], index_los=1)
         self.lensModel_minimal = SinglePlaneLOS(
-            ["GAUSSIAN", "LOS_MINIMAL"], index_los=1
+            ["GAUSSIAN_POTENTIAL", "LOS_MINIMAL"], index_los=1
         )
         self.kwargs = {
             "amp": 1.0,
@@ -121,10 +121,10 @@ class TestSinglePlaneLOS(object):
     def test_mass_2d(self):
         mass_kwargs = {"amp": 1.0, "sigma": 2.0, "center_x": 0.0, "center_y": 0.0}
 
-        lensModel = SinglePlane(["GAUSSIAN_KAPPA"])
-        lensModel_los = SinglePlaneLOS(["GAUSSIAN_KAPPA", "LOS"], index_los=1)
+        lensModel = SinglePlane(["GAUSSIAN"])
+        lensModel_los = SinglePlaneLOS(["GAUSSIAN", "LOS"], index_los=1)
         lensModel_minimal = SinglePlaneLOS(
-            ["GAUSSIAN_KAPPA", "LOS_MINIMAL"], index_los=1
+            ["GAUSSIAN", "LOS_MINIMAL"], index_los=1
         )
 
         output = lensModel.mass_2d(r=1, kwargs=[mass_kwargs])
@@ -139,10 +139,10 @@ class TestSinglePlaneLOS(object):
     def test_mass_3d(self):
         mass_kwargs = {"amp": 1.0, "sigma": 2.0, "center_x": 0.0, "center_y": 0.0}
 
-        lensModel = SinglePlane(["GAUSSIAN_KAPPA"])
-        lensModel_los = SinglePlaneLOS(["GAUSSIAN_KAPPA", "LOS"], index_los=1)
+        lensModel = SinglePlane(["GAUSSIAN"])
+        lensModel_los = SinglePlaneLOS(["GAUSSIAN", "LOS"], index_los=1)
         lensModel_minimal = SinglePlaneLOS(
-            ["GAUSSIAN_KAPPA", "LOS_MINIMAL"], index_los=1
+            ["GAUSSIAN", "LOS_MINIMAL"], index_los=1
         )
 
         output = lensModel.mass_3d(r=1, kwargs=[mass_kwargs])
