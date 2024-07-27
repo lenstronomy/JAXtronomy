@@ -1,5 +1,3 @@
-import numpy as np
-import numpy.testing as npt
 import pytest
 from scipy.special import hyp2f1 as hyp2f1_ref
 
@@ -7,7 +5,6 @@ import jax
 
 jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 import jax.numpy as jnp
-from jax import jit
 from jaxtronomy.Util.hyp2f1_util import (
     hyp2f1_scalar,
     hyp2f1_array,
