@@ -123,9 +123,7 @@ class TestSinglePlaneLOS(object):
 
         lensModel = SinglePlane(["GAUSSIAN"])
         lensModel_los = SinglePlaneLOS(["GAUSSIAN", "LOS"], index_los=1)
-        lensModel_minimal = SinglePlaneLOS(
-            ["GAUSSIAN", "LOS_MINIMAL"], index_los=1
-        )
+        lensModel_minimal = SinglePlaneLOS(["GAUSSIAN", "LOS_MINIMAL"], index_los=1)
 
         output = lensModel.mass_2d(r=1, kwargs=[mass_kwargs])
         output_los = lensModel_los.mass_2d(r=1, kwargs=[mass_kwargs, self.los_kwargs])
@@ -141,9 +139,7 @@ class TestSinglePlaneLOS(object):
 
         lensModel = SinglePlane(["GAUSSIAN"])
         lensModel_los = SinglePlaneLOS(["GAUSSIAN", "LOS"], index_los=1)
-        lensModel_minimal = SinglePlaneLOS(
-            ["GAUSSIAN", "LOS_MINIMAL"], index_los=1
-        )
+        lensModel_minimal = SinglePlaneLOS(["GAUSSIAN", "LOS_MINIMAL"], index_los=1)
 
         output = lensModel.mass_3d(r=1, kwargs=[mass_kwargs])
         output_los = lensModel_los.mass_3d(r=1, kwargs=[mass_kwargs, self.los_kwargs])

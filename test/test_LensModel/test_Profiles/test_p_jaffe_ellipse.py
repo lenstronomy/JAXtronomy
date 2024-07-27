@@ -1,7 +1,9 @@
 __author__ = "sibirrer"
 
 
-from jaxtronomy.LensModel.Profiles.pseudo_jaffe_ellipse_potential import PseudoJaffeEllipsePotential
+from jaxtronomy.LensModel.Profiles.pseudo_jaffe_ellipse_potential import (
+    PseudoJaffeEllipsePotential,
+)
 from lenstronomy.LensModel.Profiles.pseudo_jaffe_ellipse_potential import (
     PseudoJaffeEllipsePotential as PJaffe_Ellipse_ref,
 )

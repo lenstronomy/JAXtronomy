@@ -172,6 +172,7 @@ def hyp2f1_near_one(a, b, c, z, nmax=75):
     )
     return term1 + term2
 
+
 @jit
 def hyp2f1_scalar(a, b, c, z, nmax=75):
     """This function looks at where z is located on the complex plane and chooses the
@@ -180,7 +181,7 @@ def hyp2f1_scalar(a, b, c, z, nmax=75):
 
     If the user already knows which hyp2f1 function to use, this step can be skipped and
     the user can directly call the appropriate hyp2f1 function.
-    
+
     NOTE: This function ONLY works if input z is a scalar or 0d array.
     """
 
