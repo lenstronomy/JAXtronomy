@@ -46,6 +46,7 @@ def test_hyp2f1_series():
     assert jnp.allclose(
         result, result_ref
     ), "hyp2f1_series result does not match scipy result"
+    assert result.ndim == 0
 
 
 def test_hyp2f1_near_one():
