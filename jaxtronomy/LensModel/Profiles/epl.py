@@ -345,7 +345,7 @@ class EPLMajorAxis(LensProfileBase):
         alpha_imag = jnp.nan_to_num(alpha.imag, posinf=10**10, neginf=-(10**10))
 
         return alpha_real, alpha_imag
-    
+
     @jit
     def hessian(self, x, y, b, t, q):
         """Hessian matrix of the lensing potential.
@@ -484,7 +484,9 @@ class EPLQPhi(LensProfileBase):
         """
         return self._EPL.density_lens(r, theta_E, gamma)
 
+
 from jax import tree_util
-tree_util.register_pytree_node(EPLMajorAxis,
-                               EPLMajorAxis._tree_flatten,
-                               EPLMajorAxis._tree_unflatten)
+
+tree_util.register_pytree_node(
+    EPLMajorAxis, EPLMajorAxis._tree_flatten, EPLMajorAxis._tree_unflatten
+)

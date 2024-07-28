@@ -4,14 +4,14 @@ import jax
 import numpy.testing as npt
 import numpy as np
 import pytest
-from lenstronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver as LensEquationSolver_ref
+from lenstronomy.LensModel.Solver.lens_equation_solver import (
+    LensEquationSolver as LensEquationSolver_ref,
+)
 from jaxtronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver
 from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
 from jaxtronomy.LensModel.lens_model import LensModel
 
 jax.config.update("jax_enable_x64", True)
-
-
 """
 NOTE: Trying to test the lens equation solver for profiles that have not yet been
 jaxified can lead to errors, as the profiles will be automatically ported from
@@ -20,6 +20,7 @@ is not compatible with the jnp arrays used in the jaxified lens equation solver.
 Thus, cross-tests between lenstronomy and jaxtronomy should only be done
 using profiles that have been jaxified.
 """
+
 
 class TestLensEquationSolver(object):
     def setup_method(self):
@@ -71,7 +72,6 @@ class TestLensEquationSolver(object):
         npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
         npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
 
-
     def test_pjaffe(self):
         lens_model_list = ["PJAFFE"]
         lensModel = LensModel(lens_model_list)
@@ -83,13 +83,7 @@ class TestLensEquationSolver(object):
         min_distance = 0.01
         search_window = 10
         kwargs_lens = [
-            {
-                "sigma0": 1.0,
-                "Ra": 0.5, 
-                "Rs": 0.8,
-                "center_x": -0.32,
-                "center_y": 0.17
-            }
+            {"sigma0": 1.0, "Ra": 0.5, "Rs": 0.8, "center_x": -0.32, "center_y": 0.17}
         ]
         x_pos, y_pos = lensEquationSolver.image_position_from_source(
             sourcePos_x,
@@ -111,8 +105,6 @@ class TestLensEquationSolver(object):
         )
         npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
         npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
-
-
 
 
 if __name__ == "__main__":

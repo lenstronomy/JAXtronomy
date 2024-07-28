@@ -11,6 +11,7 @@ import unittest
 
 jax.config.update("jax_enable_x64", True)
 
+
 def test_rotate():
     x = np.array([0, 1, 2, 10])
     y = np.array([3, 2, 1, 8])
