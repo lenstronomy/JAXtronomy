@@ -5,6 +5,7 @@
 __author__ = "ntessore"
 
 import jax
+from jax import jit
 import jax.numpy as jnp
 import jaxtronomy.Util.util as util
 import jaxtronomy.Util.param_util as param_util
@@ -265,6 +266,23 @@ class EPLMajorAxis(LensProfileBase):
     def __init__(self):
         super(EPLMajorAxis, self).__init__()
 
+    # --------------------------------------------------------------------------------
+    # The following two methods are required to allow the JAX compiler to recognize
+    # this class. Methods involving the self variable can be jit-decorated.
+    # Class methods will need to be recompiled each time a variable in the aux_data
+    # changes
+    def _tree_flatten(self):
+        children = ()
+        aux_data = {}
+        return (children, aux_data)
+
+    @classmethod
+    def _tree_unflatten(cls, aux_data, children):
+        return cls(*children, **aux_data)
+
+    # --------------------------------------------------------------------------------
+
+    @jit
     def function(self, x, y, b, t, q):
         """Returns the lensing potential.
 
@@ -283,7 +301,9 @@ class EPLMajorAxis(LensProfileBase):
 
         return psi
 
-    def derivatives(self, x, y, b, t, q):
+    @staticmethod
+    @jit
+    def derivatives(x, y, b, t, q):
         """Returns the deflection angles.
 
         :param x: x-coordinate in image plane relative to center (major axis)
@@ -325,7 +345,8 @@ class EPLMajorAxis(LensProfileBase):
         alpha_imag = jnp.nan_to_num(alpha.imag, posinf=10**10, neginf=-(10**10))
 
         return alpha_real, alpha_imag
-
+    
+    @jit
     def hessian(self, x, y, b, t, q):
         """Hessian matrix of the lensing potential.
 
@@ -462,3 +483,8 @@ class EPLQPhi(LensProfileBase):
         :return: mass enclosed a 3D radius r
         """
         return self._EPL.density_lens(r, theta_E, gamma)
+
+from jax import tree_util
+tree_util.register_pytree_node(EPLMajorAxis,
+                               EPLMajorAxis._tree_flatten,
+                               EPLMajorAxis._tree_unflatten)
