@@ -545,6 +545,7 @@ class LensEquationSolver(object):
             image_plane_vector,
             subkey,
         ]
+        
         x_new, y_new, delta_new, iter_num, x_guess, y_guess, delta_init, _, _, _ = (
             lax.while_loop(cond_fun, keep_guessing, init_val)
         )
