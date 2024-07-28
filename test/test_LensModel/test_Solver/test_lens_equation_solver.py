@@ -7,7 +7,10 @@ import pytest
 from lenstronomy.LensModel.Solver.lens_equation_solver import (
     LensEquationSolver as LensEquationSolver_ref,
 )
-from jaxtronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver, analytical_lens_model_support
+from jaxtronomy.LensModel.Solver.lens_equation_solver import (
+    LensEquationSolver,
+    analytical_lens_model_support,
+)
 from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
 from jaxtronomy.LensModel.lens_model import LensModel
 
@@ -39,7 +42,7 @@ class TestLensEquationSolver(object):
         min_distance = 0.01
         search_window = 10
         gamma = 1.9
-        kwargs_epl ={
+        kwargs_epl = {
             "theta_E": 1.0,
             "gamma": gamma,
             "e1": 0.2,
@@ -62,7 +65,7 @@ class TestLensEquationSolver(object):
                 num_iter_max=100,
                 initial_guess_cut=True,
                 magnification_limit=0.01,
-                verbose=True
+                verbose=True,
             )
             x_pos_ref, y_pos_ref = lensEquationSolver_ref.image_position_from_source(
                 sourcePos_x,
