@@ -10,7 +10,7 @@ TODO: Import jaxified version of everything else
 from lenstronomy.Util.package_util import exporter
 import jax.numpy as jnp
 from jax import jit
-from lenstronomy.Util.util import make_grid, local_minima_2d
+from lenstronomy.Util.util import make_grid, local_minima_2d, selectBest
 
 export, __all__ = exporter()
 
