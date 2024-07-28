@@ -60,7 +60,7 @@ class TestLensEquationSolver(object):
             precision_limit=10 ** (-10),
             num_iter_max=100,
             initial_guess_cut=True,
-            magnification_limit=0.01
+            magnification_limit=0.01,
         )
         x_pos_ref, y_pos_ref = lensEquationSolver_ref.image_position_from_source(
             sourcePos_x,
@@ -71,7 +71,7 @@ class TestLensEquationSolver(object):
             precision_limit=10 ** (-10),
             num_iter_max=100,
             initial_guess_cut=True,
-            magnification_limit=0.01
+            magnification_limit=0.01,
         )
         npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
         npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
@@ -86,7 +86,7 @@ class TestLensEquationSolver(object):
             num_iter_max=100,
             initial_guess_cut=True,
             magnification_limit=0.01,
-            solver="analytical"
+            solver="analytical",
         )
         x_pos_ref, y_pos_ref = lensEquationSolver_ref.image_position_from_source(
             sourcePos_x,
@@ -98,7 +98,7 @@ class TestLensEquationSolver(object):
             num_iter_max=100,
             initial_guess_cut=True,
             magnification_limit=0.01,
-            solver="analytical"
+            solver="analytical",
         )
         npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
         npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
