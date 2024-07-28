@@ -58,6 +58,8 @@ class TestLensEquationSolver(object):
             search_window=search_window,
             precision_limit=10 ** (-10),
             num_iter_max=100,
+            initial_guess_cut=True,
+            magnification_limit=0.01
         )
         x_pos_ref, y_pos_ref = lensEquationSolver_ref.image_position_from_source(
             sourcePos_x,
@@ -67,6 +69,54 @@ class TestLensEquationSolver(object):
             search_window=search_window,
             precision_limit=10 ** (-10),
             num_iter_max=100,
+            initial_guess_cut=True,
+            magnification_limit=0.01
+        )
+        npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
+        npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
+
+        x_pos, y_pos = lensEquationSolver.image_position_from_source(
+            sourcePos_x,
+            sourcePos_y,
+            kwargs_lens,
+            min_distance=min_distance,
+            search_window=search_window,
+            precision_limit=10 ** (-10),
+            num_iter_max=100,
+            initial_guess_cut=True,
+            magnification_limit=0.01,
+            solver="analytical"
+        )
+        x_pos_ref, y_pos_ref = lensEquationSolver_ref.image_position_from_source(
+            sourcePos_x,
+            sourcePos_y,
+            kwargs_lens,
+            min_distance=min_distance,
+            search_window=search_window,
+            precision_limit=10 ** (-10),
+            num_iter_max=100,
+            initial_guess_cut=True,
+            magnification_limit=0.01,
+            solver="analytical"
+        )
+        npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
+        npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
+
+        x_pos, y_pos = lensEquationSolver.findBrightImage(
+            sourcePos_x,
+            sourcePos_y,
+            kwargs_lens,
+            numImages=4,
+            min_distance=0.01,
+            search_window=5,
+        )
+        x_pos_ref, y_pos_ref = lensEquationSolver_ref.findBrightImage(
+            sourcePos_x,
+            sourcePos_y,
+            kwargs_lens,
+            numImages=4,
+            min_distance=0.01,
+            search_window=5,
         )
         npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
         npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)

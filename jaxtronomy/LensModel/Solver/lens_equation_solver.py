@@ -152,6 +152,8 @@ class LensEquationSolver(object):
                     "The number of regions that meet the plausibility criteria are %s"
                     % len(x_mins)
                 )
+            if len(x_mins) < 1:
+                return x_mins, y_mins
         x_mins = np.append(
             x_mins,
             np.random.uniform(
@@ -168,9 +170,6 @@ class LensEquationSolver(object):
                 size=num_random,
             ),
         )
-        
-        if len(x_mins) < 1:
-            return x_mins, y_mins
 
         # iterative solving of the lens equation for the selected grid points
         x_mins, y_mins, solver_precision = self._find_gradient_decent(
