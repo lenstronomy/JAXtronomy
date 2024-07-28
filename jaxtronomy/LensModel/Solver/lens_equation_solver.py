@@ -34,6 +34,7 @@ class LensEquationSolver(object):
             lenstronomy.LensModel.lens_model
         """
         self.lensModel = lensModel
+
     # --------------------------------------------------------------------------------
     # The following two methods are required to allow the JAX compiler to recognize
     # the LensEquationSolver class. Methods involving the self variable can be
@@ -41,7 +42,7 @@ class LensEquationSolver(object):
     # aux_data are changed
     def _tree_flatten(self):
         children = ()
-        aux_data = {'lensModel': self.lensModel}
+        aux_data = {"lensModel": self.lensModel}
         return (children, aux_data)
 
     @classmethod
@@ -195,7 +196,7 @@ class LensEquationSolver(object):
             y_mins = y_mins[mag >= magnification_limit]
         self.lensModel.set_dynamic()
         return x_mins, y_mins
-    
+
     def candidate_solutions(
         self,
         sourcePos_x,
@@ -295,7 +296,7 @@ class LensEquationSolver(object):
             y_mins = y_mins.at[i].set(y_guess)
             solver_precision = solver_precision.at[i].set(delta)
             return x_mins, y_mins, solver_precision
-        
+
         return lax.fori_loop(0, num_candidates, body_fun, init_val)
 
     @jit
@@ -331,19 +332,43 @@ class LensEquationSolver(object):
             gradient decent)
         """
         l = 0
-        x_mapped, y_mapped = self.lensModel.ray_shooting(
-            x_guess, y_guess, kwargs_lens)
+        x_mapped, y_mapped = self.lensModel.ray_shooting(x_guess, y_guess, kwargs_lens)
         delta = jnp.sqrt((x_mapped - source_x) ** 2 + (y_mapped - source_y) ** 2)
 
         # Determines whether to continue iterating through gradient descent
         def cond(val):
-            _, _, _, _, delta, _, precision_limit, l, num_iter_max, _, _, = val
-            return jnp.where(delta > precision_limit,
-                             jnp.where(l < num_iter_max, True, False), False)
-        
+            (
+                _,
+                _,
+                _,
+                _,
+                delta,
+                _,
+                precision_limit,
+                l,
+                num_iter_max,
+                _,
+                _,
+            ) = val
+            return jnp.where(
+                delta > precision_limit, jnp.where(l < num_iter_max, True, False), False
+            )
+
         # Finds the direction of negative gradient and makes a step in that direction
         def find_direction(val):
-            x_guess, y_guess, source_x, source_y, delta, kwargs_lens, precision_limit, l, num_iter_max, max_step, key = val
+            (
+                x_guess,
+                y_guess,
+                source_x,
+                source_y,
+                delta,
+                kwargs_lens,
+                precision_limit,
+                l,
+                num_iter_max,
+                max_step,
+                key,
+            ) = val
             x_mapped, y_mapped = self.lensModel.ray_shooting(
                 x_guess, y_guess, kwargs_lens
             )
@@ -356,8 +381,11 @@ class LensEquationSolver(object):
             deltaVec = jnp.array([x_mapped - source_x, y_mapped - source_y])
             image_plane_vector = DistMatrix.dot(deltaVec) / det
             dist = jnp.sqrt(image_plane_vector[0] ** 2 + image_plane_vector[1] ** 2)
-            image_plane_vector = jnp.where(dist > max_step,
-                image_plane_vector * max_step / dist, image_plane_vector)
+            image_plane_vector = jnp.where(
+                dist > max_step,
+                image_plane_vector * max_step / dist,
+                image_plane_vector,
+            )
             key, subkey = random.split(key)
             x_guess, y_guess, delta, l = self._gradient_step(
                 x_guess,
@@ -371,10 +399,38 @@ class LensEquationSolver(object):
                 num_iter_max,
                 subkey,
             )
-            return x_guess, y_guess, source_x, source_y, delta, kwargs_lens, precision_limit, l, num_iter_max, max_step, key
-            
-        x_guess, y_guess, _, _, delta, _, _, l, _, _, _ = lax.while_loop(cond, find_direction, (x_guess, y_guess, source_x, source_y, delta, kwargs_lens, precision_limit, l, num_iter_max, max_step, key))
-        
+            return (
+                x_guess,
+                y_guess,
+                source_x,
+                source_y,
+                delta,
+                kwargs_lens,
+                precision_limit,
+                l,
+                num_iter_max,
+                max_step,
+                key,
+            )
+
+        x_guess, y_guess, _, _, delta, _, _, l, _, _, _ = lax.while_loop(
+            cond,
+            find_direction,
+            (
+                x_guess,
+                y_guess,
+                source_x,
+                source_y,
+                delta,
+                kwargs_lens,
+                precision_limit,
+                l,
+                num_iter_max,
+                max_step,
+                key,
+            ),
+        )
+
         return x_guess, y_guess, delta, l
 
     @jit
@@ -419,37 +475,100 @@ class LensEquationSolver(object):
 
         # If new position is worse, and we haven't reached the iteration limit, try again in slightly different direction
         def cond_fun(val):
-            _, _, delta_new, iter_num, _, _, delta_init, num_iter_max, _, _, = val
-            return jnp.where(delta_new >= delta_init,
-                             jnp.where(iter_num <= num_iter_max, True, False), False)
-        
+            (
+                _,
+                _,
+                delta_new,
+                iter_num,
+                _,
+                _,
+                delta_init,
+                num_iter_max,
+                _,
+                _,
+            ) = val
+            return jnp.where(
+                delta_new >= delta_init,
+                jnp.where(iter_num <= num_iter_max, True, False),
+                False,
+            )
+
         def keep_guessing(val):
-            x_new, y_new, delta_new, iter_num, x_guess, y_guess, delta_init, num_iter_max, image_plane_vector, subkey = val
+            (
+                x_new,
+                y_new,
+                delta_new,
+                iter_num,
+                x_guess,
+                y_guess,
+                delta_init,
+                num_iter_max,
+                image_plane_vector,
+                subkey,
+            ) = val
 
             subkey, subsubkey = random.split(subkey)
-            image_plane_vector = 0.5 * jnp.multiply(image_plane_vector, random.normal(subsubkey, (2,)))
+            image_plane_vector = 0.5 * jnp.multiply(
+                image_plane_vector, random.normal(subsubkey, (2,))
+            )
             x_new = x_guess - image_plane_vector.at[0].get()
             y_new = y_guess - image_plane_vector.at[1].get()
 
             x_mapped, y_mapped = self.lensModel.ray_shooting(x_new, y_new, kwargs_lens)
-            delta_new = jnp.sqrt((x_mapped - source_x) ** 2 + (y_mapped - source_y) ** 2)
+            delta_new = jnp.sqrt(
+                (x_mapped - source_x) ** 2 + (y_mapped - source_y) ** 2
+            )
 
             iter_num += 1
-            return [x_new, y_new, delta_new, iter_num, x_guess, y_guess, delta_init, num_iter_max, image_plane_vector, subkey]
+            return [
+                x_new,
+                y_new,
+                delta_new,
+                iter_num,
+                x_guess,
+                y_guess,
+                delta_init,
+                num_iter_max,
+                image_plane_vector,
+                subkey,
+            ]
 
-        init_val = [x_new, y_new, delta_new, iter_num, x_guess, y_guess, delta_init, num_iter_max, image_plane_vector, subkey]
-        x_new, y_new, delta_new, iter_num, x_guess, y_guess, delta_init, _, _, _ = lax.while_loop(cond_fun, keep_guessing, init_val)
+        init_val = [
+            x_new,
+            y_new,
+            delta_new,
+            iter_num,
+            x_guess,
+            y_guess,
+            delta_init,
+            num_iter_max,
+            image_plane_vector,
+            subkey,
+        ]
+        x_new, y_new, delta_new, iter_num, x_guess, y_guess, delta_init, _, _, _ = (
+            lax.while_loop(cond_fun, keep_guessing, init_val)
+        )
 
         # Now that we've stopped iterating, we return either the new guess or the old guess
         # If we got a good new guess, return the new guess, otherwise return the initial guess
         def return_new(x_new, y_new, delta_new, iter_num, x_guess, y_guess, delta_init):
             return x_new, y_new, delta_new, iter_num
-        
+
         def return_old(x_new, y_new, delta_new, iter_num, x_guess, y_guess, delta_init):
             return x_guess, y_guess, delta_init, iter_num
-        
-        return lax.cond(delta_new < delta_init, return_new, return_old, x_new, y_new, delta_new, iter_num, x_guess, y_guess, delta_init)
 
+        return lax.cond(
+            delta_new < delta_init,
+            return_new,
+            return_old,
+            x_new,
+            y_new,
+            delta_new,
+            iter_num,
+            x_guess,
+            y_guess,
+            delta_init,
+        )
 
     def image_position_analytical(
         self,
@@ -523,7 +642,6 @@ class LensEquationSolver(object):
             x_mins = x_mins[mag >= magnification_limit]
             y_mins = y_mins[mag >= magnification_limit]
         return x_mins, y_mins
-
 
     def findBrightImage(
         self,
@@ -640,11 +758,12 @@ def analytical_lens_model_support(lens_model_list):
         return True
     else:
         return False
-    
+
 
 from jax import tree_util
-tree_util.register_pytree_node(LensEquationSolver,
-                               LensEquationSolver._tree_flatten,
-                               LensEquationSolver._tree_unflatten)
 
-
+tree_util.register_pytree_node(
+    LensEquationSolver,
+    LensEquationSolver._tree_flatten,
+    LensEquationSolver._tree_unflatten,
+)
