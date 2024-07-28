@@ -658,7 +658,6 @@ class LensEquationSolver(object):
         x_center=0,
         y_center=0,
         num_random=0,
-        non_linear=False,
         magnification_limit=None,
         initial_guess_cut=True,
         verbose=False,
@@ -699,7 +698,6 @@ class LensEquationSolver(object):
             x_center=x_center,
             y_center=y_center,
             num_random=num_random,
-            non_linear=non_linear,
             magnification_limit=magnification_limit,
         )
         mag_list = []
