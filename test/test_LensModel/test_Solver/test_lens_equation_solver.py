@@ -31,7 +31,7 @@ class TestLensEquationSolver(object):
         pass
 
     def test_epl(self):
-        lens_model_list = ["EPL"]
+        lens_model_list = ["EPL", "SHEAR", "CONVERGENCE"]
         lensModel = LensModel(lens_model_list)
         lensModel_ref = LensModel_ref(lens_model_list)
         lensEquationSolver = LensEquationSolver(lensModel)
@@ -47,7 +47,11 @@ class TestLensEquationSolver(object):
             "center_x": 0.1,
             "center_y": -0.1,
         }
-        kwargs_lens_list = [kwargs_epl]
+
+        gamma1, gamma2 = 0.1, 0.2
+        kwargs_shear = {"gamma1": gamma1, "gamma2": gamma2}
+        kwargs_convergence = {"kappa": 0.1}
+        kwargs_lens_list = [kwargs_epl, kwargs_shear, kwargs_convergence]
 
         sourcePos_x = 0.22
         sourcePos_y = -0.146
@@ -99,13 +103,6 @@ class TestLensEquationSolver(object):
         )
         npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
         npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
-
-        lens_model_list = ["EPL", "SHEAR", "CONVERGENCE"]
-
-        gamma1, gamma2 = 0.1, 0.2
-        kwargs_shear = {"gamma1": gamma1, "gamma2": gamma2}
-        kwargs_convergence = {"kappa": 0.1}
-        kwargs_lens_list = [kwargs_epl, kwargs_shear, kwargs_convergence]
 
         x_pos, y_pos = lensEquationSolver.image_position_from_source(
             sourcePos_x,
