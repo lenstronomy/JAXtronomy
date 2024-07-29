@@ -729,7 +729,7 @@ class LensEquationSolver(object):
 
         if len(x_mins) <= 1:
             return x_mins, y_mins
-        
+
         """
         TODO: Re-add this block of code when jaxtronomy implements multi plane support.
         if self.lensModel.multi_plane:
