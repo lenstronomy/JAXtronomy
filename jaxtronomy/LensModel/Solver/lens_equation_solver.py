@@ -141,9 +141,7 @@ class LensEquationSolver(object):
                 "There are %s regions identified that could contain a solution of the lens equation with"
                 "coordinates %s and %s " % (len(x_mins), x_mins, y_mins)
             )
-        if len(x_mins) < 1:
-            return x_mins, y_mins
-        if initial_guess_cut:
+        if initial_guess_cut and len(x_mins > 0):
             mag = np.abs(self.lensModel.magnification(x_mins, y_mins, kwargs_lens))
             mag[mag < 1] = 1
             x_mins = x_mins[delta_map <= min_distance * mag * 5]
@@ -153,8 +151,8 @@ class LensEquationSolver(object):
                     "The number of regions that meet the plausibility criteria are %s"
                     % len(x_mins)
                 )
-            if len(x_mins) < 1:
-                return x_mins, y_mins
+        if len(x_mins) < 1:
+            return x_mins, y_mins
         x_mins = np.append(
             x_mins,
             np.random.uniform(
@@ -731,11 +729,18 @@ class LensEquationSolver(object):
 
         if len(x_mins) <= 1:
             return x_mins, y_mins
+        
+        """
+        TODO: Re-add this block of code when jaxtronomy implements multi plane support.
         if self.lensModel.multi_plane:
             arrival_time = self.lensModel.arrival_time(x_mins, y_mins, kwargs_lens)
         else:
             fermat_pot = self.lensModel.fermat_potential(x_mins, y_mins, kwargs_lens)
             arrival_time = fermat_pot
+        """
+
+        fermat_pot = self.lensModel.fermat_potential(x_mins, y_mins, kwargs_lens)
+        arrival_time = fermat_pot
         idx = np.argsort(arrival_time)
         x_mins = np.array(x_mins)[idx]
         y_mins = np.array(y_mins)[idx]
