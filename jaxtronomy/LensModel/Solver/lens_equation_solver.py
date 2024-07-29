@@ -31,7 +31,7 @@ class LensEquationSolver(object):
         standard LensModel() class: def ray_shooting() def hessian() def magnification()
 
         :param lensModel: instance of a class according to
-            lenstronomy.LensModel.lens_model
+            jaxtronomy.LensModel.lens_model
         """
         self.lensModel = lensModel
 
@@ -60,8 +60,7 @@ class LensEquationSolver(object):
         :param sourcePos_x: source position in units of angle
         :param sourcePos_y: source position in units of angle
         :param kwargs_lens: lens model parameters as keyword arguments
-        :param solver: which solver to use, can be 'lenstronomy' (default), 'analytical'
-            or 'stochastic'.
+        :param solver: which solver to use, can be 'lenstronomy' (default) or 'analytical'
         :param kwargs: Any additional kwargs are passed to the chosen solver, see the
             documentation of image_position_lenstronomy, image_position_analytical and
             image_position_stochastic
@@ -698,11 +697,7 @@ class LensEquationSolver(object):
             num_random=num_random,
             magnification_limit=magnification_limit,
         )
-        mag_list = []
-        for i in range(len(x_mins)):
-            mag = self.lensModel.magnification(x_mins[i], y_mins[i], kwargs_lens)
-            mag_list.append(abs(mag))
-        mag_list = np.array(mag_list)
+        mag_list = np.abs(self.lensModel.magnification(x_mins, y_mins, kwargs_lens))
         x_mins_sorted = util.selectBest(x_mins, mag_list, numImages)
         y_mins_sorted = util.selectBest(y_mins, mag_list, numImages)
         if arrival_time_sort:
