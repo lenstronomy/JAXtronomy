@@ -653,13 +653,13 @@ class LensEquationSolver(object):
         min_distance=0.01,
         search_window=5,
         precision_limit=10 ** (-10),
-        num_iter_max=10,
+        num_iter_max=100,
         arrival_time_sort=True,
         x_center=0,
         y_center=0,
         num_random=0,
         magnification_limit=None,
-        initial_guess_cut=True,
+        initial_guess_cut=False,
         verbose=False,
     ):
         """
