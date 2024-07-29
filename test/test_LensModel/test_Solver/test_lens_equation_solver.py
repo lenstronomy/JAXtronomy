@@ -108,7 +108,6 @@ class TestLensEquationSolver(object):
         npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
         npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
 
-
     def test_epl_analytical_solver(self):
         lens_model_list = ["EPL", "SHEAR"]
         lensModel = LensModel(lens_model_list)
@@ -160,7 +159,7 @@ class TestLensEquationSolver(object):
         )
         npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
         npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
-        
+
         lens_model_list = ["EPL", "SHEAR", "CONVERGENCE"]
         lensModel = LensModel(lens_model_list)
         lensModel_ref = LensModel_ref(lens_model_list)
