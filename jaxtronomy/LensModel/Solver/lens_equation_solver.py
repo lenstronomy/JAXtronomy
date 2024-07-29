@@ -60,7 +60,8 @@ class LensEquationSolver(object):
         :param sourcePos_x: source position in units of angle
         :param sourcePos_y: source position in units of angle
         :param kwargs_lens: lens model parameters as keyword arguments
-        :param solver: which solver to use, can be 'lenstronomy' (default) or 'analytical'
+        :param solver: which solver to use, can be 'lenstronomy' (default) or
+            'analytical'
         :param kwargs: Any additional kwargs are passed to the chosen solver, see the
             documentation of image_position_lenstronomy, image_position_analytical and
             image_position_stochastic

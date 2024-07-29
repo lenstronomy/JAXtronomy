@@ -222,12 +222,14 @@ class TestLensEquationSolver(object):
         npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
         npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
 
-        npt.assert_raises(ValueError, lensEquationSolver.image_position_from_source,
+        npt.assert_raises(
+            ValueError,
+            lensEquationSolver.image_position_from_source,
             sourcePos_x,
             sourcePos_y,
             kwargs_lens,
             magnification_limit=0.01,
-            solver="analytical"
+            solver="analytical",
         )
 
 
