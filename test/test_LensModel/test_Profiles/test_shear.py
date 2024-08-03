@@ -92,6 +92,7 @@ class TestShearGammaPsi(object):
 
     def setup_method(self):
         self.sheargammapsi_ref = ShearGammaPsi_ref()
+        test_init = ShearGammaPsi()
 
     def test_function(self):
         x = np.array([1, 3, 4])
@@ -122,6 +123,7 @@ class TestShearReduced(object):
 
     def setup_method(self):
         self.shearreduced_ref = ShearReduced_ref()
+        test_init = ShearReduced()
 
     def test_kappa_reduced(self):
         x = np.array([1, 3, 4])
