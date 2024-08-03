@@ -74,10 +74,10 @@ def hyp2f1_continuation(a, b, c, z, nmax=75):
     sum_1 = 1.0 * jnp.ones_like(z)
     sum_2 = 1.0 * jnp.ones_like(z)
 
-    # The branch cut for the hypergeometric function is on Re(z) >= 1, Im(z) = 0
+    # The branch cut for this computation of hyp2f1 is on Re(z) >= 1, Im(z) = 0
     # If z is on the branch cut, take the value above the branch cut
     z = jnp.where(
-        jnp.imag(z) == 0.0, jnp.where(jnp.real(z) >= 1.0, z + 0.0000001j, z), z
+        jnp.imag(z) == 0.0, jnp.where(jnp.real(z) >= 1, z + 0.0000001j, z), z
     )
 
     def body_fun(j, val):
@@ -138,10 +138,9 @@ def hyp2f1_continuation(a, b, c, z, nmax=75):
 @jit
 def hyp2f1_near_one(a, b, c, z, nmax=75):
     """This implementation is based off of equation 15.3.6 in Abramowitz and Stegun.
-    This transformation formula allows for a calculation.
-
-    of hyp2f1 for points near z = 1 (where other iterative computation
-    schemes converge slowly) by transforming z to 1 - z
+    This transformation formula allows for a calculation of hyp2f1 for points near 
+    z = 1 (where other iterative computation schemes converge slowly) by 
+    transforming z to 1 - z.
 
     However, due to the presence of gamma(c - a - b) and gamma(a + b - c),
     whenever c - a - b is an integer, one of the two terms will have
@@ -172,44 +171,20 @@ def hyp2f1_near_one(a, b, c, z, nmax=75):
     )
     return term1 + term2
 
-
 @jit
-def hyp2f1_scalar(a, b, c, z, nmax=75):
+def hyp2f1(a, b, c, z, nmax=75):
     """This function looks at where z is located on the complex plane and chooses the
     appropriate hyp2f1 function to use in the interest of maintaining optimal runtime
     and accuracy.
 
     If the user already knows which hyp2f1 function to use, this step can be skipped and
-    the user can directly call the appropriate hyp2f1 function.
-
-    NOTE: This function ONLY works if input z is a scalar or 0d array.
-    """
-
-    # Case 0: Whenever |z| < 0.89, hyp2f1_series should be used
-    # Case 1: Else if |1 - z| < 0.76, hyp2f1_near_one should be used
-    # Case 2: Else, use analytic continuation
-    # A visual representation of these regions can be found at
-    # https://www.desmos.com/calculator/1sympxth2t
-    case = jnp.where(jnp.abs(z) < 0.89, 0, jnp.where(jnp.abs(1.0 - z) < 0.76, 1, 2))
-    hyp2f1_func = [hyp2f1_series, hyp2f1_near_one, hyp2f1_continuation]
-
-    # If the input z is an array of values, each element needs to be
-    # checked and its corresponding hyp2f1 evaluated individually
-    return lax.switch(case, hyp2f1_func, a, b, c, z, nmax)
-
-
-@jit
-def hyp2f1_array(a, b, c, z, nmax=75):
-    """This function looks at where z is located on the complex plane and chooses the
-    appropriate hyp2f1 function to use in the interest of maintaining optimal runtime
-    and accuracy.
-
-    If the user already knows which hyp2f1 function to use, this step can be skipped and
-    the user can directly call the appropriate hyp2f1 function
-
-    NOTE: This function ONLY works if input z is an array with more than 0 dimensions.
+    the user can directly call the appropriate hyp2f1 function. If the input z is an
+    array with values in different regions on the complex plane, this function MUST
+    be used so that the appropriate hyp2f1 function is used for each value.
     """
     z = jnp.asarray(z)
+    z_shape = jnp.shape(z)
+    z = jnp.atleast_1d(z)
 
     # Case 0: Whenever |z| < 0.89, hyp2f1_series should be used
     # Case 1: Else if |1 - z| < 0.76, hyp2f1_near_one should be used
@@ -219,8 +194,7 @@ def hyp2f1_array(a, b, c, z, nmax=75):
     case = jnp.where(jnp.abs(z) < 0.89, 0, jnp.where(jnp.abs(1.0 - z) < 0.76, 1, 2))
     hyp2f1_func = [hyp2f1_series, hyp2f1_near_one, hyp2f1_continuation]
 
-    # Since the input z is an array of values, each element needs to be
-    # checked and its corresponding hyp2f1 evaluated individually
+    # Check each z value and evaluate corresponding hyp2f1
     def body_fun(i, val):
         ith_result = lax.switch(
             case.at[i].get(), hyp2f1_func, a, b, c, z.at[i].get(), nmax
@@ -228,4 +202,9 @@ def hyp2f1_array(a, b, c, z, nmax=75):
         val = val.at[i].set(ith_result)
         return val
 
-    return lax.fori_loop(0, jnp.size(z), body_fun, jnp.zeros_like(z))
+    result = lax.fori_loop(0, jnp.size(z), body_fun, jnp.zeros_like(z))
+
+    # Need to reshape result back to the original shape so that if 
+    # a scalar z is input, a scalar is returned instead of 1d array
+    result = jnp.reshape(result, z_shape)
+    return result
