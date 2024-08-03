@@ -1,6 +1,7 @@
 import jax.numpy as jnp
 from jax import jit
 
+
 @jit
 def cart2polar(x, y, center_x=0, center_y=0):
     """Transforms cartesian coords [x,y] into polar coords [r,phi] in the frame of the
@@ -22,6 +23,7 @@ def cart2polar(x, y, center_x=0, center_y=0):
     phi = jnp.arctan2(coord_shift_y, coord_shift_x)
     return r, phi
 
+
 @jit
 def polar2cart(r, phi, center):
     """Transforms polar coords [r,phi] into cartesian coords [x,y] in the frame of the
@@ -40,6 +42,7 @@ def polar2cart(r, phi, center):
     y = r * jnp.sin(phi)
     return x - center[0], y - center[1]
 
+
 @jit
 def shear_polar2cartesian(phi, gamma):
     """
@@ -52,6 +55,7 @@ def shear_polar2cartesian(phi, gamma):
     gamma2 = gamma * jnp.sin(2 * phi)
     return gamma1, gamma2
 
+
 @jit
 def shear_cartesian2polar(gamma1, gamma2):
     """
@@ -62,6 +66,7 @@ def shear_cartesian2polar(gamma1, gamma2):
     phi = jnp.arctan2(gamma2, gamma1) / 2
     gamma = jnp.sqrt(gamma1**2 + gamma2**2)
     return phi, gamma
+
 
 @jit
 def phi_q2_ellipticity(phi, q):
@@ -76,6 +81,7 @@ def phi_q2_ellipticity(phi, q):
     e2 = (1.0 - q) / (1.0 + q) * jnp.sin(2 * phi)
     return e1, e2
 
+
 @jit
 def ellipticity2phi_q(e1, e2):
     """Transforms complex ellipticity moduli in orientation angle and axis ratio.
@@ -89,6 +95,7 @@ def ellipticity2phi_q(e1, e2):
     c = jnp.minimum(c, 0.9999)
     q = (1 - c) / (1 + c)
     return phi, q
+
 
 @jit
 def transform_e1e2_product_average(x, y, e1, e2, center_x, center_y):
@@ -114,6 +121,7 @@ def transform_e1e2_product_average(x, y, e1, e2, center_x, center_y):
     xt2 = -sin_phi * x_shift + cos_phi * y_shift
     return xt1 * jnp.sqrt(q), xt2 / jnp.sqrt(q)
 
+
 @jit
 def transform_e1e2_square_average(x, y, e1, e2, center_x, center_y):
     """Maps the coordinates x, y with eccentricities e1 e2 into a new elliptical
@@ -136,6 +144,7 @@ def transform_e1e2_square_average(x, y, e1, e2, center_x, center_y):
     x_ = (cos_phi * x_shift + sin_phi * y_shift) * jnp.sqrt(1 - e)
     y_ = (-sin_phi * x_shift + cos_phi * y_shift) * jnp.sqrt(1 + e)
     return x_, y_
+
 
 @jit
 def q2e(q):

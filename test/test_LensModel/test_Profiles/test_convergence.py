@@ -53,7 +53,9 @@ class TestConvergence(object):
         x = np.array([1])
         y = np.array([2])
         f_xx, f_xy, f_yx, f_yy = Convergence.hessian(x, y, **self.kwargs_lens)
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.convergence_ref.hessian(x, y, **self.kwargs_lens)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.convergence_ref.hessian(
+            x, y, **self.kwargs_lens
+        )
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=7)
         npt.assert_almost_equal(f_yy, f_yy_ref, decimal=7)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=7)
@@ -62,7 +64,9 @@ class TestConvergence(object):
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
         f_xx, f_xy, f_yx, f_yy = Convergence.hessian(x, y, **self.kwargs_lens)
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.convergence_ref.hessian(x, y, **self.kwargs_lens)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.convergence_ref.hessian(
+            x, y, **self.kwargs_lens
+        )
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=7)
         npt.assert_almost_equal(f_yy, f_yy_ref, decimal=7)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=7)

@@ -118,7 +118,9 @@ def test_hyp2f1():
     result = hyp2f1(a, b, c, z)
     result_ref = hyp2f1_ref(a, b, c, z)
     assert jnp.allclose(result, result_ref), "hyp2f1 result does not match scipy result"
-    assert jnp.shape(result) == jnp.shape(z), "shape of output does not match shape of input"
+    assert jnp.shape(result) == jnp.shape(
+        z
+    ), "shape of output does not match shape of input"
 
     # Points that are problematic for specific cases should not be
     # problematic here in the general case
@@ -126,14 +128,18 @@ def test_hyp2f1():
     result = hyp2f1(a, b, c, z)
     result_ref = hyp2f1_ref(a, b, c, z)
     assert jnp.allclose(result, result_ref), "hyp2f1 result does not match scipy result"
-    assert jnp.shape(result) == jnp.shape(z), "shape of output does not match shape of input"
+    assert jnp.shape(result) == jnp.shape(
+        z
+    ), "shape of output does not match shape of input"
 
     # Supports list inputs
     z = [0.605 + 0.65j, 0.609 + 0.65j, 0.6072 + 0.0651j]
     result = hyp2f1(a, b, c, z)
     result_ref = hyp2f1_ref(a, b, c, z)
     assert jnp.allclose(result, result_ref), "hyp2f1 result does not match scipy result"
-    assert jnp.shape(result) == jnp.shape(z), "shape of output does not match shape of input"
+    assert jnp.shape(result) == jnp.shape(
+        z
+    ), "shape of output does not match shape of input"
 
     # Tests to see if the value above the branch cut is taken
     # Also supports scalar inputs
@@ -141,4 +147,6 @@ def test_hyp2f1():
     result = hyp2f1(a, b, c, z)
     result_ref = hyp2f1_ref(a, b, c, z)
     assert jnp.allclose(result, result_ref), "hyp2f1 result does not match scipy result"
-    assert jnp.shape(result) == jnp.shape(z), "shape of output does not match shape of input"
+    assert jnp.shape(result) == jnp.shape(
+        z
+    ), "shape of output does not match shape of input"

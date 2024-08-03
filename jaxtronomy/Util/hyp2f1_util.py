@@ -76,9 +76,7 @@ def hyp2f1_continuation(a, b, c, z, nmax=75):
 
     # The branch cut for this computation of hyp2f1 is on Re(z) >= 1, Im(z) = 0
     # If z is on the branch cut, take the value above the branch cut
-    z = jnp.where(
-        jnp.imag(z) == 0.0, jnp.where(jnp.real(z) >= 1, z + 0.0000001j, z), z
-    )
+    z = jnp.where(jnp.imag(z) == 0.0, jnp.where(jnp.real(z) >= 1, z + 0.0000001j, z), z)
 
     def body_fun(j, val):
         prev_prev_da, prev_prev_db, prev_da, prev_db, sum_1, sum_2 = val
@@ -138,8 +136,9 @@ def hyp2f1_continuation(a, b, c, z, nmax=75):
 @jit
 def hyp2f1_near_one(a, b, c, z, nmax=75):
     """This implementation is based off of equation 15.3.6 in Abramowitz and Stegun.
-    This transformation formula allows for a calculation of hyp2f1 for points near 
-    z = 1 (where other iterative computation schemes converge slowly) by 
+    This transformation formula allows for a calculation of hyp2f1 for points near.
+
+    z = 1 (where other iterative computation schemes converge slowly) by
     transforming z to 1 - z.
 
     However, due to the presence of gamma(c - a - b) and gamma(a + b - c),
@@ -171,6 +170,7 @@ def hyp2f1_near_one(a, b, c, z, nmax=75):
     )
     return term1 + term2
 
+
 @jit
 def hyp2f1(a, b, c, z, nmax=75):
     """This function looks at where z is located on the complex plane and chooses the
@@ -179,8 +179,8 @@ def hyp2f1(a, b, c, z, nmax=75):
 
     If the user already knows which hyp2f1 function to use, this step can be skipped and
     the user can directly call the appropriate hyp2f1 function. If the input z is an
-    array with values in different regions on the complex plane, this function MUST
-    be used so that the appropriate hyp2f1 function is used for each value.
+    array with values in different regions on the complex plane, this function MUST be
+    used so that the appropriate hyp2f1 function is used for each value.
     """
     z = jnp.asarray(z)
     z_shape = jnp.shape(z)
@@ -204,7 +204,7 @@ def hyp2f1(a, b, c, z, nmax=75):
 
     result = lax.fori_loop(0, jnp.size(z), body_fun, jnp.zeros_like(z))
 
-    # Need to reshape result back to the original shape so that if 
+    # Need to reshape result back to the original shape so that if
     # a scalar z is input, a scalar is returned instead of 1d array
     result = jnp.reshape(result, z_shape)
     return result

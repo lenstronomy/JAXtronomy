@@ -194,9 +194,7 @@ class ShearReduced(LensProfileBase):
         :return: deflection angles
         """
         kappa, gamma1_, gamma2_ = ShearReduced._kappa_reduced(gamma1, gamma2)
-        f_x_shear, f_y_shear = Shear.derivatives(
-            x, y, gamma1_, gamma2_, ra_0, dec_0
-        )
+        f_x_shear, f_y_shear = Shear.derivatives(x, y, gamma1_, gamma2_, ra_0, dec_0)
         f_x_kappa, f_y_kappa = Convergence.derivatives(x, y, kappa, ra_0, dec_0)
         return f_x_shear + f_x_kappa, f_y_shear + f_y_kappa
 
@@ -217,9 +215,7 @@ class ShearReduced(LensProfileBase):
         f_xx_g, f_xy_g, f_yx_g, f_yy_g = Shear.hessian(
             x, y, gamma1_, gamma2_, ra_0, dec_0
         )
-        f_xx_k, f_xy_k, f_yx_k, f_yy_k = Convergence.hessian(
-            x, y, kappa, ra_0, dec_0
-        )
+        f_xx_k, f_xy_k, f_yx_k, f_yy_k = Convergence.hessian(x, y, kappa, ra_0, dec_0)
         f_xx = f_xx_g + f_xx_k
         f_yy = f_yy_g + f_yy_k
         f_xy = f_xy_g + f_xy_k
