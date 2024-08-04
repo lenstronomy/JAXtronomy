@@ -1,6 +1,8 @@
 import jax.numpy as jnp
+from jax import jit
 
 
+@jit
 def cart2polar(x, y, center_x=0, center_y=0):
     """Transforms cartesian coords [x,y] into polar coords [r,phi] in the frame of the
     lens center.
@@ -22,6 +24,7 @@ def cart2polar(x, y, center_x=0, center_y=0):
     return r, phi
 
 
+@jit
 def polar2cart(r, phi, center):
     """Transforms polar coords [r,phi] into cartesian coords [x,y] in the frame of the
     lense center.
@@ -40,6 +43,7 @@ def polar2cart(r, phi, center):
     return x - center[0], y - center[1]
 
 
+@jit
 def shear_polar2cartesian(phi, gamma):
     """
 
@@ -52,6 +56,7 @@ def shear_polar2cartesian(phi, gamma):
     return gamma1, gamma2
 
 
+@jit
 def shear_cartesian2polar(gamma1, gamma2):
     """
     :param gamma1: cartesian shear component
@@ -63,6 +68,7 @@ def shear_cartesian2polar(gamma1, gamma2):
     return phi, gamma
 
 
+@jit
 def phi_q2_ellipticity(phi, q):
     """Transforms orientation angle and axis ratio into complex ellipticity moduli e1,
     e2.
@@ -76,6 +82,7 @@ def phi_q2_ellipticity(phi, q):
     return e1, e2
 
 
+@jit
 def ellipticity2phi_q(e1, e2):
     """Transforms complex ellipticity moduli in orientation angle and axis ratio.
 
@@ -90,6 +97,7 @@ def ellipticity2phi_q(e1, e2):
     return phi, q
 
 
+@jit
 def transform_e1e2_product_average(x, y, e1, e2, center_x, center_y):
     """Maps the coordinates x, y with eccentricities e1 e2 into a new elliptical
     coordinate system such that R = sqrt(R_major * R_minor)
@@ -114,6 +122,7 @@ def transform_e1e2_product_average(x, y, e1, e2, center_x, center_y):
     return xt1 * jnp.sqrt(q), xt2 / jnp.sqrt(q)
 
 
+@jit
 def transform_e1e2_square_average(x, y, e1, e2, center_x, center_y):
     """Maps the coordinates x, y with eccentricities e1 e2 into a new elliptical
     coordinate system such that R = sqrt(R_major**2 + R_minor**2)
@@ -137,6 +146,7 @@ def transform_e1e2_square_average(x, y, e1, e2, center_x, center_y):
     return x_, y_
 
 
+@jit
 def q2e(q):
     """computes.
 
