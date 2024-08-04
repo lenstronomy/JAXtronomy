@@ -129,7 +129,7 @@ class TestShearReduced(object):
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
         gamma1, gamma2 = -0.4, 0.4
-        kappa, gamma1_, gamma2_ = ShearReduced._kappa_reduced(gamma1, gamma2)
+        kappa, gamma1_, gamma2_ = ShearReduced.kappa_reduced(gamma1, gamma2)
         kappa_ref, gamma1_ref_, gamma2_ref_ = self.shearreduced_ref._kappa_reduced(
             gamma1, gamma2
         )

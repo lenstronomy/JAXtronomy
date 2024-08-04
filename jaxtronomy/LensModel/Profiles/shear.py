@@ -150,7 +150,7 @@ class ShearReduced(LensProfileBase):
 
     @staticmethod
     @jit
-    def _kappa_reduced(gamma1, gamma2):
+    def kappa_reduced(gamma1, gamma2):
         """Compute convergence such that magnification is unity.
 
         :param gamma1: reduced shear
@@ -175,7 +175,7 @@ class ShearReduced(LensProfileBase):
         :param dec_0: y/dec position where shear deflection is 0
         :return: lensing potential
         """
-        kappa, gamma1_, gamma2_ = ShearReduced._kappa_reduced(gamma1, gamma2)
+        kappa, gamma1_, gamma2_ = ShearReduced.kappa_reduced(gamma1, gamma2)
         f_shear = Shear.function(x, y, gamma1_, gamma2_, ra_0, dec_0)
         f_kappa = Convergence.function(x, y, kappa, ra_0, dec_0)
         return f_shear + f_kappa
@@ -193,7 +193,7 @@ class ShearReduced(LensProfileBase):
         :param dec_0: y/dec position where shear deflection is 0
         :return: deflection angles
         """
-        kappa, gamma1_, gamma2_ = ShearReduced._kappa_reduced(gamma1, gamma2)
+        kappa, gamma1_, gamma2_ = ShearReduced.kappa_reduced(gamma1, gamma2)
         f_x_shear, f_y_shear = Shear.derivatives(x, y, gamma1_, gamma2_, ra_0, dec_0)
         f_x_kappa, f_y_kappa = Convergence.derivatives(x, y, kappa, ra_0, dec_0)
         return f_x_shear + f_x_kappa, f_y_shear + f_y_kappa
@@ -211,7 +211,7 @@ class ShearReduced(LensProfileBase):
         :param dec_0: y/dec position where shear deflection is 0
         :return: f_xx, f_xy, f_yx, f_yy
         """
-        kappa, gamma1_, gamma2_ = ShearReduced._kappa_reduced(gamma1, gamma2)
+        kappa, gamma1_, gamma2_ = ShearReduced.kappa_reduced(gamma1, gamma2)
         f_xx_g, f_xy_g, f_yx_g, f_yy_g = Shear.hessian(
             x, y, gamma1_, gamma2_, ra_0, dec_0
         )
