@@ -198,8 +198,8 @@ class TestCSE_major_set(object):
 
         # NOTE: If x and y are made to be integers, the tests fails due to a bug with lenstronomy.
         #       Change the test when the bug in lenstronomy is fixed
-        x = np.array([1., 2.])
-        y = np.array([2., 0])
+        x = np.array([1.0, 2.0])
+        y = np.array([2.0, 0])
         f_xx, f_xy, f_yx, f_yy = CSEMajorAxisSet.hessian(x, y, **kwargs)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.CSEMajorAxisSet_ref.hessian(
             x, y, **kwargs
