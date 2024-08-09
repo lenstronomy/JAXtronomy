@@ -12,7 +12,7 @@ from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 __all__ = ["NFW_ELLIPSE_CSE"]
 
 # Table 1 in Oguri 2021
-HIGH_ACCURACY_S = [
+HIGH_ACCURACY_S = jnp.asarray([
     1.082411e-06,
     8.786566e-06,
     3.292868e-06,
@@ -57,8 +57,8 @@ HIGH_ACCURACY_S = [
     7.760206e02,
     2.143057e03,
     1.935749e03,
-]
-HIGH_ACCURACY_A = [
+])
+HIGH_ACCURACY_A = jnp.asarray([
     1.648988e-18,
     6.274458e-16,
     3.646620e-17,
@@ -103,10 +103,10 @@ HIGH_ACCURACY_A = [
     5.401335e02,
     9.743682e02,
     1.775124e03,
-]
+])
 
 # Table 3 in Oguri 2021
-LOW_ACCURACY_A = [
+LOW_ACCURACY_A = jnp.asarray([
     1.434960e-16,
     5.232413e-14,
     2.666660e-12,
@@ -123,8 +123,8 @@ LOW_ACCURACY_A = [
     6.340984e01,
     2.576763e02,
     1.422619e03,
-]
-LOW_ACCURACY_S = [
+])
+LOW_ACCURACY_S = jnp.asarray([
     4.041628e-06,
     3.086267e-05,
     1.298542e-04,
@@ -141,7 +141,7 @@ LOW_ACCURACY_S = [
     4.627701e01,
     1.842613e02,
     8.206569e02,
-]
+])
 
 
 class NFW_ELLIPSE_CSE(LensProfileBase):
