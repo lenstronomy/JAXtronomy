@@ -5,13 +5,14 @@
 __author__ = "ntessore"
 
 import jax
-from jax import jit
+from jax import jit, tree_util
 import jax.numpy as jnp
+
+from jaxtronomy.Util.hyp2f1_util import hyp2f1_series as hyp2f1
 import jaxtronomy.Util.util as util
 import jaxtronomy.Util.param_util as param_util
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 from lenstronomy.LensModel.Profiles.spp import SPP
-from jaxtronomy.Util.hyp2f1_util import hyp2f1_series as hyp2f1
 
 jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 
@@ -270,7 +271,7 @@ class EPLMajorAxis(LensProfileBase):
     # The following two methods are required to allow the JAX compiler to recognize
     # this class. Methods involving the self variable can be jit-decorated.
     # Class methods will need to be recompiled each time a variable in the aux_data
-    # changes
+    # changes to a new value (in this case, no recompiling is ever done)
     def _tree_flatten(self):
         children = ()
         aux_data = {}
@@ -484,8 +485,6 @@ class EPLQPhi(LensProfileBase):
         """
         return self._EPL.density_lens(r, theta_E, gamma)
 
-
-from jax import tree_util
 
 tree_util.register_pytree_node(
     EPLMajorAxis, EPLMajorAxis._tree_flatten, EPLMajorAxis._tree_unflatten

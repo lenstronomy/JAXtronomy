@@ -3,13 +3,18 @@ from lenstronomy.Util.util import convert_bool_list
 __all__ = ["ProfileListBase"]
 
 _JAXXED_MODELS = [
+    "CONVERGENCE",
+    "CSE",
     "EPL",
     "EPL_Q_PHI",
     "LOS",
     "LOS_MINIMAL",
+    "NFW",
+    "NFW_ELLIPSE_CSE",
     "PJAFFE",
     "PJAFFE_ELLIPSE_POTENTIAL",
     "SIS",
+    "SHEAR",
 ]
 
 _SUPPORTED_MODELS = [
@@ -289,7 +294,7 @@ def lens_class(
 
         return ConstMag()
     elif lens_type == "CONVERGENCE":
-        from lenstronomy.LensModel.Profiles.convergence import Convergence
+        from jaxtronomy.LensModel.Profiles.convergence import Convergence
 
         return Convergence()
     elif lens_type == "coreBURKERT":
@@ -325,7 +330,7 @@ def lens_class(
 
         return CoredDensityMST(profile_type="CORED_DENSITY_ULDM")
     elif lens_type == "CSE":
-        from lenstronomy.LensModel.Profiles.cored_steep_ellipsoid import CSE
+        from jaxtronomy.LensModel.Profiles.cored_steep_ellipsoid import CSE
 
         return CSE()
     elif lens_type == "CTNFW_GAUSS_DEC":
@@ -479,7 +484,7 @@ def lens_class(
 
         return MultiGaussianEllipsePotential()
     elif lens_type == "NFW":
-        from lenstronomy.LensModel.Profiles.nfw import NFW
+        from jaxtronomy.LensModel.Profiles.nfw import NFW
 
         return NFW()
     elif lens_type == "NFW_ELLIPSE_POTENTIAL":
@@ -489,7 +494,7 @@ def lens_class(
 
         return NFWEllipsePotential()
     elif lens_type == "NFW_ELLIPSE_CSE":
-        from lenstronomy.LensModel.Profiles.nfw_ellipse_cse import NFW_ELLIPSE_CSE
+        from jaxtronomy.LensModel.Profiles.nfw_ellipse_cse import NFW_ELLIPSE_CSE
 
         return NFW_ELLIPSE_CSE()
     elif lens_type == "NFW_ELLIPSE_GAUSS_DEC":
@@ -587,7 +592,7 @@ def lens_class(
 
         return Shift()
     elif lens_type == "SHEAR":
-        from lenstronomy.LensModel.Profiles.shear import Shear
+        from jaxtronomy.LensModel.Profiles.shear import Shear
 
         return Shear()
     elif lens_type == "SHEAR_GAMMA_PSI":
