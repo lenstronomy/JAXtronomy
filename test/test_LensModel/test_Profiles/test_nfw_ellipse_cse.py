@@ -5,7 +5,9 @@ import numpy.testing as npt
 import pytest
 
 from jaxtronomy.LensModel.Profiles.nfw_ellipse_cse import NFW_ELLIPSE_CSE
-from lenstronomy.LensModel.Profiles.nfw_ellipse_cse import NFW_ELLIPSE_CSE as NFW_ELLIPSE_CSE_ref
+from lenstronomy.LensModel.Profiles.nfw_ellipse_cse import (
+    NFW_ELLIPSE_CSE as NFW_ELLIPSE_CSE_ref,
+)
 
 
 class TestNFWELLIPSE(object):
@@ -13,9 +15,9 @@ class TestNFWELLIPSE(object):
 
     def setup_method(self):
         self.high_accuracy = NFW_ELLIPSE_CSE(high_accuracy=True)
-        self.high_accuracy_ref= NFW_ELLIPSE_CSE_ref(high_accuracy=True)
+        self.high_accuracy_ref = NFW_ELLIPSE_CSE_ref(high_accuracy=True)
         self.low_accuracy = NFW_ELLIPSE_CSE(high_accuracy=False)
-        self.low_accuracy_ref= NFW_ELLIPSE_CSE_ref(high_accuracy=False)
+        self.low_accuracy_ref = NFW_ELLIPSE_CSE_ref(high_accuracy=False)
 
     def test_function(self):
         x = np.linspace(0.01, 2, 10)
@@ -36,7 +38,9 @@ class TestNFWELLIPSE(object):
         kwargs = {"alpha_Rs": 0.5, "Rs": 2, "center_x": 0, "center_y": 0}
 
         f_x, f_y = self.high_accuracy.derivatives(x, y, e1=0, e2=0, **kwargs)
-        f_x_ref, f_y_ref = self.high_accuracy_ref.derivatives(x, y, e1=0, e2=0, **kwargs)
+        f_x_ref, f_y_ref = self.high_accuracy_ref.derivatives(
+            x, y, e1=0, e2=0, **kwargs
+        )
         npt.assert_array_almost_equal(f_x, f_x_ref, decimal=8)
         npt.assert_array_almost_equal(f_y, f_y_ref, decimal=8)
 
@@ -51,14 +55,18 @@ class TestNFWELLIPSE(object):
         kwargs = {"alpha_Rs": 0.5, "Rs": 2, "center_x": 0, "center_y": 0}
 
         f_xx, f_xy, f_yx, f_yy = self.high_accuracy.hessian(x, y, e1=0, e2=0, **kwargs)
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.high_accuracy_ref.hessian(x, y, e1=0, e2=0, **kwargs)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.high_accuracy_ref.hessian(
+            x, y, e1=0, e2=0, **kwargs
+        )
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=8)
         npt.assert_array_almost_equal(f_yx, f_yx_ref, decimal=8)
         npt.assert_array_almost_equal(f_yy, f_yy_ref, decimal=8)
 
         f_xx, f_xy, f_yx, f_yy = self.low_accuracy.hessian(x, y, e1=0, e2=0, **kwargs)
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.low_accuracy_ref.hessian(x, y, e1=0, e2=0, **kwargs)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.low_accuracy_ref.hessian(
+            x, y, e1=0, e2=0, **kwargs
+        )
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=8)
         npt.assert_array_almost_equal(f_yx, f_yx_ref, decimal=8)
@@ -79,6 +87,7 @@ class TestNFWELLIPSE(object):
         const = self.high_accuracy._normalization(alpha_Rs, Rs, q)
         const_ref = self.high_accuracy_ref._normalization(alpha_Rs, Rs, q)
         npt.assert_almost_equal(const, const_ref, decimal=8)
+
 
 if __name__ == "__main__":
     pytest.main()

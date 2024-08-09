@@ -12,136 +12,144 @@ from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 __all__ = ["NFW_ELLIPSE_CSE"]
 
 # Table 1 in Oguri 2021
-HIGH_ACCURACY_S = jnp.asarray([
-    1.082411e-06,
-    8.786566e-06,
-    3.292868e-06,
-    1.860019e-05,
-    3.274231e-05,
-    6.232485e-05,
-    9.256333e-05,
-    1.546762e-04,
-    2.097321e-04,
-    3.391140e-04,
-    5.178790e-04,
-    8.636736e-04,
-    1.405152e-03,
-    2.193855e-03,
-    3.179572e-03,
-    4.970987e-03,
-    7.631970e-03,
-    1.119413e-02,
-    1.827267e-02,
-    2.945251e-02,
-    4.562723e-02,
-    6.782509e-02,
-    1.596987e-01,
-    1.127751e-01,
-    2.169469e-01,
-    3.423835e-01,
-    5.194527e-01,
-    8.623185e-01,
-    1.382737e00,
-    2.034929e00,
-    3.402979e00,
-    5.594276e00,
-    8.052345e00,
-    1.349045e01,
-    2.603825e01,
-    4.736823e01,
-    6.559320e01,
-    1.087932e02,
-    1.477673e02,
-    2.495341e02,
-    4.305999e02,
-    7.760206e02,
-    2.143057e03,
-    1.935749e03,
-])
-HIGH_ACCURACY_A = jnp.asarray([
-    1.648988e-18,
-    6.274458e-16,
-    3.646620e-17,
-    3.459206e-15,
-    2.457389e-14,
-    1.059319e-13,
-    4.211597e-13,
-    1.142832e-12,
-    4.391215e-12,
-    1.556500e-11,
-    6.951271e-11,
-    3.147466e-10,
-    1.379109e-09,
-    3.829778e-09,
-    1.384858e-08,
-    5.370951e-08,
-    1.804384e-07,
-    5.788608e-07,
-    3.205256e-06,
-    1.102422e-05,
-    4.093971e-05,
-    1.282206e-04,
-    4.575541e-04,
-    7.995270e-04,
-    5.013701e-03,
-    1.403508e-02,
-    5.230727e-02,
-    1.898907e-01,
-    3.643448e-01,
-    7.203734e-01,
-    1.717667e00,
-    2.217566e00,
-    3.187447e00,
-    8.194898e00,
-    1.765210e01,
-    1.974319e01,
-    2.783688e01,
-    4.482311e01,
-    5.598897e01,
-    1.426485e02,
-    2.279833e02,
-    5.401335e02,
-    9.743682e02,
-    1.775124e03,
-])
+HIGH_ACCURACY_S = jnp.asarray(
+    [
+        1.082411e-06,
+        8.786566e-06,
+        3.292868e-06,
+        1.860019e-05,
+        3.274231e-05,
+        6.232485e-05,
+        9.256333e-05,
+        1.546762e-04,
+        2.097321e-04,
+        3.391140e-04,
+        5.178790e-04,
+        8.636736e-04,
+        1.405152e-03,
+        2.193855e-03,
+        3.179572e-03,
+        4.970987e-03,
+        7.631970e-03,
+        1.119413e-02,
+        1.827267e-02,
+        2.945251e-02,
+        4.562723e-02,
+        6.782509e-02,
+        1.596987e-01,
+        1.127751e-01,
+        2.169469e-01,
+        3.423835e-01,
+        5.194527e-01,
+        8.623185e-01,
+        1.382737e00,
+        2.034929e00,
+        3.402979e00,
+        5.594276e00,
+        8.052345e00,
+        1.349045e01,
+        2.603825e01,
+        4.736823e01,
+        6.559320e01,
+        1.087932e02,
+        1.477673e02,
+        2.495341e02,
+        4.305999e02,
+        7.760206e02,
+        2.143057e03,
+        1.935749e03,
+    ]
+)
+HIGH_ACCURACY_A = jnp.asarray(
+    [
+        1.648988e-18,
+        6.274458e-16,
+        3.646620e-17,
+        3.459206e-15,
+        2.457389e-14,
+        1.059319e-13,
+        4.211597e-13,
+        1.142832e-12,
+        4.391215e-12,
+        1.556500e-11,
+        6.951271e-11,
+        3.147466e-10,
+        1.379109e-09,
+        3.829778e-09,
+        1.384858e-08,
+        5.370951e-08,
+        1.804384e-07,
+        5.788608e-07,
+        3.205256e-06,
+        1.102422e-05,
+        4.093971e-05,
+        1.282206e-04,
+        4.575541e-04,
+        7.995270e-04,
+        5.013701e-03,
+        1.403508e-02,
+        5.230727e-02,
+        1.898907e-01,
+        3.643448e-01,
+        7.203734e-01,
+        1.717667e00,
+        2.217566e00,
+        3.187447e00,
+        8.194898e00,
+        1.765210e01,
+        1.974319e01,
+        2.783688e01,
+        4.482311e01,
+        5.598897e01,
+        1.426485e02,
+        2.279833e02,
+        5.401335e02,
+        9.743682e02,
+        1.775124e03,
+    ]
+)
 
 # Table 3 in Oguri 2021
-LOW_ACCURACY_A = jnp.asarray([
-    1.434960e-16,
-    5.232413e-14,
-    2.666660e-12,
-    7.961761e-11,
-    2.306895e-09,
-    6.742968e-08,
-    1.991691e-06,
-    5.904388e-05,
-    1.693069e-03,
-    4.039850e-02,
-    5.665072e-01,
-    3.683242e00,
-    1.582481e01,
-    6.340984e01,
-    2.576763e02,
-    1.422619e03,
-])
-LOW_ACCURACY_S = jnp.asarray([
-    4.041628e-06,
-    3.086267e-05,
-    1.298542e-04,
-    4.131977e-04,
-    1.271373e-03,
-    3.912641e-03,
-    1.208331e-02,
-    3.740521e-02,
-    1.153247e-01,
-    3.472038e-01,
-    1.017550e00,
-    3.253031e00,
-    1.190315e01,
-    4.627701e01,
-    1.842613e02,
-    8.206569e02,
-])
+LOW_ACCURACY_A = jnp.asarray(
+    [
+        1.434960e-16,
+        5.232413e-14,
+        2.666660e-12,
+        7.961761e-11,
+        2.306895e-09,
+        6.742968e-08,
+        1.991691e-06,
+        5.904388e-05,
+        1.693069e-03,
+        4.039850e-02,
+        5.665072e-01,
+        3.683242e00,
+        1.582481e01,
+        6.340984e01,
+        2.576763e02,
+        1.422619e03,
+    ]
+)
+LOW_ACCURACY_S = jnp.asarray(
+    [
+        4.041628e-06,
+        3.086267e-05,
+        1.298542e-04,
+        4.131977e-04,
+        1.271373e-03,
+        3.912641e-03,
+        1.208331e-02,
+        3.740521e-02,
+        1.153247e-01,
+        3.472038e-01,
+        1.017550e00,
+        3.253031e00,
+        1.190315e01,
+        4.627701e01,
+        1.842613e02,
+        8.206569e02,
+    ]
+)
 
 
 class NFW_ELLIPSE_CSE(LensProfileBase):
@@ -225,9 +233,13 @@ class NFW_ELLIPSE_CSE(LensProfileBase):
 
         # potential calculation
         if self.high_accuracy:
-            f_ = CSEProductAvgSet.function(x__ / Rs, y__ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q)
+            f_ = CSEProductAvgSet.function(
+                x__ / Rs, y__ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
+            )
         else:
-            f_ = CSEProductAvgSet.function(x__ / Rs, y__ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q)
+            f_ = CSEProductAvgSet.function(
+                x__ / Rs, y__ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
+            )
 
         const = self._normalization(alpha_Rs, Rs, q)
         return const * f_
@@ -254,9 +266,13 @@ class NFW_ELLIPSE_CSE(LensProfileBase):
         # rotate
         x__, y__ = util.rotate(x_, y_, phi_q)
         if self.high_accuracy:
-            f__x, f__y = CSEProductAvgSet.derivatives(x__ / Rs, y__ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q)
+            f__x, f__y = CSEProductAvgSet.derivatives(
+                x__ / Rs, y__ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
+            )
         else:
-            f__x, f__y = CSEProductAvgSet.derivatives(x__ / Rs, y__ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q)
+            f__x, f__y = CSEProductAvgSet.derivatives(
+                x__ / Rs, y__ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
+            )
 
         # rotate deflections back
         f_x, f_y = util.rotate(f__x, f__y, -phi_q)
@@ -286,9 +302,13 @@ class NFW_ELLIPSE_CSE(LensProfileBase):
         # rotate
         x__, y__ = util.rotate(x_, y_, phi_q)
         if self.high_accuracy:
-            f__xx, f__xy, f__yx, f__yy = CSEProductAvgSet.hessian(x__ / Rs, y__ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q)
+            f__xx, f__xy, f__yx, f__yy = CSEProductAvgSet.hessian(
+                x__ / Rs, y__ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
+            )
         else:
-            f__xx, f__xy, f__yx, f__yy = CSEProductAvgSet.hessian(x__ / Rs, y__ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q)
+            f__xx, f__xy, f__yx, f__yy = CSEProductAvgSet.hessian(
+                x__ / Rs, y__ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
+            )
 
         # rotate back
         kappa = 1.0 / 2 * (f__xx + f__yy)

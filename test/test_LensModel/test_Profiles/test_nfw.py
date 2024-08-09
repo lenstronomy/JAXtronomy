@@ -7,6 +7,7 @@ import pytest
 from jaxtronomy.LensModel.Profiles.nfw import NFW
 from lenstronomy.LensModel.Profiles.nfw import NFW as NFW_ref
 
+
 class TestNFW(object):
     """Tests the Gaussian methods."""
 
@@ -165,7 +166,9 @@ class TestNFW(object):
         Rs = 1.0
         rho0 = 1
         alpha_Rs = NFW.rho02alpha(rho0, Rs)
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.nfw_ref.hessian(x, y, Rs, alpha_Rs)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.nfw_ref.hessian(
+            x, y, Rs, alpha_Rs
+        )
         f_xx, f_xy, f_yx, f_yy = NFW.hessian(x, y, Rs, alpha_Rs)
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=8)
@@ -174,7 +177,9 @@ class TestNFW(object):
 
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.nfw_ref.hessian(x, y, Rs, alpha_Rs)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.nfw_ref.hessian(
+            x, y, Rs, alpha_Rs
+        )
         f_xx, f_xy, f_yx, f_yy = NFW.hessian(x, y, Rs, alpha_Rs)
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=8)
@@ -231,8 +236,7 @@ class TestNFW(object):
         alpha_Rs = 1.1
         m_2d_ref = self.nfw_ref.mass_2d_lens(R, Rs, alpha_Rs)
         m_2d = NFW.mass_2d_lens(R, Rs, alpha_Rs)
-        npt.assert_almost_equal(m_2d, m_2d_ref, decimal=8)    
-
+        npt.assert_almost_equal(m_2d, m_2d_ref, decimal=8)
 
 
 if __name__ == "__main__":

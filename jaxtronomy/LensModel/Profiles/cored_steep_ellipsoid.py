@@ -61,7 +61,7 @@ class CSE(LensProfileBase):
             )
         self.axis = axis
         super(CSE, self).__init__()
-    
+
     # --------------------------------------------------------------------------------
     # The following two methods are required to allow the JAX compiler to recognize
     # this class. Methods involving the self variable can be jit-decorated.
@@ -100,7 +100,7 @@ class CSE(LensProfileBase):
         x__, y__ = util.rotate(x_, y_, phi_q)
 
         # potential calculation
-        case = jnp.where(self.axis == 'major', 0, 1)
+        case = jnp.where(self.axis == "major", 0, 1)
         func = [CSEMajorAxis.function, CSEProductAvg.function]
 
         f_ = lax.switch(case, func, x__, y__, a, s, q)
@@ -128,7 +128,7 @@ class CSE(LensProfileBase):
         # rotate
         x__, y__ = util.rotate(x_, y_, phi_q)
 
-        case = jnp.where(self.axis == 'major', 0, 1)
+        case = jnp.where(self.axis == "major", 0, 1)
         func = [CSEMajorAxis.derivatives, CSEProductAvg.derivatives]
 
         f__x, f__y = lax.switch(case, func, x__, y__, a, s, q)
@@ -158,7 +158,7 @@ class CSE(LensProfileBase):
         # rotate
         x__, y__ = util.rotate(x_, y_, phi_q)
 
-        case = jnp.where(self.axis == 'major', 0, 1)
+        case = jnp.where(self.axis == "major", 0, 1)
         func = [CSEMajorAxis.hessian, CSEProductAvg.hessian]
 
         f__xx, f__xy, _, f__yy = lax.switch(case, func, x__, y__, a, s, q)
@@ -321,8 +321,10 @@ class CSEMajorAxisSet(LensProfileBase):
             x, y, a_list, s_list, q, f_ = val
             f_ += CSEMajorAxis.function(x, y, a_list.at[i].get(), s_list.at[i].get(), q)
             return x, y, a_list, s_list, q, f_
-        
-        _, _, _, _, _, f_ = lax.fori_loop(0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_))
+
+        _, _, _, _, _, f_ = lax.fori_loop(
+            0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_)
+        )
         return f_
 
     @staticmethod
@@ -342,17 +344,20 @@ class CSEMajorAxisSet(LensProfileBase):
         a_list = jnp.asarray(a_list)
         s_list = jnp.asarray(s_list)
         f_x, f_y = jnp.zeros_like(x), jnp.zeros_like(y)
-        
+
         def body_fun(i, val):
             x, y, a_list, s_list, q, f_x, f_y = val
-            f_x_, f_y_ = CSEMajorAxis.derivatives(x, y, a_list.at[i].get(), s_list.at[i].get(), q)
+            f_x_, f_y_ = CSEMajorAxis.derivatives(
+                x, y, a_list.at[i].get(), s_list.at[i].get(), q
+            )
             f_x += f_x_
             f_y += f_y_
             return x, y, a_list, s_list, q, f_x, f_y
-        
-        _, _, _, _, _, f_x, f_y = lax.fori_loop(0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_x, f_y))
 
-        
+        _, _, _, _, _, f_x, f_y = lax.fori_loop(
+            0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_x, f_y)
+        )
+
         return f_x, f_y
 
     @staticmethod
@@ -375,13 +380,17 @@ class CSEMajorAxisSet(LensProfileBase):
 
         def body_fun(i, val):
             x, y, a_list, s_list, q, f_xx, f_xy, f_yy = val
-            f_xx_, f_xy_, _, f_yy_ = CSEMajorAxis.hessian(x, y, a_list.at[i].get(), s_list.at[i].get(), q)
+            f_xx_, f_xy_, _, f_yy_ = CSEMajorAxis.hessian(
+                x, y, a_list.at[i].get(), s_list.at[i].get(), q
+            )
             f_xx += f_xx_
             f_xy += f_xy_
             f_yy += f_yy_
             return x, y, a_list, s_list, q, f_xx, f_xy, f_yy
-        
-        _, _, _, _, _, f_xx, f_xy, f_yy = lax.fori_loop(0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_xx, f_xy, f_yy))
+
+        _, _, _, _, _, f_xx, f_xy, f_yy = lax.fori_loop(
+            0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_xx, f_xy, f_yy)
+        )
         return f_xx, f_xy, f_xy, f_yy
 
 
@@ -508,10 +517,14 @@ class CSEProductAvgSet(LensProfileBase):
 
         def body_fun(i, val):
             x, y, a_list, s_list, q, f_ = val
-            f_ += CSEProductAvg.function(x, y, a_list.at[i].get(), s_list.at[i].get(), q)
+            f_ += CSEProductAvg.function(
+                x, y, a_list.at[i].get(), s_list.at[i].get(), q
+            )
             return x, y, a_list, s_list, q, f_
-        
-        _, _, _, _, _, f_ = lax.fori_loop(0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_))
+
+        _, _, _, _, _, f_ = lax.fori_loop(
+            0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_)
+        )
         return f_
 
     @staticmethod
@@ -534,12 +547,16 @@ class CSEProductAvgSet(LensProfileBase):
 
         def body_fun(i, val):
             x, y, a_list, s_list, q, f_x, f_y = val
-            f_x_, f_y_ = CSEProductAvg.derivatives(x, y, a_list.at[i].get(), s_list.at[i].get(), q)
+            f_x_, f_y_ = CSEProductAvg.derivatives(
+                x, y, a_list.at[i].get(), s_list.at[i].get(), q
+            )
             f_x += f_x_
             f_y += f_y_
             return x, y, a_list, s_list, q, f_x, f_y
-        
-        _, _, _, _, _, f_x, f_y = lax.fori_loop(0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_x, f_y))
+
+        _, _, _, _, _, f_x, f_y = lax.fori_loop(
+            0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_x, f_y)
+        )
         return f_x, f_y
 
     @staticmethod
@@ -562,17 +579,18 @@ class CSEProductAvgSet(LensProfileBase):
 
         def body_fun(i, val):
             x, y, a_list, s_list, q, f_xx, f_xy, f_yy = val
-            f_xx_, f_xy_, _, f_yy_ = CSEProductAvg.hessian(x, y, a_list.at[i].get(), s_list.at[i].get(), q)
+            f_xx_, f_xy_, _, f_yy_ = CSEProductAvg.hessian(
+                x, y, a_list.at[i].get(), s_list.at[i].get(), q
+            )
             f_xx += f_xx_
             f_xy += f_xy_
             f_yy += f_yy_
             return x, y, a_list, s_list, q, f_xx, f_xy, f_yy
-        
-        _, _, _, _, _, f_xx, f_xy, f_yy = lax.fori_loop(0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_xx, f_xy, f_yy))
+
+        _, _, _, _, _, f_xx, f_xy, f_yy = lax.fori_loop(
+            0, len(a_list), body_fun, (x, y, a_list, s_list, q, f_xx, f_xy, f_yy)
+        )
         return f_xx, f_xy, f_xy, f_yy
 
 
-
-tree_util.register_pytree_node(
-    CSE, CSE._tree_flatten, CSE._tree_unflatten
-)
+tree_util.register_pytree_node(CSE, CSE._tree_flatten, CSE._tree_unflatten)
