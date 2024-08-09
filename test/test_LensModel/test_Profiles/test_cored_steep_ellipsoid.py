@@ -156,8 +156,10 @@ class TestCSE_major_set(object):
     def test_hessian(self):
         kwargs = {"a_list": np.asarray([1., 4., 3.]), "s_list": np.asarray([1., 0., 0.]), "q": 0.3}
 
-        x = np.array([1, 2])
-        y = np.array([2, 0])
+        # NOTE: If x and y are made to be integers, the tests fails due to a bug with lenstronomy.
+        #       Change the test when the bug in lenstronomy is fixed
+        x = np.array([1., 2.])
+        y = np.array([2., 0])
         f_xx, f_xy, f_yx, f_yy = CSEMajorAxisSet.hessian(x, y, **kwargs)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.CSEMajorAxisSet_ref.hessian(x, y, **kwargs)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=8)
