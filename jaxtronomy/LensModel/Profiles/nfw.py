@@ -59,7 +59,9 @@ class NFW(LensProfileBase):
          (returning zeros outside)
         """
         if interpol:
-            raise Exception("This class no longer supports interpol functionality in JAXtronomy.")
+            raise Exception(
+                "This class no longer supports interpol functionality in JAXtronomy."
+            )
         super(NFW, self).__init__()
 
     @staticmethod
@@ -82,7 +84,7 @@ class NFW(LensProfileBase):
         R = jnp.sqrt(x_**2 + y_**2)
         f_ = NFW.nfw_potential(R, Rs, rho0_input)
         return f_
-    
+
     @staticmethod
     @jit
     def derivatives(x, y, Rs, alpha_Rs, center_x=0, center_y=0):
@@ -318,9 +320,31 @@ class NFW(LensProfileBase):
         :type X: float >0
         """
         c = 0.0000001
-        a = jnp.where(X == 0, (-1 + 2 * jnp.arctanh(jnp.sqrt((1 - c) / (1 + c)))),
-                      jnp.where(X < 1, 1 / (X**2 - 1) * (1 - 2 / jnp.sqrt(1 - X**2) * jnp.arctanh(jnp.sqrt((1 - X) / (1 + X)))),
-                                jnp.where(X == 1, 1.0 / 3, 1 / (X**2 - 1) * (1 - 2 / jnp.sqrt(X**2 - 1) * jnp.arctan(jnp.sqrt((X - 1) / (1 + X)))))))
+        a = jnp.where(
+            X == 0,
+            (-1 + 2 * jnp.arctanh(jnp.sqrt((1 - c) / (1 + c)))),
+            jnp.where(
+                X < 1,
+                1
+                / (X**2 - 1)
+                * (
+                    1
+                    - 2 / jnp.sqrt(1 - X**2) * jnp.arctanh(jnp.sqrt((1 - X) / (1 + X)))
+                ),
+                jnp.where(
+                    X == 1,
+                    1.0 / 3,
+                    1
+                    / (X**2 - 1)
+                    * (
+                        1
+                        - 2
+                        / jnp.sqrt(X**2 - 1)
+                        * jnp.arctan(jnp.sqrt((X - 1) / (1 + X)))
+                    ),
+                ),
+            ),
+        )
         return a
 
     @staticmethod
@@ -334,9 +358,15 @@ class NFW(LensProfileBase):
         """
         c = 0.000001
         X = jnp.where(X < c, c, X)
-        a = jnp.where(X < 1, jnp.log(X / 2.0) + 1 / jnp.sqrt(1 - X**2) * jnp.arccosh(1.0 / X),
-                jnp.where(X == 1, 1 + jnp.log(1.0 / 2.0),
-                    jnp.log(X / 2) + 1 / jnp.sqrt(X**2 - 1) * jnp.arccos(1.0 / X)))
+        a = jnp.where(
+            X < 1,
+            jnp.log(X / 2.0) + 1 / jnp.sqrt(1 - X**2) * jnp.arccosh(1.0 / X),
+            jnp.where(
+                X == 1,
+                1 + jnp.log(1.0 / 2.0),
+                jnp.log(X / 2) + 1 / jnp.sqrt(X**2 - 1) * jnp.arccos(1.0 / X),
+            ),
+        )
         return a
 
     @staticmethod
@@ -349,8 +379,11 @@ class NFW(LensProfileBase):
         """
         c = 0.000001
         X = jnp.where(X < c, c, X)
-        a = jnp.where(X < 1, jnp.log(X / 2.0) ** 2 - jnp.arccosh(1.0 / X) ** 2,
-                      jnp.log(X / 2.0) ** 2 + jnp.arccos(1.0 / X) ** 2)
+        a = jnp.where(
+            X < 1,
+            jnp.log(X / 2.0) ** 2 - jnp.arccosh(1.0 / X) ** 2,
+            jnp.log(X / 2.0) ** 2 + jnp.arccos(1.0 / X) ** 2,
+        )
         return a
 
     @staticmethod

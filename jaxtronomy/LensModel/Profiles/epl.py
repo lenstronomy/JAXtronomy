@@ -485,6 +485,7 @@ class EPLQPhi(LensProfileBase):
         """
         return self._EPL.density_lens(r, theta_E, gamma)
 
+
 tree_util.register_pytree_node(
     EPLMajorAxis, EPLMajorAxis._tree_flatten, EPLMajorAxis._tree_unflatten
 )
