@@ -189,7 +189,8 @@ class NFW_ELLIPSE_CSE(LensProfileBase):
     # The following two methods are required to allow the JAX compiler to recognize
     # this class. Methods involving the self variable can be jit-decorated.
     # Class methods will need to be recompiled each time a variable in the aux_data
-    # changes to a new value (in this case, no recompiling is ever done)
+    # changes to a new value (will not need to recompile if it changes back to a
+    # previous value)
     def _tree_flatten(self):
         children = ()
         aux_data = {"high_accuracy": self.high_accuracy}
