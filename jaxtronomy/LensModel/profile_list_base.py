@@ -7,6 +7,8 @@ _JAXXED_MODELS = [
     "CSE",
     "EPL",
     "EPL_Q_PHI",
+    "HERNQUIST",
+    "HERNQUIST_ELLIPSE_CSE",
     "LOS",
     "LOS_MINIMAL",
     "NFW",
@@ -430,7 +432,7 @@ def lens_class(
 
         return GNFW()
     elif lens_type == "HERNQUIST":
-        from lenstronomy.LensModel.Profiles.hernquist import Hernquist
+        from jaxtronomy.LensModel.Profiles.hernquist import Hernquist
 
         return Hernquist()
     elif lens_type == "HERNQUIST_ELLIPSE_POTENTIAL":
@@ -440,7 +442,7 @@ def lens_class(
 
         return HernquistEllipsePotential()
     elif lens_type == "HERNQUIST_ELLIPSE_CSE":
-        from lenstronomy.LensModel.Profiles.hernquist_ellipse_cse import (
+        from jaxtronomy.LensModel.Profiles.hernquist_ellipse_cse import (
             HernquistEllipseCSE,
         )
 
