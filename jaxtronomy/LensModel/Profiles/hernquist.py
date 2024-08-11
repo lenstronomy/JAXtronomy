@@ -205,8 +205,7 @@ class Hernquist(LensProfileBase):
         r = jnp.sqrt(x_**2 + y_**2)
         r = jnp.maximum(r, Hernquist._s)
         X = r / Rs
-        f = jnp.where(X == 1, 1.0 / 3, 
-            (1 - Hernquist._F(X)) / (X**2 - 1))
+        f = jnp.where(X == 1, 1.0 / 3, (1 - Hernquist._F(X)) / (X**2 - 1))
         alpha_r = 2 * sigma0 * Rs * f * X
         f_x = alpha_r * x_ / r
         f_y = alpha_r * y_ / r
@@ -280,10 +279,18 @@ class Hernquist(LensProfileBase):
         """
         c = Hernquist._s
         X = jnp.where(X < c, c, X)
-        a = jnp.where(X == 0, 1.0 / jnp.sqrt(1 - c**2) * jnp.arctanh(jnp.sqrt((1 - c**2))),
-                jnp.where(X < 1, 1.0 / jnp.sqrt(1 - X**2) * jnp.arctanh(jnp.sqrt(1 - X**2)),
-                        jnp.where(X == 1, 1.0, 1.0 / jnp.sqrt(X**2 - 1) * jnp.arctan(jnp.sqrt(X**2 - 1)))        
-                )     
+        a = jnp.where(
+            X == 0,
+            1.0 / jnp.sqrt(1 - c**2) * jnp.arctanh(jnp.sqrt((1 - c**2))),
+            jnp.where(
+                X < 1,
+                1.0 / jnp.sqrt(1 - X**2) * jnp.arctanh(jnp.sqrt(1 - X**2)),
+                jnp.where(
+                    X == 1,
+                    1.0,
+                    1.0 / jnp.sqrt(X**2 - 1) * jnp.arctan(jnp.sqrt(X**2 - 1)),
+                ),
+            ),
         )
         return a
 

@@ -1,7 +1,9 @@
 __author__ = "sibirrer"
 
 
-from lenstronomy.LensModel.Profiles.hernquist_ellipse_cse import HernquistEllipseCSE as HernquistEllipseCSE_ref
+from lenstronomy.LensModel.Profiles.hernquist_ellipse_cse import (
+    HernquistEllipseCSE as HernquistEllipseCSE_ref,
+)
 from jaxtronomy.LensModel.Profiles.hernquist_ellipse_cse import HernquistEllipseCSE
 
 
@@ -31,7 +33,9 @@ class TestHernquistEllipseCSE(object):
         y = np.zeros_like(x)
         kwargs = {"sigma0": 0.5, "Rs": 2, "center_x": 0, "center_y": 0}
 
-        f_x_ref, f_y_ref = self.hernquist_cse_ref.derivatives(x, y, e1=0, e2=0, **kwargs)
+        f_x_ref, f_y_ref = self.hernquist_cse_ref.derivatives(
+            x, y, e1=0, e2=0, **kwargs
+        )
         f_x, f_y = HernquistEllipseCSE.derivatives(x, y, e1=0, e2=0, **kwargs)
         npt.assert_array_almost_equal(f_x, f_x_ref, decimal=8)
         npt.assert_array_almost_equal(f_y, f_y_ref, decimal=8)
@@ -41,7 +45,9 @@ class TestHernquistEllipseCSE(object):
         y = np.zeros_like(x)
         kwargs = {"sigma0": 0.5, "Rs": 2, "center_x": 0, "center_y": 0}
 
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.hernquist_cse_ref.hessian(x, y, e1=0, e2=0, **kwargs)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.hernquist_cse_ref.hessian(
+            x, y, e1=0, e2=0, **kwargs
+        )
         f_xx, f_xy, f_yx, f_yy = HernquistEllipseCSE.hessian(x, y, e1=0, e2=0, **kwargs)
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=8)

@@ -70,7 +70,9 @@ class TestHernquist(object):
         y = np.array([2])
         Rs = 1.0
         sigma0 = 0.5
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(x, y, sigma0, Rs)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
+            x, y, sigma0, Rs
+        )
         f_xx, f_xy, f_yx, f_yy = Hernquist.hessian(x, y, sigma0, Rs)
         npt.assert_array_almost_equal(f_xx_ref, f_xx, decimal=8)
         npt.assert_array_almost_equal(f_xy_ref, f_xy, decimal=8)
@@ -80,7 +82,9 @@ class TestHernquist(object):
         y = np.array([0])
         Rs = 1.0
         sigma0 = 0.5
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(x, y, sigma0, Rs)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
+            x, y, sigma0, Rs
+        )
         f_xx, f_xy, f_yx, f_yy = Hernquist.hessian(x, y, sigma0, Rs)
         npt.assert_array_almost_equal(f_xx_ref, f_xx, decimal=8)
         npt.assert_array_almost_equal(f_xy_ref, f_xy, decimal=8)
@@ -89,7 +93,9 @@ class TestHernquist(object):
 
         x = np.array([2, 3, 4])
         y = np.array([1, 1, 1])
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(x, y, sigma0, Rs)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
+            x, y, sigma0, Rs
+        )
         f_xx, f_xy, f_yx, f_yy = Hernquist.hessian(x, y, sigma0, Rs)
         npt.assert_array_almost_equal(f_xx_ref, f_xx, decimal=8)
         npt.assert_array_almost_equal(f_xy_ref, f_xy, decimal=8)
@@ -116,7 +122,6 @@ class TestHernquist(object):
         F = Hernquist._F(x)
         F_ref = self.profile_ref._F(x)
         npt.assert_almost_equal(F, F_ref, decimal=8)
-
 
 
 if __name__ == "__main__":
