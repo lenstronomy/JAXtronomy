@@ -34,7 +34,7 @@ class Hernquist(LensProfileBase):
 
     The lens model calculation uses angular units as arguments! So to execute a deflection angle calculation one uses
 
-    >>> from lenstronomy.LensModel.Profiles.hernquist import Hernquist
+    >>> from jaxtronomy.LensModel.Profiles.hernquist import Hernquist
     >>> hernquist = Hernquist()
     >>> alpha_x, alpha_y = hernquist.derivatives(x=1, y=1, Rs=rs_angle, sigma0=sigma0, center_x=0, center_y=0)
     """
