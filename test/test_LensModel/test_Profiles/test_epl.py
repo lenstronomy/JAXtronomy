@@ -26,7 +26,9 @@ class TestEPL(object):
         self.profile.set_static(theta_E, gamma, e1, e2)
         self.profile_ref.set_static(theta_E, gamma, e1, e2)
 
-        b_static, t_static, q_static, phi_static = self.profile.param_conv(theta_E, gamma, e1, e2)
+        b_static, t_static, q_static, phi_static = self.profile.param_conv(
+            theta_E, gamma, e1, e2
+        )
 
         (
             b_static_ref,
@@ -59,7 +61,9 @@ class TestEPL(object):
         self.profile.set_static(theta_E, gamma, e1, e2)
         self.profile_ref.set_static(theta_E, gamma, e1, e2)
 
-        b_static, t_static, q_static, phi_static = self.profile.param_conv(theta_E, gamma, e1, e2)
+        b_static, t_static, q_static, phi_static = self.profile.param_conv(
+            theta_E, gamma, e1, e2
+        )
 
         (
             b_static_ref,
