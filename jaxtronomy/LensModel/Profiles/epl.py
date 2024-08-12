@@ -11,8 +11,8 @@ import jax.numpy as jnp
 from jaxtronomy.Util.hyp2f1_util import hyp2f1_series as hyp2f1
 import jaxtronomy.Util.util as util
 import jaxtronomy.Util.param_util as param_util
+from jaxtronomy.LensModel.Profiles.spp import SPP
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
-from lenstronomy.LensModel.Profiles.spp import SPP
 
 jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 
@@ -72,11 +72,32 @@ class EPL(LensProfileBase):
         "center_y": 100,
     }
 
-    def __init__(self):
-        self.epl_major_axis = EPLMajorAxis()
-        self.spp = SPP()
-        super(EPL, self).__init__()
+    # These static self variables are not used until self.set_static is called
+    # However these need to be here for the JAX to correctly keep track of them
+    def __init__(self, b=0, t=0, q=0, phi=0, static=False):
+        self._static = static
+        self._b_static = b
+        self._t_static = t
+        self._q_static = q
+        self._phi_G_static = phi
 
+    # --------------------------------------------------------------------------------
+    # The following two methods are required to allow the JAX compiler to recognize
+    # this class. Methods involving the self variable can be jit-decorated.
+    # Class methods will need to be recompiled each time a variable in the aux_data
+    # changes to a new value (but there's no need to recompile if it changes to a previous value)
+    def _tree_flatten(self):
+        children = (self._b_static, self._t_static, self._q_static, self._phi_G_static)
+        aux_data = {"static": self._static}
+        return (children, aux_data)
+
+    @classmethod
+    def _tree_unflatten(cls, aux_data, children):
+        return cls(*children, **aux_data)
+
+    # --------------------------------------------------------------------------------
+
+    @jit
     def param_conv(self, theta_E, gamma, e1, e2):
         """Converts parameters as defined in this class to the parameters used in the
         EPLMajorAxis() class.
@@ -89,9 +110,11 @@ class EPL(LensProfileBase):
         """
         if self._static is True:
             return self._b_static, self._t_static, self._q_static, self._phi_G_static
-        return self._param_conv(theta_E, gamma, e1, e2)
+        else:
+            return self._param_conv(theta_E, gamma, e1, e2)
 
     @staticmethod
+    @jit
     def _param_conv(theta_E, gamma, e1, e2):
         """Convert parameters from :math:`R = \\sqrt{q x^2 + y^2/q}` to :math:`R =
         \\sqrt{q^2 x^2 + y^2}`
@@ -107,6 +130,7 @@ class EPL(LensProfileBase):
         b = theta_E * jnp.sqrt(q)
         return b, t, q, phi_G
 
+    # NOTE: Do not jit-decorate this function; it won't work correctly
     def set_static(self, theta_E, gamma, e1, e2, center_x=0, center_y=0):
         """
 
@@ -124,23 +148,16 @@ class EPL(LensProfileBase):
             self._t_static,
             self._q_static,
             self._phi_G_static,
-        ) = self._param_conv(theta_E, gamma, e1, e2)
+        ) = EPL._param_conv(theta_E, gamma, e1, e2)
 
+    # NOTE: Do not jit-decorate this function; it won't work correctly
     def set_dynamic(self):
         """
-
         :return:
         """
         self._static = False
-        if hasattr(self, "_b_static"):
-            del self._b_static
-        if hasattr(self, "_t_static"):
-            del self._t_static
-        if hasattr(self, "_phi_G_static"):
-            del self._phi_G_static
-        if hasattr(self, "_q_static"):
-            del self._q_static
 
+    @jit
     def function(self, x, y, theta_E, gamma, e1, e2, center_x=0, center_y=0):
         """
 
@@ -161,10 +178,11 @@ class EPL(LensProfileBase):
         # rotate
         x__, y__ = util.rotate(x_, y_, phi_G)
         # evaluate
-        f_ = self.epl_major_axis.function(x__, y__, b, t, q)
+        f_ = EPLMajorAxis.function(x__, y__, b, t, q)
         # rotate back
         return f_
 
+    @jit
     def derivatives(self, x, y, theta_E, gamma, e1, e2, center_x=0, center_y=0):
         """
 
@@ -185,11 +203,12 @@ class EPL(LensProfileBase):
         # rotate
         x__, y__ = util.rotate(x_, y_, phi_G)
         # evaluate
-        f__x, f__y = self.epl_major_axis.derivatives(x__, y__, b, t, q)
+        f__x, f__y = EPLMajorAxis.derivatives(x__, y__, b, t, q)
         # rotate back
         f_x, f_y = util.rotate(f__x, f__y, -phi_G)
         return f_x, f_y
 
+    @jit
     def hessian(self, x, y, theta_E, gamma, e1, e2, center_x=0, center_y=0):
         """
 
@@ -211,18 +230,19 @@ class EPL(LensProfileBase):
         # rotate
         x__, y__ = util.rotate(x_, y_, phi_G)
         # evaluate
-        f__xx, f__xy, f__yx, f__yy = self.epl_major_axis.hessian(x__, y__, b, t, q)
+        f__xx, f__xy, f__yx, f__yy = EPLMajorAxis.hessian(x__, y__, b, t, q)
         # rotate back
         kappa = 1.0 / 2 * (f__xx + f__yy)
         gamma1__ = 1.0 / 2 * (f__xx - f__yy)
         gamma2__ = f__xy
         gamma1 = jnp.cos(2 * phi_G) * gamma1__ - jnp.sin(2 * phi_G) * gamma2__
-        gamma2 = +jnp.sin(2 * phi_G) * gamma1__ + jnp.cos(2 * phi_G) * gamma2__
+        gamma2 = jnp.sin(2 * phi_G) * gamma1__ + jnp.cos(2 * phi_G) * gamma2__
         f_xx = kappa + gamma1
         f_yy = kappa - gamma1
         f_xy = gamma2
         return f_xx, f_xy, f_xy, f_yy
 
+    @jit
     def mass_3d_lens(self, r, theta_E, gamma, e1=None, e2=None):
         """Computes the spherical power-law mass enclosed (with SPP routine)
 
@@ -233,8 +253,9 @@ class EPL(LensProfileBase):
         :param e2: eccentricity component (not used)
         :return: mass enclosed a 3D radius r.
         """
-        return self.spp.mass_3d_lens(r, theta_E, gamma)
+        return SPP.mass_3d_lens(r, theta_E, gamma)
 
+    @jit
     def density_lens(self, r, theta_E, gamma, e1=None, e2=None):
         """Computes the density at 3d radius r given lens model parameterization. The
         integral in the LOS projection of this quantity results in the convergence
@@ -247,7 +268,7 @@ class EPL(LensProfileBase):
         :param e2: eccentricity component (not used)
         :return: mass enclosed a 3D radius r
         """
-        return self.spp.density_lens(r, theta_E, gamma)
+        return SPP.density_lens(r, theta_E, gamma)
 
 
 class EPLMajorAxis(LensProfileBase):
@@ -267,24 +288,9 @@ class EPLMajorAxis(LensProfileBase):
     def __init__(self):
         super(EPLMajorAxis, self).__init__()
 
-    # --------------------------------------------------------------------------------
-    # The following two methods are required to allow the JAX compiler to recognize
-    # this class. Methods involving the self variable can be jit-decorated.
-    # Class methods will need to be recompiled each time a variable in the aux_data
-    # changes to a new value (in this case, no recompiling is ever done)
-    def _tree_flatten(self):
-        children = ()
-        aux_data = {}
-        return (children, aux_data)
-
-    @classmethod
-    def _tree_unflatten(cls, aux_data, children):
-        return cls(*children, **aux_data)
-
-    # --------------------------------------------------------------------------------
-
+    @staticmethod
     @jit
-    def function(self, x, y, b, t, q):
+    def function(x, y, b, t, q):
         """Returns the lensing potential.
 
         :param x: x-coordinate in image plane relative to center (major axis)
@@ -295,7 +301,7 @@ class EPLMajorAxis(LensProfileBase):
         :return: lensing potential
         """
         # deflection from method
-        alpha_x, alpha_y = self.derivatives(x, y, b, t, q)
+        alpha_x, alpha_y = EPLMajorAxis.derivatives(x, y, b, t, q)
 
         # deflection potential, eq. (15)
         psi = (x * alpha_x + y * alpha_y) / (2 - t)
@@ -347,8 +353,9 @@ class EPLMajorAxis(LensProfileBase):
 
         return alpha_real, alpha_imag
 
+    @staticmethod
     @jit
-    def hessian(self, x, y, b, t, q):
+    def hessian(x, y, b, t, q):
         """Hessian matrix of the lensing potential.
 
         :param x: x-coordinate in image plane relative to center (major axis)
@@ -370,7 +377,7 @@ class EPLMajorAxis(LensProfileBase):
         kappa = jnp.nan_to_num(kappa, posinf=10**10, neginf=-(10**10))
 
         # deflection via method
-        alpha_x, alpha_y = self.derivatives(x, y, b, t, q)
+        alpha_x, alpha_y = EPLMajorAxis.derivatives(x, y, b, t, q)
 
         # shear, eq. (17), corrected version from arXiv/corrigendum
         gamma_1 = (1 - t) * (alpha_x * cos - alpha_y * sin) / r - kappa * cos2
@@ -411,6 +418,21 @@ class EPLQPhi(LensProfileBase):
         self._EPL = EPL()
         super(EPLQPhi, self).__init__()
 
+    # --------------------------------------------------------------------------------
+    # Makes it so that the functions in this class will not recompile when new
+    # instances of EPLQPhi are created
+    def _tree_flatten(self):
+        children = ()
+        aux_data = {}
+        return (children, aux_data)
+
+    @classmethod
+    def _tree_unflatten(cls, aux_data, children):
+        return cls(*children, **aux_data)
+
+    # --------------------------------------------------------------------------------
+
+    @jit
     def function(self, x, y, theta_E, gamma, q, phi, center_x=0, center_y=0):
         """
 
@@ -427,6 +449,7 @@ class EPLQPhi(LensProfileBase):
         e1, e2 = param_util.phi_q2_ellipticity(phi, q)
         return self._EPL.function(x, y, theta_E, gamma, e1, e2, center_x, center_y)
 
+    @jit
     def derivatives(self, x, y, theta_E, gamma, q, phi, center_x=0, center_y=0):
         """
 
@@ -443,6 +466,7 @@ class EPLQPhi(LensProfileBase):
         e1, e2 = param_util.phi_q2_ellipticity(phi, q)
         return self._EPL.derivatives(x, y, theta_E, gamma, e1, e2, center_x, center_y)
 
+    @jit
     def hessian(self, x, y, theta_E, gamma, q, phi, center_x=0, center_y=0):
         """
 
@@ -459,6 +483,7 @@ class EPLQPhi(LensProfileBase):
         e1, e2 = param_util.phi_q2_ellipticity(phi, q)
         return self._EPL.hessian(x, y, theta_E, gamma, e1, e2, center_x, center_y)
 
+    @jit
     def mass_3d_lens(self, r, theta_E, gamma, q=None, phi=None):
         """Computes the spherical power-law mass enclosed (with SPP routine).
 
@@ -471,6 +496,7 @@ class EPLQPhi(LensProfileBase):
         """
         return self._EPL.mass_3d_lens(r, theta_E, gamma)
 
+    @jit
     def density_lens(self, r, theta_E, gamma, q=None, phi=None):
         """Computes the density at 3d radius r given lens model parameterization. The
         integral in the LOS projection of this quantity results in the convergence
@@ -486,6 +512,5 @@ class EPLQPhi(LensProfileBase):
         return self._EPL.density_lens(r, theta_E, gamma)
 
 
-tree_util.register_pytree_node(
-    EPLMajorAxis, EPLMajorAxis._tree_flatten, EPLMajorAxis._tree_unflatten
-)
+tree_util.register_pytree_node(EPL, EPL._tree_flatten, EPL._tree_unflatten)
+tree_util.register_pytree_node(EPLQPhi, EPLQPhi._tree_flatten, EPLQPhi._tree_unflatten)

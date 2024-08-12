@@ -1,4 +1,5 @@
 from lenstronomy.Util.util import convert_bool_list
+from warnings import warn
 
 __all__ = ["ProfileListBase"]
 
@@ -17,6 +18,7 @@ _JAXXED_MODELS = [
     "PJAFFE_ELLIPSE_POTENTIAL",
     "SIS",
     "SHEAR",
+    "SPP",
 ]
 
 _SUPPORTED_MODELS = [
@@ -259,8 +261,10 @@ def lens_class(
     """
 
     if lens_type not in _JAXXED_MODELS:
-        print(
-            "Warning: the {} profile is not currently jaxified; using lenstronomy implementation.".format(
+        warn(
+            "The {} profile is not in JAXtronomy; using lenstronomy implementation.\n"
+            "Note that this may cause crashes in some situations where jax arrays are passed into"
+            " functions utilizing the numba compiler in lenstronomy (e.g. util.rotate)".format(
                 lens_type
             )
         )
@@ -630,7 +634,7 @@ def lens_class(
 
         return SPLCORE()
     elif lens_type == "SPP":
-        from lenstronomy.LensModel.Profiles.spp import SPP
+        from jaxtronomy.LensModel.Profiles.spp import SPP
 
         return SPP()
     elif lens_type == "SYNTHESIS":
