@@ -73,7 +73,7 @@ class EPL(LensProfileBase):
     }
 
     # These static self variables are not used until self.set_static is called
-    # However these need to be here for the JAX compiler to correctly keep track
+    # However these need to be here for the JAX to correctly keep track of them
     def __init__(self, b=0, t=0, q=0, phi=0, static=False):
         self._static = static
         self._b_static = b
