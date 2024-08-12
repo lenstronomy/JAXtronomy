@@ -22,30 +22,22 @@ class TestEPL(object):
 
     def test_param_conv(self):
         theta_E = 12.3
-        gamma, e1, e2 = 1.7, 0.3, -0.2
+        gamma, e1, e2 = 1.7, 0.3, -0.4
         self.profile.set_static(theta_E, gamma, e1, e2)
         self.profile_ref.set_static(theta_E, gamma, e1, e2)
-        self.profile._b_static, self._t_static, self._q_static, self._phi_G_static = (
-            self.profile.param_conv(theta_E, gamma, e1, e2)
-        )
+
+        b_static, t_static, q_static, phi_static = self.profile.param_conv(theta_E, gamma, e1, e2)
+
         (
-            self.profile_ref._b_static,
-            self._t_static,
-            self._q_static,
-            self._phi_G_static,
+            b_static_ref,
+            t_static_ref,
+            q_static_ref,
+            phi_static_ref,
         ) = self.profile_ref.param_conv(theta_E, gamma, e1, e2)
-        npt.assert_almost_equal(
-            self.profile._b_static, self.profile_ref._b_static, decimal=8
-        )
-        npt.assert_almost_equal(
-            self.profile._t_static, self.profile_ref._t_static, decimal=8
-        )
-        npt.assert_almost_equal(
-            self.profile._q_static, self.profile_ref._q_static, decimal=8
-        )
-        npt.assert_almost_equal(
-            self.profile._phi_G_static, self.profile_ref._phi_G_static, decimal=8
-        )
+        npt.assert_almost_equal(b_static, b_static_ref, decimal=8)
+        npt.assert_almost_equal(t_static, t_static_ref, decimal=8)
+        npt.assert_almost_equal(q_static, q_static_ref, decimal=8)
+        npt.assert_almost_equal(phi_static, phi_static_ref, decimal=8)
 
         theta_E = 11.3
         gamma, e1, e2 = 1.6, 0.2, -0.3
@@ -59,6 +51,26 @@ class TestEPL(object):
         npt.assert_almost_equal(t, t_ref, decimal=8)
         npt.assert_almost_equal(q, q_ref, decimal=8)
         npt.assert_almost_equal(phi_G, phi_G_ref, decimal=8)
+
+        # Do the same test as before to make sure that the
+        # static variables are correctly updated with new values
+        theta_E = 4.3
+        gamma, e1, e2 = 2.3, 0.4, -0.2
+        self.profile.set_static(theta_E, gamma, e1, e2)
+        self.profile_ref.set_static(theta_E, gamma, e1, e2)
+
+        b_static, t_static, q_static, phi_static = self.profile.param_conv(theta_E, gamma, e1, e2)
+
+        (
+            b_static_ref,
+            t_static_ref,
+            q_static_ref,
+            phi_static_ref,
+        ) = self.profile_ref.param_conv(theta_E, gamma, e1, e2)
+        npt.assert_almost_equal(b_static, b_static_ref, decimal=8)
+        npt.assert_almost_equal(t_static, t_static_ref, decimal=8)
+        npt.assert_almost_equal(q_static, q_static_ref, decimal=8)
+        npt.assert_almost_equal(phi_static, phi_static_ref, decimal=8)
 
     def test_function(self):
         x = np.array([1])

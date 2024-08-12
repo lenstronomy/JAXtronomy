@@ -130,6 +130,7 @@ class EPL(LensProfileBase):
         b = theta_E * jnp.sqrt(q)
         return b, t, q, phi_G
 
+    # NOTE: Do not jit-decorate this function; it won't work correctly
     def set_static(self, theta_E, gamma, e1, e2, center_x=0, center_y=0):
         """
 
@@ -147,8 +148,9 @@ class EPL(LensProfileBase):
             self._t_static,
             self._q_static,
             self._phi_G_static,
-        ) = self._param_conv(theta_E, gamma, e1, e2)
+        ) = EPL._param_conv(theta_E, gamma, e1, e2)
 
+    # NOTE: Do not jit-decorate this function; it won't work correctly
     def set_dynamic(self):
         """
         :return:
