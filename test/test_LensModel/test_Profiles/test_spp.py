@@ -67,7 +67,9 @@ class TestSPP(object):
         theta_E = 1.3
         gamma = 1.9
 
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.SPP_ref.hessian(x, y, theta_E, gamma)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.SPP_ref.hessian(
+            x, y, theta_E, gamma
+        )
         f_xx, f_xy, f_yx, f_yy = SPP.hessian(x, y, theta_E, gamma)
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=8)
@@ -76,7 +78,9 @@ class TestSPP(object):
 
         x = np.array([0])
         y = np.array([0])
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.SPP_ref.hessian(x, y, theta_E, gamma)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.SPP_ref.hessian(
+            x, y, theta_E, gamma
+        )
         f_xx, f_xy, f_yx, f_yy = SPP.hessian(x, y, theta_E, gamma)
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=8)
@@ -85,7 +89,9 @@ class TestSPP(object):
 
         x = np.array([2, 3, 4])
         y = np.array([1, 1, 1])
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.SPP_ref.hessian(x, y, theta_E, gamma)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.SPP_ref.hessian(
+            x, y, theta_E, gamma
+        )
         f_xx, f_xy, f_yx, f_yy = SPP.hessian(x, y, theta_E, gamma)
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=8)
@@ -170,7 +176,6 @@ class TestSPP(object):
         density_ref = self.SPP_ref.density_2d(x, y, rho0, gamma)
         density = SPP.density_2d(x, y, rho0, gamma)
         npt.assert_almost_equal(density, density_ref, decimal=8)
-
 
 
 if __name__ == "__main__":
