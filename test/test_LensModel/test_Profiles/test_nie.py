@@ -11,6 +11,7 @@ from lenstronomy.LensModel.Profiles.nie import NIEMajorAxis as NIEMajorAxis_ref
 
 jax.config.update("jax_enable_x64", True)
 
+
 class TestNIE(object):
     """Tests the Gaussian methods."""
 
@@ -52,7 +53,9 @@ class TestNIE(object):
         s = 0.00001
 
         f_xx, f_xy, f_yx, f_yy = self.nie.hessian(x, y, theta_E, e1, e2, s)
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.nie_ref.hessian(x, y, theta_E, e1, e2, s)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.nie_ref.hessian(
+            x, y, theta_E, e1, e2, s
+        )
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=5)
         npt.assert_almost_equal(f_yy, f_yy_ref, decimal=5)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=5)
@@ -144,10 +147,9 @@ class TestNIE(object):
 class TestNIEMajorAxis(object):
 
     def setup_method(self):
-        self.nie = NIEMajorAxis # Class methods have all been made static in jaxtronomy
+        self.nie = NIEMajorAxis  # Class methods have all been made static in jaxtronomy
         self.nie_ref = NIEMajorAxis_ref()
         test_init = NIEMajorAxis()
-
 
     def test_function(self):
         y = np.array([1.0, 2])
@@ -197,7 +199,6 @@ class TestNIEMajorAxis(object):
         psi = self.nie._psi(x, y, s, q)
         psi_ref = self.nie_ref._psi(x, y, s, q)
         npt.assert_almost_equal(psi, psi_ref, decimal=6)
-
 
 
 if __name__ == "__main__":

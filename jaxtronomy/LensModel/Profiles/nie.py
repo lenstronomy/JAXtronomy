@@ -285,7 +285,9 @@ class NIEMajorAxis(LensProfileBase):
         """Returns df/dx and df/dy of the function."""
         q = jnp.where(q >= 1, 0.99999999, q)
         psi = NIEMajorAxis._psi(x, y, q, s)
-        f_x = b / jnp.sqrt(1.0 - q**2) * jnp.arctan(jnp.sqrt(1.0 - q**2) * x / (psi + s))
+        f_x = (
+            b / jnp.sqrt(1.0 - q**2) * jnp.arctan(jnp.sqrt(1.0 - q**2) * x / (psi + s))
+        )
         f_y = (
             b
             / jnp.sqrt(1.0 - q**2)
@@ -336,5 +338,6 @@ class NIEMajorAxis(LensProfileBase):
         :return: phi
         """
         return jnp.sqrt(q**2 * (s**2 + x**2) + y**2)
+
 
 tree_util.register_pytree_node(NIE, NIE._tree_flatten, NIE._tree_unflatten)
