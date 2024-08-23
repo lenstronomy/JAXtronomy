@@ -108,8 +108,8 @@ class TestSPP(object):
     def test_theta2rho(self):
         theta_E = 7.8
         gamma = 2.4
-        rho_ref = self.SPP_ref.rho2theta(theta_E, gamma)
-        rho = SPP.rho2theta(theta_E, gamma)
+        rho_ref = self.SPP_ref.theta2rho(theta_E, gamma)
+        rho = SPP.theta2rho(theta_E, gamma)
         npt.assert_almost_equal(rho, rho_ref, decimal=8)
 
     def test_mass_3d(self):

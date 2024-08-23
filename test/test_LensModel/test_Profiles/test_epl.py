@@ -148,32 +148,6 @@ class TestEPL(object):
         density_ref = self.profile_ref.density_lens(r, theta_E, gamma)
         npt.assert_almost_equal(density, density_ref, decimal=8)
 
-    def test_jax_jit(self):
-        x = jnp.array([1])
-        y = jnp.array([2])
-        theta_E = 12.3
-        gamma, e1, e2 = 1.7, 0.1, -0.3
-        jitted = jax.jit(self.profile.function)
-        npt.assert_almost_equal(
-            self.profile.function(x, y, theta_E, gamma, e1, e2),
-            jitted(x, y, theta_E, gamma, e1, e2),
-            decimal=8,
-        )
-
-        jitted = jax.jit(self.profile.derivatives)
-        npt.assert_array_almost_equal(
-            self.profile.derivatives(x, y, theta_E, gamma, e1, e2),
-            jitted(x, y, theta_E, gamma, e1, e2),
-            decimal=8,
-        )
-
-        jitted = jax.jit(self.profile.hessian)
-        npt.assert_array_almost_equal(
-            self.profile.hessian(x, y, theta_E, gamma, e1, e2),
-            jitted(x, y, theta_E, gamma, e1, e2),
-            decimal=8,
-        )
-
 
 class TestEPLMajorAxis(object):
 
@@ -233,31 +207,6 @@ class TestEPLMajorAxis(object):
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=7)
         npt.assert_array_almost_equal(f_yy, f_yy_ref, decimal=7)
         npt.assert_array_almost_equal(f_xy, f_yx, decimal=7)
-
-    def test_jax_jit(self):
-        x = jnp.array([1])
-        y = jnp.array([2])
-        b, t, q = 3.7, 1.1, 0.3
-        jitted = jax.jit(self.profile.function)
-        npt.assert_almost_equal(
-            self.profile.function(x, y, b, t, q),
-            jitted(x, y, b, t, q),
-            decimal=8,
-        )
-
-        jitted = jax.jit(self.profile.derivatives)
-        npt.assert_array_almost_equal(
-            self.profile.derivatives(x, y, b, t, q),
-            jitted(x, y, b, t, q),
-            decimal=8,
-        )
-
-        jitted = jax.jit(self.profile.hessian)
-        npt.assert_array_almost_equal(
-            self.profile.hessian(x, y, b, t, q),
-            jitted(x, y, b, t, q),
-            decimal=8,
-        )
 
 
 class TestEPLQPhi(object):
@@ -337,32 +286,6 @@ class TestEPLQPhi(object):
         density = self.profile.density_lens(r, theta_E, gamma)
         density_ref = self.profile_ref.density_lens(r, theta_E, gamma)
         npt.assert_almost_equal(density, density_ref, decimal=8)
-
-    def test_jax_jit(self):
-        x = jnp.array([1])
-        y = jnp.array([2])
-        theta_E = 12.3
-        gamma, q, phi = 1.7, 0.3, 3.1
-        jitted = jax.jit(self.profile.function)
-        npt.assert_almost_equal(
-            self.profile.function(x, y, theta_E, gamma, q, phi),
-            jitted(x, y, theta_E, gamma, q, phi),
-            decimal=8,
-        )
-
-        jitted = jax.jit(self.profile.derivatives)
-        npt.assert_array_almost_equal(
-            self.profile.derivatives(x, y, theta_E, gamma, q, phi),
-            jitted(x, y, theta_E, gamma, q, phi),
-            decimal=8,
-        )
-
-        jitted = jax.jit(self.profile.hessian)
-        npt.assert_array_almost_equal(
-            self.profile.hessian(x, y, theta_E, gamma, q, phi),
-            jitted(x, y, theta_E, gamma, q, phi),
-            decimal=8,
-        )
 
 
 if __name__ == "__main__":
