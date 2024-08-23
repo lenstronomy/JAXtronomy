@@ -14,10 +14,12 @@ _JAXXED_MODELS = [
     "LOS_MINIMAL",
     "NFW",
     "NFW_ELLIPSE_CSE",
+    "NIE",
     "PJAFFE",
     "PJAFFE_ELLIPSE_POTENTIAL",
-    "SIS",
     "SHEAR",
+    "SIE",
+    "SIS",
     "SPP",
 ]
 
@@ -520,7 +522,7 @@ def lens_class(
 
         return NFWMCEllipsePotential(z_lens=z_lens, z_source=z_source)
     elif lens_type == "NIE":
-        from lenstronomy.LensModel.Profiles.nie import NIE
+        from jaxtronomy.LensModel.Profiles.nie import NIE
 
         return NIE()
     elif lens_type == "NIE_POTENTIAL":
@@ -610,7 +612,7 @@ def lens_class(
 
         return ShearReduced()
     elif lens_type == "SIE":
-        from lenstronomy.LensModel.Profiles.sie import SIE
+        from jaxtronomy.LensModel.Profiles.sie import SIE
 
         return SIE()
     elif lens_type == "SIS":
