@@ -11,6 +11,12 @@ sersic_major_axis_conf = convention_conf.get("sersic_major_axis", False)
 
 __all__ = ["LightModelBase"]
 
+_JAXXED_MODELS = [
+    "SERSIC",
+    "SERSIC_ELLIPSE",
+    "SERSIC_ELLIPSE_Q_PHI",
+    "CORE_SERSIC",
+]
 
 _MODELS_SUPPORTED = [
     "GAUSSIAN",
@@ -62,6 +68,7 @@ class LightModelBase(object):
         if sersic_major_axis is None:
             sersic_major_axis = sersic_major_axis_conf
         for profile_type in light_model_list:
+            """
             if profile_type == "GAUSSIAN":
                 from lenstronomy.LightModel.Profiles.gaussian import Gaussian
 
@@ -84,12 +91,13 @@ class LightModelBase(object):
                 )
 
                 self.func_list.append(MultiGaussianEllipse())
-            elif profile_type == "SERSIC":
-                from lenstronomy.LightModel.Profiles.sersic import Sersic
+            """
+            if profile_type == "SERSIC":
+                from jaxtronomy.LightModel.Profiles.sersic import Sersic
 
                 self.func_list.append(Sersic(smoothing=smoothing))
             elif profile_type == "SERSIC_ELLIPSE":
-                from lenstronomy.LightModel.Profiles.sersic import SersicElliptic
+                from jaxtronomy.LightModel.Profiles.sersic import SersicElliptic
 
                 self.func_list.append(
                     SersicElliptic(
@@ -97,7 +105,7 @@ class LightModelBase(object):
                     )
                 )
             elif profile_type == "SERSIC_ELLIPSE_Q_PHI":
-                from lenstronomy.LightModel.Profiles.sersic import SersicElliptic_qPhi
+                from jaxtronomy.LightModel.Profiles.sersic import SersicElliptic_qPhi
 
                 self.func_list.append(
                     SersicElliptic_qPhi(
@@ -105,105 +113,108 @@ class LightModelBase(object):
                     )
                 )
             elif profile_type == "CORE_SERSIC":
-                from lenstronomy.LightModel.Profiles.sersic import CoreSersic
+                from jaxtronomy.LightModel.Profiles.sersic import CoreSersic
 
                 self.func_list.append(
                     CoreSersic(smoothing=smoothing, sersic_major_axis=sersic_major_axis)
                 )
-            elif profile_type == "SHAPELETS":
-                from lenstronomy.LightModel.Profiles.shapelets import ShapeletSet
+            
+            #elif profile_type == "SHAPELETS":
+            #    from lenstronomy.LightModel.Profiles.shapelets import ShapeletSet
 
-                self.func_list.append(ShapeletSet())
-            elif profile_type == "SHAPELETS_ELLIPSE":
-                from lenstronomy.LightModel.Profiles.shapelets_ellipse import (
-                    ShapeletSetEllipse,
-                )
+            #    self.func_list.append(ShapeletSet())
+            #elif profile_type == "SHAPELETS_ELLIPSE":
+            #    from lenstronomy.LightModel.Profiles.shapelets_ellipse import (
+            #        ShapeletSetEllipse,
+            #    )
 
-                self.func_list.append(ShapeletSetEllipse())
-            elif profile_type == "SHAPELETS_POLAR":
-                from lenstronomy.LightModel.Profiles.shapelets_polar import (
-                    ShapeletSetPolar,
-                )
+            #    self.func_list.append(ShapeletSetEllipse())
+            #elif profile_type == "SHAPELETS_POLAR":
+            #    from lenstronomy.LightModel.Profiles.shapelets_polar import (
+            #        ShapeletSetPolar,
+            #    )
 
-                self.func_list.append(ShapeletSetPolar(exponential=False))
-            elif profile_type == "SHAPELETS_POLAR_EXP":
-                from lenstronomy.LightModel.Profiles.shapelets_polar import (
-                    ShapeletSetPolar,
-                )
+            #    self.func_list.append(ShapeletSetPolar(exponential=False))
+            #elif profile_type == "SHAPELETS_POLAR_EXP":
+            #    from lenstronomy.LightModel.Profiles.shapelets_polar import (
+            #        ShapeletSetPolar,
+            #    )
 
-                self.func_list.append(ShapeletSetPolar(exponential=True))
-            elif profile_type == "HERNQUIST":
-                from lenstronomy.LightModel.Profiles.hernquist import Hernquist
+            #    self.func_list.append(ShapeletSetPolar(exponential=True))
+            #elif profile_type == "HERNQUIST":
+            #    from lenstronomy.LightModel.Profiles.hernquist import Hernquist
 
-                self.func_list.append(Hernquist())
-            elif profile_type == "HERNQUIST_ELLIPSE":
-                from lenstronomy.LightModel.Profiles.hernquist import HernquistEllipse
+            #    self.func_list.append(Hernquist())
+            #elif profile_type == "HERNQUIST_ELLIPSE":
+            #    from lenstronomy.LightModel.Profiles.hernquist import HernquistEllipse
 
-                self.func_list.append(HernquistEllipse())
-            elif profile_type == "PJAFFE":
-                from lenstronomy.LightModel.Profiles.pseudo_jaffe import PseudoJaffe
+            #    self.func_list.append(HernquistEllipse())
+            #elif profile_type == "PJAFFE":
+            #    from lenstronomy.LightModel.Profiles.pseudo_jaffe import PseudoJaffe
 
-                self.func_list.append(PseudoJaffe())
-            elif profile_type == "PJAFFE_ELLIPSE":
-                from lenstronomy.LightModel.Profiles.pseudo_jaffe import (
-                    PseudoJaffeEllipse,
-                )
+            #    self.func_list.append(PseudoJaffe())
+            #elif profile_type == "PJAFFE_ELLIPSE":
+            #    from lenstronomy.LightModel.Profiles.pseudo_jaffe import (
+            #        PseudoJaffeEllipse,
+            #    )
 
-                self.func_list.append(PseudoJaffeEllipse())
-            elif profile_type == "UNIFORM":
-                from lenstronomy.LightModel.Profiles.uniform import Uniform
+            #    self.func_list.append(PseudoJaffeEllipse())
+            #elif profile_type == "UNIFORM":
+            #    from lenstronomy.LightModel.Profiles.uniform import Uniform
 
-                self.func_list.append(Uniform())
-            elif profile_type == "POWER_LAW":
-                from lenstronomy.LightModel.Profiles.power_law import PowerLaw
+            #    self.func_list.append(Uniform())
+            #elif profile_type == "POWER_LAW":
+            #    from lenstronomy.LightModel.Profiles.power_law import PowerLaw
 
-                self.func_list.append(PowerLaw())
-            elif profile_type == "NIE":
-                from lenstronomy.LightModel.Profiles.nie import NIE
+            #    self.func_list.append(PowerLaw())
+            #elif profile_type == "NIE":
+            #    from lenstronomy.LightModel.Profiles.nie import NIE
 
-                self.func_list.append(NIE())
-            elif profile_type == "CHAMELEON":
-                from lenstronomy.LightModel.Profiles.chameleon import Chameleon
+            #    self.func_list.append(NIE())
+            #elif profile_type == "CHAMELEON":
+            #    from lenstronomy.LightModel.Profiles.chameleon import Chameleon
 
-                self.func_list.append(Chameleon())
-            elif profile_type == "DOUBLE_CHAMELEON":
-                from lenstronomy.LightModel.Profiles.chameleon import DoubleChameleon
+            #    self.func_list.append(Chameleon())
+            #elif profile_type == "DOUBLE_CHAMELEON":
+            #    from lenstronomy.LightModel.Profiles.chameleon import DoubleChameleon
 
-                self.func_list.append(DoubleChameleon())
-            elif profile_type == "TRIPLE_CHAMELEON":
-                from lenstronomy.LightModel.Profiles.chameleon import TripleChameleon
+            #    self.func_list.append(DoubleChameleon())
+            #elif profile_type == "TRIPLE_CHAMELEON":
+            #    from lenstronomy.LightModel.Profiles.chameleon import TripleChameleon
 
-                self.func_list.append(TripleChameleon())
-            elif profile_type == "INTERPOL":
-                from lenstronomy.LightModel.Profiles.interpolation import Interpol
+            #    self.func_list.append(TripleChameleon())
+            #elif profile_type == "INTERPOL":
+            #    from lenstronomy.LightModel.Profiles.interpolation import Interpol
 
-                self.func_list.append(Interpol())
-            elif profile_type == "SLIT_STARLETS":
-                from lenstronomy.LightModel.Profiles.starlets import SLIT_Starlets
+            #    self.func_list.append(Interpol())
+            #elif profile_type == "SLIT_STARLETS":
+            #    from lenstronomy.LightModel.Profiles.starlets import SLIT_Starlets
 
-                self.func_list.append(
-                    SLIT_Starlets(fast_inverse=True, second_gen=False)
-                )
-            elif profile_type == "SLIT_STARLETS_GEN2":
-                from lenstronomy.LightModel.Profiles.starlets import SLIT_Starlets
+            #    self.func_list.append(
+            #        SLIT_Starlets(fast_inverse=True, second_gen=False)
+            #    )
+            #elif profile_type == "SLIT_STARLETS_GEN2":
+            #    from lenstronomy.LightModel.Profiles.starlets import SLIT_Starlets
 
-                self.func_list.append(SLIT_Starlets(second_gen=True))
-            elif profile_type == "LINEAR":
-                from lenstronomy.LightModel.Profiles.linear import Linear
+            #    self.func_list.append(SLIT_Starlets(second_gen=True))
+            #elif profile_type == "LINEAR":
+            #    from lenstronomy.LightModel.Profiles.linear import Linear
 
-                self.func_list.append(Linear())
-            elif profile_type == "LINEAR_ELLIPSE":
-                from lenstronomy.LightModel.Profiles.linear import LinearEllipse
+            #    self.func_list.append(Linear())
+            #elif profile_type == "LINEAR_ELLIPSE":
+            #    from lenstronomy.LightModel.Profiles.linear import LinearEllipse
 
-                self.func_list.append(LinearEllipse())
-            elif profile_type == "LINE_PROFILE":
-                from lenstronomy.LightModel.Profiles.lineprofile import LineProfile
+            #    self.func_list.append(LinearEllipse())
+            #elif profile_type == "LINE_PROFILE":
+            #    from lenstronomy.LightModel.Profiles.lineprofile import LineProfile
 
-                self.func_list.append(LineProfile())
+            #    self.func_list.append(LineProfile())
+            
             else:
                 raise ValueError(
-                    "No light model of type %s found! Supported are the following models: %s"
-                    % (profile_type, _MODELS_SUPPORTED)
+                    "Light model of type %s not supported by jaxtronomy! Please use lenstronomy instead.\n"
+                    "Supported models in jaxtronomy are %s"
+                    % (profile_type, _JAXXED_MODELS)
                 )
         self._num_func = len(self.func_list)
 

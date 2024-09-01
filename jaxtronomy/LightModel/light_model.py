@@ -1,7 +1,7 @@
 __author__ = "sibirrer"
 
 
-from lenstronomy.LightModel.linear_basis import LinearBasis
+from jaxtronomy.LightModel.linear_basis import LinearBasis
 
 __all__ = ["LightModel"]
 

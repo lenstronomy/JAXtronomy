@@ -2,7 +2,9 @@ __author__ = "sibirrer"
 
 #  this file contains a class to make a Sersic profile
 
+from jax import jit, tree_util
 import jax.numpy as jnp
+
 from jaxtronomy.LensModel.Profiles.sersic_utils import SersicUtil
 import jaxtronomy.Util.param_util as param_util
 
@@ -34,6 +36,25 @@ class Sersic(SersicUtil):
         "center_y": 100,
     }
 
+    
+    # --------------------------------------------------------------------------------
+    # The following two methods are required to allow the JAX compiler to recognize
+    # this class. Methods involving the self variable can be jit-decorated.
+    # Class methods will need to be recompiled each time a variable in the aux_data
+    # changes to a new value (but there's no need to recompile if it changes to a previous value)
+    def _tree_flatten(self):
+        children = (self._smoothing,)
+        aux_data = {"sersic_major_axis": self._sersic_major_axis}
+        return (children, aux_data)
+
+    @classmethod
+    def _tree_unflatten(cls, aux_data, children):
+        return cls(*children, **aux_data)
+
+    # --------------------------------------------------------------------------------
+    
+
+    @jit
     def function(
         self, x, y, amp, R_sersic, n_sersic, center_x=0, center_y=0, max_R_frac=1000.0
     ):
@@ -54,6 +75,8 @@ class Sersic(SersicUtil):
         )
         result = self._r_sersic(R, R_sersic, n_sersic, max_R_frac)
         return amp * result
+    
+tree_util.register_pytree_node(Sersic, Sersic._tree_flatten, Sersic._tree_unflatten)
 
 
 class SersicElliptic(SersicUtil):
@@ -89,6 +112,23 @@ class SersicElliptic(SersicUtil):
         "center_y": 100,
     }
 
+    # --------------------------------------------------------------------------------
+    # The following two methods are required to allow the JAX compiler to recognize
+    # this class. Methods involving the self variable can be jit-decorated.
+    # Class methods will need to be recompiled each time a variable in the aux_data
+    # changes to a new value (but there's no need to recompile if it changes to a previous value)
+    def _tree_flatten(self):
+        children = (self._smoothing,)
+        aux_data = {"sersic_major_axis": self._sersic_major_axis}
+        return (children, aux_data)
+
+    @classmethod
+    def _tree_unflatten(cls, aux_data, children):
+        return cls(*children, **aux_data)
+
+    # --------------------------------------------------------------------------------
+
+    @jit
     def function(
         self,
         x,
@@ -122,6 +162,8 @@ class SersicElliptic(SersicUtil):
         result = self._r_sersic(R, R_sersic, n_sersic, max_R_frac)
         return amp * result
 
+tree_util.register_pytree_node(SersicElliptic, SersicElliptic._tree_flatten, SersicElliptic._tree_unflatten)
+
 
 class SersicElliptic_qPhi(SersicUtil):
     """This class is the same as SersicElliptic except sampling over q and phi instead
@@ -147,9 +189,23 @@ class SersicElliptic_qPhi(SersicUtil):
         "center_y": 100,
     }
 
-    def __init__(self, *args, **kwargs):
-        self._sersic_e1e2 = SersicElliptic(*args, **kwargs)
+    # --------------------------------------------------------------------------------
+    # The following two methods are required to allow the JAX compiler to recognize
+    # this class. Methods involving the self variable can be jit-decorated.
+    # Class methods will need to be recompiled each time a variable in the aux_data
+    # changes to a new value (but there's no need to recompile if it changes to a previous value)
+    def _tree_flatten(self):
+        children = (self._smoothing,)
+        aux_data = {"sersic_major_axis": self._sersic_major_axis}
+        return (children, aux_data)
 
+    @classmethod
+    def _tree_unflatten(cls, aux_data, children):
+        return cls(*children, **aux_data)
+
+    # --------------------------------------------------------------------------------
+
+    @jit
     def function(
         self,
         x,
@@ -179,9 +235,12 @@ class SersicElliptic_qPhi(SersicUtil):
         """
 
         e1, e2 = param_util.phi_q2_ellipticity(phi, q)
-        return self._sersic_e1e2.function(
-            x, y, amp, R_sersic, n_sersic, e1, e2, center_x, center_y, max_R_frac
-        )
+        R_sersic = jnp.maximum(0, R_sersic)
+        R = self.get_distance_from_center(x, y, e1, e2, center_x, center_y)
+        result = self._r_sersic(R, R_sersic, n_sersic, max_R_frac)
+        return amp * result
+    
+tree_util.register_pytree_node(SersicElliptic_qPhi, SersicElliptic_qPhi._tree_flatten, SersicElliptic_qPhi._tree_unflatten)
 
 
 class CoreSersic(SersicUtil):
@@ -233,6 +292,23 @@ class CoreSersic(SersicUtil):
         "center_y": 100,
     }
 
+    # --------------------------------------------------------------------------------
+    # The following two methods are required to allow the JAX compiler to recognize
+    # this class. Methods involving the self variable can be jit-decorated.
+    # Class methods will need to be recompiled each time a variable in the aux_data
+    # changes to a new value (but there's no need to recompile if it changes to a previous value)
+    def _tree_flatten(self):
+        children = (self._smoothing,)
+        aux_data = {"sersic_major_axis": self._sersic_major_axis}
+        return (children, aux_data)
+
+    @classmethod
+    def _tree_unflatten(cls, aux_data, children):
+        return cls(*children, **aux_data)
+
+    # --------------------------------------------------------------------------------
+
+    @jit
     def function(
         self,
         x,
@@ -282,3 +358,5 @@ class CoreSersic(SersicUtil):
             )
         )
         return jnp.nan_to_num(result)
+
+tree_util.register_pytree_node(CoreSersic, CoreSersic._tree_flatten, CoreSersic._tree_unflatten)

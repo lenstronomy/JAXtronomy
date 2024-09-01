@@ -1,5 +1,7 @@
-import jax.scipy.special as special
+from jax import jit, tree_util
 import jax.numpy as jnp
+import jax.scipy.special as special
+
 from jaxtronomy.Util import param_util
 
 __all__ = ["SersicUtil"]
@@ -20,6 +22,23 @@ class SersicUtil(object):
         self._smoothing = smoothing
         self._sersic_major_axis = sersic_major_axis
 
+    # --------------------------------------------------------------------------------
+    # The following two methods are required to allow the JAX compiler to recognize
+    # this class. Methods involving the self variable can be jit-decorated.
+    # Class methods will need to be recompiled each time a variable in the aux_data
+    # changes to a new value (but there's no need to recompile if it changes to a previous value)
+    def _tree_flatten(self):
+        children = (self._smoothing,)
+        aux_data = {"sersic_major_axis": self._sersic_major_axis}
+        return (children, aux_data)
+
+    @classmethod
+    def _tree_unflatten(cls, aux_data, children):
+        return cls(*children, **aux_data)
+
+    # --------------------------------------------------------------------------------
+
+    @jit
     def k_bn(self, n, Re):
         """Returns normalisation of the sersic profile such that Re is the half light
         radius given n_sersic slope."""
@@ -27,6 +46,7 @@ class SersicUtil(object):
         k = bn * Re ** (-1.0 / n)
         return k, bn
 
+    @jit
     def k_Re(self, n, k):
         """"""
         bn = self.b_n(n)
@@ -34,6 +54,7 @@ class SersicUtil(object):
         return Re
 
     @staticmethod
+    @jit
     def b_n(n):
         """B(n) computation. This is the approximation of the exact solution to the
         relation, 2*incomplete_gamma_function(2n; b_n) = Gamma_function(2*n).
@@ -47,6 +68,7 @@ class SersicUtil(object):
         )  # make sure bn is strictly positive as a save guard for very low n_sersic
         return bn
 
+    @jit
     def get_distance_from_center(self, x, y, e1, e2, center_x, center_y):
         """Get the distance from the center of Sersic, accounting for orientation and
         axis ratio :param x:
@@ -75,6 +97,7 @@ class SersicUtil(object):
             r = jnp.sqrt(x_**2 + y_**2)
         return r
 
+    @jit
     def _x_reduced(self, x, y, n_sersic, r_eff, center_x, center_y):
         """Coordinate transform to normalized radius :param x:
 
@@ -86,13 +109,11 @@ class SersicUtil(object):
         x_ = x - center_x
         y_ = y - center_y
         r = jnp.sqrt(x_**2 + y_**2)
-        if isinstance(r, int) or isinstance(r, float):
-            r = max(self._s, r)
-        else:
-            r[r < self._s] = self._s
+        r = jnp.where(r < self._s, self._s, r)
         x_reduced = (r / r_eff) ** (1.0 / n_sersic)
         return x_reduced
 
+    @jit
     def _alpha_eff(self, r_eff, n_sersic, k_eff):
         """Deflection angle at r_eff :param r_eff:
 
@@ -111,6 +132,7 @@ class SersicUtil(object):
         )
         return -alpha_eff
 
+    @jit
     def alpha_abs(self, x, y, n_sersic, r_eff, k_eff, center_x=0, center_y=0):
         """
 
@@ -130,6 +152,7 @@ class SersicUtil(object):
         alpha = 2.0 * a_eff * x_red ** (-n) * (special.gammainc(2 * n, b * x_red))
         return alpha
 
+    @jit
     def d_alpha_dr(self, x, y, n_sersic, r_eff, k_eff, center_x=0, center_y=0):
         """
 
@@ -158,6 +181,7 @@ class SersicUtil(object):
             "not implemented! Use a Multi-Gaussian-component decomposition."
         )
 
+    @jit
     def _total_flux(self, r_eff, I_eff, n_sersic):
         """Computes total flux of a round Sersic profile.
 
@@ -178,6 +202,7 @@ class SersicUtil(object):
             * special.gamma(2 * n_sersic)
         )
 
+    @jit
     def total_flux(self, amp, R_sersic, n_sersic, e1=0, e2=0, **kwargs):
         """Computes analytical integral to compute total flux of the Sersic profile.
 
@@ -198,6 +223,7 @@ class SersicUtil(object):
             r_eff = R_sersic
         return self._total_flux(r_eff=r_eff, I_eff=amp, n_sersic=n_sersic)
 
+    @jit
     def _R_stable(self, R):
         """Floor R_ at self._smoothing for numerical stability.
 
@@ -206,6 +232,7 @@ class SersicUtil(object):
         """
         return jnp.maximum(self._smoothing, R)
 
+    @jit
     def _r_sersic(
         self, R, R_sersic, n_sersic, max_R_frac=1000.0, alpha=1.0, R_break=0.0
     ):
@@ -222,15 +249,9 @@ class SersicUtil(object):
         R_sersic_ = self._R_stable(R_sersic)
         bn = self.b_n(n_sersic)
         R_frac = R_ / R_sersic_
-        if isinstance(R_, int) or isinstance(R_, float):
-            if R_frac > max_R_frac:
-                result = 0
-            else:
-                exponent = -bn * (R_frac ** (1.0 / n_sersic) - 1.0)
-                result = jnp.exp(exponent)
-        else:
-            R_frac_real = R_frac[R_frac <= max_R_frac]
-            exponent = -bn * (R_frac_real ** (1.0 / n_sersic) - 1.0)
-            result = jnp.zeros_like(R_)
-            result[R_frac <= max_R_frac] = jnp.exp(exponent)
+
+        exponent = -bn * (R_frac ** (1.0 / n_sersic) - 1.0)
+        result = jnp.where(R_frac <= max_R_frac, jnp.exp(exponent), 0)
         return jnp.nan_to_num(result)
+
+tree_util.register_pytree_node(SersicUtil, SersicUtil._tree_flatten, SersicUtil._tree_unflatten)
