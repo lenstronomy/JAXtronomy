@@ -1,5 +1,6 @@
 __author__ = "sibirrer"
 
+# NOTE: Copy pasted from lenstronomy, functions have not been jaxified yet
 # this file contains a class which describes the surface brightness of the light models
 
 import numpy as np
