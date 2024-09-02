@@ -42,7 +42,7 @@ class SersicUtil(object):
     def k_bn(self, n, Re):
         """Returns normalisation of the sersic profile such that Re is the half light
         radius given n_sersic slope.
-        
+
         :param n: Sersic index
         :param Re: the desired half light radius
         """
@@ -54,7 +54,7 @@ class SersicUtil(object):
     @jit
     def k_Re(self, n, k):
         """Returns the half light radius given the n_sersic slope and normalization of
-        the sersic profile
+        the sersic profile.
 
         :param n: Sersic index
         :param k: normalization of the sersic profile
@@ -82,8 +82,8 @@ class SersicUtil(object):
     @jit
     def get_distance_from_center(self, x, y, e1, e2, center_x, center_y):
         """Get the distance from the center of Sersic, accounting for orientation and
-        axis ratio 
-        
+        axis ratio.
+
         :param x: position
         :param y: position
         :param e1: eccentricity
@@ -112,7 +112,7 @@ class SersicUtil(object):
 
     @jit
     def _x_reduced(self, x, y, n_sersic, r_eff, center_x, center_y):
-        """Coordinate transform to normalized radius
+        """Coordinate transform to normalized radius.
 
         :param x: position
         :param y: position
@@ -129,7 +129,7 @@ class SersicUtil(object):
 
     @jit
     def _alpha_eff(self, r_eff, n_sersic, k_eff):
-        """Deflection angle at r_eff
+        """Deflection angle at r_eff.
 
         :param r_eff: projected half light radius
         :param n_sersic: Sersic index
@@ -149,7 +149,7 @@ class SersicUtil(object):
 
     @jit
     def alpha_abs(self, x, y, n_sersic, r_eff, k_eff, center_x=0, center_y=0):
-        """Returns the absolute value of the deflection angle
+        """Returns the absolute value of the deflection angle.
 
         :param x: position
         :param y: position
@@ -169,7 +169,7 @@ class SersicUtil(object):
 
     @jit
     def d_alpha_dr(self, x, y, n_sersic, r_eff, k_eff, center_x=0, center_y=0):
-        """Returns the derivative of the deflection angle w.r.t radius
+        """Returns the derivative of the deflection angle w.r.t radius.
 
         :param x: position
         :param y: position
