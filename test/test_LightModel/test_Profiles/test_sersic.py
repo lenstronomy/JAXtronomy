@@ -33,7 +33,9 @@ class TestSersicMajorAxis(object):
         self.core_sersic = CoreSersic(smoothing=0.02, sersic_major_axis=True)
 
         self.sersic_ref = Sersic_ref(smoothing=0.02, sersic_major_axis=True)
-        self.sersic_elliptic_ref = SersicElliptic_ref(smoothing=0.02, sersic_major_axis=True)
+        self.sersic_elliptic_ref = SersicElliptic_ref(
+            smoothing=0.02, sersic_major_axis=True
+        )
         self.sersic_elliptic_qphi_ref = SersicElliptic_qPhi_ref(
             smoothing=0.02, sersic_major_axis=True
         )
@@ -47,9 +49,7 @@ class TestSersicMajorAxis(object):
         n_sersic = 3
         center_x = 0.1
         center_y = -0.3
-        values = self.sersic.function(
-            x, y, I0, R_sersic, n_sersic, center_x, center_y
-        )
+        values = self.sersic.function(x, y, I0, R_sersic, n_sersic, center_x, center_y)
         values_ref = self.sersic_ref.function(
             x, y, I0, R_sersic, n_sersic, center_x, center_y
         )
@@ -80,7 +80,7 @@ class TestSersicMajorAxis(object):
         R_sersic = 1
         n_sersic = 3
         q = 0.7
-        phi = np.pi/8
+        phi = np.pi / 8
         center_x = 0.1
         center_y = -0.3
         values = self.sersic_elliptic_qphi.function(
@@ -124,7 +124,9 @@ class TestSersic(object):
         self.core_sersic = CoreSersic(smoothing=0.02, sersic_major_axis=False)
 
         self.sersic_ref = Sersic_ref(smoothing=0.02, sersic_major_axis=False)
-        self.sersic_elliptic_ref = SersicElliptic_ref(smoothing=0.02, sersic_major_axis=False)
+        self.sersic_elliptic_ref = SersicElliptic_ref(
+            smoothing=0.02, sersic_major_axis=False
+        )
         self.sersic_elliptic_qphi_ref = SersicElliptic_qPhi_ref(
             smoothing=0.02, sersic_major_axis=False
         )
@@ -138,9 +140,7 @@ class TestSersic(object):
         n_sersic = 3
         center_x = 0.1
         center_y = -0.3
-        values = self.sersic.function(
-            x, y, I0, R_sersic, n_sersic, center_x, center_y
-        )
+        values = self.sersic.function(x, y, I0, R_sersic, n_sersic, center_x, center_y)
         values_ref = self.sersic_ref.function(
             x, y, I0, R_sersic, n_sersic, center_x, center_y
         )
@@ -171,7 +171,7 @@ class TestSersic(object):
         R_sersic = 1
         n_sersic = 3
         q = 0.7
-        phi = np.pi/8
+        phi = np.pi / 8
         center_x = 0.1
         center_y = -0.3
         values = self.sersic_elliptic_qphi.function(
@@ -201,6 +201,7 @@ class TestSersic(object):
             x, y, I0, R_sersic, Rb, n_sersic, gamma, e1, e2, center_x, center_y
         )
         npt.assert_array_almost_equal(values, values_ref, decimal=8)
+
 
 if __name__ == "__main__":
     pytest.main()

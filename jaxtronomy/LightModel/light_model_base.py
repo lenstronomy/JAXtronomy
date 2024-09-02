@@ -69,29 +69,26 @@ class LightModelBase(object):
         if sersic_major_axis is None:
             sersic_major_axis = sersic_major_axis_conf
         for profile_type in light_model_list:
-            """
-            if profile_type == "GAUSSIAN":
-                from lenstronomy.LightModel.Profiles.gaussian import Gaussian
+            """If profile_type == "GAUSSIAN": from
+            lenstronomy.LightModel.Profiles.gaussian import Gaussian.
 
-                self.func_list.append(Gaussian())
-            elif profile_type == "GAUSSIAN_ELLIPSE":
-                from lenstronomy.LightModel.Profiles.gaussian import GaussianEllipse
+            self.func_list.append(Gaussian()) elif profile_type ==
+            "GAUSSIAN_ELLIPSE":     from lenstronomy.LightModel.Profiles.gaussian import
+            GaussianEllipse
 
-                self.func_list.append(GaussianEllipse())
-            elif profile_type == "ELLIPSOID":
-                from lenstronomy.LightModel.Profiles.ellipsoid import Ellipsoid
+                self.func_list.append(GaussianEllipse()) elif profile_type ==
+            "ELLIPSOID":     from lenstronomy.LightModel.Profiles.ellipsoid import
+            Ellipsoid
 
-                self.func_list.append(Ellipsoid())
-            elif profile_type == "MULTI_GAUSSIAN":
-                from lenstronomy.LightModel.Profiles.gaussian import MultiGaussian
+                self.func_list.append(Ellipsoid()) elif profile_type ==
+            "MULTI_GAUSSIAN":     from lenstronomy.LightModel.Profiles.gaussian import
+            MultiGaussian
 
-                self.func_list.append(MultiGaussian())
-            elif profile_type == "MULTI_GAUSSIAN_ELLIPSE":
-                from lenstronomy.LightModel.Profiles.gaussian import (
-                    MultiGaussianEllipse,
-                )
+                self.func_list.append(MultiGaussian()) elif profile_type ==
+            "MULTI_GAUSSIAN_ELLIPSE":     from lenstronomy.LightModel.Profiles.gaussian
+            import (         MultiGaussianEllipse,     )
 
-                self.func_list.append(MultiGaussianEllipse())
+            self.func_list.append(MultiGaussianEllipse())
             """
             if profile_type == "SERSIC":
                 from jaxtronomy.LightModel.Profiles.sersic import Sersic
@@ -119,98 +116,98 @@ class LightModelBase(object):
                 self.func_list.append(
                     CoreSersic(smoothing=smoothing, sersic_major_axis=sersic_major_axis)
                 )
-            
-            #elif profile_type == "SHAPELETS":
+
+            # elif profile_type == "SHAPELETS":
             #    from lenstronomy.LightModel.Profiles.shapelets import ShapeletSet
 
             #    self.func_list.append(ShapeletSet())
-            #elif profile_type == "SHAPELETS_ELLIPSE":
+            # elif profile_type == "SHAPELETS_ELLIPSE":
             #    from lenstronomy.LightModel.Profiles.shapelets_ellipse import (
             #        ShapeletSetEllipse,
             #    )
 
             #    self.func_list.append(ShapeletSetEllipse())
-            #elif profile_type == "SHAPELETS_POLAR":
+            # elif profile_type == "SHAPELETS_POLAR":
             #    from lenstronomy.LightModel.Profiles.shapelets_polar import (
             #        ShapeletSetPolar,
             #    )
 
             #    self.func_list.append(ShapeletSetPolar(exponential=False))
-            #elif profile_type == "SHAPELETS_POLAR_EXP":
+            # elif profile_type == "SHAPELETS_POLAR_EXP":
             #    from lenstronomy.LightModel.Profiles.shapelets_polar import (
             #        ShapeletSetPolar,
             #    )
 
             #    self.func_list.append(ShapeletSetPolar(exponential=True))
-            #elif profile_type == "HERNQUIST":
+            # elif profile_type == "HERNQUIST":
             #    from lenstronomy.LightModel.Profiles.hernquist import Hernquist
 
             #    self.func_list.append(Hernquist())
-            #elif profile_type == "HERNQUIST_ELLIPSE":
+            # elif profile_type == "HERNQUIST_ELLIPSE":
             #    from lenstronomy.LightModel.Profiles.hernquist import HernquistEllipse
 
             #    self.func_list.append(HernquistEllipse())
-            #elif profile_type == "PJAFFE":
+            # elif profile_type == "PJAFFE":
             #    from lenstronomy.LightModel.Profiles.pseudo_jaffe import PseudoJaffe
 
             #    self.func_list.append(PseudoJaffe())
-            #elif profile_type == "PJAFFE_ELLIPSE":
+            # elif profile_type == "PJAFFE_ELLIPSE":
             #    from lenstronomy.LightModel.Profiles.pseudo_jaffe import (
             #        PseudoJaffeEllipse,
             #    )
 
             #    self.func_list.append(PseudoJaffeEllipse())
-            #elif profile_type == "UNIFORM":
+            # elif profile_type == "UNIFORM":
             #    from lenstronomy.LightModel.Profiles.uniform import Uniform
 
             #    self.func_list.append(Uniform())
-            #elif profile_type == "POWER_LAW":
+            # elif profile_type == "POWER_LAW":
             #    from lenstronomy.LightModel.Profiles.power_law import PowerLaw
 
             #    self.func_list.append(PowerLaw())
-            #elif profile_type == "NIE":
+            # elif profile_type == "NIE":
             #    from lenstronomy.LightModel.Profiles.nie import NIE
 
             #    self.func_list.append(NIE())
-            #elif profile_type == "CHAMELEON":
+            # elif profile_type == "CHAMELEON":
             #    from lenstronomy.LightModel.Profiles.chameleon import Chameleon
 
             #    self.func_list.append(Chameleon())
-            #elif profile_type == "DOUBLE_CHAMELEON":
+            # elif profile_type == "DOUBLE_CHAMELEON":
             #    from lenstronomy.LightModel.Profiles.chameleon import DoubleChameleon
 
             #    self.func_list.append(DoubleChameleon())
-            #elif profile_type == "TRIPLE_CHAMELEON":
+            # elif profile_type == "TRIPLE_CHAMELEON":
             #    from lenstronomy.LightModel.Profiles.chameleon import TripleChameleon
 
             #    self.func_list.append(TripleChameleon())
-            #elif profile_type == "INTERPOL":
+            # elif profile_type == "INTERPOL":
             #    from lenstronomy.LightModel.Profiles.interpolation import Interpol
 
             #    self.func_list.append(Interpol())
-            #elif profile_type == "SLIT_STARLETS":
+            # elif profile_type == "SLIT_STARLETS":
             #    from lenstronomy.LightModel.Profiles.starlets import SLIT_Starlets
 
             #    self.func_list.append(
             #        SLIT_Starlets(fast_inverse=True, second_gen=False)
             #    )
-            #elif profile_type == "SLIT_STARLETS_GEN2":
+            # elif profile_type == "SLIT_STARLETS_GEN2":
             #    from lenstronomy.LightModel.Profiles.starlets import SLIT_Starlets
 
             #    self.func_list.append(SLIT_Starlets(second_gen=True))
-            #elif profile_type == "LINEAR":
+            # elif profile_type == "LINEAR":
             #    from lenstronomy.LightModel.Profiles.linear import Linear
 
             #    self.func_list.append(Linear())
-            #elif profile_type == "LINEAR_ELLIPSE":
+            # elif profile_type == "LINEAR_ELLIPSE":
             #    from lenstronomy.LightModel.Profiles.linear import LinearEllipse
 
             #    self.func_list.append(LinearEllipse())
-            #elif profile_type == "LINE_PROFILE":
+            # elif profile_type == "LINE_PROFILE":
             #    from lenstronomy.LightModel.Profiles.lineprofile import LineProfile
 
             #    self.func_list.append(LineProfile())
-            
+
             else:
                 raise ValueError(
                     "Light model of type %s not supported by jaxtronomy! Please use lenstronomy instead.\n"
@@ -317,16 +314,18 @@ class LightModelBase(object):
                     kwargs_new = kwargs_list_standard[i].copy()
                     if norm is True:
                         # TODO: Re-implement when these profiles are added to jaxtronomy
-                        """
-                        if model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
-                            new = {
+                        """If model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
+
+                        new = {
                                 "amp": np.array(kwargs_new["amp"])
                                 / kwargs_new["amp"][0]
                             }
                         else:
                             new = {"amp": 1}
                         """
-                        new = {"amp": 1} # Delete this line when the above if statement is re-implemented
+                        new = {
+                            "amp": 1
+                        }  # Delete this line when the above if statement is re-implemented
                         kwargs_new.update(new)
                     norm_flux = self.func_list[i].total_flux(**kwargs_new)
                     norm_flux_list.append(norm_flux)

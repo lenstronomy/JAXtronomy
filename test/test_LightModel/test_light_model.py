@@ -74,7 +74,9 @@ class TestLightModel(object):
 
     def test_functions_split(self):
         output = self.lightModel.functions_split(x=1.0, y=1.0, kwargs_list=self.kwargs)
-        output_ref = self.lightModel_ref.functions_split(x=1.0, y=1.0, kwargs_list=self.kwargs)
+        output_ref = self.lightModel_ref.functions_split(
+            x=1.0, y=1.0, kwargs_list=self.kwargs
+        )
         npt.assert_array_almost_equal(output[0], output_ref[0], decimal=6)
         assert output[1] == output_ref[1]
 
@@ -129,13 +131,17 @@ class TestLightModel(object):
         lightModel_ref = LightModel_ref(light_model_list=light_model_list)
         total_flux_list = lightModel.total_flux(kwargs_list)
         total_flux_list_ref = lightModel_ref.total_flux(kwargs_list)
-        npt.assert_array_almost_equal(np.array(total_flux_list), np.array(total_flux_list_ref))
+        npt.assert_array_almost_equal(
+            np.array(total_flux_list), np.array(total_flux_list_ref)
+        )
 
         lightModel = LightModel(light_model_list=light_model_list)
         lightModel_ref = LightModel_ref(light_model_list=light_model_list)
         total_flux_list = lightModel.total_flux(kwargs_list, norm=True)
         total_flux_list_ref = lightModel_ref.total_flux(kwargs_list, norm=True)
-        npt.assert_array_almost_equal(np.array(total_flux_list), np.array(total_flux_list_ref))
+        npt.assert_array_almost_equal(
+            np.array(total_flux_list), np.array(total_flux_list_ref)
+        )
 
 
 class TestRaise(unittest.TestCase):
