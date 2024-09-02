@@ -91,7 +91,7 @@ class SersicElliptic(SersicUtil):
         R = self.get_distance_from_center(x, y, e1, e2, center_x, center_y)
         result = self._r_sersic(R, R_sersic, n_sersic, max_R_frac)
         return amp * result
-    
+
 
 class SersicElliptic_qPhi(SersicUtil):
     """This class is the same as SersicElliptic except sampling over q and phi instead
