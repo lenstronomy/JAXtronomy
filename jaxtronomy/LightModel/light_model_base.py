@@ -117,7 +117,7 @@ class LightModelBase(object):
                 self.func_list.append(
                     CoreSersic(smoothing=smoothing, sersic_major_axis=sersic_major_axis)
                 )
-            
+
             # elif profile_type == "SHAPELETS":
             #     from lenstronomy.LightModel.Profiles.shapelets import ShapeletSet
 
@@ -208,7 +208,7 @@ class LightModelBase(object):
             #     from lenstronomy.LightModel.Profiles.lineprofile import LineProfile
 
             #     self.func_list.append(LineProfile())
-            
+
             else:
                 raise ValueError(
                     "Light model of type %s not supported by jaxtronomy! Please use lenstronomy instead.\n"
@@ -321,7 +321,9 @@ class LightModelBase(object):
                         #     }
                         # else:
                         #     new = {"amp": 1}
-                        new = {"amp": 1} # Delete this line when the above if statement is re-implemented
+                        new = {
+                            "amp": 1
+                        }  # Delete this line when the above if statement is re-implemented
                         kwargs_new.update(new)
                     norm_flux = self.func_list[i].total_flux(**kwargs_new)
                     norm_flux_list.append(norm_flux)
