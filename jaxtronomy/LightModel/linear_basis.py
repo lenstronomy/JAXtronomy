@@ -84,34 +84,35 @@ class LinearBasis(LightModelBase):
                     kwargs_new.update(new)
                     response += [self.func_list[i].function(x, y, **kwargs_new)]
                     n += 1
-                elif model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
-                    num = len(kwargs_list[i]["amp"])
-                    new = {"amp": np.ones(num)}
-                    kwargs_new = kwargs_list[i].copy()
-                    kwargs_new.update(new)
-                    response += self.func_list[i].function_split(x, y, **kwargs_new)
-                    n += num
-                elif model in [
-                    "SHAPELETS",
-                    "SHAPELETS_POLAR",
-                    "SHAPELETS_POLAR_EXP",
-                    "SHAPELETS_ELLIPSE",
-                ]:
-                    kwargs = kwargs_list[i]
-                    n_max = kwargs["n_max"]
-                    if model in ["SHAPELETS_POLAR_EXP"]:
-                        num_param = int((n_max + 1) ** 2)
-                    else:
-                        num_param = int((n_max + 1) * (n_max + 2) / 2)
-                    new = {"amp": np.ones(num_param)}
-                    kwargs_new = kwargs_list[i].copy()
-                    kwargs_new.update(new)
-                    response += self.func_list[i].function_split(x, y, **kwargs_new)
-                    n += num_param
-                elif model in ["SLIT_STARLETS", "SLIT_STARLETS_GEN2"]:
-                    raise ValueError(
-                        "'{}' model does not support function split".format(model)
-                    )
+                # NOTE: Re-implement these when the profiles are added to jaxtronomy
+                # elif model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
+                #     num = len(kwargs_list[i]["amp"])
+                #     new = {"amp": np.ones(num)}
+                #     kwargs_new = kwargs_list[i].copy()
+                #     kwargs_new.update(new)
+                #     response += self.func_list[i].function_split(x, y, **kwargs_new)
+                #     n += num
+                # elif model in [
+                #     "SHAPELETS",
+                #     "SHAPELETS_POLAR",
+                #     "SHAPELETS_POLAR_EXP",
+                #     "SHAPELETS_ELLIPSE",
+                # ]:
+                #     kwargs = kwargs_list[i]
+                #     n_max = kwargs["n_max"]
+                #     if model in ["SHAPELETS_POLAR_EXP"]:
+                #         num_param = int((n_max + 1) ** 2)
+                #     else:
+                #         num_param = int((n_max + 1) * (n_max + 2) / 2)
+                #     new = {"amp": np.ones(num_param)}
+                #     kwargs_new = kwargs_list[i].copy()
+                #     kwargs_new.update(new)
+                #     response += self.func_list[i].function_split(x, y, **kwargs_new)
+                #     n += num_param
+                # elif model in ["SLIT_STARLETS", "SLIT_STARLETS_GEN2"]:
+                #     raise ValueError(
+                #         "'{}' model does not support function split".format(model)
+                #     )
                 else:
                     raise ValueError("model type %s not valid!" % model)
         return response, n
@@ -160,28 +161,29 @@ class LinearBasis(LightModelBase):
                 "LINE_PROFILE",
             ]:
                 n_list += [1]
-            elif model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
-                num = len(kwargs_list[i]["sigma"])
-                n_list += [num]
-            elif model in [
-                "SHAPELETS",
-                "SHAPELETS_POLAR",
-                "SHAPELETS_POLAR_EXP",
-                "SHAPELETS_ELLIPSE",
-            ]:
-                n_max = kwargs_list[i]["n_max"]
-                if model in ["SHAPELETS_POLAR_EXP"]:
-                    num_param = int((n_max + 1) ** 2)
-                else:
-                    num_param = int((n_max + 1) * (n_max + 2) / 2)
-                n_list += [num_param]
-            elif model in ["SLIT_STARLETS", "SLIT_STARLETS_GEN2"]:
-                n_scales = kwargs_list[i]["n_scales"]
-                n_pixels = kwargs_list[i]["n_pixels"]
-                num_param = int(n_scales * n_pixels)
-                n_list += [
-                    num_param
-                ]  # TODO : find a way to make it the number of source pixels
+            # NOTE: Re-implement these when the profiles are added to jaxtronomy
+            # elif model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
+            #     num = len(kwargs_list[i]["sigma"])
+            #     n_list += [num]
+            # elif model in [
+            #     "SHAPELETS",
+            #     "SHAPELETS_POLAR",
+            #     "SHAPELETS_POLAR_EXP",
+            #     "SHAPELETS_ELLIPSE",
+            # ]:
+            #     n_max = kwargs_list[i]["n_max"]
+            #     if model in ["SHAPELETS_POLAR_EXP"]:
+            #         num_param = int((n_max + 1) ** 2)
+            #     else:
+            #         num_param = int((n_max + 1) * (n_max + 2) / 2)
+            #     n_list += [num_param]
+            # elif model in ["SLIT_STARLETS", "SLIT_STARLETS_GEN2"]:
+            #     n_scales = kwargs_list[i]["n_scales"]
+            #     n_pixels = kwargs_list[i]["n_pixels"]
+            #     num_param = int(n_scales * n_pixels)
+            #     n_list += [
+            #         num_param
+            #     ]  # TODO : find a way to make it the number of source pixels
             else:
                 raise ValueError("model type %s not valid!" % model)
         return n_list
@@ -221,29 +223,30 @@ class LinearBasis(LightModelBase):
             ]:
                 kwargs_list[k]["amp"] = param[i]
                 i += 1
-            elif model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
-                num_param = len(kwargs_list[k]["sigma"])
-                kwargs_list[k]["amp"] = param[i : i + num_param]
-                i += num_param
-            elif model in [
-                "SHAPELETS",
-                "SHAPELETS_POLAR",
-                "SHAPELETS_POLAR_EXP",
-                "SHAPELETS_ELLIPSE",
-            ]:
-                n_max = kwargs_list[k]["n_max"]
-                if model in ["SHAPELETS_POLAR_EXP"]:
-                    num_param = int((n_max + 1) ** 2)
-                else:
-                    num_param = int((n_max + 1) * (n_max + 2) / 2)
-                kwargs_list[k]["amp"] = param[i : i + num_param]
-                i += num_param
-            elif model in ["SLIT_STARLETS", "SLIT_STARLETS_GEN2"]:
-                n_scales = kwargs_list[k]["n_scales"]
-                n_pixels = kwargs_list[k]["n_pixels"]
-                num_param = int(n_scales * n_pixels)
-                kwargs_list[k]["amp"] = param[i : i + num_param]
-                i += num_param
+            # NOTE: Re-implement these when the profiles are added to jaxtronomy
+            # elif model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
+            #     num_param = len(kwargs_list[k]["sigma"])
+            #     kwargs_list[k]["amp"] = param[i : i + num_param]
+            #     i += num_param
+            # elif model in [
+            #     "SHAPELETS",
+            #     "SHAPELETS_POLAR",
+            #     "SHAPELETS_POLAR_EXP",
+            #     "SHAPELETS_ELLIPSE",
+            # ]:
+            #     n_max = kwargs_list[k]["n_max"]
+            #     if model in ["SHAPELETS_POLAR_EXP"]:
+            #         num_param = int((n_max + 1) ** 2)
+            #     else:
+            #         num_param = int((n_max + 1) * (n_max + 2) / 2)
+            #     kwargs_list[k]["amp"] = param[i : i + num_param]
+            #     i += num_param
+            # elif model in ["SLIT_STARLETS", "SLIT_STARLETS_GEN2"]:
+            #     n_scales = kwargs_list[k]["n_scales"]
+            #     n_pixels = kwargs_list[k]["n_pixels"]
+            #     num_param = int(n_scales * n_pixels)
+            #     kwargs_list[k]["amp"] = param[i : i + num_param]
+            #     i += num_param
             else:
                 raise ValueError("model type %s not valid!" % model)
         return kwargs_list, i

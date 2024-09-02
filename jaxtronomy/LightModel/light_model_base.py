@@ -241,15 +241,17 @@ class LightModelBase(object):
                 flux += out
         return flux
 
+    # TODO: Re-implement this when other profiles are added to jaxtronomy
+    """
     def light_3d(self, r, kwargs_list, k=None):
-        """Computes 3d density at radius r (3D radius) such that integrated in
+        Computes 3d density at radius r (3D radius) such that integrated in
         projection in units of angle results in the projected surface brightness.
 
         :param r: 3d radius units of arcsec relative to the center of the light profile
         :param kwargs_list: keyword argument list of light profile
         :param k: integer or list of integers for selecting subsets of light profiles.
         :return: flux density
-        """
+        
         kwargs_list_standard = self._transform_kwargs(kwargs_list)
         r = np.array(r, dtype=float)
         flux = np.zeros_like(r)
@@ -283,6 +285,7 @@ class LightModelBase(object):
                         % self.profile_type_list[i]
                     )
         return flux
+    """
 
     def total_flux(self, kwargs_list, norm=False, k=None):
         """Computes the total flux of each individual light profile. This allows to
@@ -313,6 +316,8 @@ class LightModelBase(object):
                 ]:
                     kwargs_new = kwargs_list_standard[i].copy()
                     if norm is True:
+                        # TODO: Re-implement when these profiles are added to jaxtronomy
+                        """
                         if model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
                             new = {
                                 "amp": np.array(kwargs_new["amp"])
@@ -320,6 +325,8 @@ class LightModelBase(object):
                             }
                         else:
                             new = {"amp": 1}
+                        """
+                        new = {"amp": 1} # Delete this line when the above if statement is re-implemented
                         kwargs_new.update(new)
                     norm_flux = self.func_list[i].total_flux(**kwargs_new)
                     norm_flux_list.append(norm_flux)
@@ -332,11 +339,14 @@ class LightModelBase(object):
                 # 'TRIPLE_CHAMELEON', 'UNIFORM'
         return norm_flux_list
 
+    # TODO: Re-implement when these profiles are added to jaxtronomy
+    """
     def delete_interpol_caches(self):
-        """Call the delete_cache method of INTERPOL profiles."""
+        Call the delete_cache method of INTERPOL profiles.
         for i, model in enumerate(self.profile_type_list):
             if model in ["INTERPOL", "SLIT_STARLETS", "SLIT_STARLETS_GEN2"]:
                 self.func_list[i].delete_cache()
+    """
 
     def _transform_kwargs(self, kwargs_list):
         """
