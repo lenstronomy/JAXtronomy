@@ -96,7 +96,7 @@ class LightModelBase(object):
 
                 self.func_list.append(Sersic(smoothing=smoothing))
             elif profile_type == "SERSIC_ELLIPSE":
-                from jaxtronomy.LightModel.Profiles.sersic import SersicElliptic
+                from jaxtronomy.LightModel.Profiles.sersic_ellipse import SersicElliptic
 
                 self.func_list.append(
                     SersicElliptic(
@@ -104,7 +104,7 @@ class LightModelBase(object):
                     )
                 )
             elif profile_type == "SERSIC_ELLIPSE_Q_PHI":
-                from jaxtronomy.LightModel.Profiles.sersic import SersicElliptic_qPhi
+                from jaxtronomy.LightModel.Profiles.sersic_ellipse import SersicElliptic_qPhi
 
                 self.func_list.append(
                     SersicElliptic_qPhi(
@@ -112,7 +112,7 @@ class LightModelBase(object):
                     )
                 )
             elif profile_type == "CORE_SERSIC":
-                from jaxtronomy.LightModel.Profiles.sersic import CoreSersic
+                from jaxtronomy.LightModel.Profiles.core_sersic import CoreSersic
 
                 self.func_list.append(
                     CoreSersic(smoothing=smoothing, sersic_major_axis=sersic_major_axis)
