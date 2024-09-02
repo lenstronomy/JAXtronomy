@@ -104,7 +104,9 @@ class LightModelBase(object):
                     )
                 )
             elif profile_type == "SERSIC_ELLIPSE_Q_PHI":
-                from jaxtronomy.LightModel.Profiles.sersic_ellipse import SersicElliptic_qPhi
+                from jaxtronomy.LightModel.Profiles.sersic_ellipse import (
+                    SersicElliptic_qPhi,
+                )
 
                 self.func_list.append(
                     SersicElliptic_qPhi(
