@@ -19,7 +19,7 @@ class TestSersicUtils(object):
         npt.assert_array_almost_equal(k, k_ref, decimal=6)
         npt.assert_array_almost_equal(bn, bn_ref, decimal=6)
 
-    def k_Re(self):
+    def test_k_Re(self):
         n = 3
         k = 1.383482
         Re = self.sersicutil.k_Re(n, k)
@@ -32,7 +32,7 @@ class TestSersicUtils(object):
         bn_ref = self.sersicutil_ref.b_n(n)
         npt.assert_array_almost_equal(bn, bn_ref, decimal=6)
 
-    def get_distance_from_center(self):
+    def test_get_distance_from_center(self):
         x = np.array([1, 3, 4, 2.3217, -1.3])
         y = np.array([0, 1.123, -2.3, 4, -2])
         e1, e2 = 0.1, -0.2
@@ -41,7 +41,7 @@ class TestSersicUtils(object):
         r_ref = self.sersicutil_ref.get_distance_from_center(x, y, e1, e2, center_x, center_y)
         npt.assert_array_almost_equal(r, r_ref, decimal=6)
 
-    def _x_reduced(self):
+    def test_x_reduced(self):
         x = np.array([1, 3, 4, 2.3217, -1.3])
         y = np.array([0, 1.123, -2.3, 4, -2])
         n_sersic = 1.3
@@ -51,7 +51,7 @@ class TestSersicUtils(object):
         x_reduced_ref = self.sersicutil_ref._x_reduced(x, y, n_sersic, r_eff, center_x, center_y)
         npt.assert_array_almost_equal(x_reduced, x_reduced_ref, decimal=6)
 
-    def _alpha_eff(self):
+    def test_alpha_eff(self):
         r_eff = 1.61298
         n_sersic = 1.4453
         k_eff = 1.288488
@@ -59,7 +59,7 @@ class TestSersicUtils(object):
         alpha_eff_ref = self.sersicutil_ref._alpha_eff(r_eff, n_sersic, k_eff)
         npt.assert_array_almost_equal(alpha_eff, alpha_eff_ref, decimal=6)
 
-    def alpha_abs(self):
+    def test_alpha_abs(self):
         x = np.array([1, 3, 4, 2.3217, -1.3])
         y = np.array([0, 1.123, -2.3, 4, -2])
         r_eff = 1.61298
@@ -70,7 +70,7 @@ class TestSersicUtils(object):
         alpha_ref = self.sersicutil_ref.alpha_abs(x, y, n_sersic, r_eff, k_eff, center_x, center_y)
         npt.assert_array_almost_equal(alpha, alpha_ref, decimal=6)
 
-    def d_alpha_dr(self):
+    def test_d_alpha_dr(self):
         x = np.array([1, 3, 4, 2.3217, -1.3])
         y = np.array([0, 1.123, -2.3, 4, -2])
         r_eff = 3.61298
@@ -81,7 +81,7 @@ class TestSersicUtils(object):
         d_alpha_dr_ref = self.sersicutil_ref.d_alpha_dr(x, y, n_sersic, r_eff, k_eff, center_x, center_y)
         npt.assert_array_almost_equal(d_alpha_dr, d_alpha_dr_ref, decimal=6)
 
-    def density(self):
+    def test_density(self):
         x = np.array([1, 3, 4, 2.3217, -1.3])
         y = np.array([0, 1.123, -2.3, 4, -2])
         r_eff = 1.81298
@@ -90,7 +90,7 @@ class TestSersicUtils(object):
         center_x, center_y = 1, 0
         npt.assert_raises(ValueError, self.sersicutil.density, x, y, n_sersic, r_eff, k_eff, center_x, center_y)
 
-    def _total_flux(self):
+    def test__total_flux(self):
         r_eff = 1.31298
         n_sersic = 1.1453
         I_eff = 1.388488
@@ -98,7 +98,7 @@ class TestSersicUtils(object):
         total_flux_ref = self.sersicutil_ref._total_flux(r_eff, I_eff, n_sersic)
         npt.assert_array_almost_equal(total_flux, total_flux_ref, decimal=6)
 
-    def total_flux(self):
+    def test_total_flux(self):
         amp = 4.28319
         R_sersic = 1.388488
         n_sersic = 1.1453
@@ -107,13 +107,13 @@ class TestSersicUtils(object):
         total_flux_ref = self.sersicutil_ref.total_flux(amp, R_sersic, n_sersic, e1, e2)
         npt.assert_array_almost_equal(total_flux, total_flux_ref, decimal=6)
 
-    def _R_stable(self):
+    def test_R_stable(self):
         R = np.linspace(start=0.0, stop=0.5, num=50)
         R_stable = self.sersicutil._R_stable(R)
         R_stable_ref = self.sersicutil_ref._R_stable(R)
         npt.assert_array_almost_equal(R_stable, R_stable_ref, decimal=6)
 
-    def _r_sersic(self):
+    def test_r_sersic(self):
         R = 0.2178482
         R_sersic = 1.588488
         n_sersic = 2.1453
@@ -128,7 +128,7 @@ class TestSersicUtilsMajorAxis(object):
         self.sersicutil = SersicUtil(sersic_major_axis=True)
         self.sersicutil_ref = SersicUtil_ref(sersic_major_axis=True)
 
-    def get_distance_from_center(self):
+    def test_get_distance_from_center(self):
         x = np.array([1, 3, 4, 2.3217, -1.3])
         y = np.array([0, 1.123, -2.3, 4, -2])
         e1, e2 = 0.1, -0.2
@@ -137,7 +137,7 @@ class TestSersicUtilsMajorAxis(object):
         r_ref = self.sersicutil_ref.get_distance_from_center(x, y, e1, e2, center_x, center_y)
         npt.assert_array_almost_equal(r, r_ref, decimal=6)
 
-    def total_flux(self):
+    def test_total_flux(self):
         amp = 4.28319
         R_sersic = 1.388488
         n_sersic = 1.1453
