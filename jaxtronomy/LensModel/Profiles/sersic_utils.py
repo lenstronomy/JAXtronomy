@@ -41,14 +41,25 @@ class SersicUtil(object):
     @jit
     def k_bn(self, n, Re):
         """Returns normalisation of the sersic profile such that Re is the half light
-        radius given n_sersic slope."""
+        radius given n_sersic slope.
+        
+        :param n: Sersic index
+        :param Re: the desired half light radius
+        """
+
         bn = self.b_n(n)
         k = bn * Re ** (-1.0 / n)
         return k, bn
 
     @jit
     def k_Re(self, n, k):
-        """"""
+        """Returns the half light radius given the n_sersic slope and normalization of
+        the sersic profile
+
+        :param n: Sersic index
+        :param k: normalization of the sersic profile
+        """
+
         bn = self.b_n(n)
         Re = (bn / k) ** n
         return Re
@@ -71,13 +82,15 @@ class SersicUtil(object):
     @jit
     def get_distance_from_center(self, x, y, e1, e2, center_x, center_y):
         """Get the distance from the center of Sersic, accounting for orientation and
-        axis ratio :param x:
-
-        :param y:
+        axis ratio 
+        
+        :param x: position
+        :param y: position
         :param e1: eccentricity
         :param e2: eccentricity
         :param center_x: center x of sersic
         :param center_y: center y of sersic
+        :return: distance from center of Sersic
         """
 
         if self._sersic_major_axis:
@@ -99,12 +112,13 @@ class SersicUtil(object):
 
     @jit
     def _x_reduced(self, x, y, n_sersic, r_eff, center_x, center_y):
-        """Coordinate transform to normalized radius :param x:
+        """Coordinate transform to normalized radius
 
-        :param y:
-        :param center_x:
-        :param center_y:
-        :return:
+        :param x: position
+        :param y: position
+        :param center_x: position of the center of the source
+        :param center_y: position of the center of the source
+        :return: transformed normalized radius coordinate
         """
         x_ = x - center_x
         y_ = y - center_y
@@ -115,11 +129,12 @@ class SersicUtil(object):
 
     @jit
     def _alpha_eff(self, r_eff, n_sersic, k_eff):
-        """Deflection angle at r_eff :param r_eff:
+        """Deflection angle at r_eff
 
-        :param n_sersic:
-        :param k_eff:
-        :return:
+        :param r_eff: projected half light radius
+        :param n_sersic: Sersic index
+        :param k_eff: convergence at half light radius
+        :return: Deflection angle at r_eff
         """
         b = self.b_n(n_sersic)
         alpha_eff = (
@@ -134,16 +149,16 @@ class SersicUtil(object):
 
     @jit
     def alpha_abs(self, x, y, n_sersic, r_eff, k_eff, center_x=0, center_y=0):
-        """
+        """Returns the absolute value of the deflection angle
 
-        :param x:
-        :param y:
-        :param n_sersic:
-        :param r_eff:
-        :param k_eff:
-        :param center_x:
-        :param center_y:
-        :return:
+        :param x: position
+        :param y: position
+        :param n_sersic: Sersic index
+        :param r_eff: projected half light radius
+        :param k_eff: convergence at half light radius
+        :param center_x: position of the center of the source
+        :param center_y: position of the center of the source
+        :return: absolute value of deflection angle
         """
         n = n_sersic
         x_red = self._x_reduced(x, y, n_sersic, r_eff, center_x, center_y)
@@ -154,16 +169,16 @@ class SersicUtil(object):
 
     @jit
     def d_alpha_dr(self, x, y, n_sersic, r_eff, k_eff, center_x=0, center_y=0):
-        """
+        """Returns the derivative of the deflection angle w.r.t radius
 
-        :param x:
-        :param y:
-        :param n_sersic:
-        :param r_eff:
-        :param k_eff:
-        :param center_x:
-        :param center_y:
-        :return:
+        :param x: position
+        :param y: position
+        :param n_sersic: Sersic index
+        :param r_eff: projected half light radius
+        :param k_eff: convergence at half light radius
+        :param center_x: position of the center of the source
+        :param center_y: position of the center of the source
+        :return: derivative of deflection angle w.r.t radius
         """
         _dr = 0.00001
         x_ = x - center_x
