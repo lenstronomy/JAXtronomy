@@ -273,6 +273,7 @@ class CoreSersic(SersicUtil):
     ]
     lower_limit_default = {
         "amp": 0,
+        "R_sersic": 0,
         "Rb": 0,
         "n_sersic": 0.5,
         "gamma": 0,
@@ -283,6 +284,7 @@ class CoreSersic(SersicUtil):
     }
     upper_limit_default = {
         "amp": 100,
+        "R_sersic": 100,
         "Rb": 100,
         "n_sersic": 8,
         "gamma": 10,
