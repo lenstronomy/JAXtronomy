@@ -36,7 +36,6 @@ class Sersic(SersicUtil):
         "center_y": 100,
     }
 
-    
     # --------------------------------------------------------------------------------
     # The following two methods are required to allow the JAX compiler to recognize
     # this class. Methods involving the self variable can be jit-decorated.
@@ -52,7 +51,6 @@ class Sersic(SersicUtil):
         return cls(*children, **aux_data)
 
     # --------------------------------------------------------------------------------
-    
 
     @jit
     def function(
@@ -75,7 +73,8 @@ class Sersic(SersicUtil):
         )
         result = self._r_sersic(R, R_sersic, n_sersic, max_R_frac)
         return amp * result
-    
+
+
 tree_util.register_pytree_node(Sersic, Sersic._tree_flatten, Sersic._tree_unflatten)
 
 
@@ -162,7 +161,10 @@ class SersicElliptic(SersicUtil):
         result = self._r_sersic(R, R_sersic, n_sersic, max_R_frac)
         return amp * result
 
-tree_util.register_pytree_node(SersicElliptic, SersicElliptic._tree_flatten, SersicElliptic._tree_unflatten)
+
+tree_util.register_pytree_node(
+    SersicElliptic, SersicElliptic._tree_flatten, SersicElliptic._tree_unflatten
+)
 
 
 class SersicElliptic_qPhi(SersicUtil):
@@ -239,8 +241,13 @@ class SersicElliptic_qPhi(SersicUtil):
         R = self.get_distance_from_center(x, y, e1, e2, center_x, center_y)
         result = self._r_sersic(R, R_sersic, n_sersic, max_R_frac)
         return amp * result
-    
-tree_util.register_pytree_node(SersicElliptic_qPhi, SersicElliptic_qPhi._tree_flatten, SersicElliptic_qPhi._tree_unflatten)
+
+
+tree_util.register_pytree_node(
+    SersicElliptic_qPhi,
+    SersicElliptic_qPhi._tree_flatten,
+    SersicElliptic_qPhi._tree_unflatten,
+)
 
 
 class CoreSersic(SersicUtil):
@@ -361,4 +368,7 @@ class CoreSersic(SersicUtil):
         )
         return jnp.nan_to_num(result)
 
-tree_util.register_pytree_node(CoreSersic, CoreSersic._tree_flatten, CoreSersic._tree_unflatten)
+
+tree_util.register_pytree_node(
+    CoreSersic, CoreSersic._tree_flatten, CoreSersic._tree_unflatten
+)

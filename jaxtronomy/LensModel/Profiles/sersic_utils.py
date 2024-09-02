@@ -254,4 +254,7 @@ class SersicUtil(object):
         result = jnp.where(R_frac <= max_R_frac, jnp.exp(exponent), 0)
         return jnp.nan_to_num(result)
 
-tree_util.register_pytree_node(SersicUtil, SersicUtil._tree_flatten, SersicUtil._tree_unflatten)
+
+tree_util.register_pytree_node(
+    SersicUtil, SersicUtil._tree_flatten, SersicUtil._tree_unflatten
+)
