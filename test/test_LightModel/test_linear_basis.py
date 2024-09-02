@@ -1,4 +1,4 @@
-from lenstronomy.LightModel.linear_basis import LinearBasis
+from jaxtronomy.LightModel.linear_basis import LinearBasis
 
 
 class TestLinearBasis(object):
@@ -6,7 +6,7 @@ class TestLinearBasis(object):
         pass
 
     def test_linear_param_from_kwargs(self):
-        linear_basis = LinearBasis(light_model_list=["UNIFORM", "UNIFORM"])
+        linear_basis = LinearBasis(light_model_list=["SERSIC", "SERSIC_ELLIPSE"])
         kwargs_list = [{"amp": 0.5}, {"amp": -1}]
         param = linear_basis.linear_param_from_kwargs(kwargs_list)
         assert param[0] == kwargs_list[0]["amp"]
