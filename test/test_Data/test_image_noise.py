@@ -50,13 +50,12 @@ class Test_ImageNoise_without_noisemap(object):
 
     def setup_method(self):
         self.numPix = 10
-        kwargs_data = {
-            "image_data": np.ones((self.numPix, self.numPix)),
-            "exposure_time": 2 * np.ones((self.numPix, self.numPix)),
-            "background_rms": 1.103,
-        }
-        self.Noise = ImageNoise(**kwargs_data)
-        self.Noise_ref = ImageNoise_ref(**kwargs_data)
+        image_data = np.ones((self.numPix, self.numPix))
+        exposure_time = 2 * np.ones((self.numPix, self.numPix))
+        background_rms = 1.103
+        self.Noise = ImageNoise(image_data=image_data, exposure_time=exposure_time, background_rms=background_rms)
+        self.Noise_ref = ImageNoise_ref(image_data=image_data, exposure_time=exposure_time, background_rms=background_rms)
+        test_verbose = ImageNoise(image_data=image_data, exposure_time=exposure_time/10, background_rms=background_rms, verbose=True)
 
     def test_C_D_model(self):
         model = np.tile(np.linspace(-1, 1, self.numPix), (self.numPix, 1))
