@@ -45,9 +45,7 @@ class Test_ImageNoise_without_noisemap(object):
         exposure_time = 2 * np.ones((self.numPix, self.numPix))
         noise_map = 2 * np.ones((self.numPix, self.numPix))
         background_rms = 1.103
-        npt.assert_raises(
-            ValueError, ImageNoise, image_data=image_data
-        )
+        npt.assert_raises(ValueError, ImageNoise, image_data=image_data)
         npt.assert_raises(
             ValueError,
             ImageNoise,
@@ -64,9 +62,9 @@ class Test_ImageNoise_without_noisemap(object):
         test_verbose = ImageNoise(
             image_data=image_data,
             exposure_time=exposure_time,
-            background_rms=background_rms/100,
-            verbose=True
-            )
+            background_rms=background_rms / 100,
+            verbose=True,
+        )
 
     def test_C_D_model(self):
         model = np.tile(np.linspace(-1, 1, self.numPix), (self.numPix, 1))
