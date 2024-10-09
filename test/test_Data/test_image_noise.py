@@ -5,6 +5,7 @@ import numpy.testing as npt
 from lenstronomy.Data.image_noise import ImageNoise as ImageNoise_ref
 from jaxtronomy.Data.image_noise import ImageNoise as ImageNoise
 
+
 class Test_ImageNoise_noisemap(object):
     def setup_method(self):
         self.numPix = 10
@@ -16,15 +17,23 @@ class Test_ImageNoise_noisemap(object):
         self.Noise_ref = ImageNoise_ref(**kwargs_data)
 
     def test_init(self):
-        npt.assert_raises(ValueError, ImageNoise, image_data=np.ones((self.numPix, self.numPix)))
-        npt.assert_raises(ValueError, ImageNoise,
-                          image_data=np.ones((self.numPix, self.numPix)),
-                          exposure_time=2 * np.ones((self.numPix, self.numPix)))
-        npt.assert_raises(ValueError, ImageNoise,
-                          image_data=np.ones((self.numPix, self.numPix)),
-                          noise_map=2*np.ones((self.numPix, self.numPix)),
-                          gradient_boost_factor=3)
-        
+        npt.assert_raises(
+            ValueError, ImageNoise, image_data=np.ones((self.numPix, self.numPix))
+        )
+        npt.assert_raises(
+            ValueError,
+            ImageNoise,
+            image_data=np.ones((self.numPix, self.numPix)),
+            exposure_time=2 * np.ones((self.numPix, self.numPix)),
+        )
+        npt.assert_raises(
+            ValueError,
+            ImageNoise,
+            image_data=np.ones((self.numPix, self.numPix)),
+            noise_map=2 * np.ones((self.numPix, self.numPix)),
+            gradient_boost_factor=3,
+        )
+
     def test_C_D_model(self):
         model = np.tile(np.linspace(-1, 1, self.numPix), (self.numPix, 1))
         c_d = self.Noise.C_D_model(model)
@@ -59,8 +68,6 @@ class Test_ImageNoise_without_noisemap(object):
         c_d = self.Noise.C_D_model(model)
         c_d_ref = self.Noise_ref.C_D_model(model)
         npt.assert_array_almost_equal(c_d, c_d_ref, decimal=6)
-
-
 
 
 if __name__ == "__main__":

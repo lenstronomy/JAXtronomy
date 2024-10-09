@@ -10,6 +10,7 @@ export, __all__ = exporter()
 @export
 class ImageNoise(object):
     """Class that deals with noise properties of imaging data."""
+
     # NOTE: JIT-compiled functions need to be recompiled each time a new instance of the class is created.
 
     def __init__(
@@ -48,8 +49,10 @@ class ImageNoise(object):
                 )
         else:
             # make sure no negative exposure values are present no dividing by zero
-            self.exp_map = jnp.where(exposure_time <= 10 ** (-10), 10 ** (-10), exposure_time)
-        
+            self.exp_map = jnp.where(
+                exposure_time <= 10 ** (-10), 10 ** (-10), exposure_time
+            )
+
         # Set background rms
         if background_rms is None:
             if noise_map is None:
@@ -62,7 +65,7 @@ class ImageNoise(object):
 
         self.data = jnp.array(image_data)
         self.flux_scaling = flux_scaling
-        
+
         if noise_map is not None:
             assert np.shape(noise_map) == np.shape(image_data)
             self._noise_map = jnp.array(noise_map)
@@ -90,9 +93,10 @@ class ImageNoise(object):
             )
 
         if gradient_boost_factor is not None:
-            raise ValueError("gradient_boost_factor not supported in JAXtronomy. Please use lenstronomy instead")
+            raise ValueError(
+                "gradient_boost_factor not supported in JAXtronomy. Please use lenstronomy instead"
+            )
 
-    
     @partial(jit, static_argnums=0)
     def C_D_model(self, model):
         """
@@ -104,9 +108,7 @@ class ImageNoise(object):
         if self._noise_map is not None:
             return self._noise_map**2
         else:
-            return covariance_matrix(
-                model, self.background_rms, self.exp_map
-            )
+            return covariance_matrix(model, self.background_rms, self.exp_map)
 
 
 @export
@@ -131,6 +133,6 @@ def covariance_matrix(data, background_rms, exposure_map):
          gradient^2 * gradient_boost_factor
     :return: len(d) x len(d) matrix that give the error of background and Poisson components; (photons/second)^2
     """
-    d_pos = jnp.where(data >=0, data, 0)
+    d_pos = jnp.where(data >= 0, data, 0)
     sigma = d_pos / exposure_map + background_rms**2
     return sigma

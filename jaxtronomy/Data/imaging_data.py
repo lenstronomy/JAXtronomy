@@ -47,6 +47,7 @@ class ImageData(PixelGrid, ImageNoise):
     your definitions and units of 'exposure_map', 'background_rms' and 'image_data' are in accordance with the
     likelihood function. In particular, make sure that the Poisson noise contribution is defined in the count rate.
     """
+
     # NOTE: JIT-compiled functions need to be recompiled each time a new instance of the class is created.
 
     def __init__(
@@ -131,9 +132,14 @@ class ImageData(PixelGrid, ImageNoise):
             )
 
     def update_data(self, image_data):
-        raise Exception("Cannot update data when using JAX. Instead, a new instance of ImageData must be created.")
+        raise Exception(
+            "Cannot update data when using JAX. Instead, a new instance of ImageData must be created."
+        )
 
-    @partial(jit, static_argnums=0,)
+    @partial(
+        jit,
+        static_argnums=0,
+    )
     def log_likelihood(self, model, mask, additional_error_map=0):
         """Computes the likelihood of the data given the model p(data|model) The
         Gaussian errors are estimated with the covariance matrix, based on the model
