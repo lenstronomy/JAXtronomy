@@ -1,7 +1,7 @@
 __author__ = "sibirrer"
 
 import numpy as np
-from lenstronomy.ImSim.Numerics.grid import RegularGrid
+from jaxtronomy.ImSim.Numerics.grid import RegularGrid
 
 import pytest
 
