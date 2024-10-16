@@ -14,6 +14,8 @@ export, __all__ = exporter()
 @export
 class RegularGrid(Coordinates1D):
     """Manages a super-sampled grid on the partial image."""
+    # NOTE: JIT-compiled functions need to be recompiled each time a new instance
+    # of RegularGrid is created
 
     def __init__(
         self,
