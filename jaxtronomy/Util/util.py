@@ -9,7 +9,7 @@ from functools import partial
 from jax import jit, numpy as jnp
 import numpy as np
 
-from lenstronomy.Util.util import make_grid, local_minima_2d, selectBest
+from lenstronomy.Util.util import local_minima_2d, make_grid, make_subgrid, selectBest
 from lenstronomy.Util.package_util import exporter
 
 export, __all__ = exporter()
@@ -70,44 +70,6 @@ def image2array(image):
     """
     imgh = jnp.reshape(image, jnp.size(image))  # change the shape to be 1d
     return imgh
-
-@export
-@partial(jit, static_argnums=2)
-def make_subgrid(ra_coord, dec_coord, subgrid_res=2):
-    """Return a grid with subgrid resolution.
-
-    :param ra_coord:
-    :param dec_coord:
-    :param subgrid_res:
-    :return:
-    """
-    ra_array = array2image(ra_coord)
-    dec_array = array2image(dec_coord)
-    n = jnp.size(ra_array, axis=0)
-    d_ra_x = ra_array.at[0,1].get() - ra_array.at[0,0].get()
-    d_ra_y = ra_array.at[1,0].get() - ra_array.at[0,0].get()
-    d_dec_x = dec_array.at[0,1].get() - dec_array.at[0,0].get()
-    d_dec_y = dec_array.at[1,0].get() - dec_array.at[0,0].get()
-
-    ra_array_new = jnp.zeros((n * subgrid_res, n * subgrid_res))
-    dec_array_new = jnp.zeros((n * subgrid_res, n * subgrid_res))
-    for i in range(0, subgrid_res):
-        for j in range(0, subgrid_res):
-            ra_array_new = ra_array_new.at[i::subgrid_res, j::subgrid_res].set(
-                ra_array
-                + d_ra_x * (-1 / 2.0 + 1 / (2.0 * subgrid_res) + j / float(subgrid_res))
-                + d_ra_y * (-1 / 2.0 + 1 / (2.0 * subgrid_res) + i / float(subgrid_res))
-            )
-            dec_array_new = dec_array_new.at[i::subgrid_res, j::subgrid_res].set(
-                dec_array
-                + d_dec_x
-                * (-1 / 2.0 + 1 / (2.0 * subgrid_res) + j / float(subgrid_res))
-                + d_dec_y
-                * (-1 / 2.0 + 1 / (2.0 * subgrid_res) + i / float(subgrid_res))
-            )
-    ra_coords_sub = image2array(ra_array_new)
-    dec_coords_sub = image2array(dec_array_new)
-    return ra_coords_sub, dec_coords_sub
 
 @export
 @jit

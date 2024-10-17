@@ -39,20 +39,6 @@ def test_image2array():
     x_array_ref = util_ref.image2array(x)
     npt.assert_array_almost_equal(x_array, x_array_ref, decimal=8)
 
-def test_makesubgrid():
-    ra_coord = np.array([1, 3, 5, 7, 1, 9, 4, 2, 6], dtype=float)
-    dec_coord = np.array([3, 8, 4, 7, 5, 2, 9, 7, 6], dtype=float)
-    ra_coord_sub, dec_coord_sub = util.make_subgrid(ra_coord, dec_coord)
-    ra_coord_sub_ref, dec_coord_sub_ref = util_ref.make_subgrid(ra_coord, dec_coord)
-    npt.assert_array_almost_equal(ra_coord_sub, ra_coord_sub_ref, decimal=8)
-    npt.assert_array_almost_equal(dec_coord_sub, dec_coord_sub_ref, decimal=8)
-
-    subgrid_res = 4
-    ra_coord_sub, dec_coord_sub = util.make_subgrid(ra_coord, dec_coord, subgrid_res)
-    ra_coord_sub_ref, dec_coord_sub_ref = util_ref.make_subgrid(ra_coord, dec_coord, subgrid_res)
-    npt.assert_array_almost_equal(ra_coord_sub, ra_coord_sub_ref, decimal=8)
-    npt.assert_array_almost_equal(dec_coord_sub, dec_coord_sub_ref, decimal=8)
-
 def test_rotate():
     x = np.array([0, 1, 2, 10])
     y = np.array([3, 2, 1, 8])
