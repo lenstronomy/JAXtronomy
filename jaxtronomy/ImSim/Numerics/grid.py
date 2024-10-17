@@ -92,7 +92,7 @@ class RegularGrid(Coordinates1D):
         """
         return self._supersampling_factor
 
-    def flux_array2image_low_high(self, flux_array, **kwargs):
+    def flux_array2image_low_high(self, flux_array):
         """
 
         :param flux_array: 1d array of low and high resolution flux values corresponding
