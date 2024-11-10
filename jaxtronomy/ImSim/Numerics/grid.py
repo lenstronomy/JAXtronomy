@@ -3,7 +3,7 @@ from jax import jit, numpy as jnp
 import numpy as np
 
 from jaxtronomy.Util import util
-from lenstronomy.Util import image_util
+from jaxtronomy.Util import image_util
 from lenstronomy.Data.coord_transforms import Coordinates1D
 
 from lenstronomy.Util.package_util import exporter
@@ -92,6 +92,7 @@ class RegularGrid(Coordinates1D):
         """
         return self._supersampling_factor
 
+    @partial(jit, static_argnums=0)
     def flux_array2image_low_high(self, flux_array, **kwargs):
         """
 
