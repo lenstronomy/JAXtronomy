@@ -43,6 +43,9 @@ class TestPixelKernelConvolution(object):
         image_convolved_ref = pixel_conv_ref.convolution2d(self.model)
         npt.assert_almost_equal(image_convolved, image_convolved_ref, decimal=5)
 
+        pixel_conv.convolution_type = "incorrect"
+        npt.assert_raises(ValueError, pixel_conv.convolution2d, self.model)
+
     def test_convolve2d_grid(self):
         kernel = np.ones((3, 3)) * 2
         kernel[1, 1] = 1
