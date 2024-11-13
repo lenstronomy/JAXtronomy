@@ -67,10 +67,8 @@ class PixelKernelConvolution(object):
         """
         if self.convolution_type == "fft":
             image_conv = signal.fftconvolve(image, self._kernel, mode="same")
-        elif self.convolution_type == "grid":
-            image_conv = signal.convolve2d(image, self._kernel, mode="same")
         else:
-            raise ValueError("convolution_type %s not supported!" % self.convolution_type)
+            image_conv = signal.convolve2d(image, self._kernel, mode="same")
         return image_conv
     
     @jit
