@@ -13,6 +13,10 @@ from jaxtronomy.LensModel.Profiles.gaussian_potential import GaussianPotential
 
 jax.config.update("jax_enable_x64", True)
 
+# NOTE: Since there is no scipy.integrate.quad function in JAX,
+#       the _num_integral function is implemented using trapezoidal
+#       integration, resulting in numerical differences from lenstronomy.
+#       It is accurate up to 5 decimal places.
 
 class TestGaussian(object):
     def setup_method(self):
@@ -26,22 +30,21 @@ class TestGaussian(object):
         sigma = 0.5
         values_ref = self.profile_ref.function(x, y, amp, sigma)
         values = self.profile.function(x, y, amp, sigma)
-        npt.assert_array_almost_equal(values_ref, values, decimal=6)
+        npt.assert_array_almost_equal(values_ref, values, decimal=5)
 
-        # NOTE: This test fails with 32 bit floats
         x = np.array([0])
         y = np.array([0])
         amp = 1.3
         sigma = 0.5
         values_ref = self.profile_ref.function(x, y, amp, sigma)
         values = self.profile.function(x, y, amp, sigma)
-        npt.assert_array_almost_equal(values_ref, values, decimal=6)
+        npt.assert_array_almost_equal(values_ref, values, decimal=5)
 
         x = np.array([2., 3., 4.])
         y = np.array([1., 1., 1.])
         values_ref = self.profile_ref.function(x, y, amp, sigma)
         values = self.profile.function(x, y, amp, sigma)
-        npt.assert_almost_equal(values_ref, values, decimal=6)
+        npt.assert_almost_equal(values_ref, values, decimal=5)
 
     def test_derivatives(self):
         x = np.array([1])
@@ -197,7 +200,7 @@ class TestGaussian(object):
         result_ref = np.array(result_ref)
 
         result = self.profile._num_integral(r, c)
-        npt.assert_array_almost_equal(result_ref, result, decimal=6)
+        npt.assert_array_almost_equal(result_ref, result, decimal=4)
 
 
 class TestGaussianPotential(object):
