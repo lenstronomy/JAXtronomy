@@ -145,7 +145,7 @@ class SinglePlane(ProfileListBase):
         return f_xx, f_xy, f_yx, f_yy
 
     @partial(jit, static_argnums=(0,3))
-    def mass_3d(self, r, kwargs, bool_list=None):
+    def mass_3d(self, r, kwargs, k=None):
         """Computes the mass within a 3d sphere of radius r.
 
         if you want to have physical units of kg, you need to multiply by this factor:
@@ -156,10 +156,11 @@ class SinglePlane(ProfileListBase):
         :param r: radius (in angular units)
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
-        :param bool_list: tuple of bools that are part of the output
+        :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: mass (in angular units, modulo epsilon_crit)
         """
-        bool_list = self._bool_list(bool_list)
+        bool_list = self._bool_list(k)
         mass_3d = 0
         for i, func in enumerate(self.func_list):
             if bool_list[i] is True:
@@ -173,7 +174,7 @@ class SinglePlane(ProfileListBase):
         return mass_3d
 
     @partial(jit, static_argnums=(0,3))
-    def mass_2d(self, r, kwargs, bool_list=None):
+    def mass_2d(self, r, kwargs, k=None):
         """Computes the mass enclosed a projected (2d) radius r.
 
         The mass definition is such that:
@@ -186,10 +187,11 @@ class SinglePlane(ProfileListBase):
         :param r: radius (in angular units)
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
-        :param bool_list: tuple of bools that are part of the output
+        :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: projected mass (in angular units, modulo epsilon_crit)
         """
-        bool_list = self._bool_list(bool_list)
+        bool_list = self._bool_list(k)
         mass_2d = 0
         for i, func in enumerate(self.func_list):
             if bool_list[i] is True:
@@ -203,17 +205,18 @@ class SinglePlane(ProfileListBase):
         return mass_2d
 
     @partial(jit, static_argnums=(0,3))
-    def density(self, r, kwargs, bool_list=None):
+    def density(self, r, kwargs, k=None):
         """3d mass density at radius r The integral in the LOS projection of this
         quantity results in the convergence quantity.
 
         :param r: radius (in angular units)
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
-        :param bool_list: tuple of bools that are part of the output
+        :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: mass density at radius r (in angular units, modulo epsilon_crit)
         """
-        bool_list = self._bool_list(bool_list)
+        bool_list = self._bool_list(k)
         density = 0
         for i, func in enumerate(self.func_list):
             if bool_list[i] is True:
