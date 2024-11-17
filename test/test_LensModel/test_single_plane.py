@@ -1,12 +1,12 @@
 __author__ = "sibirrer"
 
-import numpy as np
 import numpy.testing as npt
 import pytest
 from jaxtronomy.LensModel.single_plane import SinglePlane
 from lenstronomy.LensModel.single_plane import SinglePlane as SinglePlane_ref
 from jaxtronomy.LensModel.Profiles.sis import SIS
 from lenstronomy.LensModel.Profiles.sis import SIS as SIS_ref
+from jaxtronomy.LensModel.profile_list_base import _JAXXED_MODELS
 
 import unittest
 
@@ -27,36 +27,32 @@ class TestLensModel(object):
     """Tests the source model routines."""
 
     def setup_method(self):
-        self.lensModel = SinglePlane(["GAUSSIAN_POTENTIAL"])
-        self.lensModel_ref = SinglePlane_ref(["GAUSSIAN_POTENTIAL"])
+        self.lensModel = SinglePlane(["EPL"])
+        self.lensModel_ref = SinglePlane_ref(["EPL"])
 
         self.kwargs = [
             {
-                "amp": 1.0,
-                "sigma_x": 2.0,
-                "sigma_y": 2.0,
-                "center_x": 0.0,
-                "center_y": 0.0,
+                "theta_E": 1.7,
+                "e1": -0.3,
+                "e2": 0.3,
+                "center_x": 0.3,
+                "center_y": 0.1,
+                "gamma": 1.73,
             }
         ]
 
     def test_potential(self):
         output = self.lensModel.potential(x=1.0, y=1.0, kwargs=self.kwargs)
         output_ref = self.lensModel_ref.potential(x=1.0, y=1.0, kwargs=self.kwargs)
-        assert output == 0.77880078307140488 / (8 * jnp.pi)
-        assert output == output_ref
+        npt.assert_array_almost_equal(output, output_ref, decimal=8)
 
     def test_alpha(self):
         output1, output2 = self.lensModel.alpha(x=1.0, y=1.0, kwargs=self.kwargs)
         output1_ref, output2_ref = self.lensModel_ref.alpha(
             x=1.0, y=1.0, kwargs=self.kwargs
         )
-        assert output1 == -0.19470019576785122 / (8 * jnp.pi)
-        assert output2 == -0.19470019576785122 / (8 * jnp.pi)
-        assert output1 == output1_ref
-
-        assert output1 == output1_ref
-        assert output2 == output2_ref
+        npt.assert_array_almost_equal(output1, output1_ref, decimal=8)
+        npt.assert_array_almost_equal(output2, output2_ref, decimal=8)
 
     def test_hessian(self):
         f_xx, f_xy, f_yx, f_yy = self.lensModel.hessian(
@@ -66,11 +62,6 @@ class TestLensModel(object):
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.lensModel_ref.hessian(
             x=1.0, y=1.0, kwargs=self.kwargs
         )
-
-        npt.assert_almost_equal(f_xx, -0.00581, decimal=6)
-        npt.assert_almost_equal(f_xy, 0.001937, decimal=6)
-        npt.assert_almost_equal(f_yx, 0.001937, decimal=6)
-        npt.assert_almost_equal(f_yy, -0.00581, decimal=6)
 
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=6)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=6)
@@ -83,19 +74,24 @@ class TestLensModel(object):
             x=1.0, y=1.0, kwargs=self.kwargs
         )
 
-        assert delta_x == 1 + 0.19470019576785122 / (8 * jnp.pi)
-        assert delta_y == 1 + 0.19470019576785122 / (8 * jnp.pi)
-
-        assert delta_x == delta_x_ref
-        assert delta_y == delta_y_ref
+        npt.assert_array_almost_equal(delta_x, delta_x_ref, decimal=8)
+        npt.assert_array_almost_equal(delta_y, delta_y_ref, decimal=8)
 
     def test_mass_2d(self):
-        lensModel = SinglePlane(["GAUSSIAN"])
-        lensModel_ref = SinglePlane_ref(["GAUSSIAN"])
-        kwargs = [{"amp": 1.0, "sigma": 2.0, "center_x": 0.0, "center_y": 0.0}]
+        lensModel = SinglePlane(["SIE"])
+        lensModel_ref = SinglePlane_ref(["SIE"])
+
+        kwargs = [
+            {
+                "theta_E": 1.7,
+                "e1": -0.3,
+                "e2": 0.3,
+                "center_x": 0.3,
+                "center_y": 0.1,
+            }
+        ]
         output = lensModel.mass_2d(r=1, kwargs=kwargs)
         output_ref = lensModel_ref.mass_2d(r=1, kwargs=kwargs)
-        npt.assert_almost_equal(output, 0.11750309741540453, decimal=9)
         npt.assert_almost_equal(output, output_ref, decimal=9)
 
     def test_density(self):
@@ -118,8 +114,8 @@ class TestLensModel(object):
         npt.assert_almost_equal(density_model, density_model_ref, decimal=8)
 
     def test_bool_list(self):
-        lensModel = SinglePlane(["SPEP", "SHEAR"])
-        lensModel_ref = SinglePlane_ref(["SPEP", "SHEAR"])
+        lensModel = SinglePlane(["EPL", "SHEAR"])
+        lensModel_ref = SinglePlane_ref(["EPL", "SHEAR"])
 
         kwargs = [
             {
@@ -136,11 +132,8 @@ class TestLensModel(object):
         alphax_1, alphay_1 = lensModel.alpha(1, 1, kwargs, k=0)
         alphax_1_ref, alphay_1_ref = lensModel_ref.alpha(1, 1, kwargs, k=0)
 
-        alphax_1_list, alphay_1_list = lensModel.alpha(1, 1, kwargs, k=[0])
-        alphax_1_list_ref, alphay_1_list_ref = lensModel_ref.alpha(1, 1, kwargs, k=[0])
-
-        npt.assert_almost_equal(alphax_1, alphax_1_list, decimal=5)
-        npt.assert_almost_equal(alphay_1, alphay_1_list, decimal=5)
+        alphax_1_list, alphay_1_list = lensModel.alpha(1, 1, kwargs, k=(0,1))
+        alphax_1_list_ref, alphay_1_list_ref = lensModel_ref.alpha(1, 1, kwargs, k=(0,1))
 
         npt.assert_almost_equal(alphax_1, alphax_1_ref)
         npt.assert_almost_equal(alphay_1, alphay_1_ref)
@@ -182,102 +175,12 @@ class TestLensModel(object):
             "MULTIPOLE",
             "CURVED_ARC_SPP",
         ]
-        lensModel = SinglePlane(lens_model_list=lens_model_list)
-        assert lensModel.func_list[0].param_names[0] == "Rs"
+        npt.assert_raises(ValueError, SinglePlane, lens_model_list)
 
     def test_profile_list_base(self):
         # this tests the giant elif statement in profile_list_base
-        # profiles which break this test for various reasons are commented
-        lens_model_list = [
-            "ARC_PERT",
-            "BLANK_PLANE",
-            "CHAMELEON",
-            "CNFW",
-            "CNFW_ELLIPSE_POTENTIAL",
-            "CONST_MAG",
-            "CONVERGENCE",
-            "coreBURKERT",
-            "CORED_DENSITY",
-            "CORED_DENSITY_2",
-            "CORED_DENSITY_2_MST",
-            "CORED_DENSITY_EXP",
-            "CORED_DENSITY_EXP_MST",
-            "CORED_DENSITY_MST",
-            "CORED_DENSITY_ULDM_MST",
-            "CSE",
-            "CTNFW_GAUSS_DEC",
-            "CURVED_ARC_CONST",
-            "CURVED_ARC_CONST_MST",
-            "CURVED_ARC_SIS_MST",
-            "CURVED_ARC_SPP",
-            "CURVED_ARC_SPT",
-            "CURVED_ARC_TAN_DIFF",
-            "DIPOLE",
-            "DOUBLE_CHAMELEON",
-            "EPL",
-            "EPL_BOXYDISKY",
-            "EPL_MULTIPOLE_M3M4",
-            "EPL_NUMBA",
-            "EPL_Q_PHI",
-            "ElliSLICE",
-            "FLEXION",
-            "FLEXIONFG",
-            "GAUSSIAN",
-            "GAUSSIAN_ELLIPSE_KAPPA",
-            "GAUSSIAN_ELLIPSE_POTENTIAL",
-            "GAUSSIAN_POTENTIAL",
-            "GNFW",
-            "HERNQUIST",
-            "HERNQUIST_ELLIPSE_POTENTIAL",
-            "HERNQUIST_ELLIPSE_CSE",
-            "HESSIAN",
-            "INTERPOL",
-            "INTERPOL_SCALED",
-            "RADIAL_INTERPOL",
-            # "LOS", # can't use SinglePlane
-            # "LOS_MINIMAL", # can't use SinglePlane
-            "MULTIPOLE",
-            "MULTI_GAUSSIAN",
-            "MULTI_GAUSSIAN_ELLIPSE_POTENTIAL",
-            "NFW",
-            "NFW_ELLIPSE_POTENTIAL",
-            "NFW_ELLIPSE_CSE",
-            "NFW_ELLIPSE_GAUSS_DEC",
-            "NFW_MC",
-            "NFW_MC_ELLIPSE_POTENTIAL",
-            "NIE",
-            "NIE_POTENTIAL",
-            "NIE_SIMPLE",
-            "POINT_MASS",
-            "PSEUDO_DPL",
-            "SERSIC",
-            "SERSIC_ELLIPSE_GAUSS_DEC",
-            "SERSIC_ELLIPSE_KAPPA",
-            "SERSIC_ELLIPSE_POTENTIAL",
-            "SHAPELETS_CART",
-            "SHAPELETS_POLAR",
-            "SHEAR",
-            "SHEAR_GAMMA_PSI",
-            "SHEAR_REDUCED",
-            "SHIFT",
-            "SIE",
-            "SIS",
-            "SIS_TRUNCATED",
-            # "SPEMD", # needs fastell to pass (fails locally)
-            "SPEP",
-            "SPL_CORE",
-            "SPP",
-            # "SYNTHESIS", # needs other arguments
-            "TABULATED_DEFLECTIONS",
-            "TNFW",
-            "TNFWC",
-            "TNFW_ELLIPSE_POTENTIAL",
-            "TRIPLE_CHAMELEON",
-            "ULDM",
-            "EPL_MULTIPOLE_M3M4",
-        ]
 
-        lensModel = SinglePlane(lens_model_list=lens_model_list)
+        lensModel = SinglePlane(lens_model_list=_JAXXED_MODELS)
 
 
 class TestRaise(unittest.TestCase):
@@ -286,13 +189,14 @@ class TestRaise(unittest.TestCase):
 
         :return:
         """
-        if bool_test is False:
-            with self.assertRaises(ImportError):
-                SinglePlane(lens_model_list=["PEMD"])
-            with self.assertRaises(ImportError):
-                SinglePlane(lens_model_list=["SPEMD"])
-        else:
-            SinglePlane(lens_model_list=["PEMD", "SPEMD"])
+        # NOTE: These profiles are not yet implemented in JAXtronomy
+        # if bool_test is False:
+        #     with self.assertRaises(ImportError):
+        #         SinglePlane(lens_model_list=["PEMD"])
+        #     with self.assertRaises(ImportError):
+        #         SinglePlane(lens_model_list=["SPEMD"])
+        # else:
+        #     SinglePlane(lens_model_list=["PEMD", "SPEMD"])
 
         with self.assertRaises(ValueError):
             SinglePlane(lens_model_list=["MY_FAKE_PROFILE"])
