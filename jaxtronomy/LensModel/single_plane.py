@@ -1,8 +1,9 @@
 __author__ = "sibirrer"
 
 import jax
-import jax.numpy as jnp
+from jax import jit, numpy as jnp
 from jaxtronomy.LensModel.profile_list_base import ProfileListBase
+from functools import partial
 
 jax.config.update("jax_enable_x64", True)
 
@@ -12,6 +13,7 @@ __all__ = ["SinglePlane"]
 class SinglePlane(ProfileListBase):
     """Class to handle an arbitrary list of lens models in a single lensing plane."""
 
+    @partial(jit, static_argnums=(0,4))
     def ray_shooting(self, x, y, kwargs, k=None):
         """Maps image to source position (inverse deflection).
 
@@ -22,6 +24,7 @@ class SinglePlane(ProfileListBase):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: source plane positions corresponding to (x, y) in the image plane
         """
 
@@ -39,7 +42,8 @@ class SinglePlane(ProfileListBase):
         :param y_source: source position
         :param kwargs_lens: list of keyword arguments of lens model parameters matching
             the lens model classes
-        :param k:
+        :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: fermat potential in arcsec**2 without geometry term (second part of Eqn
             1 in Suyu et al. 2013) as a list
         """
@@ -50,6 +54,7 @@ class SinglePlane(ProfileListBase):
         geometry = ((x_image - x_source) ** 2 + (y_image - y_source) ** 2) / 2.0
         return geometry - potential
 
+    @partial(jit, static_argnums=(0,4))
     def potential(self, x, y, kwargs, k=None):
         """Lensing potential.
 
@@ -60,6 +65,7 @@ class SinglePlane(ProfileListBase):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: lensing potential in units of arcsec^2
         """
         x = jnp.array(x, dtype=float)
@@ -73,6 +79,7 @@ class SinglePlane(ProfileListBase):
                 potential += func.function(x, y, **kwargs[i])
         return potential
 
+    @partial(jit, static_argnums=(0,4))
     def alpha(self, x, y, kwargs, k=None):
         """Deflection angles.
 
@@ -83,6 +90,7 @@ class SinglePlane(ProfileListBase):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: deflectionangles in units of arcsec
         """
         x = jnp.array(x, dtype=float)
@@ -100,6 +108,7 @@ class SinglePlane(ProfileListBase):
 
         return f_x, f_y
 
+    @partial(jit, static_argnums=(0,4))
     def hessian(self, x, y, kwargs, k=None):
         """Hessian matrix.
 
@@ -110,6 +119,7 @@ class SinglePlane(ProfileListBase):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: f_xx, f_xy, f_yx, f_yy components
         """
         x = jnp.array(x, dtype=float)
@@ -134,6 +144,7 @@ class SinglePlane(ProfileListBase):
                 f_yy += f_yy_i
         return f_xx, f_xy, f_yx, f_yy
 
+    @partial(jit, static_argnums=(0,3))
     def mass_3d(self, r, kwargs, bool_list=None):
         """Computes the mass within a 3d sphere of radius r.
 
@@ -145,7 +156,7 @@ class SinglePlane(ProfileListBase):
         :param r: radius (in angular units)
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
-        :param bool_list: list of bools that are part of the output
+        :param bool_list: tuple of bools that are part of the output
         :return: mass (in angular units, modulo epsilon_crit)
         """
         bool_list = self._bool_list(bool_list)
@@ -161,6 +172,7 @@ class SinglePlane(ProfileListBase):
                 mass_3d += mass_3d_i
         return mass_3d
 
+    @partial(jit, static_argnums=(0,3))
     def mass_2d(self, r, kwargs, bool_list=None):
         """Computes the mass enclosed a projected (2d) radius r.
 
@@ -174,7 +186,7 @@ class SinglePlane(ProfileListBase):
         :param r: radius (in angular units)
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
-        :param bool_list: list of bools that are part of the output
+        :param bool_list: tuple of bools that are part of the output
         :return: projected mass (in angular units, modulo epsilon_crit)
         """
         bool_list = self._bool_list(bool_list)
@@ -190,6 +202,7 @@ class SinglePlane(ProfileListBase):
                 mass_2d += mass_2d_i
         return mass_2d
 
+    @partial(jit, static_argnums=(0,3))
     def density(self, r, kwargs, bool_list=None):
         """3d mass density at radius r The integral in the LOS projection of this
         quantity results in the convergence quantity.
@@ -197,7 +210,7 @@ class SinglePlane(ProfileListBase):
         :param r: radius (in angular units)
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
-        :param bool_list: list of bools that are part of the output
+        :param bool_list: tuple of bools that are part of the output
         :return: mass density at radius r (in angular units, modulo epsilon_crit)
         """
         bool_list = self._bool_list(bool_list)

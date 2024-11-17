@@ -3,9 +3,10 @@ __author__ = "sibirrer"
 # NOTE: Copy pasted from lenstronomy, functions have not been jaxified yet
 # this file contains a class which describes the surface brightness of the light models
 
-import numpy as np
 from lenstronomy.Util.util import convert_bool_list
+from jax import jit, numpy as jnp
 from lenstronomy.Conf import config_loader
+from functools import partial
 
 convention_conf = config_loader.conventions_conf()
 sersic_major_axis_conf = convention_conf.get("sersic_major_axis", False)
@@ -219,6 +220,7 @@ class LightModelBase(object):
                 )
         self._num_func = len(self.func_list)
 
+    @partial(jit, static_argnums=(0,4))
     def surface_brightness(self, x, y, kwargs_list, k=None):
         """
         :param x: coordinate in units of arcsec relative to the center of the image
@@ -226,16 +228,17 @@ class LightModelBase(object):
         :param y: coordinate in units of arcsec relative to the center of the image
         :type y: set or single 1d numpy array
         :param kwargs_list: keyword argument list of light profile
-        :param k: integer or list of integers for selecting subsets of light profiles
+        :param k: integer or tuple of integers for selecting subsets of light profiles
         """
         kwargs_list_standard = self._transform_kwargs(kwargs_list)
-        x = np.array(x, dtype=float)
-        y = np.array(y, dtype=float)
-        flux = np.zeros_like(x)
+        x = jnp.array(x, dtype=float)
+        y = jnp.array(y, dtype=float)
+
+        flux = jnp.zeros_like(x)
         bool_list = self._bool_list(k=k)
         for i, func in enumerate(self.func_list):
             if bool_list[i] is True:
-                out = np.array(
+                out = jnp.array(
                     func.function(x, y, **kwargs_list_standard[i]), dtype=float
                 )
                 flux += out
@@ -286,6 +289,7 @@ class LightModelBase(object):
     #                 )
     #     return flux
 
+    @partial(jit, static_argnums=(0,2,3))
     def total_flux(self, kwargs_list, norm=False, k=None):
         """Computes the total flux of each individual light profile. This allows to
         estimate the total flux as well as lenstronomy amp to magnitude conversions. Not
@@ -295,7 +299,7 @@ class LightModelBase(object):
         :param kwargs_list: list of keyword arguments corresponding to the light
             profiles. The 'amp' parameter can be missing.
         :param norm: bool, if True, computes the flux for amp=1
-        :param k: int, if set, only evaluates the specific light model
+        :param k: int or tuple of ints, if set, only evaluates the specific light model
         :return: list of (total) flux values attributed to each profile
         """
         kwargs_list_standard = self._transform_kwargs(kwargs_list)
