@@ -316,24 +316,25 @@ class SinglePlaneLOS(SinglePlane):
 
         return f_xx, f_xy, f_yx, f_yy
 
-    def mass_3d(self, r, kwargs, bool_list=None):
+    def mass_3d(self, r, kwargs, k=None):
         """Computes the mass within a 3d sphere of radius r *for the main lens only*
 
         :param r: radius (in angular units)
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
-        :param bool_list: list of bools that are part of the output
+        :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: mass (in angular units, modulo epsilon_crit)
         """
 
         print("Note: The computation of the 3d mass ignores the LOS corrections.")
 
         kwargs_main, kwargs_los = self.split_lens_los(kwargs)
-        mass_3d = self._main_lens.mass_3d(r=r, kwargs=kwargs_main, bool_list=bool_list)
+        mass_3d = self._main_lens.mass_3d(r=r, kwargs=kwargs_main, k=k)
 
         return mass_3d
 
-    def mass_2d(self, r, kwargs, bool_list=None):
+    def mass_2d(self, r, kwargs, k=None):
         """Computes the mass enclosed a projected (2d) radius r *for the main lens only*
 
         The mass definition is such that:
@@ -345,32 +346,34 @@ class SinglePlaneLOS(SinglePlane):
 
         :param r: radius (in angular units)
         :param kwargs: list of keyword arguments of lens model parameters matching the lens model classes
-        :param bool_list: list of bools that are part of the output
+        :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: projected mass (in angular units, modulo epsilon_crit)
         """
 
         print("Note: The computation of the 2d mass ignores the LOS corrections.")
 
         kwargs_main, kwargs_los = self.split_lens_los(kwargs)
-        mass_2d = self._main_lens.mass_2d(r=r, kwargs=kwargs_main, bool_list=bool_list)
+        mass_2d = self._main_lens.mass_2d(r=r, kwargs=kwargs_main, k=k)
 
         return mass_2d
 
-    def density(self, r, kwargs, bool_list=None):
+    def density(self, r, kwargs, k=None):
         """3d mass density at radius r *for the main lens only* The integral in the LOS
         projection of this quantity results in the convergence quantity.
 
         :param r: radius (in angular units)
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
-        :param bool_list: list of bools that are part of the output
+        :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: mass density at radius r (in angular units, modulo epsilon_crit)
         """
 
         print("Note: The computation of the density ignores the LOS corrections.")
 
         kwargs_main, kwargs_los = self.split_lens_los(kwargs)
-        density = self._main_lens.density(r=r, kwargs=kwargs_main, bool_list=bool_list)
+        density = self._main_lens.density(r=r, kwargs=kwargs_main, k=k)
 
         return density
 
