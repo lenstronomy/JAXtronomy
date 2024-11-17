@@ -187,7 +187,7 @@ class NFW(LensProfileBase):
     @staticmethod
     @jit
     def mass_3d(r, Rs, rho0):
-        """Mass enclosed a 3d sphere or radius r.
+        """Mass enclosed a 3d sphere of radius r.
 
         :param r: 3d radius
         :param Rs: scale radius
@@ -201,7 +201,7 @@ class NFW(LensProfileBase):
     @staticmethod
     @jit
     def mass_3d_lens(r, Rs, alpha_Rs):
-        """Mass enclosed a 3d sphere or radius r. This function takes as ijnput the
+        """Mass enclosed a 3d sphere of radius r. This function takes as input the
         lensing parameterization.
 
         :param r: 3d radius
@@ -216,7 +216,7 @@ class NFW(LensProfileBase):
     @staticmethod
     @jit
     def mass_2d(R, Rs, rho0):
-        """Mass enclosed a 2d cylinder or projected radius R.
+        """Mass enclosed a 2d cylinder of projected radius R.
 
         :param R: projected radius
         :param Rs: scale radius
