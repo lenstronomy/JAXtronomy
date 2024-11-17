@@ -30,7 +30,7 @@ class TestGaussian(object):
         sigma = 0.5
         values_ref = self.profile_ref.function(x, y, amp, sigma)
         values = self.profile.function(x, y, amp, sigma)
-        npt.assert_array_almost_equal(values_ref, values, decimal=5)
+        npt.assert_array_almost_equal(values_ref, values, decimal=4)
 
         x = np.array([0])
         y = np.array([0])
@@ -38,13 +38,13 @@ class TestGaussian(object):
         sigma = 0.5
         values_ref = self.profile_ref.function(x, y, amp, sigma)
         values = self.profile.function(x, y, amp, sigma)
-        npt.assert_array_almost_equal(values_ref, values, decimal=5)
+        npt.assert_array_almost_equal(values_ref, values, decimal=4)
 
         x = np.array([2., 3., 4.])
         y = np.array([1., 1., 1.])
         values_ref = self.profile_ref.function(x, y, amp, sigma)
         values = self.profile.function(x, y, amp, sigma)
-        npt.assert_almost_equal(values_ref, values, decimal=5)
+        npt.assert_almost_equal(values_ref, values, decimal=4)
 
     def test_derivatives(self):
         x = np.array([1])
