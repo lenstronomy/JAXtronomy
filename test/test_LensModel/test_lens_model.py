@@ -4,10 +4,10 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 from jaxtronomy.LensModel.lens_model import LensModel
+from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane
 from lenstronomy.LensModel.MultiPlane.decoupled_multi_plane import MultiPlaneDecoupled
 
-from lenstronomy.LensModel.Profiles.nfw import NFW  # NH: no NFW in jaxtronomy yet
 from lenstronomy.Util.util import make_grid
 import unittest
 
@@ -21,16 +21,20 @@ class TestLensModel(object):
     """Tests the source model routines."""
 
     def setup_method(self):
-        self.lensModel = LensModel(["GAUSSIAN_POTENTIAL"])
         self.kwargs = [
             {
-                "amp": 1.0,
-                "sigma_x": 2.0,
-                "sigma_y": 2.0,
+                "theta_E": 1.0,
+                "gamma": 2,
                 "center_x": 0.0,
                 "center_y": 0.0,
+                "e1": 0,
+                "e2": 0,
             }
         ]
+        self.lensModel = LensModel(["EPL"])
+        self.lensModel_ref = LensModel_ref(["EPL"])
+        self.x = np.array([-1.5, -0.3, 1.1, 1.3, 2.7])
+        self.y = np.array([-1.1, -0.6, 0.7, 1.2, 1.9])
 
     def test_init(self):
         lens_model_list = [  # NH: removing non-jaxxed profiles for now
@@ -43,12 +47,12 @@ class TestLensModel(object):
 
         lens_model_list = ["NFW"]
         lensModel = LensModel(lens_model_list)
+        lensModel_ref = LensModel_ref(lens_model_list)
         x, y = 0.2, 1
         kwargs = [{"alpha_Rs": 1, "Rs": 0.5, "center_x": 0, "center_y": 0}]
-        value = lensModel.potential(x, y, kwargs)
-        nfw_interp = NFW(interpol=True)
-        value_interp_lookup = nfw_interp.function(x, y, **kwargs[0])
-        npt.assert_almost_equal(value, value_interp_lookup, decimal=4)
+        value = lensModel.potential(self.x, self.y, kwargs)
+        value_ref = lensModel_ref.potential(self.x, self.y, kwargs)
+        npt.assert_array_almost_equal(value, value_ref, decimal=6)
 
         lens_model_list = ["SIS", "SIS"]
         lensModel = LensModel(lens_model_list, decouple_multi_plane=True)
@@ -58,76 +62,86 @@ class TestLensModel(object):
 
     def test_kappa(self):
         lensModel = LensModel(lens_model_list=["CONVERGENCE"])
+        lensModel_ref = LensModel_ref(lens_model_list=["CONVERGENCE"])
         kappa_ext = 0.5
         kwargs = [{"kappa": kappa_ext}]
-        output = lensModel.kappa(x=1.0, y=1.0, kwargs=kwargs)
-        assert output == kappa_ext
+        output = lensModel.kappa(self.x, self.y, kwargs=kwargs)
+        output_ref = lensModel_ref.kappa(self.x, self.y, kwargs=kwargs)
+        npt.assert_array_almost_equal(output, np.ones_like(output)*kappa_ext, decimal=6)
+        npt.assert_array_almost_equal(output, output_ref, decimal=6)
 
     def test_potential(self):
-        output = self.lensModel.potential(x=1.0, y=1.0, kwargs=self.kwargs)
-        npt.assert_almost_equal(output, 0.77880078307140488 / (8 * jnp.pi), decimal=8)
-        # assert output == 0.77880078307140488/(8*jnp.pi)
+        output = self.lensModel.potential(self.x, self.y, kwargs=self.kwargs)
+        output_ref = self.lensModel_ref.potential(self.x, self.y, kwargs=self.kwargs)
+        npt.assert_array_almost_equal(output, output_ref, decimal=6)
 
     def test_alpha(self):
-        output1, output2 = self.lensModel.alpha(x=1.0, y=1.0, kwargs=self.kwargs)
-        npt.assert_almost_equal(output1, -0.19470019576785122 / (8 * jnp.pi), decimal=8)
-        npt.assert_almost_equal(output2, -0.19470019576785122 / (8 * jnp.pi), decimal=8)
-        # assert output1 == -0.19470019576785122/(8*jnp.pi)
-        # assert output2 == -0.19470019576785122/(8*jnp.pi)
+        output1, output2 = self.lensModel.alpha(self.x, self.y, kwargs=self.kwargs)
+        output1_ref, output2_ref = self.lensModel_ref.alpha(self.x, self.y, kwargs=self.kwargs)
+        npt.assert_array_almost_equal(output1, output1_ref, decimal=6)
+        npt.assert_array_almost_equal(output2, output2_ref, decimal=6)
 
         output1_diff, output2_diff = self.lensModel.alpha(
-            x=1.0, y=1.0, kwargs=self.kwargs, diff=0.00001
+            self.x, self.y, kwargs=self.kwargs, diff=0.00001
         )
-        npt.assert_almost_equal(output1_diff, output1, decimal=5)
-        npt.assert_almost_equal(output2_diff, output2, decimal=5)
+        npt.assert_array_almost_equal(output1_diff, output1, decimal=5)
+        npt.assert_array_almost_equal(output2_diff, output2, decimal=5)
 
     def test_gamma(self):
         lensModel = LensModel(lens_model_list=["SHEAR"])
-        gamma1, gamm2 = 0.1, -0.1
-        kwargs = [{"gamma1": gamma1, "gamma2": gamm2}]
-        e1_out, e2_out = lensModel.gamma(x=1.0, y=1.0, kwargs=kwargs)
-        assert e1_out == gamma1
-        assert e2_out == gamm2
+        lensModel_ref = LensModel_ref(lens_model_list=["SHEAR"])
+        gamma1, gamma2 = 0.1, -0.1
+        kwargs = [{"gamma1": gamma1, "gamma2": gamma2}]
+        e1_out, e2_out = lensModel.gamma(self.x, self.y, kwargs=kwargs)
+        e1_out_ref, e2_out_ref = lensModel_ref.gamma(self.x, self.y, kwargs=kwargs)
+        npt.assert_array_almost_equal(e1_out, np.ones_like(e1_out)*gamma1, decimal=6)
+        npt.assert_array_almost_equal(e2_out, np.ones_like(e2_out)*gamma2, decimal=6)
+        npt.assert_array_almost_equal(e1_out, e1_out_ref, decimal=6)
+        npt.assert_array_almost_equal(e2_out, e2_out_ref, decimal=6)
 
-        output1, output2 = self.lensModel.gamma(x=1.0, y=1.0, kwargs=self.kwargs)
-        assert output1 == 0
-        assert output2 == 0.048675048941962805 / (8 * jnp.pi)
 
     def test_magnification(self):
-        output = self.lensModel.magnification(x=1.0, y=1.0, kwargs=self.kwargs)
-        assert output == 0.98848384784633392
+        output = self.lensModel.magnification(self.x, self.y, kwargs=self.kwargs)
+        output_ref = self.lensModel_ref.magnification(self.x, self.y, kwargs=self.kwargs)
+        npt.assert_array_almost_equal(output, output_ref, decimal=6)
 
     def test_flexion(self):
-        lensModel = LensModel(lens_model_list=["FLEXION"])
-        g1, g2, g3, g4 = 0.01, 0.02, 0.03, 0.04
-        kwargs = [{"g1": g1, "g2": g2, "g3": g3, "g4": g4}]
-        f_xxx, f_xxy, f_xyy, f_yyy = lensModel.flexion(x=1.0, y=1.0, kwargs=kwargs)
-        npt.assert_almost_equal(f_xxx, g1, decimal=8)
-        npt.assert_almost_equal(f_xxy, g2, decimal=8)
-        npt.assert_almost_equal(f_xyy, g3, decimal=8)
-        npt.assert_almost_equal(f_yyy, g4, decimal=8)
+        f_xxx, f_xxy, f_xyy, f_yyy = self.lensModel.flexion(self.x, self.y, kwargs=self.kwargs)
+        f_xxx_ref, f_xxy_ref, f_xyy_ref, f_yyy_ref = self.lensModel_ref.flexion(self.x, self.y, kwargs=self.kwargs)
+        npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=6)
+        npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=6)
+        npt.assert_array_almost_equal(f_xyy, f_xyy_ref, decimal=6)
+        npt.assert_array_almost_equal(f_yyy, f_yyy_ref, decimal=6)
 
-        f_xxx, f_xxy, f_xyy, f_yyy = lensModel.flexion(
-            x=1.0, y=1.0, kwargs=kwargs, hessian_diff=False
+        f_xxx, f_xxy, f_xyy, f_yyy = self.lensModel.flexion(
+            self.x, self.y, kwargs=self.kwargs, hessian_diff=False
         )
+        f_xxx_ref, f_xxy_ref, f_xyy_ref, f_yyy_ref = self.lensModel.flexion(
+            self.x, self.y, kwargs=self.kwargs, hessian_diff=False
+        )
+        npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=6)
+        npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=6)
+        npt.assert_array_almost_equal(f_xyy, f_xyy_ref, decimal=6)
+        npt.assert_array_almost_equal(f_yyy, f_yyy_ref, decimal=6)
 
     def test_ray_shooting(self):
-        delta_x, delta_y = self.lensModel.ray_shooting(x=1.0, y=1.0, kwargs=self.kwargs)
-        npt.assert_almost_equal(
-            delta_x, 1 + 0.19470019576785122 / (8 * jnp.pi), decimal=8
-        )
-        npt.assert_almost_equal(
-            delta_y, 1 + 0.19470019576785122 / (8 * jnp.pi), decimal=8
-        )
-        # assert delta_x == 1 + 0.19470019576785122/(8*jnp.pi)
-        # assert delta_y == 1 + 0.19470019576785122/(8*jnp.pi)
+        delta_x, delta_y = self.lensModel.ray_shooting(self.x, self.y, kwargs=self.kwargs)
+        delta_x_ref, delta_y_ref = self.lensModel_ref.ray_shooting(self.x, self.y, kwargs=self.kwargs)
+        npt.assert_array_almost_equal(delta_x, delta_x_ref, decimal=6)
+        npt.assert_array_almost_equal(delta_y, delta_y_ref, decimal=6)
 
     def test_arrival_time(self):
         z_lens = 0.5
         z_source = 1.5
         x_image, y_image = 1.0, 0.0
-        lensModel = LensModel(
-            lens_model_list=["EPL"],  # NH: jax error when testing on SIS; to be fixed
+        lensModel_mp = LensModel(
+            lens_model_list=["SIS"], 
+            multi_plane=True,
+            lens_redshift_list=[z_lens],
+            z_source=z_source,
+        )
+        lensModel_mp_ref = LensModel_ref(
+            lens_model_list=["SIS"], 
             multi_plane=True,
             lens_redshift_list=[z_lens],
             z_source=z_source,
@@ -135,19 +149,23 @@ class TestLensModel(object):
         kwargs = [
             {
                 "theta_E": 1.0,
-                "gamma": 2,
                 "center_x": 0.0,
                 "center_y": 0.0,
-                "e1": 0,
-                "e2": 0,
             }
         ]
-        arrival_time_mp = lensModel.arrival_time(x_image, y_image, kwargs)
+        arrival_time_mp = lensModel_mp.arrival_time(x_image, y_image, kwargs)
+        arrival_time_mp_ref = lensModel_mp_ref.arrival_time(x_image, y_image, kwargs)
         lensModel_sp = LensModel(
-            lens_model_list=["EPL"], z_source=z_source, z_lens=z_lens
+            lens_model_list=["SIS"], z_source=z_source, z_lens=z_lens
+        )
+        lensModel_sp_ref = LensModel_ref(
+            lens_model_list=["SIS"], z_source=z_source, z_lens=z_lens
         )
         arrival_time_sp = lensModel_sp.arrival_time(x_image, y_image, kwargs)
-        npt.assert_almost_equal(arrival_time_sp, arrival_time_mp, decimal=8)
+        arrival_time_sp_ref = lensModel_sp_ref.arrival_time(x_image, y_image, kwargs)
+        npt.assert_array_almost_equal(arrival_time_sp, arrival_time_mp, decimal=8)
+        npt.assert_array_almost_equal(arrival_time_sp, arrival_time_sp_ref, decimal=6)
+        npt.assert_array_almost_equal(arrival_time_mp, arrival_time_mp_ref, decimal=6)
 
     def test_fermat_potential(self):
         z_lens = 0.5

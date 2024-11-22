@@ -9,10 +9,12 @@ from jaxtronomy.LensModel.single_plane import SinglePlane
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane
 from jaxtronomy.LensModel.Profiles.sis import SIS
-from jaxtronomy.LensModel.lens_model import LensModel
-from lenstronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver
+from jaxtronomy.LensModel.profile_list_base import _JAXXED_MODELS
 
 from astropy.cosmology import default_cosmology
+
+import jax
+jax.config.update("jax_enable_x64", True)  # 64-bit floats
 
 cosmo = default_cosmology.get()
 
@@ -173,9 +175,9 @@ class TestSinglePlaneLOS(object):
         npt.assert_almost_equal(density_minimal, density_model, decimal=8)
 
     def test_bool_list(self):
-        lensModel_los = SinglePlaneLOS(["SPEP", "SHEAR", "LOS"], index_los=2)
+        lensModel_los = SinglePlaneLOS(["EPL", "SHEAR", "LOS"], index_los=2)
         lensModel_minimal = SinglePlaneLOS(
-            ["SPEP", "SHEAR", "LOS_MINIMAL"], index_los=2
+            ["EPL", "SHEAR", "LOS_MINIMAL"], index_los=2
         )
         kwargs = [
             {
@@ -192,7 +194,7 @@ class TestSinglePlaneLOS(object):
 
         # LOS
         alphax_1_los, alphay_1_los = lensModel_los.alpha(1, 1, kwargs, k=0)
-        alphax_1_list, alphay_1_list = lensModel_los.alpha(1, 1, kwargs, k=[0])
+        alphax_1_list, alphay_1_list = lensModel_los.alpha(1, 1, kwargs, k=(0,))
         npt.assert_almost_equal(alphax_1_los, alphax_1_list, decimal=5)
         npt.assert_almost_equal(alphay_1_los, alphay_1_list, decimal=5)
 
@@ -205,7 +207,7 @@ class TestSinglePlaneLOS(object):
         # LOS_MINIMAL
         alphax_1_minimal, alphay_1_minimal = lensModel_minimal.alpha(1, 1, kwargs, k=0)
         alphax_1_list_minimal, alphay_1_list_minimal = lensModel_minimal.alpha(
-            1, 1, kwargs, k=[0]
+            1, 1, kwargs, k=(0,)
         )
         npt.assert_almost_equal(alphax_1_minimal, alphax_1_list_minimal, decimal=5)
         npt.assert_almost_equal(alphay_1_minimal, alphay_1_list_minimal, decimal=5)
@@ -440,8 +442,8 @@ class TestSinglePlaneLOS(object):
             "MULTIPOLE",
             "CURVED_ARC_SPP",
         ]
-        lensModel = SinglePlaneLOS(lens_model_list=lens_model_list, index_los=0)
-        assert lensModel.func_list[0].param_names[0] == "Rs"
+        npt.assert_raises(ValueError, SinglePlaneLOS, lens_model_list=lens_model_list, index_los=0)
+        lensModel = SinglePlaneLOS(lens_model_list=_JAXXED_MODELS, index_los=0)
 
 
 class TestRaise(unittest.TestCase):
@@ -450,13 +452,14 @@ class TestRaise(unittest.TestCase):
 
         :return:
         """
-        if bool_test is False:
-            with self.assertRaises(ImportError):
-                SinglePlaneLOS(lens_model_list=["PEMD", "LOS"], index_los=1)
-            with self.assertRaises(ImportError):
-                SinglePlaneLOS(lens_model_list=["SPEMD", "LOS"], index_los=1)
-        else:
-            SinglePlaneLOS(lens_model_list=["PEMD", "SPEMD", "LOS"], index_los=2)
+        # These profiles are not yet implemented in JAXtronomy
+        # if bool_test is False:
+        #     with self.assertRaises(ImportError):
+        #         SinglePlaneLOS(lens_model_list=["PEMD", "LOS"], index_los=1)
+        #     with self.assertRaises(ImportError):
+        #         SinglePlaneLOS(lens_model_list=["SPEMD", "LOS"], index_los=1)
+        # else:
+        #     SinglePlaneLOS(lens_model_list=["PEMD", "SPEMD", "LOS"], index_los=2)
 
 
 if __name__ == "__main__":

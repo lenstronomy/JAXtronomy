@@ -8,6 +8,8 @@ _JAXXED_MODELS = [
     "CSE",
     "EPL",
     "EPL_Q_PHI",
+    "GAUSSIAN",
+    "GAUSSIAN_POTENTIAL",
     "HERNQUIST",
     "HERNQUIST_ELLIPSE_CSE",
     "LOS",
@@ -262,209 +264,204 @@ def lens_class(
     :return: class instance of the lens model type
     """
 
-    if lens_type not in _JAXXED_MODELS:
-        warn(
-            "The {} profile is not in JAXtronomy; using lenstronomy implementation.\n"
-            "Note that this may cause crashes in some situations where jax arrays are passed into"
-            " functions utilizing the numba compiler in lenstronomy (e.g. util.rotate)".format(
-                lens_type
-            )
-        )
-    else:
-        pass
-
-    if lens_type == "ARC_PERT":
-        from lenstronomy.LensModel.Profiles.arc_perturbations import (
-            ArcPerturbations,
+    if lens_type not in _JAXXED_MODELS and lens_type in _SUPPORTED_MODELS:
+        raise ValueError(
+            "The {} profile is not in JAXtronomy; use lenstronomy instead."
+            .format(lens_type)
         )
 
-        return ArcPerturbations()
-    if lens_type == "BLANK_PLANE":
-        from lenstronomy.LensModel.Profiles.blank_plane import BlankPlane
+    # if lens_type == "ARC_PERT":
+    #     from lenstronomy.LensModel.Profiles.arc_perturbations import (
+    #         ArcPerturbations,
+    #     )
 
-        return BlankPlane()
-    elif lens_type == "CHAMELEON":
-        from lenstronomy.LensModel.Profiles.chameleon import Chameleon
+    #     return ArcPerturbations()
+    # if lens_type == "BLANK_PLANE":
+    #     from lenstronomy.LensModel.Profiles.blank_plane import BlankPlane
 
-        return Chameleon()
-    elif lens_type == "CNFW":
-        from lenstronomy.LensModel.Profiles.cnfw import CNFW
+    #     return BlankPlane()
+    # elif lens_type == "CHAMELEON":
+    #     from lenstronomy.LensModel.Profiles.chameleon import Chameleon
 
-        return CNFW()
-    elif lens_type == "CNFW_ELLIPSE_POTENTIAL":
-        from lenstronomy.LensModel.Profiles.cnfw_ellipse_potential import (
-            CNFWEllipsePotential,
-        )
+    #     return Chameleon()
+    # elif lens_type == "CNFW":
+    #     from lenstronomy.LensModel.Profiles.cnfw import CNFW
 
-        return CNFWEllipsePotential()
-    elif lens_type == "CONST_MAG":
-        from lenstronomy.LensModel.Profiles.const_mag import ConstMag
+    #     return CNFW()
+    # elif lens_type == "CNFW_ELLIPSE_POTENTIAL":
+    #     from lenstronomy.LensModel.Profiles.cnfw_ellipse_potential import (
+    #         CNFWEllipsePotential,
+    #     )
 
-        return ConstMag()
+    #     return CNFWEllipsePotential()
+    # elif lens_type == "CONST_MAG":
+    #     from lenstronomy.LensModel.Profiles.const_mag import ConstMag
+
+    #     return ConstMag()
     elif lens_type == "CONVERGENCE":
         from jaxtronomy.LensModel.Profiles.convergence import Convergence
 
         return Convergence()
-    elif lens_type == "coreBURKERT":
-        from lenstronomy.LensModel.Profiles.coreBurkert import CoreBurkert
+    # elif lens_type == "coreBURKERT":
+    #     from lenstronomy.LensModel.Profiles.coreBurkert import CoreBurkert
 
-        return CoreBurkert()
-    elif lens_type == "CORED_DENSITY":
-        from lenstronomy.LensModel.Profiles.cored_density import CoredDensity
+    #     return CoreBurkert()
+    # elif lens_type == "CORED_DENSITY":
+    #     from lenstronomy.LensModel.Profiles.cored_density import CoredDensity
 
-        return CoredDensity()
-    elif lens_type == "CORED_DENSITY_2":
-        from lenstronomy.LensModel.Profiles.cored_density_2 import CoredDensity2
+    #     return CoredDensity()
+    # elif lens_type == "CORED_DENSITY_2":
+    #     from lenstronomy.LensModel.Profiles.cored_density_2 import CoredDensity2
 
-        return CoredDensity2()
-    elif lens_type == "CORED_DENSITY_2_MST":
-        from lenstronomy.LensModel.Profiles.cored_density_mst import CoredDensityMST
+    #     return CoredDensity2()
+    # elif lens_type == "CORED_DENSITY_2_MST":
+    #     from lenstronomy.LensModel.Profiles.cored_density_mst import CoredDensityMST
 
-        return CoredDensityMST(profile_type="CORED_DENSITY_2")
-    elif lens_type == "CORED_DENSITY_EXP":
-        from lenstronomy.LensModel.Profiles.cored_density_exp import CoredDensityExp
+    #     return CoredDensityMST(profile_type="CORED_DENSITY_2")
+    # elif lens_type == "CORED_DENSITY_EXP":
+    #     from lenstronomy.LensModel.Profiles.cored_density_exp import CoredDensityExp
 
-        return CoredDensityExp()
-    elif lens_type == "CORED_DENSITY_EXP_MST":
-        from lenstronomy.LensModel.Profiles.cored_density_mst import CoredDensityMST
+    #     return CoredDensityExp()
+    # elif lens_type == "CORED_DENSITY_EXP_MST":
+    #     from lenstronomy.LensModel.Profiles.cored_density_mst import CoredDensityMST
 
-        return CoredDensityMST(profile_type="CORED_DENSITY_EXP")
-    elif lens_type == "CORED_DENSITY_MST":
-        from lenstronomy.LensModel.Profiles.cored_density_mst import CoredDensityMST
+    #     return CoredDensityMST(profile_type="CORED_DENSITY_EXP")
+    # elif lens_type == "CORED_DENSITY_MST":
+    #     from lenstronomy.LensModel.Profiles.cored_density_mst import CoredDensityMST
 
-        return CoredDensityMST(profile_type="CORED_DENSITY")
-    elif lens_type == "CORED_DENSITY_ULDM_MST":
-        from lenstronomy.LensModel.Profiles.cored_density_mst import CoredDensityMST
+    #     return CoredDensityMST(profile_type="CORED_DENSITY")
+    # elif lens_type == "CORED_DENSITY_ULDM_MST":
+    #     from lenstronomy.LensModel.Profiles.cored_density_mst import CoredDensityMST
 
-        return CoredDensityMST(profile_type="CORED_DENSITY_ULDM")
+    #     return CoredDensityMST(profile_type="CORED_DENSITY_ULDM")
     elif lens_type == "CSE":
         from jaxtronomy.LensModel.Profiles.cored_steep_ellipsoid import CSE
 
         return CSE()
-    elif lens_type == "CTNFW_GAUSS_DEC":
-        from lenstronomy.LensModel.Profiles.gauss_decomposition import CTNFWGaussDec
+    # elif lens_type == "CTNFW_GAUSS_DEC":
+    #     from lenstronomy.LensModel.Profiles.gauss_decomposition import CTNFWGaussDec
 
-        return CTNFWGaussDec()
-    elif lens_type == "CURVED_ARC_CONST":
-        from lenstronomy.LensModel.Profiles.curved_arc_const import CurvedArcConst
+    #     return CTNFWGaussDec()
+    # elif lens_type == "CURVED_ARC_CONST":
+    #     from lenstronomy.LensModel.Profiles.curved_arc_const import CurvedArcConst
 
-        return CurvedArcConst()
-    elif lens_type == "CURVED_ARC_CONST_MST":
-        from lenstronomy.LensModel.Profiles.curved_arc_const import CurvedArcConstMST
+    #     return CurvedArcConst()
+    # elif lens_type == "CURVED_ARC_CONST_MST":
+    #     from lenstronomy.LensModel.Profiles.curved_arc_const import CurvedArcConstMST
 
-        return CurvedArcConstMST()
-    elif lens_type == "CURVED_ARC_SIS_MST":
-        from lenstronomy.LensModel.Profiles.curved_arc_sis_mst import CurvedArcSISMST
+    #     return CurvedArcConstMST()
+    # elif lens_type == "CURVED_ARC_SIS_MST":
+    #     from lenstronomy.LensModel.Profiles.curved_arc_sis_mst import CurvedArcSISMST
 
-        return CurvedArcSISMST()
-    elif lens_type == "CURVED_ARC_SPP":
-        from lenstronomy.LensModel.Profiles.curved_arc_spp import CurvedArcSPP
+    #     return CurvedArcSISMST()
+    # elif lens_type == "CURVED_ARC_SPP":
+    #     from lenstronomy.LensModel.Profiles.curved_arc_spp import CurvedArcSPP
 
-        return CurvedArcSPP()
-    elif lens_type == "CURVED_ARC_SPT":
-        from lenstronomy.LensModel.Profiles.curved_arc_spt import CurvedArcSPT
+    #     return CurvedArcSPP()
+    # elif lens_type == "CURVED_ARC_SPT":
+    #     from lenstronomy.LensModel.Profiles.curved_arc_spt import CurvedArcSPT
 
-        return CurvedArcSPT()
-    elif lens_type == "CURVED_ARC_TAN_DIFF":
-        from lenstronomy.LensModel.Profiles.curved_arc_tan_diff import (
-            CurvedArcTanDiff,
-        )
+    #     return CurvedArcSPT()
+    # elif lens_type == "CURVED_ARC_TAN_DIFF":
+    #     from lenstronomy.LensModel.Profiles.curved_arc_tan_diff import (
+    #         CurvedArcTanDiff,
+    #     )
 
-        return CurvedArcTanDiff()
-    elif lens_type == "DIPOLE":
-        from lenstronomy.LensModel.Profiles.dipole import Dipole
+    #     return CurvedArcTanDiff()
+    # elif lens_type == "DIPOLE":
+    #     from lenstronomy.LensModel.Profiles.dipole import Dipole
 
-        return Dipole()
-    elif lens_type == "DOUBLE_CHAMELEON":
-        from lenstronomy.LensModel.Profiles.chameleon import DoubleChameleon
+    #     return Dipole()
+    # elif lens_type == "DOUBLE_CHAMELEON":
+    #     from lenstronomy.LensModel.Profiles.chameleon import DoubleChameleon
 
-        return DoubleChameleon()
+    #     return DoubleChameleon()
     elif lens_type == "EPL":
         from jaxtronomy.LensModel.Profiles.epl import EPL
 
         return EPL()
-    elif lens_type == "EPL_BOXYDISKY":
-        from lenstronomy.LensModel.Profiles.epl_boxydisky import EPL_BOXYDISKY
+    # elif lens_type == "EPL_BOXYDISKY":
+    #     from lenstronomy.LensModel.Profiles.epl_boxydisky import EPL_BOXYDISKY
 
-        return EPL_BOXYDISKY()
-    elif lens_type == "EPL_MULTIPOLE_M3M4":
-        from lenstronomy.LensModel.Profiles.epl_multipole_m3m4 import EPL_MULTIPOLE_M3M4
+    #     return EPL_BOXYDISKY()
+    # elif lens_type == "EPL_MULTIPOLE_M3M4":
+    #     from lenstronomy.LensModel.Profiles.epl_multipole_m3m4 import EPL_MULTIPOLE_M3M4
 
-        return EPL_MULTIPOLE_M3M4()
-    elif lens_type == "EPL_NUMBA":
-        from lenstronomy.LensModel.Profiles.epl_numba import EPL_numba
+    #     return EPL_MULTIPOLE_M3M4()
+    # elif lens_type == "EPL_NUMBA":
+    #     from lenstronomy.LensModel.Profiles.epl_numba import EPL_numba
 
-        return EPL_numba()
+    #     return EPL_numba()
     elif lens_type == "EPL_Q_PHI":
         from jaxtronomy.LensModel.Profiles.epl import EPLQPhi
 
         return EPLQPhi()
-    elif lens_type == "ElliSLICE":
-        from lenstronomy.LensModel.Profiles.elliptical_density_slice import (
-            ElliSLICE,
-        )
+    # elif lens_type == "ElliSLICE":
+    #     from lenstronomy.LensModel.Profiles.elliptical_density_slice import (
+    #         ElliSLICE,
+    #     )
 
-        return ElliSLICE()
-    elif lens_type == "FLEXION":
-        from lenstronomy.LensModel.Profiles.flexion import Flexion
+    #     return ElliSLICE()
+    # elif lens_type == "FLEXION":
+    #     from lenstronomy.LensModel.Profiles.flexion import Flexion
 
-        return Flexion()
-    elif lens_type == "FLEXIONFG":
-        from lenstronomy.LensModel.Profiles.flexionfg import Flexionfg
+    #     return Flexion()
+    # elif lens_type == "FLEXIONFG":
+    #     from lenstronomy.LensModel.Profiles.flexionfg import Flexionfg
 
-        return Flexionfg()
+    #     return Flexionfg()
     elif lens_type == "GAUSSIAN":
-        from lenstronomy.LensModel.Profiles.gaussian import Gaussian
+        from jaxtronomy.LensModel.Profiles.gaussian import Gaussian
 
         return Gaussian()
-    elif lens_type == "GAUSSIAN_ELLIPSE_KAPPA":
-        from lenstronomy.LensModel.Profiles.gaussian_ellipse_kappa import (
-            GaussianEllipseKappa,
-        )
+    # elif lens_type == "GAUSSIAN_ELLIPSE_KAPPA":
+    #     from lenstronomy.LensModel.Profiles.gaussian_ellipse_kappa import (
+    #         GaussianEllipseKappa,
+    #     )
 
-        return GaussianEllipseKappa()
-    elif lens_type == "GAUSSIAN_ELLIPSE_POTENTIAL":
-        from lenstronomy.LensModel.Profiles.gaussian_ellipse_potential import (
-            GaussianEllipsePotential,
-        )
+    #     return GaussianEllipseKappa()
+    # elif lens_type == "GAUSSIAN_ELLIPSE_POTENTIAL":
+    #     from lenstronomy.LensModel.Profiles.gaussian_ellipse_potential import (
+    #         GaussianEllipsePotential,
+    #     )
 
-        return GaussianEllipsePotential()
+    #     return GaussianEllipsePotential()
     elif lens_type == "GAUSSIAN_POTENTIAL":
-        from lenstronomy.LensModel.Profiles.gaussian_potential import GaussianPotential
+        from jaxtronomy.LensModel.Profiles.gaussian_potential import GaussianPotential
 
         return GaussianPotential()
-    elif lens_type == "GNFW":
-        from lenstronomy.LensModel.Profiles.gnfw import GNFW
+    # elif lens_type == "GNFW":
+    #     from lenstronomy.LensModel.Profiles.gnfw import GNFW
 
-        return GNFW()
+    #     return GNFW()
     elif lens_type == "HERNQUIST":
         from jaxtronomy.LensModel.Profiles.hernquist import Hernquist
 
         return Hernquist()
-    elif lens_type == "HERNQUIST_ELLIPSE_POTENTIAL":
-        from lenstronomy.LensModel.Profiles.hernquist_ellipse_potential import (
-            HernquistEllipsePotential,
-        )
+    # elif lens_type == "HERNQUIST_ELLIPSE_POTENTIAL":
+    #     from lenstronomy.LensModel.Profiles.hernquist_ellipse_potential import (
+    #         HernquistEllipsePotential,
+    #     )
 
-        return HernquistEllipsePotential()
+    #     return HernquistEllipsePotential()
     elif lens_type == "HERNQUIST_ELLIPSE_CSE":
         from jaxtronomy.LensModel.Profiles.hernquist_ellipse_cse import (
             HernquistEllipseCSE,
         )
 
         return HernquistEllipseCSE()
-    elif lens_type == "HESSIAN":
-        from lenstronomy.LensModel.Profiles.hessian import Hessian
+    # elif lens_type == "HESSIAN":
+    #     from lenstronomy.LensModel.Profiles.hessian import Hessian
 
-        return Hessian()
-    elif lens_type == "INTERPOL":
-        from lenstronomy.LensModel.Profiles.interpol import Interpol
+    #     return Hessian()
+    # elif lens_type == "INTERPOL":
+    #     from lenstronomy.LensModel.Profiles.interpol import Interpol
 
-        return Interpol(**kwargs_interp)
-    elif lens_type == "INTERPOL_SCALED":
-        from lenstronomy.LensModel.Profiles.interpol import InterpolScaled
+    #     return Interpol(**kwargs_interp)
+    # elif lens_type == "INTERPOL_SCALED":
+    #     from lenstronomy.LensModel.Profiles.interpol import InterpolScaled
 
-        return InterpolScaled(**kwargs_interp)
+    #     return InterpolScaled(**kwargs_interp)
     elif lens_type == "LOS":
         from jaxtronomy.LensModel.LineOfSight.LOSModels.los import LOS
 
@@ -475,68 +472,68 @@ def lens_class(
         )
 
         return LOSMinimal()
-    elif lens_type == "MULTIPOLE":
-        from lenstronomy.LensModel.Profiles.multipole import Multipole
+    # elif lens_type == "MULTIPOLE":
+    #     from lenstronomy.LensModel.Profiles.multipole import Multipole
 
-        return Multipole()
-    elif lens_type == "MULTI_GAUSSIAN":
-        from lenstronomy.LensModel.Profiles.multi_gaussian import (
-            MultiGaussian,
-        )
+    #     return Multipole()
+    # elif lens_type == "MULTI_GAUSSIAN":
+    #     from lenstronomy.LensModel.Profiles.multi_gaussian import (
+    #         MultiGaussian,
+    #     )
 
-        return MultiGaussian()
-    elif lens_type == "MULTI_GAUSSIAN_ELLIPSE_POTENTIAL":
-        from lenstronomy.LensModel.Profiles.multi_gaussian import (
-            MultiGaussianEllipsePotential,
-        )
+    #     return MultiGaussian()
+    # elif lens_type == "MULTI_GAUSSIAN_ELLIPSE_POTENTIAL":
+    #     from lenstronomy.LensModel.Profiles.multi_gaussian import (
+    #         MultiGaussianEllipsePotential,
+    #     )
 
-        return MultiGaussianEllipsePotential()
+    #     return MultiGaussianEllipsePotential()
     elif lens_type == "NFW":
         from jaxtronomy.LensModel.Profiles.nfw import NFW
 
         return NFW()
-    elif lens_type == "NFW_ELLIPSE_POTENTIAL":
-        from lenstronomy.LensModel.Profiles.nfw_ellipse_potential import (
-            NFWEllipsePotential,
-        )
+    # elif lens_type == "NFW_ELLIPSE_POTENTIAL":
+    #     from lenstronomy.LensModel.Profiles.nfw_ellipse_potential import (
+    #         NFWEllipsePotential,
+    #     )
 
-        return NFWEllipsePotential()
+    #     return NFWEllipsePotential()
     elif lens_type == "NFW_ELLIPSE_CSE":
         from jaxtronomy.LensModel.Profiles.nfw_ellipse_cse import NFW_ELLIPSE_CSE
 
         return NFW_ELLIPSE_CSE()
-    elif lens_type == "NFW_ELLIPSE_GAUSS_DEC":
-        from lenstronomy.LensModel.Profiles.gauss_decomposition import (
-            NFWEllipseGaussDec,
-        )
+    # elif lens_type == "NFW_ELLIPSE_GAUSS_DEC":
+    #     from lenstronomy.LensModel.Profiles.gauss_decomposition import (
+    #         NFWEllipseGaussDec,
+    #     )
 
-        return NFWEllipseGaussDec()
-    elif lens_type == "NFW_MC":
-        from lenstronomy.LensModel.Profiles.nfw_mass_concentration import NFWMC
+    #     return NFWEllipseGaussDec()
+    # elif lens_type == "NFW_MC":
+    #     from lenstronomy.LensModel.Profiles.nfw_mass_concentration import NFWMC
 
-        return NFWMC(z_lens=z_lens, z_source=z_source)
-    elif lens_type == "NFW_MC_ELLIPSE_POTENTIAL":
-        from lenstronomy.LensModel.Profiles.nfw_mass_concentration_ellipse import (
-            NFWMCEllipsePotential,
-        )
+    #     return NFWMC(z_lens=z_lens, z_source=z_source)
+    # elif lens_type == "NFW_MC_ELLIPSE_POTENTIAL":
+    #     from lenstronomy.LensModel.Profiles.nfw_mass_concentration_ellipse import (
+    #         NFWMCEllipsePotential,
+    #     )
 
-        return NFWMCEllipsePotential(z_lens=z_lens, z_source=z_source)
+    #     return NFWMCEllipsePotential(z_lens=z_lens, z_source=z_source)
     elif lens_type == "NIE":
         from jaxtronomy.LensModel.Profiles.nie import NIE
 
         return NIE()
-    elif lens_type == "NIE_POTENTIAL":
-        from lenstronomy.LensModel.Profiles.nie_potential import NIE_POTENTIAL
+    # elif lens_type == "NIE_POTENTIAL":
+    #     from lenstronomy.LensModel.Profiles.nie_potential import NIE_POTENTIAL
 
-        return NIE_POTENTIAL()
-    elif lens_type == "NIE_SIMPLE":
-        from lenstronomy.LensModel.Profiles.nie import NIEMajorAxis
+    #     return NIE_POTENTIAL()
+    # elif lens_type == "NIE_SIMPLE":
+    #     from lenstronomy.LensModel.Profiles.nie import NIEMajorAxis
 
-        return NIEMajorAxis()
-    elif lens_type == "PEMD":
-        from lenstronomy.LensModel.Profiles.pemd import PEMD
+    #     return NIEMajorAxis()
+    # elif lens_type == "PEMD":
+    #     from lenstronomy.LensModel.Profiles.pemd import PEMD
 
-        return PEMD()
+    #     return PEMD()
     elif lens_type == "PJAFFE":
         from jaxtronomy.LensModel.Profiles.pseudo_jaffe import PseudoJaffe
 
@@ -547,70 +544,70 @@ def lens_class(
         )
 
         return PseudoJaffeEllipsePotential()
-    elif lens_type == "POINT_MASS":
-        from lenstronomy.LensModel.Profiles.point_mass import PointMass
+    # elif lens_type == "POINT_MASS":
+    #     from lenstronomy.LensModel.Profiles.point_mass import PointMass
 
-        return PointMass()
-    elif lens_type == "PSEUDO_DPL":
-        from lenstronomy.LensModel.Profiles.pseudo_double_powerlaw import (
-            PseudoDoublePowerlaw,
-        )
+    #     return PointMass()
+    # elif lens_type == "PSEUDO_DPL":
+    #     from lenstronomy.LensModel.Profiles.pseudo_double_powerlaw import (
+    #         PseudoDoublePowerlaw,
+    #     )
 
-        return PseudoDoublePowerlaw()
-    elif lens_type == "RADIAL_INTERPOL":
-        from lenstronomy.LensModel.Profiles.radial_interpolated import (
-            RadialInterpolate,
-        )
+    #     return PseudoDoublePowerlaw()
+    # elif lens_type == "RADIAL_INTERPOL":
+    #     from lenstronomy.LensModel.Profiles.radial_interpolated import (
+    #         RadialInterpolate,
+    #     )
 
-        return RadialInterpolate()
-    elif lens_type == "SERSIC":
-        from lenstronomy.LensModel.Profiles.sersic import Sersic
+    #     return RadialInterpolate()
+    # elif lens_type == "SERSIC":
+    #     from lenstronomy.LensModel.Profiles.sersic import Sersic
 
-        return Sersic()
-    elif lens_type == "SERSIC_ELLIPSE_GAUSS_DEC":
-        from lenstronomy.LensModel.Profiles.gauss_decomposition import (
-            SersicEllipseGaussDec,
-        )
+    #     return Sersic()
+    # elif lens_type == "SERSIC_ELLIPSE_GAUSS_DEC":
+    #     from lenstronomy.LensModel.Profiles.gauss_decomposition import (
+    #         SersicEllipseGaussDec,
+    #     )
 
-        return SersicEllipseGaussDec()
-    elif lens_type == "SERSIC_ELLIPSE_KAPPA":
-        from lenstronomy.LensModel.Profiles.sersic_ellipse_kappa import (
-            SersicEllipseKappa,
-        )
+    #     return SersicEllipseGaussDec()
+    # elif lens_type == "SERSIC_ELLIPSE_KAPPA":
+    #     from lenstronomy.LensModel.Profiles.sersic_ellipse_kappa import (
+    #         SersicEllipseKappa,
+    #     )
 
-        return SersicEllipseKappa()
-    elif lens_type == "SERSIC_ELLIPSE_POTENTIAL":
-        from lenstronomy.LensModel.Profiles.sersic_ellipse_potential import (
-            SersicEllipsePotential,
-        )
+    #     return SersicEllipseKappa()
+    # elif lens_type == "SERSIC_ELLIPSE_POTENTIAL":
+    #     from lenstronomy.LensModel.Profiles.sersic_ellipse_potential import (
+    #         SersicEllipsePotential,
+    #     )
 
-        return SersicEllipsePotential()
-    elif lens_type == "SHAPELETS_CART":
-        from lenstronomy.LensModel.Profiles.shapelet_pot_cartesian import (
-            CartShapelets,
-        )
+    #     return SersicEllipsePotential()
+    # elif lens_type == "SHAPELETS_CART":
+    #     from lenstronomy.LensModel.Profiles.shapelet_pot_cartesian import (
+    #         CartShapelets,
+    #     )
 
-        return CartShapelets()
-    elif lens_type == "SHAPELETS_POLAR":
-        from lenstronomy.LensModel.Profiles.shapelet_pot_polar import PolarShapelets
+    #     return CartShapelets()
+    # elif lens_type == "SHAPELETS_POLAR":
+    #     from lenstronomy.LensModel.Profiles.shapelet_pot_polar import PolarShapelets
 
-        return PolarShapelets()
-    elif lens_type == "SHIFT":
-        from lenstronomy.LensModel.Profiles.constant_shift import Shift
+    #     return PolarShapelets()
+    # elif lens_type == "SHIFT":
+    #     from lenstronomy.LensModel.Profiles.constant_shift import Shift
 
-        return Shift()
+    #     return Shift()
     elif lens_type == "SHEAR":
         from jaxtronomy.LensModel.Profiles.shear import Shear
 
         return Shear()
-    elif lens_type == "SHEAR_GAMMA_PSI":
-        from lenstronomy.LensModel.Profiles.shear import ShearGammaPsi
+    # elif lens_type == "SHEAR_GAMMA_PSI":
+    #     from lenstronomy.LensModel.Profiles.shear import ShearGammaPsi
 
-        return ShearGammaPsi()
-    elif lens_type == "SHEAR_REDUCED":
-        from lenstronomy.LensModel.Profiles.shear import ShearReduced
+    #     return ShearGammaPsi()
+    # elif lens_type == "SHEAR_REDUCED":
+    #     from lenstronomy.LensModel.Profiles.shear import ShearReduced
 
-        return ShearReduced()
+    #     return ShearReduced()
     elif lens_type == "SIE":
         from jaxtronomy.LensModel.Profiles.sie import SIE
 
@@ -619,61 +616,60 @@ def lens_class(
         from jaxtronomy.LensModel.Profiles.sis import SIS
 
         return SIS()
-    elif lens_type == "SIS_TRUNCATED":
-        from lenstronomy.LensModel.Profiles.sis_truncate import SIS_truncate
+    # elif lens_type == "SIS_TRUNCATED":
+    #     from lenstronomy.LensModel.Profiles.sis_truncate import SIS_truncate
 
-        return SIS_truncate()
-    elif lens_type == "SPEMD":
-        from lenstronomy.LensModel.Profiles.spemd import SPEMD
+    #     return SIS_truncate()
+    # elif lens_type == "SPEMD":
+    #     from lenstronomy.LensModel.Profiles.spemd import SPEMD
 
-        return SPEMD()
-    elif lens_type == "SPEP":
-        from lenstronomy.LensModel.Profiles.spep import SPEP
+    #     return SPEMD()
+    # elif lens_type == "SPEP":
+    #     from lenstronomy.LensModel.Profiles.spep import SPEP
 
-        return SPEP()
-    elif lens_type == "SPL_CORE":
-        from lenstronomy.LensModel.Profiles.splcore import SPLCORE
+    #     return SPEP()
+    # elif lens_type == "SPL_CORE":
+    #     from lenstronomy.LensModel.Profiles.splcore import SPLCORE
 
-        return SPLCORE()
+    #     return SPLCORE()
     elif lens_type == "SPP":
         from jaxtronomy.LensModel.Profiles.spp import SPP
 
         return SPP()
-    elif lens_type == "SYNTHESIS":
-        from lenstronomy.LensModel.Profiles.synthesis import SynthesisProfile
+    # elif lens_type == "SYNTHESIS":
+    #     from lenstronomy.LensModel.Profiles.synthesis import SynthesisProfile
 
-        return SynthesisProfile(**kwargs_synthesis)
-    elif lens_type == "TABULATED_DEFLECTIONS":
-        from lenstronomy.LensModel.Profiles.numerical_deflections import (
-            TabulatedDeflections,
-        )
+    #     return SynthesisProfile(**kwargs_synthesis)
+    # elif lens_type == "TABULATED_DEFLECTIONS":
+    #     from lenstronomy.LensModel.Profiles.numerical_deflections import (
+    #         TabulatedDeflections,
+    #     )
 
-        return TabulatedDeflections(custom_class)
-    elif lens_type == "TNFW":
-        from lenstronomy.LensModel.Profiles.tnfw import TNFW
+    #     return TabulatedDeflections(custom_class)
+    # elif lens_type == "TNFW":
+    #     from lenstronomy.LensModel.Profiles.tnfw import TNFW
 
-        return TNFW()
-    elif lens_type == "TNFWC":
-        from lenstronomy.LensModel.Profiles.nfw_core_truncated import TNFWC
+    #     return TNFW()
+    # elif lens_type == "TNFWC":
+    #     from lenstronomy.LensModel.Profiles.nfw_core_truncated import TNFWC
 
-        return TNFWC()
-    elif lens_type == "TNFW_ELLIPSE_POTENTIAL":
-        from lenstronomy.LensModel.Profiles.tnfw_ellipse_potential import (
-            TNFWELLIPSEPotential,
-        )
+    #     return TNFWC()
+    # elif lens_type == "TNFW_ELLIPSE_POTENTIAL":
+    #     from lenstronomy.LensModel.Profiles.tnfw_ellipse_potential import (
+    #         TNFWELLIPSEPotential,
+    #     )
 
-        return TNFWELLIPSEPotential()
-    elif lens_type == "TRIPLE_CHAMELEON":
-        from lenstronomy.LensModel.Profiles.chameleon import TripleChameleon
+    #     return TNFWELLIPSEPotential()
+    # elif lens_type == "TRIPLE_CHAMELEON":
+    #     from lenstronomy.LensModel.Profiles.chameleon import TripleChameleon
 
-        return TripleChameleon()
-    elif lens_type == "ULDM":
-        from lenstronomy.LensModel.Profiles.uldm import Uldm
+    #     return TripleChameleon()
+    # elif lens_type == "ULDM":
+    #     from lenstronomy.LensModel.Profiles.uldm import Uldm
 
-        return Uldm()
+    #     return Uldm()
     # when adding a new profile, insert the corresponding elif statement in its
     # alphabetical position
-
     else:
         raise ValueError(
             "%s is not a valid lens model. Supported are: %s."
