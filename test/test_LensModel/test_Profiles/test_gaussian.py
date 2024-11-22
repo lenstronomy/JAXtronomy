@@ -16,7 +16,7 @@ jax.config.update("jax_enable_x64", True)
 # NOTE: Since there is no scipy.integrate.quad function in JAX,
 #       the _num_integral function is implemented using trapezoidal
 #       integration, resulting in numerical differences from lenstronomy.
-#       It is accurate up to 5 decimal places.
+#       It is accurate up to 4 decimal places.
 
 class TestGaussian(object):
     def setup_method(self):
@@ -85,10 +85,9 @@ class TestGaussian(object):
         npt.assert_array_almost_equal(f_xy_ref, f_xy, decimal=6)
         npt.assert_array_almost_equal(f_yx_ref, f_yx, decimal=6)
         npt.assert_array_almost_equal(f_yy_ref, f_yy, decimal=6)
+        
         x = np.array([0])
         y = np.array([0])
-        amp = 1.3
-        sigma = 0.5
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
             x, y, amp, sigma
         )
