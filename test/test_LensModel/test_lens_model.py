@@ -67,7 +67,9 @@ class TestLensModel(object):
         kwargs = [{"kappa": kappa_ext}]
         output = lensModel.kappa(self.x, self.y, kwargs=kwargs)
         output_ref = lensModel_ref.kappa(self.x, self.y, kwargs=kwargs)
-        npt.assert_array_almost_equal(output, np.ones_like(output)*kappa_ext, decimal=6)
+        npt.assert_array_almost_equal(
+            output, np.ones_like(output) * kappa_ext, decimal=6
+        )
         npt.assert_array_almost_equal(output, output_ref, decimal=6)
 
     def test_potential(self):
@@ -77,7 +79,9 @@ class TestLensModel(object):
 
     def test_alpha(self):
         output1, output2 = self.lensModel.alpha(self.x, self.y, kwargs=self.kwargs)
-        output1_ref, output2_ref = self.lensModel_ref.alpha(self.x, self.y, kwargs=self.kwargs)
+        output1_ref, output2_ref = self.lensModel_ref.alpha(
+            self.x, self.y, kwargs=self.kwargs
+        )
         npt.assert_array_almost_equal(output1, output1_ref, decimal=6)
         npt.assert_array_almost_equal(output2, output2_ref, decimal=6)
 
@@ -94,20 +98,25 @@ class TestLensModel(object):
         kwargs = [{"gamma1": gamma1, "gamma2": gamma2}]
         e1_out, e2_out = lensModel.gamma(self.x, self.y, kwargs=kwargs)
         e1_out_ref, e2_out_ref = lensModel_ref.gamma(self.x, self.y, kwargs=kwargs)
-        npt.assert_array_almost_equal(e1_out, np.ones_like(e1_out)*gamma1, decimal=6)
-        npt.assert_array_almost_equal(e2_out, np.ones_like(e2_out)*gamma2, decimal=6)
+        npt.assert_array_almost_equal(e1_out, np.ones_like(e1_out) * gamma1, decimal=6)
+        npt.assert_array_almost_equal(e2_out, np.ones_like(e2_out) * gamma2, decimal=6)
         npt.assert_array_almost_equal(e1_out, e1_out_ref, decimal=6)
         npt.assert_array_almost_equal(e2_out, e2_out_ref, decimal=6)
 
-
     def test_magnification(self):
         output = self.lensModel.magnification(self.x, self.y, kwargs=self.kwargs)
-        output_ref = self.lensModel_ref.magnification(self.x, self.y, kwargs=self.kwargs)
+        output_ref = self.lensModel_ref.magnification(
+            self.x, self.y, kwargs=self.kwargs
+        )
         npt.assert_array_almost_equal(output, output_ref, decimal=6)
 
     def test_flexion(self):
-        f_xxx, f_xxy, f_xyy, f_yyy = self.lensModel.flexion(self.x, self.y, kwargs=self.kwargs)
-        f_xxx_ref, f_xxy_ref, f_xyy_ref, f_yyy_ref = self.lensModel_ref.flexion(self.x, self.y, kwargs=self.kwargs)
+        f_xxx, f_xxy, f_xyy, f_yyy = self.lensModel.flexion(
+            self.x, self.y, kwargs=self.kwargs
+        )
+        f_xxx_ref, f_xxy_ref, f_xyy_ref, f_yyy_ref = self.lensModel_ref.flexion(
+            self.x, self.y, kwargs=self.kwargs
+        )
         npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=6)
         npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=6)
         npt.assert_array_almost_equal(f_xyy, f_xyy_ref, decimal=6)
@@ -125,8 +134,12 @@ class TestLensModel(object):
         npt.assert_array_almost_equal(f_yyy, f_yyy_ref, decimal=6)
 
     def test_ray_shooting(self):
-        delta_x, delta_y = self.lensModel.ray_shooting(self.x, self.y, kwargs=self.kwargs)
-        delta_x_ref, delta_y_ref = self.lensModel_ref.ray_shooting(self.x, self.y, kwargs=self.kwargs)
+        delta_x, delta_y = self.lensModel.ray_shooting(
+            self.x, self.y, kwargs=self.kwargs
+        )
+        delta_x_ref, delta_y_ref = self.lensModel_ref.ray_shooting(
+            self.x, self.y, kwargs=self.kwargs
+        )
         npt.assert_array_almost_equal(delta_x, delta_x_ref, decimal=6)
         npt.assert_array_almost_equal(delta_y, delta_y_ref, decimal=6)
 
@@ -135,13 +148,13 @@ class TestLensModel(object):
         z_source = 1.5
         x_image, y_image = 1.0, 0.0
         lensModel_mp = LensModel(
-            lens_model_list=["SIS"], 
+            lens_model_list=["SIS"],
             multi_plane=True,
             lens_redshift_list=[z_lens],
             z_source=z_source,
         )
         lensModel_mp_ref = LensModel_ref(
-            lens_model_list=["SIS"], 
+            lens_model_list=["SIS"],
             multi_plane=True,
             lens_redshift_list=[z_lens],
             z_source=z_source,

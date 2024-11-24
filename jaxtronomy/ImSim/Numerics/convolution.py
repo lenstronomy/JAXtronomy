@@ -8,6 +8,7 @@ from lenstronomy.Util.package_util import exporter
 
 export, __all__ = exporter()
 
+
 @export
 class PixelKernelConvolution(object):
     """Class to compute convolutions for a given pixelized kernel (fft, grid)"""
@@ -38,7 +39,8 @@ class PixelKernelConvolution(object):
     @classmethod
     def _tree_unflatten(cls, aux_data, children):
         return cls(*children, **aux_data)
-    #---------------------------------------------------------------------------------
+
+    # ---------------------------------------------------------------------------------
 
     def pixel_kernel(self, num_pix=None):
         """Access pixelated kernel.
@@ -56,7 +58,9 @@ class PixelKernelConvolution(object):
 
         :return: copy of the class with kernel set to the transpose of original one
         """
-        return PixelKernelConvolution(self._kernel.T, convolution_type=self.convolution_type)
+        return PixelKernelConvolution(
+            self._kernel.T, convolution_type=self.convolution_type
+        )
 
     @jit
     def convolution2d(self, image):
@@ -70,7 +74,7 @@ class PixelKernelConvolution(object):
         else:
             image_conv = signal.convolve2d(image, self._kernel, mode="same")
         return image_conv
-    
+
     @jit
     def re_size_convolve(self, image_low_res, image_high_res=None):
         """
@@ -152,4 +156,8 @@ class SubgridKernelConvolution(object):
         return image_resized_conv
 
 
-tree_util.register_pytree_node(PixelKernelConvolution, PixelKernelConvolution._tree_flatten, PixelKernelConvolution._tree_unflatten)
+tree_util.register_pytree_node(
+    PixelKernelConvolution,
+    PixelKernelConvolution._tree_flatten,
+    PixelKernelConvolution._tree_unflatten,
+)

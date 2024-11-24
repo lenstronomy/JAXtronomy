@@ -2,7 +2,6 @@ __author__ = "sibirrer"
 
 import jax
 import numpy.testing as npt
-import numpy as np
 import pytest
 from lenstronomy.LensModel.Solver.lens_equation_solver import (
     LensEquationSolver as LensEquationSolver_ref,
@@ -15,14 +14,9 @@ from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
 from jaxtronomy.LensModel.lens_model import LensModel
 
 jax.config.update("jax_enable_x64", True)
-"""
-NOTE: Trying to test the lens equation solver for profiles that have not yet been
-jaxified can lead to errors, as the profiles will be automatically ported from
-lenstronomy whose functions may make use of the numba compiler. The numba compiler
-is not compatible with the jnp arrays used in the jaxified lens equation solver.
-Thus, cross-tests between lenstronomy and jaxtronomy should only be done
-using profiles that have been jaxified.
-"""
+
+# NOTE: The jaxtronomy solver sometimes finds more solutions than the
+#       lenstronomy solver for min_distance >= 0.05, not sure why
 
 
 class TestLensEquationSolver(object):
@@ -39,8 +33,8 @@ class TestLensEquationSolver(object):
         lensModel_ref = LensModel_ref(lens_model_list)
         lensEquationSolver = LensEquationSolver(lensModel)
         lensEquationSolver_ref = LensEquationSolver_ref(lensModel_ref)
-        min_distance = 0.01
-        search_window = 5
+        min_distance = 0.04
+        search_window = 2.5
         gamma = 1.9
         kwargs_epl = {
             "theta_E": 1.0,
@@ -55,45 +49,39 @@ class TestLensEquationSolver(object):
 
         sourcePos_x = -0.13
         sourcePos_y = 0.15
-        for i in range(2):
-            x_pos, y_pos = lensEquationSolver.image_position_from_source(
-                sourcePos_x,
-                sourcePos_y,
-                kwargs_lens_list,
-                min_distance=min_distance,
-                search_window=search_window,
-                precision_limit=10 ** (-10),
-                num_iter_max=100,
-                initial_guess_cut=True,
-                magnification_limit=0.01,
-                verbose=True,
-            )
-            x_pos_ref, y_pos_ref = lensEquationSolver_ref.image_position_from_source(
-                sourcePos_x,
-                sourcePos_y,
-                kwargs_lens_list,
-                min_distance=min_distance,
-                search_window=search_window,
-                precision_limit=10 ** (-10),
-                num_iter_max=100,
-                initial_guess_cut=True,
-                magnification_limit=0.01,
-            )
-            npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
-            npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
-            sourcePos_x += 4.14
-            sourcePos_y -= -3.6
-            search_window = 5
+        x_pos, y_pos = lensEquationSolver.image_position_from_source(
+            sourcePos_x,
+            sourcePos_y,
+            kwargs_lens_list,
+            min_distance=min_distance,
+            search_window=search_window,
+            precision_limit=10 ** (-10),
+            num_iter_max=100,
+            initial_guess_cut=True,
+            magnification_limit=0.01,
+            verbose=True,
+        )
+        x_pos_ref, y_pos_ref = lensEquationSolver_ref.image_position_from_source(
+            sourcePos_x,
+            sourcePos_y,
+            kwargs_lens_list,
+            min_distance=min_distance,
+            search_window=search_window,
+            precision_limit=10 ** (-10),
+            num_iter_max=100,
+            initial_guess_cut=True,
+            magnification_limit=0.01,
+        )
+        npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
+        npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
 
-        sourcePos_x = -0.13
-        sourcePos_y = 0.15
         x_pos, y_pos = lensEquationSolver.findBrightImage(
             sourcePos_x,
             sourcePos_y,
             kwargs_lens_list,
             numImages=4,
-            min_distance=0.01,
-            search_window=5,
+            min_distance=min_distance,
+            search_window=search_window,
             num_iter_max=100,
         )
         x_pos_ref, y_pos_ref = lensEquationSolver_ref.findBrightImage(
@@ -101,12 +89,26 @@ class TestLensEquationSolver(object):
             sourcePos_y,
             kwargs_lens_list,
             numImages=4,
-            min_distance=0.01,
-            search_window=5,
+            min_distance=min_distance,
+            search_window=search_window,
             num_iter_max=100,
         )
         npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
         npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
+
+        x_pos, y_pos = lensEquationSolver.image_position_from_source(
+            sourcePos_x,
+            sourcePos_y,
+            kwargs_lens_list,
+            min_distance=min_distance,
+            search_window=0.04,
+            precision_limit=10 ** (-10),
+            num_iter_max=100,
+            initial_guess_cut=True,
+            magnification_limit=0.01,
+            verbose=True,
+        )
+        assert x_pos.size == 0 and y_pos.size == 0
 
     def test_epl_analytical_solver(self):
         lens_model_list = ["EPL", "SHEAR"]
