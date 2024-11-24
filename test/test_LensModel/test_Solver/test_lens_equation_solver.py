@@ -19,7 +19,6 @@ jax.config.update("jax_enable_x64", True)
 #       lenstronomy solver for min_distance >= 0.05, not sure why
 
 
-
 class TestLensEquationSolver(object):
     def setup_method(self):
         """
