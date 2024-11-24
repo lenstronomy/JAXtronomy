@@ -27,15 +27,25 @@ class TestPixelKernelConvolution(object):
     def test_init(self):
         kernel = np.ones((3, 3)) * 2
         kernel[1, 1] = 1
-        kernel = kernel/np.sum(kernel)
+        kernel = kernel / np.sum(kernel)
 
-        npt.assert_raises(ValueError, PixelKernelConvolution, kernel=kernel, convolution_type="fft_static")
-        npt.assert_raises(ValueError, PixelKernelConvolution, kernel=kernel, convolution_type="incorrect")
+        npt.assert_raises(
+            ValueError,
+            PixelKernelConvolution,
+            kernel=kernel,
+            convolution_type="fft_static",
+        )
+        npt.assert_raises(
+            ValueError,
+            PixelKernelConvolution,
+            kernel=kernel,
+            convolution_type="incorrect",
+        )
 
     def test_convolve2d_fft(self):
         kernel = np.ones((3, 3)) * 2
         kernel[1, 1] = 1
-        kernel = kernel/np.sum(kernel)
+        kernel = kernel / np.sum(kernel)
 
         pixel_conv = PixelKernelConvolution(kernel=kernel)
         pixel_conv_ref = PixelKernelConvolution_ref(kernel=kernel)
@@ -46,10 +56,12 @@ class TestPixelKernelConvolution(object):
     def test_convolve2d_grid(self):
         kernel = np.ones((3, 3)) * 2
         kernel[1, 1] = 1
-        kernel = kernel/np.sum(kernel)
+        kernel = kernel / np.sum(kernel)
 
         pixel_conv = PixelKernelConvolution(kernel=kernel, convolution_type="grid")
-        pixel_conv_ref = PixelKernelConvolution_ref(kernel=kernel, convolution_type="grid")
+        pixel_conv_ref = PixelKernelConvolution_ref(
+            kernel=kernel, convolution_type="grid"
+        )
         image_convolved = pixel_conv.convolution2d(self.model)
         image_convolved_ref = pixel_conv_ref.convolution2d(self.model)
         npt.assert_almost_equal(image_convolved, image_convolved_ref, decimal=8)
@@ -57,18 +69,17 @@ class TestPixelKernelConvolution(object):
     def test_convolve2d_incorrect(self):
         kernel = np.ones((3, 3)) * 2
         kernel[1, 1] = 1
-        kernel = kernel/np.sum(kernel)
+        kernel = kernel / np.sum(kernel)
 
         pixel_conv = PixelKernelConvolution(kernel=kernel, convolution_type="grid")
         pixel_conv.convolution_type = "incorrect"
         npt.assert_raises(ValueError, pixel_conv.convolution2d, self.model)
 
-
     def test_copy_transpose(self):
         kernel = np.zeros((3, 3))
-        kernel[1, 1] = 1./7.
-        kernel[2, 0] = 3./7.
-        kernel[0, 2] = 3./7.
+        kernel[1, 1] = 1.0 / 7.0
+        kernel[2, 0] = 3.0 / 7.0
+        kernel[0, 2] = 3.0 / 7.0
         pixel_conv = PixelKernelConvolution(kernel=kernel)
         pixel_conv_t = pixel_conv.copy_transpose()
         image_convolved = pixel_conv.convolution2d(self.model)
@@ -77,23 +88,25 @@ class TestPixelKernelConvolution(object):
 
     def test_pixel_kernel(self):
         kernel = np.zeros((5, 5))
-        kernel[1, 1] = 1./3.
-        kernel[2, 0] = 2./3.
+        kernel[1, 1] = 1.0 / 3.0
+        kernel[2, 0] = 2.0 / 3.0
         pixel_conv = PixelKernelConvolution(kernel=kernel)
         npt.assert_equal(pixel_conv.pixel_kernel(), kernel)
-        npt.assert_equal(pixel_conv.pixel_kernel(num_pix=3), kernel[1:-1, 1:-1]/np.sum(kernel[1:-1, 1:-1]))
+        npt.assert_equal(
+            pixel_conv.pixel_kernel(num_pix=3),
+            kernel[1:-1, 1:-1] / np.sum(kernel[1:-1, 1:-1]),
+        )
 
     def test_re_size_convolve(self):
         kernel = np.ones((3, 3)) * 2
         kernel[1, 1] = 1
-        kernel = kernel/np.sum(kernel)
+        kernel = kernel / np.sum(kernel)
 
         pixel_conv = PixelKernelConvolution(kernel=kernel)
         pixel_conv_ref = PixelKernelConvolution_ref(kernel=kernel)
         image_convolved = pixel_conv.re_size_convolve(self.model)
         image_convolved_ref = pixel_conv_ref.re_size_convolve(self.model)
         npt.assert_almost_equal(image_convolved, image_convolved_ref, decimal=5)
-
 
 
 class TestSubgridKernelConvolution(object):
@@ -141,7 +154,9 @@ class TestSubgridKernelConvolution(object):
         )
         model_subgrid_conv_ref = subgrid_conv_ref.convolution2d(self.model_sub)
 
-        npt.assert_array_almost_equal(model_subgrid_conv, model_subgrid_conv_ref, decimal=6)
+        npt.assert_array_almost_equal(
+            model_subgrid_conv, model_subgrid_conv_ref, decimal=6
+        )
 
     def test_convolve2d_low_res(self):
         subgrid_conv_split = SubgridKernelConvolution(
@@ -160,7 +175,9 @@ class TestSubgridKernelConvolution(object):
         )
         model_subgrid_conv_ref = subgrid_conv_split_ref.convolution2d(self.model_sub)
 
-        npt.assert_array_almost_equal(model_subgrid_conv, model_subgrid_conv_ref, decimal=6)
+        npt.assert_array_almost_equal(
+            model_subgrid_conv, model_subgrid_conv_ref, decimal=6
+        )
 
     def test_re_size_convolve(self):
         subgrid_conv = SubgridKernelConvolution(
@@ -199,8 +216,6 @@ class TestSubgridKernelConvolution(object):
         re_size_conv_ref = subgrid_conv_ref.re_size_convolve(self.model, self.model_sub)
 
         npt.assert_array_almost_equal(re_size_conv, re_size_conv_ref, decimal=6)
-
-
 
 
 if __name__ == "__main__":

@@ -8,7 +8,9 @@ import pytest
 from lenstronomy.LensModel.Profiles.gaussian import Gaussian as Gaussian_ref
 from jaxtronomy.LensModel.Profiles.gaussian import Gaussian
 
-from lenstronomy.LensModel.Profiles.gaussian_potential import GaussianPotential as GaussianPotential_ref
+from lenstronomy.LensModel.Profiles.gaussian_potential import (
+    GaussianPotential as GaussianPotential_ref,
+)
 from jaxtronomy.LensModel.Profiles.gaussian_potential import GaussianPotential
 
 jax.config.update("jax_enable_x64", True)
@@ -17,6 +19,7 @@ jax.config.update("jax_enable_x64", True)
 #       the _num_integral function is implemented using trapezoidal
 #       integration, resulting in numerical differences from lenstronomy.
 #       It is accurate up to 4 decimal places.
+
 
 class TestGaussian(object):
     def setup_method(self):
@@ -40,8 +43,8 @@ class TestGaussian(object):
         values = self.profile.function(x, y, amp, sigma)
         npt.assert_array_almost_equal(values_ref, values, decimal=4)
 
-        x = np.array([2., 3., 4.])
-        y = np.array([1., 1., 1.])
+        x = np.array([2.0, 3.0, 4.0])
+        y = np.array([1.0, 1.0, 1.0])
         values_ref = self.profile_ref.function(x, y, amp, sigma)
         values = self.profile.function(x, y, amp, sigma)
         npt.assert_almost_equal(values_ref, values, decimal=4)
@@ -85,7 +88,7 @@ class TestGaussian(object):
         npt.assert_array_almost_equal(f_xy_ref, f_xy, decimal=6)
         npt.assert_array_almost_equal(f_yx_ref, f_yx, decimal=6)
         npt.assert_array_almost_equal(f_yy_ref, f_yy, decimal=6)
-        
+
         x = np.array([0])
         y = np.array([0])
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
@@ -215,7 +218,7 @@ class TestGaussianPotential(object):
         values_ref = self.profile_ref.function(x, y, amp, sigma_x, sigma_y)
         values = self.profile.function(x, y, amp, sigma_x, sigma_y)
         npt.assert_array_almost_equal(values_ref, values, decimal=8)
-        
+
         # NOTE: This test fails with 32 bit floats
         x = np.array([0])
         y = np.array([0])
@@ -225,8 +228,8 @@ class TestGaussianPotential(object):
         values = self.profile.function(x, y, amp, sigma_x, sigma_y)
         npt.assert_array_almost_equal(values_ref, values, decimal=8)
 
-        x = np.array([2., 3., 4.])
-        y = np.array([1., 1., 1.])
+        x = np.array([2.0, 3.0, 4.0])
+        y = np.array([1.0, 1.0, 1.0])
         values_ref = self.profile_ref.function(x, y, amp, sigma_x, sigma_y)
         values = self.profile.function(x, y, amp, sigma_x, sigma_y)
         npt.assert_almost_equal(values_ref, values, decimal=8)
