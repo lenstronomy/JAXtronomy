@@ -14,6 +14,7 @@ from jaxtronomy.LensModel.profile_list_base import _JAXXED_MODELS
 from astropy.cosmology import default_cosmology
 
 import jax
+
 jax.config.update("jax_enable_x64", True)  # 64-bit floats
 
 cosmo = default_cosmology.get()
@@ -176,9 +177,7 @@ class TestSinglePlaneLOS(object):
 
     def test_bool_list(self):
         lensModel_los = SinglePlaneLOS(["EPL", "SHEAR", "LOS"], index_los=2)
-        lensModel_minimal = SinglePlaneLOS(
-            ["EPL", "SHEAR", "LOS_MINIMAL"], index_los=2
-        )
+        lensModel_minimal = SinglePlaneLOS(["EPL", "SHEAR", "LOS_MINIMAL"], index_los=2)
         kwargs = [
             {
                 "theta_E": 1,
@@ -442,7 +441,9 @@ class TestSinglePlaneLOS(object):
             "MULTIPOLE",
             "CURVED_ARC_SPP",
         ]
-        npt.assert_raises(ValueError, SinglePlaneLOS, lens_model_list=lens_model_list, index_los=0)
+        npt.assert_raises(
+            ValueError, SinglePlaneLOS, lens_model_list=lens_model_list, index_los=0
+        )
         lensModel = SinglePlaneLOS(lens_model_list=_JAXXED_MODELS, index_los=0)
 
 

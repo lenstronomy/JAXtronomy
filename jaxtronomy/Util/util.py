@@ -16,7 +16,7 @@ export, __all__ = exporter()
 
 
 @export
-@partial(jit, static_argnums=(1,2))
+@partial(jit, static_argnums=(1, 2))
 def array2image(array, nx=0, ny=0):
     """Returns the information contained in a 1d array into an n*n 2d array (only works
     when length of array is n**2, or nx and ny are provided)
@@ -36,6 +36,7 @@ def array2image(array, nx=0, ny=0):
         nx, ny = n, n
     image = jnp.reshape(array, (nx, ny))
     return image
+
 
 @export
 @jit
@@ -58,6 +59,7 @@ def displaceAbs(x, y, sourcePos_x, sourcePos_y):
     absmapped = jnp.sqrt(x_mapped**2 + y_mapped**2)
     return absmapped
 
+
 @export
 @jit
 def image2array(image):
@@ -70,6 +72,7 @@ def image2array(image):
     """
     imgh = jnp.reshape(image, jnp.size(image))  # change the shape to be 1d
     return imgh
+
 
 @export
 @jit

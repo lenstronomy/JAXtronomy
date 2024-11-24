@@ -13,7 +13,7 @@ __all__ = ["SinglePlane"]
 class SinglePlane(ProfileListBase):
     """Class to handle an arbitrary list of lens models in a single lensing plane."""
 
-    @partial(jit, static_argnums=(0,4))
+    @partial(jit, static_argnums=(0, 4))
     def ray_shooting(self, x, y, kwargs, k=None):
         """Maps image to source position (inverse deflection).
 
@@ -54,7 +54,7 @@ class SinglePlane(ProfileListBase):
         geometry = ((x_image - x_source) ** 2 + (y_image - y_source) ** 2) / 2.0
         return geometry - potential
 
-    @partial(jit, static_argnums=(0,4))
+    @partial(jit, static_argnums=(0, 4))
     def potential(self, x, y, kwargs, k=None):
         """Lensing potential.
 
@@ -79,7 +79,7 @@ class SinglePlane(ProfileListBase):
                 potential += func.function(x, y, **kwargs[i])
         return potential
 
-    @partial(jit, static_argnums=(0,4))
+    @partial(jit, static_argnums=(0, 4))
     def alpha(self, x, y, kwargs, k=None):
         """Deflection angles.
 
@@ -108,7 +108,7 @@ class SinglePlane(ProfileListBase):
 
         return f_x, f_y
 
-    @partial(jit, static_argnums=(0,4))
+    @partial(jit, static_argnums=(0, 4))
     def hessian(self, x, y, kwargs, k=None):
         """Hessian matrix.
 
@@ -144,7 +144,7 @@ class SinglePlane(ProfileListBase):
                 f_yy += f_yy_i
         return f_xx, f_xy, f_yx, f_yy
 
-    @partial(jit, static_argnums=(0,3))
+    @partial(jit, static_argnums=(0, 3))
     def mass_3d(self, r, kwargs, k=None):
         """Computes the mass within a 3d sphere of radius r.
 
@@ -173,7 +173,7 @@ class SinglePlane(ProfileListBase):
                 mass_3d += mass_3d_i
         return mass_3d
 
-    @partial(jit, static_argnums=(0,3))
+    @partial(jit, static_argnums=(0, 3))
     def mass_2d(self, r, kwargs, k=None):
         """Computes the mass enclosed a projected (2d) radius r.
 
@@ -204,7 +204,7 @@ class SinglePlane(ProfileListBase):
                 mass_2d += mass_2d_i
         return mass_2d
 
-    @partial(jit, static_argnums=(0,3))
+    @partial(jit, static_argnums=(0, 3))
     def density(self, r, kwargs, k=None):
         """3d mass density at radius r The integral in the LOS projection of this
         quantity results in the convergence quantity.

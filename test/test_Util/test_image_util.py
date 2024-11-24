@@ -6,6 +6,7 @@ import numpy.testing as npt
 import lenstronomy.Util.image_util as image_util_ref
 import jaxtronomy.Util.image_util as image_util
 
+
 def test_re_size():
     grid = np.ones((200, 100))
     grid[101, 57] = 4

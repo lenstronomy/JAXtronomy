@@ -220,7 +220,7 @@ class LightModelBase(object):
                 )
         self._num_func = len(self.func_list)
 
-    @partial(jit, static_argnums=(0,4))
+    @partial(jit, static_argnums=(0, 4))
     def surface_brightness(self, x, y, kwargs_list, k=None):
         """
         :param x: coordinate in units of arcsec relative to the center of the image
@@ -289,7 +289,7 @@ class LightModelBase(object):
     #                 )
     #     return flux
 
-    @partial(jit, static_argnums=(0,2,3))
+    @partial(jit, static_argnums=(0, 2, 3))
     def total_flux(self, kwargs_list, norm=False, k=None):
         """Computes the total flux of each individual light profile. This allows to
         estimate the total flux as well as lenstronomy amp to magnitude conversions. Not

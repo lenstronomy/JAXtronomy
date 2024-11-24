@@ -266,8 +266,9 @@ def lens_class(
 
     if lens_type not in _JAXXED_MODELS and lens_type in _SUPPORTED_MODELS:
         raise ValueError(
-            "The {} profile is not in JAXtronomy; use lenstronomy instead."
-            .format(lens_type)
+            "The {} profile is not in JAXtronomy; use lenstronomy instead.".format(
+                lens_type
+            )
         )
 
     # if lens_type == "ARC_PERT":

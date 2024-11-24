@@ -12,14 +12,26 @@ class GaussianPotential(LensProfileBase):
     derivative and hessian matrix."""
 
     param_names = ["amp", "sigma_x", "sigma_y", "center_x", "center_y"]
-    lower_limit_default = {"amp": 0, "sigma_x": 0, "sigma_y": 0, "center_x": -100, "center_y": -100}
-    upper_limit_default = {"amp": 100, "sigma_x": 100, "sigma_y": 100, "center_x": 100, "center_y": 100}
+    lower_limit_default = {
+        "amp": 0,
+        "sigma_x": 0,
+        "sigma_y": 0,
+        "center_x": -100,
+        "center_y": -100,
+    }
+    upper_limit_default = {
+        "amp": 100,
+        "sigma_x": 100,
+        "sigma_y": 100,
+        "center_x": 100,
+        "center_y": 100,
+    }
 
     @staticmethod
     @jit
     def function(x, y, amp, sigma_x, sigma_y, center_x=0, center_y=0):
         """Returns Gaussian.
-        
+
         :param x: x position
         :param y: y position
         :param amp: amplitude of Gaussian
@@ -38,7 +50,7 @@ class GaussianPotential(LensProfileBase):
     @jit
     def derivatives(x, y, amp, sigma_x, sigma_y, center_x=0, center_y=0):
         """Returns df/dx and df/dy of the function.
-        
+
         :param x: x position
         :param y: y position
         :param amp: amplitude of Gaussian
@@ -53,9 +65,8 @@ class GaussianPotential(LensProfileBase):
     @staticmethod
     @jit
     def hessian(x, y, amp, sigma_x, sigma_y, center_x=0, center_y=0):
-        """Returns Hessian matrix of function d^2f/dx^2, d^2/dxdy, d^2/dydx,
-        d^f/dy^2.
-        
+        """Returns Hessian matrix of function d^2f/dx^2, d^2/dxdy, d^2/dydx, d^f/dy^2.
+
         :param x: x position
         :param y: y position
         :param amp: amplitude of Gaussian

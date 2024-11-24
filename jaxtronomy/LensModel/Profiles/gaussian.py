@@ -13,6 +13,7 @@ __all__ = ["Gaussian"]
 
 GAUSSIAN_INSTANCE = GaussianPotential()
 
+
 class Gaussian(LensProfileBase):
     """This class contains functions to evaluate a Gaussian convergence and calculates
     its derivative and hessian matrix."""
@@ -44,7 +45,7 @@ class Gaussian(LensProfileBase):
     @jit
     def function(self, x, y, amp, sigma, center_x=0, center_y=0):
         """Returns potential for a Gaussian convergence.
-        
+
         :param x: x position
         :param y: y position
         :param amp: 2d amplitude of Gaussian
@@ -66,24 +67,23 @@ class Gaussian(LensProfileBase):
     @staticmethod
     @jit
     def _num_integral(r, c):
-        """Numerical integral of (1-e^{-c*x^2})/x dx from 0 to r
-        calculated using a trapezoidal sum with 200 steps.
-        If r is a 1D array of size n, then there are n integrals
-        which are computed in parallel.
+        """Numerical integral of (1-e^{-c*x^2})/x dx from 0 to r calculated using a
+        trapezoidal sum with 200 steps. If r is a 1D array of size n, then there are n
+        integrals which are computed in parallel.
 
         :param r: radius
         :param c: 1/2sigma^2
-        :return: Array with the same shape as r containing the result
-         for each integral
+        :return: Array with the same shape as r containing the result for each integral
         """
+
         def trapezoidal_sum(i, val):
             sum = val
-            dx = r/200.
+            dx = r / 200.0
             x_left = dx * i
             x_right = dx * (i + 1)
-            y_left = jnp.where(x_left == 0, 0, (1 - jnp.exp(-c * x_left**2))/x_left)
-            y_right = (1 - jnp.exp(-c * x_right**2))/x_right
-            sum += (y_left + y_right)/2 * dx
+            y_left = jnp.where(x_left == 0, 0, (1 - jnp.exp(-c * x_left**2)) / x_left)
+            y_right = (1 - jnp.exp(-c * x_right**2)) / x_right
+            sum += (y_left + y_right) / 2 * dx
             return sum
 
         sum = jnp.zeros_like(r, dtype=float)
@@ -109,9 +109,8 @@ class Gaussian(LensProfileBase):
 
     @jit
     def hessian(self, x, y, amp, sigma, center_x=0, center_y=0):
-        """Returns Hessian matrix of function d^2f/dx^2, d^2/dxdy, d^2/dydx,
-        d^f/dy^2.
-        
+        """Returns Hessian matrix of function d^2f/dx^2, d^2/dxdy, d^2/dydx, d^f/dy^2.
+
         :param x: x position
         :param y: y position
         :param amp: 2d amplitude of Gaussian
@@ -134,7 +133,7 @@ class Gaussian(LensProfileBase):
 
     @jit
     def density(self, r, amp, sigma):
-        """3d mass density as a function of radius r
+        """3d mass density as a function of radius r.
 
         :param r: radius
         :param amp: 3d amplitude of Gaussian
@@ -156,11 +155,13 @@ class Gaussian(LensProfileBase):
         """
         sigma_x, sigma_y = sigma, sigma
         amp2d = self._amp3d_to_2d(amp, sigma_x, sigma_y)
-        return GAUSSIAN_INSTANCE.function(x, y, amp2d, sigma_x, sigma_y, center_x, center_y)
+        return GAUSSIAN_INSTANCE.function(
+            x, y, amp2d, sigma_x, sigma_y, center_x, center_y
+        )
 
     @jit
     def mass_2d(self, R, amp, sigma):
-        """Mass enclosed in a circle of radius R when projected into 2d
+        """Mass enclosed in a circle of radius R when projected into 2d.
 
         :param R: projected radius
         :param amp: 3d amplitude of Gaussian
@@ -173,7 +174,7 @@ class Gaussian(LensProfileBase):
 
     @jit
     def mass_2d_lens(self, R, amp, sigma):
-        """Mass enclosed in a circle of radius R when projected into 2d
+        """Mass enclosed in a circle of radius R when projected into 2d.
 
         :param R: projected radius
         :param amp: 2d amplitude of Gaussian
@@ -198,7 +199,7 @@ class Gaussian(LensProfileBase):
 
     @jit
     def d_alpha_dr(self, R, amp, sigma_x, sigma_y):
-        """Derivative of deflection angle w.r.t r
+        """Derivative of deflection angle w.r.t r.
 
         :param R: radius projected into 2d
         :param amp: 2d amplitude of Gaussian
@@ -213,8 +214,9 @@ class Gaussian(LensProfileBase):
 
     @jit
     def mass_3d(self, R, amp, sigma):
-        """Mass enclosed within a 3D sphere of projected radius R given a lens parameterization
-        with angular units. The input parameter amp is the 3d amplitude.
+        """Mass enclosed within a 3D sphere of projected radius R given a lens
+        parameterization with angular units. The input parameter amp is the 3d
+        amplitude.
 
         :param R: radius projected into 2d
         :param amp: 3d amplitude of Gaussian
@@ -235,9 +237,9 @@ class Gaussian(LensProfileBase):
 
     @jit
     def mass_3d_lens(self, R, amp, sigma):
-        """Mass enclosed within a 3D sphere of projected radius R given a lens parameterization
-        with angular units. The input parameters are identical as for the derivatives
-        definition. (optional definition)
+        """Mass enclosed within a 3D sphere of projected radius R given a lens
+        parameterization with angular units. The input parameters are identical as for
+        the derivatives definition. (optional definition)
 
         :param R: radius projected into 2d
         :param amp: 2d amplitude of Gaussian
@@ -268,7 +270,8 @@ class Gaussian(LensProfileBase):
         :param sigma_y: standard deviation of Gaussian in y direction
         """
         return amp / (jnp.sqrt(jnp.pi) * jnp.sqrt(sigma_x * sigma_y * 2))
-    
 
-tree_util.register_pytree_node(Gaussian, Gaussian._tree_flatten, Gaussian._tree_unflatten)
 
+tree_util.register_pytree_node(
+    Gaussian, Gaussian._tree_flatten, Gaussian._tree_unflatten
+)
