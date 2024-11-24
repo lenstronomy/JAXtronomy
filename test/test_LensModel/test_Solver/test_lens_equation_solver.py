@@ -96,6 +96,20 @@ class TestLensEquationSolver(object):
         npt.assert_array_almost_equal(x_pos, x_pos_ref, decimal=8)
         npt.assert_array_almost_equal(y_pos, y_pos_ref, decimal=8)
 
+        x_pos, y_pos = lensEquationSolver.image_position_from_source(
+            sourcePos_x,
+            sourcePos_y,
+            kwargs_lens_list,
+            min_distance=min_distance,
+            search_window=0.04,
+            precision_limit=10 ** (-10),
+            num_iter_max=100,
+            initial_guess_cut=True,
+            magnification_limit=0.01,
+            verbose=True,
+        )
+        assert x_pos.size == 0 and y_pos.size == 0
+
     def test_epl_analytical_solver(self):
         lens_model_list = ["EPL", "SHEAR"]
         lensModel = LensModel(lens_model_list)
