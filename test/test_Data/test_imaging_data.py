@@ -49,7 +49,7 @@ class Test_ImageData_noisemap(object):
 
         # Check that the data is updated
         npt.assert_array_almost_equal(self.Data.data, self.Data_ref.data)
-        
+
         # Check that the log likelihoods are correctly calculated after updating the data
         model = np.tile(np.array([0.3, -0.1, 0.4, 0.7, -0.9]), (self.numPix, 2))
         mask = np.tile(np.array([0, 1]), (self.numPix, 5))
@@ -65,7 +65,7 @@ class Test_ImageData_without_noisemap(object):
     def setup_method(self):
         self.numPix = 10
         kwargs_data = {
-            "image_data": np.ones((self.numPix, self.numPix))* 0.3,
+            "image_data": np.ones((self.numPix, self.numPix)) * 0.3,
             "exposure_time": 2 * np.ones((self.numPix, self.numPix)),
             "background_rms": 1.103,
         }
