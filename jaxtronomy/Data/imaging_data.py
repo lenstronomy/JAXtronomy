@@ -3,7 +3,6 @@ from jax import jit, numpy as jnp
 
 from lenstronomy.Data.pixel_grid import PixelGrid
 from jaxtronomy.Data.image_noise import ImageNoise
-from functools import partial
 
 __all__ = ["ImageData"]
 
@@ -47,8 +46,6 @@ class ImageData(PixelGrid, ImageNoise):
     your definitions and units of 'exposure_map', 'background_rms' and 'image_data' are in accordance with the
     likelihood function. In particular, make sure that the Poisson noise contribution is defined in the count rate.
     """
-
-    # NOTE: JIT-compiled functions need to be recompiled each time a new instance of the class is created.
 
     def __init__(
         self,
@@ -130,17 +127,24 @@ class ImageData(PixelGrid, ImageNoise):
                 "likelihood_method %s not supported! likelihood_method can only be 'diagonal' or 'interferometry_natwt'!"
                 % self._logL_method
             )
+        self.log_likelihood = jit(self._log_likelihood)
+        self.log_likelihood_interferometry = jit(self._log_likelihood_interferometry)
 
     def update_data(self, image_data):
-        raise Exception(
-            "Cannot update data when using JAX. Instead, a new instance of ImageData must be created."
-        )
+        """Updates self.data with a new image data and recompiles the log likelihood functions.
+        Note that if recompilation is not done, the log likelihood functions will use the previous
+        value of self.data, since that value was cached during the previous compilation.
 
-    @partial(
-        jit,
-        static_argnums=0,
-    )
-    def log_likelihood(self, model, mask, additional_error_map=0):
+        :param image_data: 2D array representing the new image to be stored in self.data
+        """
+        self.data = image_data
+
+        # Recompile the log likelihood functions
+        self.log_likelihood = jit(self._log_likelihood)
+        self.log_likelihood_interferometry = jit(self._log_likelihood_interferometry)
+        
+        
+    def _log_likelihood(self, model, mask, additional_error_map=0):
         """Computes the likelihood of the data given the model p(data|model) The
         Gaussian errors are estimated with the covariance matrix, based on the model
         image. The errors include the background rms value and the exposure time to
@@ -165,8 +169,7 @@ class ImageData(PixelGrid, ImageNoise):
         log_likelihood = -jnp.sum(chi2) / 2
         return log_likelihood
 
-    @partial(jit, static_argnums=0)
-    def log_likelihood_interferometry(self, model):
+    def _log_likelihood_interferometry(self, model):
         """log_likelihood function for natural weighting interferometric images, based
         on (placeholder for Nan Zhang's paper).
 
