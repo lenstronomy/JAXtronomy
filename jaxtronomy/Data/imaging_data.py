@@ -131,9 +131,10 @@ class ImageData(PixelGrid, ImageNoise):
         self.log_likelihood_interferometry = jit(self._log_likelihood_interferometry)
 
     def update_data(self, image_data):
-        """Updates self.data with a new image data and recompiles the log likelihood functions.
-        Note that if recompilation is not done, the log likelihood functions will use the previous
-        value of self.data, since that value was cached during the previous compilation.
+        """Updates self.data with a new image data and recompiles the log likelihood
+        functions. Note that if recompilation is not done, the log likelihood functions
+        will use the previous value of self.data, since that value was cached during the
+        previous compilation.
 
         :param image_data: 2D array representing the new image to be stored in self.data
         """
@@ -142,8 +143,7 @@ class ImageData(PixelGrid, ImageNoise):
         # Recompile the log likelihood functions
         self.log_likelihood = jit(self._log_likelihood)
         self.log_likelihood_interferometry = jit(self._log_likelihood_interferometry)
-        
-        
+
     def _log_likelihood(self, model, mask, additional_error_map=0):
         """Computes the likelihood of the data given the model p(data|model) The
         Gaussian errors are estimated with the covariance matrix, based on the model
