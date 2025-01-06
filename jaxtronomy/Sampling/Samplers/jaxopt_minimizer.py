@@ -65,8 +65,12 @@ class JaxoptMinimizer:
         """
 
         # Reset the parameter and logL histories with initial values only
-        self.parameter_history = [init_args,]
-        self.logL_history = [self.logL(init_args),]
+        self.parameter_history = [
+            init_args,
+        ]
+        self.logL_history = [
+            self.logL(init_args),
+        ]
 
         # Convert contrained space parameters to unconstrained space
         init_args_unconstrained = unconstrain_fn(
