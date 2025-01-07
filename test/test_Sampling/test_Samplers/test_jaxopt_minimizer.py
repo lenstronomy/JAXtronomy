@@ -9,15 +9,7 @@ from jaxtronomy.Sampling.Samplers.jaxopt_minimizer import JaxoptMinimizer
 
 
 class TestJaxoptMinimizer(object):
-    """This class is a wrapper for the jaxopt.ScipyMinimize class.
-
-    This minimizer only works in an unconstrained parameter space (i.e. no hard bounds).
-    To get around this, we use numpyro to map from the constrained space to the
-    unconstrained space, run the minimizer, then convert the result back into the
-    constrained space
-    """
-
-    # Test two different logL functions
+    """Tests two different logL functions"""
 
     def _logL(self, x):
         # Minimum at x = 0.6
