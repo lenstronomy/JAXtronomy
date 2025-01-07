@@ -55,7 +55,7 @@ class JaxoptMinimizer:
             maxiter=maxiter,
         )
 
-    def run_scipy(self, init_args):
+    def run(self, init_args):
         """Runs the minimizer. The initial parameters are assumed to be in constrained
         space. They are converted to the unconstrained space to be passed into the
         minimizer.

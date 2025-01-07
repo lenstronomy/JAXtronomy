@@ -29,13 +29,13 @@ class TestJaxoptMinimizer(object):
         self.minimizer2 = JaxoptMinimizer("BFGS", self._logL2, *args, maxiter=200)
         self.args_mean = args_mean
 
-    def test_run_scipy(self):
+    def test_run(self):
         # Tests to see if the minimizer gets close to the analytical answer
-        final_result, final_logL = self.minimizer.run_scipy(self.args_mean)
+        final_result, final_logL = self.minimizer.run(self.args_mean)
         npt.assert_almost_equal(final_result.item(), 0.6, decimal=6)
         npt.assert_almost_equal(final_logL, 0.0, decimal=8)
 
-        final_result, final_logL = self.minimizer2.run_scipy(self.args_mean)
+        final_result, final_logL = self.minimizer2.run(self.args_mean)
         npt.assert_almost_equal(final_result.item(), 0.25, decimal=2)
         npt.assert_almost_equal(final_logL, 0.0, decimal=7)
 
