@@ -9,7 +9,7 @@ from jaxtronomy.Sampling.Samplers.jaxopt_minimizer import JaxoptMinimizer
 
 
 class TestJaxoptMinimizer(object):
-    """Tests two different logL functions"""
+    """Tests two different logL functions."""
 
     def _logL(self, x):
         # Minimum at x = 0.6
