@@ -15,7 +15,6 @@ from lenstronomy.Util.package_util import exporter
 export, __all__ = exporter()
 
 
-@export
 @partial(jit, static_argnums=(1, 2))
 def array2image(array, nx=0, ny=0):
     """Returns the information contained in a 1d array into an n*n 2d array (only works
@@ -38,7 +37,6 @@ def array2image(array, nx=0, ny=0):
     return image
 
 
-@export
 @jit
 def displaceAbs(x, y, sourcePos_x, sourcePos_y):
     """Calculates a grid of distances to the observer in angel.
@@ -59,8 +57,16 @@ def displaceAbs(x, y, sourcePos_x, sourcePos_y):
     absmapped = jnp.sqrt(x_mapped**2 + y_mapped**2)
     return absmapped
 
+@jit
+def fwhm2sigma(fwhm):
+    """
 
-@export
+    :param fwhm: full-width-half-max value
+    :return: gaussian sigma (sqrt(var))
+    """
+    sigma = fwhm / (2 * jnp.sqrt(2 * jnp.log(2)))
+    return sigma
+
 @jit
 def image2array(image):
     """Returns the information contained in a 2d array into an n*n 1d array.
@@ -73,8 +79,6 @@ def image2array(image):
     imgh = jnp.reshape(image, jnp.size(image))  # change the shape to be 1d
     return imgh
 
-
-@export
 @jit
 def rotate(xcoords, ycoords, angle):
     """
@@ -86,3 +90,13 @@ def rotate(xcoords, ycoords, angle):
     return xcoords * jnp.cos(angle) + ycoords * jnp.sin(angle), -xcoords * jnp.sin(
         angle
     ) + ycoords * jnp.cos(angle)
+
+@jit
+def sigma2fwhm(sigma):
+    """
+
+    :param sigma:
+    :return:
+    """
+    fwhm = sigma * (2 * jnp.sqrt(2 * jnp.log(2)))
+    return fwhm
