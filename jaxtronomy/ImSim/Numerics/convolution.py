@@ -26,9 +26,13 @@ class PixelKernelConvolution(object):
         self._kernel = kernel
         if convolution_type not in ["fft", "grid"]:
             if convolution_type == "fft_static":
-                self.fftconvolve_static = jit(partial(signal.fftconvolve, in2=kernel, mode="same"))
+                self.fftconvolve_static = jit(
+                    partial(signal.fftconvolve, in2=kernel, mode="same")
+                )
             else:
-                raise ValueError("convolution_type %s not supported!" % convolution_type)
+                raise ValueError(
+                    "convolution_type %s not supported!" % convolution_type
+                )
         self.convolution_type = convolution_type
 
     # --------------------------------------------------------------------------------
@@ -161,14 +165,16 @@ class SubgridKernelConvolution(object):
         if self._low_res_convolution is True:
             image_resized_conv += self._low_res_conv.convolution2d(image_low_res)
         return image_resized_conv
-    
+
 
 class MultiGaussianConvolution(object):
-    """Class to perform a convolution consisting of multiple 2d Gaussians. Since
-    JAX does not have an ndimage.gaussian_filter function, to perform Gaussian
+    """Class to perform a convolution consisting of multiple 2d Gaussians.
+
+    Since JAX does not have an ndimage.gaussian_filter function, to perform Gaussian
     convolutions, we first create Gaussian psf kernels and convolve them using
     fftconvolve.
     """
+
     def __init__(
         self,
         sigma_list,
@@ -207,9 +213,9 @@ class MultiGaussianConvolution(object):
             num_pix = int(2 * truncation * sigma + 1)
 
             # Ensure num_pix is odd and >= 3
-            if (num_pix < 3):
+            if num_pix < 3:
                 num_pix = 3
-            if (num_pix % 2 == 0):
+            if num_pix % 2 == 0:
                 num_pix += 1
 
             kernel = self.pixel_kernel(num_pix)
@@ -219,8 +225,10 @@ class MultiGaussianConvolution(object):
         # radius of the gaussian kernel
         self._pad_width = np.max(self._sigmas_scaled) * self._truncation
         self._pad_width = self._pad_width.astype(int)
-        
-        self.PixelKernelConv = PixelKernelConvolution(self.kernel_list[0], convolution_type="fft")
+
+        self.PixelKernelConv = PixelKernelConvolution(
+            self.kernel_list[0], convolution_type="fft"
+        )
 
     @partial(jit, static_argnums=0)
     def convolution2d(self, image):
@@ -237,10 +245,14 @@ class MultiGaussianConvolution(object):
 
         for i in range(self._num_gaussians):
             self.PixelKernelConv._kernel = self.kernel_list[i]
-            image_conv += self.PixelKernelConv.convolution2d(image) * self._fraction_list[i]
+            image_conv += (
+                self.PixelKernelConv.convolution2d(image) * self._fraction_list[i]
+            )
 
         # Removes the padding from the final image
-        image_conv = image_conv[self._pad_width:-self._pad_width, self._pad_width:-self._pad_width]
+        image_conv = image_conv[
+            self._pad_width : -self._pad_width, self._pad_width : -self._pad_width
+        ]
 
         return image_conv
 
@@ -263,9 +275,9 @@ class MultiGaussianConvolution(object):
     def pixel_kernel(self, num_pix):
         """Computes a pixelized kernel from the Gaussian parameters.
 
-        :param num_pix: int, size of kernel (odd number per axis)
-            should be equal to 2 * sigma_scaled * truncation + 1 to be
-            consistent with scipy.ndimage.gaussian_filter
+        :param num_pix: int, size of kernel (odd number per axis) should be equal to 2 *
+            sigma_scaled * truncation + 1 to be consistent with
+            scipy.ndimage.gaussian_filter
         :return: pixel kernel centered
         """
 
@@ -275,12 +287,13 @@ class MultiGaussianConvolution(object):
             raise ValueError("psf kernel size must be 3 or greater")
 
         gaussian = Gaussian()
-        sigma = (num_pix - 1)/(2 * self._truncation)
+        sigma = (num_pix - 1) / (2 * self._truncation)
         # Since sigma is in units of pixels, deltapix is trivially 1 in units of pixels
         x, y = util.make_grid(numPix=num_pix, deltapix=1)
         kernel = gaussian.function(x, y, amp=1, sigma=sigma)
         kernel = util.array2image(kernel)
         return kernel / jnp.sum(kernel)
+
 
 tree_util.register_pytree_node(
     PixelKernelConvolution,

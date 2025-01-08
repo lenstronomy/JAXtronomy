@@ -57,6 +57,7 @@ def displaceAbs(x, y, sourcePos_x, sourcePos_y):
     absmapped = jnp.sqrt(x_mapped**2 + y_mapped**2)
     return absmapped
 
+
 @jit
 def fwhm2sigma(fwhm):
     """
@@ -66,6 +67,7 @@ def fwhm2sigma(fwhm):
     """
     sigma = fwhm / (2 * jnp.sqrt(2 * jnp.log(2)))
     return sigma
+
 
 @jit
 def image2array(image):
@@ -79,6 +81,7 @@ def image2array(image):
     imgh = jnp.reshape(image, jnp.size(image))  # change the shape to be 1d
     return imgh
 
+
 @jit
 def rotate(xcoords, ycoords, angle):
     """
@@ -90,6 +93,7 @@ def rotate(xcoords, ycoords, angle):
     return xcoords * jnp.cos(angle) + ycoords * jnp.sin(angle), -xcoords * jnp.sin(
         angle
     ) + ycoords * jnp.cos(angle)
+
 
 @jit
 def sigma2fwhm(sigma):

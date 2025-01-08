@@ -74,27 +74,27 @@ class LightModelBase(object):
             sersic_major_axis = sersic_major_axis_conf
         for profile_type in light_model_list:
             if profile_type == "GAUSSIAN":
-                 from jaxtronomy.LightModel.Profiles.gaussian import Gaussian
+                from jaxtronomy.LightModel.Profiles.gaussian import Gaussian
 
-                 self.func_list.append(Gaussian())
+                self.func_list.append(Gaussian())
             elif profile_type == "GAUSSIAN_ELLIPSE":
-                 from jaxtronomy.LightModel.Profiles.gaussian import GaussianEllipse
+                from jaxtronomy.LightModel.Profiles.gaussian import GaussianEllipse
 
-                 self.func_list.append(GaussianEllipse())
+                self.func_list.append(GaussianEllipse())
             # elif profile_type == "ELLIPSOID":
             #     from lenstronomy.LightModel.Profiles.ellipsoid import Ellipsoid
 
             #     self.func_list.append(Ellipsoid())
             elif profile_type == "MULTI_GAUSSIAN":
-                 from jaxtronomy.LightModel.Profiles.gaussian import MultiGaussian
+                from jaxtronomy.LightModel.Profiles.gaussian import MultiGaussian
 
-                 self.func_list.append(MultiGaussian())
+                self.func_list.append(MultiGaussian())
             elif profile_type == "MULTI_GAUSSIAN_ELLIPSE":
-                 from jaxtronomy.LightModel.Profiles.gaussian import (
-                     MultiGaussianEllipse,
-                 )
+                from jaxtronomy.LightModel.Profiles.gaussian import (
+                    MultiGaussianEllipse,
+                )
 
-                 self.func_list.append(MultiGaussianEllipse())
+                self.func_list.append(MultiGaussianEllipse())
             elif profile_type == "SERSIC":
                 from jaxtronomy.LightModel.Profiles.sersic import Sersic
 

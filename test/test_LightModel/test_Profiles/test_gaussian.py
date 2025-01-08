@@ -9,13 +9,13 @@ from lenstronomy.LightModel.Profiles.gaussian import (
     Gaussian as Gaussian_ref,
     GaussianEllipse as GaussianEllipse_ref,
     MultiGaussian as MultiGaussian_ref,
-    MultiGaussianEllipse as MultiGaussianEllipse_ref
+    MultiGaussianEllipse as MultiGaussianEllipse_ref,
 )
 from jaxtronomy.LightModel.Profiles.gaussian import (
     Gaussian,
     GaussianEllipse,
     MultiGaussian,
-    MultiGaussianEllipse
+    MultiGaussianEllipse,
 )
 
 
@@ -75,6 +75,7 @@ class TestGaussian(object):
         values = self.profile.light_3d(r, amp, sigma)
         npt.assert_array_almost_equal(values_ref, values, decimal=8)
 
+
 class TestGaussianEllipse(object):
     def setup_method(self):
         self.profile_ref = GaussianEllipse_ref()
@@ -131,22 +132,23 @@ class TestGaussianEllipse(object):
         values = self.profile.light_3d(r, amp, sigma)
         npt.assert_array_almost_equal(values_ref, values, decimal=8)
 
+
 class TestMultiGaussian(object):
     def setup_method(self):
         self.profile_ref = MultiGaussian_ref()
         self.profile = MultiGaussian()
 
     def test_function(self):
-        x = np.array([1.])
-        y = np.array([2.])
+        x = np.array([1.0])
+        y = np.array([2.0])
         amp = [1.3, 1.5, 2.3]
         sigma = [0.5, 1.1, 3.7]
         values_ref = self.profile_ref.function(x, y, amp, sigma)
         values = self.profile.function(x, y, amp, sigma)
         npt.assert_array_almost_equal(values_ref, values, decimal=8)
 
-        x = np.array([0.])
-        y = np.array([0.])
+        x = np.array([0.0])
+        y = np.array([0.0])
         values_ref = self.profile_ref.function(x, y, amp, sigma)
         values = self.profile.function(x, y, amp, sigma)
         npt.assert_array_almost_equal(values_ref, values, decimal=7)
@@ -166,8 +168,8 @@ class TestMultiGaussian(object):
         values = self.profile.function_split(x, y, amp, sigma)
         npt.assert_array_almost_equal(values_ref, values, decimal=8)
 
-        x = np.array([0.])
-        y = np.array([0.])
+        x = np.array([0.0])
+        y = np.array([0.0])
         values_ref = self.profile_ref.function_split(x, y, amp, sigma)
         values = self.profile.function_split(x, y, amp, sigma)
         npt.assert_array_almost_equal(values_ref, values, decimal=7)
@@ -187,7 +189,7 @@ class TestMultiGaussian(object):
         npt.assert_array_almost_equal(np.sum(amp), values, decimal=7)
 
     def test_light_3d(self):
-        r = np.array([2.])
+        r = np.array([2.0])
         amp = [1.3, 1.5, 2.3]
         sigma = [0.5, 1.1, 3.7]
         values_ref = self.profile_ref.light_3d(r, amp, sigma)
@@ -204,14 +206,15 @@ class TestMultiGaussian(object):
         values = self.profile.light_3d(r, amp, sigma)
         npt.assert_array_almost_equal(values_ref, values, decimal=8)
 
+
 class TestMultiGaussianEllipse(object):
     def setup_method(self):
         self.profile_ref = MultiGaussianEllipse_ref()
         self.profile = MultiGaussianEllipse()
 
     def test_function(self):
-        x = np.array([1.])
-        y = np.array([2.])
+        x = np.array([1.0])
+        y = np.array([2.0])
         amp = [1.3, 1.5, 2.3]
         sigma = [0.5, 1.1, 3.7]
         e1 = 0.1345236
@@ -220,8 +223,8 @@ class TestMultiGaussianEllipse(object):
         values = self.profile.function(x, y, amp, sigma, e1, e2)
         npt.assert_array_almost_equal(values_ref, values, decimal=8)
 
-        x = np.array([0.])
-        y = np.array([0.])
+        x = np.array([0.0])
+        y = np.array([0.0])
         values_ref = self.profile_ref.function(x, y, amp, sigma, e1, e2)
         values = self.profile.function(x, y, amp, sigma, e1, e2)
         npt.assert_array_almost_equal(values_ref, values, decimal=7)
@@ -243,8 +246,8 @@ class TestMultiGaussianEllipse(object):
         values = self.profile.function_split(x, y, amp, sigma, e1, e2)
         npt.assert_array_almost_equal(values_ref, values, decimal=8)
 
-        x = np.array([0.])
-        y = np.array([0.])
+        x = np.array([0.0])
+        y = np.array([0.0])
         values_ref = self.profile_ref.function_split(x, y, amp, sigma, e1, e2)
         values = self.profile.function_split(x, y, amp, sigma, e1, e2)
         npt.assert_array_almost_equal(values_ref, values, decimal=7)
@@ -266,7 +269,7 @@ class TestMultiGaussianEllipse(object):
         npt.assert_array_almost_equal(np.sum(amp), values, decimal=7)
 
     def test_light_3d(self):
-        r = np.array([2.])
+        r = np.array([2.0])
         amp = [1.3, 1.5, 2.3]
         sigma = [0.5, 1.1, 3.7]
         values_ref = self.profile_ref.light_3d(r, amp, sigma)
@@ -282,7 +285,6 @@ class TestMultiGaussianEllipse(object):
         values_ref = self.profile_ref.light_3d(r, amp, sigma)
         values = self.profile.light_3d(r, amp, sigma)
         npt.assert_array_almost_equal(values_ref, values, decimal=8)
-
 
 
 if __name__ == "__main__":

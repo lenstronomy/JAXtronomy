@@ -5,7 +5,11 @@ import numpy.testing as npt
 import lenstronomy.Util.util as util
 import lenstronomy.Util.kernel_util as kernel_util
 
-from jaxtronomy.ImSim.Numerics.convolution import PixelKernelConvolution, SubgridKernelConvolution, MultiGaussianConvolution
+from jaxtronomy.ImSim.Numerics.convolution import (
+    PixelKernelConvolution,
+    SubgridKernelConvolution,
+    MultiGaussianConvolution,
+)
 from jaxtronomy.ImSim.Numerics.grid import RegularGrid
 
 from jaxtronomy.ImSim.Numerics.numerics import Numerics
@@ -16,6 +20,7 @@ from lenstronomy.Data.psf import PSF
 from lenstronomy.LightModel.light_model import LightModel
 
 jax.config.update("jax_enable_x64", True)
+
 
 class TestNumerics(object):
     def setup_method(self):
@@ -55,7 +60,9 @@ class TestNumerics(object):
             left_lower=False,
             inverse=False,
         )
-        self.flux = self.lightModel.surface_brightness(x, y, kwargs_list=self.kwargs_light)
+        self.flux = self.lightModel.surface_brightness(
+            x, y, kwargs_list=self.kwargs_light
+        )
 
         (
             x,
@@ -67,13 +74,15 @@ class TestNumerics(object):
             Mpix2coord,
             Mcoord2pix,
         ) = util.make_grid_with_coordtransform(
-            numPix=numPix*self._supersampling_factor,
-            deltapix=deltaPix/self._supersampling_factor,
+            numPix=numPix * self._supersampling_factor,
+            deltapix=deltaPix / self._supersampling_factor,
             subgrid_res=1,
             left_lower=False,
             inverse=False,
         )
-        self.flux_supersampled = self.lightModel.surface_brightness(x, y, kwargs_list=self.kwargs_light)
+        self.flux_supersampled = self.lightModel.surface_brightness(
+            x, y, kwargs_list=self.kwargs_light
+        )
 
         self.kernel_super = kernel_util.kernel_gaussian(
             num_pix=11 * self._supersampling_factor,
@@ -109,7 +118,6 @@ class TestNumerics(object):
         }
         self.psf_class_none = PSF(**kwargs_psf_none)
 
-
     def test_supersampling_cut_kernel(self):
         numerics = Numerics(
             pixel_grid=self.pixel_grid,
@@ -119,14 +127,21 @@ class TestNumerics(object):
             pixel_grid=self.pixel_grid,
             psf=self.psf_class_pixel,
         )
-        cut_kernel = numerics._supersampling_cut_kernel(self.kernel_super, 5, self._supersampling_factor)
-        cut_kernel_ref = numerics_ref._supersampling_cut_kernel(self.kernel_super, 5, self._supersampling_factor)
+        cut_kernel = numerics._supersampling_cut_kernel(
+            self.kernel_super, 5, self._supersampling_factor
+        )
+        cut_kernel_ref = numerics_ref._supersampling_cut_kernel(
+            self.kernel_super, 5, self._supersampling_factor
+        )
         npt.assert_array_almost_equal(cut_kernel, cut_kernel_ref, decimal=8)
 
-        cut_kernel = numerics._supersampling_cut_kernel(self.kernel_super, None, self._supersampling_factor)
-        cut_kernel_ref = numerics_ref._supersampling_cut_kernel(self.kernel_super, None, self._supersampling_factor)
+        cut_kernel = numerics._supersampling_cut_kernel(
+            self.kernel_super, None, self._supersampling_factor
+        )
+        cut_kernel_ref = numerics_ref._supersampling_cut_kernel(
+            self.kernel_super, None, self._supersampling_factor
+        )
         npt.assert_array_equal(cut_kernel, cut_kernel_ref)
-
 
     def test_no_supersampling_pixel_psf(self):
         numerics = Numerics(
@@ -157,9 +172,10 @@ class TestNumerics(object):
         npt.assert_array_almost_equal(re_size_convolve, re_size_convolve_ref, decimal=8)
 
         re_size_convolve = numerics.re_size_convolve(self.flux, unconvolved=True)
-        re_size_convolve_ref = numerics_ref.re_size_convolve(self.flux, unconvolved=True)
+        re_size_convolve_ref = numerics_ref.re_size_convolve(
+            self.flux, unconvolved=True
+        )
         npt.assert_array_equal(re_size_convolve, re_size_convolve_ref)
-
 
     def test_supersampling_pixel_psf(self):
         numerics = Numerics(
@@ -186,17 +202,24 @@ class TestNumerics(object):
             convolution_kernel_size=9,
             convolution_type="fft",
         )
-        npt.assert_array_equal(numerics.coordinates_evaluate, numerics_ref.coordinates_evaluate)
+        npt.assert_array_equal(
+            numerics.coordinates_evaluate, numerics_ref.coordinates_evaluate
+        )
 
         re_size_convolve = numerics.re_size_convolve(self.flux_supersampled)
         re_size_convolve_ref = numerics_ref.re_size_convolve(self.flux_supersampled)
         npt.assert_array_almost_equal(re_size_convolve, re_size_convolve_ref, decimal=8)
 
-        re_size_convolve = numerics.re_size_convolve(self.flux_supersampled, unconvolved=True)
-        re_size_convolve_ref = numerics_ref.re_size_convolve(self.flux_supersampled, unconvolved=True)
+        re_size_convolve = numerics.re_size_convolve(
+            self.flux_supersampled, unconvolved=True
+        )
+        re_size_convolve_ref = numerics_ref.re_size_convolve(
+            self.flux_supersampled, unconvolved=True
+        )
         # These should actually be equal but there's some floating point precision nonsense happening
-        npt.assert_array_almost_equal(re_size_convolve, re_size_convolve_ref, decimal=16)
-
+        npt.assert_array_almost_equal(
+            re_size_convolve, re_size_convolve_ref, decimal=16
+        )
 
     def test_no_supersampling_gaussian_psf(self):
         numerics = Numerics(
@@ -224,14 +247,15 @@ class TestNumerics(object):
         re_size_convolve_ref = numerics_ref.re_size_convolve(self.flux)
         npt.assert_array_almost_equal(re_size_convolve, re_size_convolve_ref, decimal=5)
 
-        re_size_convolve = numerics.re_size_convolve(self.flux+5.12838)
-        re_size_convolve_ref = numerics_ref.re_size_convolve(self.flux+5.12838)
+        re_size_convolve = numerics.re_size_convolve(self.flux + 5.12838)
+        re_size_convolve_ref = numerics_ref.re_size_convolve(self.flux + 5.12838)
         npt.assert_array_almost_equal(re_size_convolve, re_size_convolve_ref, decimal=5)
 
         re_size_convolve = numerics.re_size_convolve(self.flux, unconvolved=True)
-        re_size_convolve_ref = numerics_ref.re_size_convolve(self.flux, unconvolved=True)
+        re_size_convolve_ref = numerics_ref.re_size_convolve(
+            self.flux, unconvolved=True
+        )
         npt.assert_array_equal(re_size_convolve, re_size_convolve_ref)
-
 
     def test_supersampling_gaussian_psf(self):
         numerics = Numerics(
@@ -257,17 +281,23 @@ class TestNumerics(object):
         re_size_convolve_ref = numerics_ref.re_size_convolve(self.flux_supersampled)
         npt.assert_array_almost_equal(re_size_convolve, re_size_convolve_ref, decimal=5)
 
-        re_size_convolve = numerics.re_size_convolve(self.flux_supersampled, unconvolved=True)
-        re_size_convolve_ref = numerics_ref.re_size_convolve(self.flux_supersampled, unconvolved=True)
+        re_size_convolve = numerics.re_size_convolve(
+            self.flux_supersampled, unconvolved=True
+        )
+        re_size_convolve_ref = numerics_ref.re_size_convolve(
+            self.flux_supersampled, unconvolved=True
+        )
         # These should actually be equal but there's some floating point precision nonsense happening
-        npt.assert_array_almost_equal(re_size_convolve, re_size_convolve_ref, decimal=16)
+        npt.assert_array_almost_equal(
+            re_size_convolve, re_size_convolve_ref, decimal=16
+        )
 
     def test_psf_none(self):
         numerics = Numerics(
             pixel_grid=self.pixel_grid,
             psf=self.psf_class_none,
         )
-        assert (numerics.convolution_class is None)
+        assert numerics.convolution_class is None
         assert isinstance(numerics.grid_class, RegularGrid)
 
         numerics_ref = Numerics_ref(
@@ -280,11 +310,31 @@ class TestNumerics(object):
         npt.assert_array_equal(re_size_convolve, re_size_convolve_ref)
 
     def test_init_raise_errors(self):
-        npt.assert_raises(TypeError, Numerics, pixel_grid=self.pixel_grid, psf=self.psf_class_none, supersampling_factor=1.0)
-        npt.assert_raises(ValueError, Numerics, pixel_grid=self.pixel_grid, psf=self.psf_class_none, compute_mode="incorrect")
-        npt.assert_raises(ValueError, Numerics, pixel_grid=self.pixel_grid, psf=self.psf_class_none, compute_mode="adaptive")
+        npt.assert_raises(
+            TypeError,
+            Numerics,
+            pixel_grid=self.pixel_grid,
+            psf=self.psf_class_none,
+            supersampling_factor=1.0,
+        )
+        npt.assert_raises(
+            ValueError,
+            Numerics,
+            pixel_grid=self.pixel_grid,
+            psf=self.psf_class_none,
+            compute_mode="incorrect",
+        )
+        npt.assert_raises(
+            ValueError,
+            Numerics,
+            pixel_grid=self.pixel_grid,
+            psf=self.psf_class_none,
+            compute_mode="adaptive",
+        )
         self.psf_class_none.psf_type = "incorrect"
-        npt.assert_raises(ValueError, Numerics, pixel_grid=self.pixel_grid, psf=self.psf_class_none)
+        npt.assert_raises(
+            ValueError, Numerics, pixel_grid=self.pixel_grid, psf=self.psf_class_none
+        )
 
 
 if __name__ == "__main__":
