@@ -259,14 +259,14 @@ class TestGaussianConvolution(object):
             sigma=sigma,
             pixel_scale=1.0,
         )
-        assert g_conv.PixelKernelConv._kernel.shape == (3,3)
+        assert g_conv.PixelKernelConv._kernel.shape == (3, 3)
 
         sigma = 4
         g_conv = GaussianConvolution(
             sigma=sigma,
             pixel_scale=1.0,
         )
-        assert g_conv.PixelKernelConv._kernel.shape == (17,17)
+        assert g_conv.PixelKernelConv._kernel.shape == (17, 17)
 
         npt.assert_raises(ValueError, g_conv.pixel_kernel, num_pix=1)
         npt.assert_raises(ValueError, g_conv.pixel_kernel, num_pix=2)
