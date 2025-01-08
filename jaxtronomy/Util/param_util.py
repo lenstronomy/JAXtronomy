@@ -104,7 +104,7 @@ def transform_e1e2_product_average(x, y, e1, e2, center_x, center_y):
     :param y: y-coordinate :param e1: eccentricity :param e2: eccentricity :param
     center_x: center of distortion :param center_y: center of distortion :return:
     distorted coordinates x', y'
-    
+
     :param x: x-coordinate
     :param y: y-coordinate
     :param e1: eccentricity
