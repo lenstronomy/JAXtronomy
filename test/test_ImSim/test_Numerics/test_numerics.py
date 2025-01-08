@@ -185,7 +185,7 @@ class TestNumerics(object):
             compute_mode="regular",
             supersampling_convolution=True,
             supersampling_kernel_size=5,
-            convolution_kernel_size=9,
+            convolution_kernel_size=8,
             convolution_type="fft",
         )
         assert numerics.grid_supersampling_factor == 5
@@ -199,7 +199,7 @@ class TestNumerics(object):
             compute_mode="regular",
             supersampling_convolution=True,
             supersampling_kernel_size=5,
-            convolution_kernel_size=9,
+            convolution_kernel_size=8,
             convolution_type="fft",
         )
         npt.assert_array_equal(
