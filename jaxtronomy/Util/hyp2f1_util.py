@@ -43,7 +43,7 @@ def hyp2f1_series(a, b, c, z):
 
         return [partial_sum, A_i]
 
-    result = lax.fori_loop(1, 200, body_fun, [partial_sum, A_i])
+    result = lax.fori_loop(1, 150, body_fun, [partial_sum, A_i])
     return result[0]
 
 
