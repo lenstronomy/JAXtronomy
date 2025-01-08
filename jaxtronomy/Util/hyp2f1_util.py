@@ -9,6 +9,7 @@ from jax.scipy.special import gamma
 #       whenever c - b - a is not an integer. Other implementations are required
 #       for these situations.
 
+
 @jit
 def hyp2f1_series(a, b, c, z):
     """This computation uses the well known relation between successive terms in the
@@ -196,9 +197,7 @@ def hyp2f1(a, b, c, z):
 
     # Check each z value and evaluate corresponding hyp2f1
     def body_fun(i, val):
-        ith_result = lax.switch(
-            case.at[i].get(), hyp2f1_func, a, b, c, z.at[i].get()
-        )
+        ith_result = lax.switch(case.at[i].get(), hyp2f1_func, a, b, c, z.at[i].get())
         val = val.at[i].set(ith_result)
         return val
 
