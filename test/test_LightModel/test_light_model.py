@@ -1,6 +1,7 @@
 __author__ = "sibirrer"
 
 from jaxtronomy.LightModel.light_model import LightModel
+from jaxtronomy.LightModel.light_model_base import _JAXXED_MODELS
 from lenstronomy.LightModel.light_model import LightModel as LightModel_ref
 
 import numpy as np
@@ -57,6 +58,9 @@ class TestLightModel(object):
             light_model_list=self.light_model_list, sersic_major_axis=False
         )
         test_sersic_ellipse_qphi = LightModel(["SERSIC_ELLIPSE_Q_PHI"])
+
+    def test_import_profiles(self):
+        lightModel = LightModel(light_model_list=_JAXXED_MODELS)
 
     def test_surface_brightness(self):
         x = 1.0
