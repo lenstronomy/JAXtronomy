@@ -5,12 +5,12 @@ import numpy.testing as npt
 from jaxtronomy.ImSim.Numerics.convolution import (
     PixelKernelConvolution,
     SubgridKernelConvolution,
-    MultiGaussianConvolution
+    MultiGaussianConvolution,
 )
 from lenstronomy.ImSim.Numerics.convolution import (
     PixelKernelConvolution as PixelKernelConvolution_ref,
     SubgridKernelConvolution as SubgridKernelConvolution_ref,
-    MultiGaussianConvolution as MultiGaussianConvolution_ref
+    MultiGaussianConvolution as MultiGaussianConvolution_ref,
 )
 from lenstronomy.LightModel.light_model import LightModel
 import lenstronomy.Util.util as util
@@ -44,7 +44,9 @@ class TestPixelKernelConvolution(object):
         kernel = kernel / np.sum(kernel)
 
         pixel_conv = PixelKernelConvolution(kernel=kernel, convolution_type="fft")
-        pixel_conv_ref = PixelKernelConvolution_ref(kernel=kernel, convolution_type="fft")
+        pixel_conv_ref = PixelKernelConvolution_ref(
+            kernel=kernel, convolution_type="fft"
+        )
         image_convolved = pixel_conv.convolution2d(self.model)
         image_convolved_ref = pixel_conv_ref.convolution2d(self.model)
         npt.assert_almost_equal(image_convolved, image_convolved_ref, decimal=5)
@@ -67,8 +69,12 @@ class TestPixelKernelConvolution(object):
         kernel[1, 1] = 1
         kernel = kernel / np.sum(kernel)
 
-        pixel_conv = PixelKernelConvolution(kernel=kernel, convolution_type="fft_static")
-        pixel_conv_ref = PixelKernelConvolution_ref(kernel=kernel, convolution_type="fft_static")
+        pixel_conv = PixelKernelConvolution(
+            kernel=kernel, convolution_type="fft_static"
+        )
+        pixel_conv_ref = PixelKernelConvolution_ref(
+            kernel=kernel, convolution_type="fft_static"
+        )
         image_convolved = pixel_conv.convolution2d(self.model)
         image_convolved_ref = pixel_conv_ref.convolution2d(self.model)
         npt.assert_almost_equal(image_convolved, image_convolved_ref, decimal=5)
@@ -239,7 +245,9 @@ class TestMultiGaussianConvolution(object):
             30 * self.supersampling_factor,
             deltapix=self.delta_pix / self.supersampling_factor,
         )
-        kwargs = [{"amp": 31.345982834, "sigma": 2.123784, "center_x": 0, "center_y": 0}]
+        kwargs = [
+            {"amp": 31.345982834, "sigma": 2.123784, "center_x": 0, "center_y": 0}
+        ]
         flux = lightModel.surface_brightness(x, y, kwargs)
         self.model = util.array2image(flux)
         flux_sub = lightModel.surface_brightness(x_sub, y_sub, kwargs)
@@ -286,7 +294,7 @@ class TestMultiGaussianConvolution(object):
         image_convolved = mg_conv.convolution2d(self.model * 1.3422 - 1)
         image_convolved_ref = mg_conv_ref.convolution2d(self.model * 1.3422 - 1)
         npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
-        
+
     def test_convolve2d_supersampled(self):
         sigma_list = [3, 1, 2]
         fraction_list = [0.5, 0.2, 0.3]
@@ -296,7 +304,7 @@ class TestMultiGaussianConvolution(object):
             pixel_scale=self.delta_pix,
             supersampling_factor=self.supersampling_factor,
             supersampling_convolution=True,
-            truncation=4
+            truncation=4,
         )
         mg_conv_ref = MultiGaussianConvolution_ref(
             sigma_list=sigma_list,
@@ -304,7 +312,7 @@ class TestMultiGaussianConvolution(object):
             pixel_scale=self.delta_pix,
             supersampling_factor=self.supersampling_factor,
             supersampling_convolution=True,
-            truncation=4
+            truncation=4,
         )
         image_convolved = mg_conv.convolution2d(self.model)
         image_convolved_ref = mg_conv_ref.convolution2d(self.model)
@@ -318,21 +326,25 @@ class TestMultiGaussianConvolution(object):
             fraction_list=fraction_list,
             pixel_scale=self.delta_pix,
             supersampling_factor=self.supersampling_factor,
-            supersampling_convolution=True
+            supersampling_convolution=True,
         )
         mg_conv_ref = MultiGaussianConvolution_ref(
             sigma_list=sigma_list,
             fraction_list=fraction_list,
             pixel_scale=self.delta_pix,
             supersampling_factor=self.supersampling_factor,
-            supersampling_convolution=True
+            supersampling_convolution=True,
         )
         image_convolved = mg_conv.re_size_convolve(self.model, self.model_sub)
         image_convolved_ref = mg_conv_ref.re_size_convolve(self.model, self.model_sub)
         npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
 
-        image_convolved = mg_conv.re_size_convolve(self.model+2.923, self.model_sub+1.923)
-        image_convolved_ref = mg_conv_ref.re_size_convolve(self.model+2.923, self.model_sub+1.923)
+        image_convolved = mg_conv.re_size_convolve(
+            self.model + 2.923, self.model_sub + 1.923
+        )
+        image_convolved_ref = mg_conv_ref.re_size_convolve(
+            self.model + 2.923, self.model_sub + 1.923
+        )
         npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
 
     def test_re_size_convolve_low_res(self):
@@ -352,8 +364,12 @@ class TestMultiGaussianConvolution(object):
         image_convolved_ref = mg_conv_ref.re_size_convolve(self.model, self.model_sub)
         npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
 
-        image_convolved = mg_conv.re_size_convolve(self.model+2.923, self.model_sub+1.923)
-        image_convolved_ref = mg_conv_ref.re_size_convolve(self.model+2.923, self.model_sub+1.923)
+        image_convolved = mg_conv.re_size_convolve(
+            self.model + 2.923, self.model_sub + 1.923
+        )
+        image_convolved_ref = mg_conv_ref.re_size_convolve(
+            self.model + 2.923, self.model_sub + 1.923
+        )
         npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
 
 

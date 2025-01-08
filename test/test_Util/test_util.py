@@ -35,11 +35,13 @@ def test_displaceAbs():
     result_ref = util_ref.displaceAbs(x, y, sourcePos_x, sourcePos_y)
     npt.assert_array_almost_equal(result, result_ref, decimal=7)
 
+
 def test_fwhm2sigma():
     fwhm = np.array([0.32345, 1.0, 2.3, 3.5, 4.7])
     sigma = util.fwhm2sigma(fwhm)
     sigma_ref = util_ref.fwhm2sigma(fwhm)
     npt.assert_array_almost_equal(sigma, sigma_ref, decimal=8)
+
 
 def test_image2array():
     x = np.array([[0, 1, 2], [5, 7, 3], [1, 5, 8]], dtype=float)
@@ -55,6 +57,7 @@ def test_rotate():
     result = util.rotate(x, y, angle)
     result_ref = util_ref.rotate(x, y, angle)
     npt.assert_array_almost_equal(result, result_ref, decimal=8)
+
 
 def test_sigma2fwhm():
     sigma = np.array([0.32345, 1.0, 2.3, 3.5, 4.7])

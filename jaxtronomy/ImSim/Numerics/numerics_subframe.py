@@ -83,7 +83,7 @@ class NumericsSubFrame(PointSourceRendering):
             psf=psf,
         )
 
-    @partial(jit, static_argnums=(0,2))
+    @partial(jit, static_argnums=(0, 2))
     def re_size_convolve(self, flux_array, unconvolved=False):
         """
 

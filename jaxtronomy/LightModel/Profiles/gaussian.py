@@ -113,9 +113,7 @@ class GaussianEllipse(object):
         return Gaussian.function(x_, y_, amp, sigma, center_x=0, center_y=0)
 
     @staticmethod
-    def total_flux(
-        amp, sigma=None, e1=None, e2=None, center_x=None, center_y=None
-    ):
+    def total_flux(amp, sigma=None, e1=None, e2=None, center_x=None, center_y=None):
         """Total integrated flux of profile.
 
         :param amp: amplitude, such that 2D integral leads to this value
@@ -141,6 +139,7 @@ class GaussianEllipse(object):
         :return: 3D brightness per angular volume element
         """
         return Gaussian.light_3d(r, amp, sigma=sigma)
+
 
 class MultiGaussian(object):
     """Class for elliptical pseudo Jaffe lens light (2d projected light/mass
@@ -216,9 +215,7 @@ class MultiGaussian(object):
         """
         f_list = []
         for i in range(len(amp)):
-            f_list.append(
-                Gaussian.function(x, y, amp[i], sigma[i], center_x, center_y)
-            )
+            f_list.append(Gaussian.function(x, y, amp[i], sigma[i], center_x, center_y))
         return f_list
 
     @staticmethod
@@ -282,9 +279,7 @@ class MultiGaussianEllipse(object):
 
         f_ = jnp.zeros_like(x, dtype=float)
         for i in range(len(amp)):
-            f_ += Gaussian.function(
-                x_, y_, amp[i], sigma[i], center_x=0, center_y=0
-            )
+            f_ += Gaussian.function(x_, y_, amp[i], sigma[i], center_x=0, center_y=0)
         return f_
 
     @staticmethod

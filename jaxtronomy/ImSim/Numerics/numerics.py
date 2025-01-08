@@ -2,7 +2,7 @@ from jaxtronomy.ImSim.Numerics.grid import RegularGrid
 from jaxtronomy.ImSim.Numerics.convolution import (
     SubgridKernelConvolution,
     PixelKernelConvolution,
-    MultiGaussianConvolution
+    MultiGaussianConvolution,
 )
 from jaxtronomy.Util import util
 from lenstronomy.ImSim.Numerics.point_source_rendering import PointSourceRendering
@@ -63,11 +63,13 @@ class Numerics(PointSourceRendering):
         """
         if compute_mode != "regular":
             if compute_mode == "adaptive":
-                raise ValueError("AdaptiveConvolution not implemented in Jaxtronomy. Please use lenstronomy instead.")
+                raise ValueError(
+                    "AdaptiveConvolution not implemented in Jaxtronomy. Please use lenstronomy instead."
+                )
             else:
                 raise ValueError(
-                'compute_mode specified as %s not valid. Options are "regular" and "adaptive" (adaptive only supported in lenstronomy)'
-            )
+                    'compute_mode specified as %s not valid. Options are "regular" and "adaptive" (adaptive only supported in lenstronomy)'
+                )
         # if no super sampling, turn the supersampling convolution off
         self._psf_type = psf.psf_type
         if not isinstance(supersampling_factor, int):
@@ -81,8 +83,8 @@ class Numerics(PointSourceRendering):
         nx, ny = pixel_grid.num_pixel_axes
         transform_pix2angle = pixel_grid.transform_pix2angle
         ra_at_xy_0, dec_at_xy_0 = pixel_grid.radec_at_xy_0
-        # This is only used for adaptive convolution which is not implemented in JAXtronomy 
-        #if supersampled_indexes is None:
+        # This is only used for adaptive convolution which is not implemented in JAXtronomy
+        # if supersampled_indexes is None:
         #    supersampled_indexes = np.zeros((nx, ny), dtype=bool)
         self._grid = RegularGrid(
             nx,
