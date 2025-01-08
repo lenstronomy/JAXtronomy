@@ -2,7 +2,7 @@ from jaxtronomy.ImSim.Numerics.grid import RegularGrid
 from jaxtronomy.ImSim.Numerics.convolution import (
     SubgridKernelConvolution,
     PixelKernelConvolution,
-    MultiGaussianConvolution,
+    GaussianConvolution,
 )
 from jaxtronomy.Util import util
 from lenstronomy.ImSim.Numerics.point_source_rendering import PointSourceRendering
@@ -123,11 +123,8 @@ class Numerics(PointSourceRendering):
             pixel_scale = pixel_grid.pixel_width
             fwhm = psf.fwhm  # FWHM  in units of angle
             sigma = util.fwhm2sigma(fwhm)
-            sigma_list = [sigma]
-            fraction_list = [1]
-            self._conv = MultiGaussianConvolution(
-                sigma_list,
-                fraction_list,
+            self._conv = GaussianConvolution(
+                sigma,
                 pixel_scale,
                 supersampling_factor,
                 supersampling_convolution,

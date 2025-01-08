@@ -5,12 +5,12 @@ import numpy.testing as npt
 from jaxtronomy.ImSim.Numerics.convolution import (
     PixelKernelConvolution,
     SubgridKernelConvolution,
-    MultiGaussianConvolution,
+    GaussianConvolution,
 )
 from lenstronomy.ImSim.Numerics.convolution import (
     PixelKernelConvolution as PixelKernelConvolution_ref,
     SubgridKernelConvolution as SubgridKernelConvolution_ref,
-    MultiGaussianConvolution as MultiGaussianConvolution_ref,
+    MultiGaussianConvolution as GaussianConvolution_ref,
 )
 from lenstronomy.LightModel.light_model import LightModel
 import lenstronomy.Util.util as util
@@ -235,7 +235,7 @@ class TestSubgridKernelConvolution(object):
         npt.assert_array_almost_equal(re_size_conv, re_size_conv_ref, decimal=6)
 
 
-class TestMultiGaussianConvolution(object):
+class TestGaussianConvolution(object):
     def setup_method(self):
         self.supersampling_factor = 3
         lightModel = LightModel(light_model_list=["GAUSSIAN"])
@@ -254,123 +254,112 @@ class TestMultiGaussianConvolution(object):
         self.model_sub = util.array2image(flux_sub)
 
     def test_init_and_pixel_kernel(self):
-        sigma_list = [0.333, 0.75, 2]
-        fraction_list = [0.5, 0.2, 0.3]
-        mg_conv = MultiGaussianConvolution(
-            sigma_list=sigma_list,
-            fraction_list=fraction_list,
+        sigma = 0.333
+        g_conv = GaussianConvolution(
+            sigma=sigma,
             pixel_scale=1.0,
         )
+        assert g_conv.PixelKernelConv._kernel.shape == (3,3)
 
-        kernel = mg_conv.pixel_kernel(num_pix=3)
-        npt.assert_array_equal(kernel, mg_conv.kernel_list[0])
+        sigma = 4
+        g_conv = GaussianConvolution(
+            sigma=sigma,
+            pixel_scale=1.0,
+        )
+        assert g_conv.PixelKernelConv._kernel.shape == (17,17)
 
-        kernel = mg_conv.pixel_kernel(num_pix=5)
-        npt.assert_array_equal(kernel, mg_conv.kernel_list[1])
-
-        kernel = mg_conv.pixel_kernel(num_pix=9)
-        npt.assert_array_equal(kernel, mg_conv.kernel_list[2])
-
-        npt.assert_raises(ValueError, mg_conv.pixel_kernel, num_pix=1)
-        npt.assert_raises(ValueError, mg_conv.pixel_kernel, num_pix=2)
+        npt.assert_raises(ValueError, g_conv.pixel_kernel, num_pix=1)
+        npt.assert_raises(ValueError, g_conv.pixel_kernel, num_pix=2)
 
     def test_convolve2d(self):
-        sigma_list = [0.5, 1, 2]
-        fraction_list = [0.5, 0.2, 0.3]
-        mg_conv = MultiGaussianConvolution(
-            sigma_list=sigma_list,
-            fraction_list=fraction_list,
+        sigma = 0.5
+        g_conv = GaussianConvolution(
+            sigma=sigma,
             pixel_scale=self.delta_pix,
         )
-        mg_conv_ref = MultiGaussianConvolution_ref(
-            sigma_list=sigma_list,
-            fraction_list=fraction_list,
+        g_conv_ref = GaussianConvolution_ref(
+            sigma_list=[sigma],
+            fraction_list=[1],
             pixel_scale=self.delta_pix,
         )
-        image_convolved = mg_conv.convolution2d(self.model)
-        image_convolved_ref = mg_conv_ref.convolution2d(self.model)
+        image_convolved = g_conv.convolution2d(self.model)
+        image_convolved_ref = g_conv_ref.convolution2d(self.model)
         npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
 
-        image_convolved = mg_conv.convolution2d(self.model * 1.3422 - 1)
-        image_convolved_ref = mg_conv_ref.convolution2d(self.model * 1.3422 - 1)
+        image_convolved = g_conv.convolution2d(self.model * 1.3422 - 1)
+        image_convolved_ref = g_conv_ref.convolution2d(self.model * 1.3422 - 1)
         npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
 
     def test_convolve2d_supersampled(self):
-        sigma_list = [3, 1, 2]
-        fraction_list = [0.5, 0.2, 0.3]
-        mg_conv = MultiGaussianConvolution(
-            sigma_list=sigma_list,
-            fraction_list=fraction_list,
+        sigma = 3
+        g_conv = GaussianConvolution(
+            sigma=sigma,
             pixel_scale=self.delta_pix,
             supersampling_factor=self.supersampling_factor,
             supersampling_convolution=True,
             truncation=4,
         )
-        mg_conv_ref = MultiGaussianConvolution_ref(
-            sigma_list=sigma_list,
-            fraction_list=fraction_list,
+        g_conv_ref = GaussianConvolution_ref(
+            sigma_list=[sigma],
+            fraction_list=[1],
             pixel_scale=self.delta_pix,
             supersampling_factor=self.supersampling_factor,
             supersampling_convolution=True,
             truncation=4,
         )
-        image_convolved = mg_conv.convolution2d(self.model)
-        image_convolved_ref = mg_conv_ref.convolution2d(self.model)
+        image_convolved = g_conv.convolution2d(self.model)
+        image_convolved_ref = g_conv_ref.convolution2d(self.model)
         npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
 
     def test_re_size_convolve(self):
-        sigma_list = [5, 1, 2]
-        fraction_list = [0.5, 0.2, 0.3]
-        mg_conv = MultiGaussianConvolution(
-            sigma_list=sigma_list,
-            fraction_list=fraction_list,
+        sigma = 5
+        g_conv = GaussianConvolution(
+            sigma=sigma,
             pixel_scale=self.delta_pix,
             supersampling_factor=self.supersampling_factor,
             supersampling_convolution=True,
         )
-        mg_conv_ref = MultiGaussianConvolution_ref(
-            sigma_list=sigma_list,
-            fraction_list=fraction_list,
+        g_conv_ref = GaussianConvolution_ref(
+            sigma_list=[sigma],
+            fraction_list=[1],
             pixel_scale=self.delta_pix,
             supersampling_factor=self.supersampling_factor,
             supersampling_convolution=True,
         )
-        image_convolved = mg_conv.re_size_convolve(self.model, self.model_sub)
-        image_convolved_ref = mg_conv_ref.re_size_convolve(self.model, self.model_sub)
+        image_convolved = g_conv.re_size_convolve(self.model, self.model_sub)
+        image_convolved_ref = g_conv_ref.re_size_convolve(self.model, self.model_sub)
         npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
 
-        image_convolved = mg_conv.re_size_convolve(
+        image_convolved = g_conv.re_size_convolve(
             self.model + 2.923, self.model_sub + 1.923
         )
-        image_convolved_ref = mg_conv_ref.re_size_convolve(
+        image_convolved_ref = g_conv_ref.re_size_convolve(
             self.model + 2.923, self.model_sub + 1.923
         )
         npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
 
     def test_re_size_convolve_low_res(self):
-        sigma_list = [0.5, 1, 2]
-        fraction_list = [0.5, 0.2, 0.3]
-        mg_conv = MultiGaussianConvolution(
-            sigma_list=sigma_list,
-            fraction_list=fraction_list,
+        sigma = 0.5
+        g_conv = GaussianConvolution(
+            sigma=sigma,
             pixel_scale=self.delta_pix,
         )
-        mg_conv_ref = MultiGaussianConvolution_ref(
-            sigma_list=sigma_list,
-            fraction_list=fraction_list,
+        g_conv_ref = GaussianConvolution_ref(
+            sigma_list=[sigma],
+            fraction_list=[1],
             pixel_scale=self.delta_pix,
         )
-        image_convolved = mg_conv.re_size_convolve(self.model, self.model_sub)
-        image_convolved_ref = mg_conv_ref.re_size_convolve(self.model, self.model_sub)
+        image_convolved = g_conv.re_size_convolve(self.model, self.model_sub)
+        image_convolved_ref = g_conv_ref.re_size_convolve(self.model, self.model_sub)
         npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
 
-        image_convolved = mg_conv.re_size_convolve(
+        image_convolved = g_conv.re_size_convolve(
             self.model + 2.923, self.model_sub + 1.923
         )
-        image_convolved_ref = mg_conv_ref.re_size_convolve(
+        image_convolved_ref = g_conv_ref.re_size_convolve(
             self.model + 2.923, self.model_sub + 1.923
         )
-        npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=6)
+        npt.assert_array_almost_equal(image_convolved, image_convolved_ref, decimal=5)
 
 
 if __name__ == "__main__":

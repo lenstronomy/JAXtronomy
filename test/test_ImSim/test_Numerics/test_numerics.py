@@ -8,7 +8,7 @@ import lenstronomy.Util.kernel_util as kernel_util
 from jaxtronomy.ImSim.Numerics.convolution import (
     PixelKernelConvolution,
     SubgridKernelConvolution,
-    MultiGaussianConvolution,
+    GaussianConvolution,
 )
 from jaxtronomy.ImSim.Numerics.grid import RegularGrid
 
@@ -231,7 +231,7 @@ class TestNumerics(object):
             convolution_kernel_size=None,
         )
         assert numerics.grid_supersampling_factor == 1
-        assert isinstance(numerics.convolution_class, MultiGaussianConvolution)
+        assert isinstance(numerics.convolution_class, GaussianConvolution)
         assert isinstance(numerics.grid_class, RegularGrid)
 
         numerics_ref = Numerics_ref(
@@ -266,7 +266,7 @@ class TestNumerics(object):
             supersampling_convolution=True,
         )
         assert numerics.grid_supersampling_factor == 5
-        assert isinstance(numerics.convolution_class, MultiGaussianConvolution)
+        assert isinstance(numerics.convolution_class, GaussianConvolution)
         assert isinstance(numerics.grid_class, RegularGrid)
 
         numerics_ref = Numerics_ref(

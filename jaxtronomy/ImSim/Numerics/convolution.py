@@ -166,7 +166,7 @@ class SubgridKernelConvolution(object):
         return image_resized_conv
 
 
-class MultiGaussianConvolution(object):
+class GaussianConvolution(object):
     """Class to perform a convolution consisting of multiple 2d Gaussians.
 
     Since JAX does not have an ndimage.gaussian_filter function, to perform Gaussian
@@ -176,16 +176,14 @@ class MultiGaussianConvolution(object):
 
     def __init__(
         self,
-        sigma_list,
-        fraction_list,
+        sigma,
         pixel_scale,
         supersampling_factor=1,
         supersampling_convolution=False,
         truncation=2,
     ):
         """
-        :param sigma_list: list of std value of Gaussian kernel
-        :param fraction_list: fraction of flux to be convoled with each Gaussian kernel
+        :param sigma: std value of Gaussian kernel
         :param pixel_scale: scale of pixel width (to convert sigmas into units of pixels)
         :param supersampling_factor: int, ratio of the number of pixels of the high resolution grid
             to the number of pixels of the original image
@@ -193,45 +191,37 @@ class MultiGaussianConvolution(object):
         :param truncation: float. Truncate the filter at this many standard deviations.
          Default is 4.0.
         """
-        self._num_gaussians = len(sigma_list)
-        self._sigmas_scaled = np.array(sigma_list) / pixel_scale
-        self._fraction_list = fraction_list / np.sum(fraction_list)
+        self._sigma_scaled = sigma / pixel_scale
         self._supersampling_factor = supersampling_factor
         self._supersampling_convolution = supersampling_convolution
         self._truncation = truncation
 
         if supersampling_convolution is True:
-            self._sigmas_scaled *= supersampling_factor
-        assert len(self._sigmas_scaled) == len(self._fraction_list)
+            self._sigma_scaled *= supersampling_factor
 
-        self.kernel_list = []
+        # This num_pix definition is equivalent to that of the scipy ndimage.gaussian_filter
+        # num_pix = 2 * r + 1 where r = truncation * sigma is the radius of the gaussian kernel
+        num_pix = int(2 * truncation * self._sigma_scaled + 1)
 
-        for sigma in self._sigmas_scaled:
-            # This num_pix definition is equivalent to that of the scipy ndimage.gaussian_filter
-            # num_pix = 2 * r + 1 where r = truncation * sigma is the radius of the gaussian kernel
-            num_pix = int(2 * truncation * sigma + 1)
+        # Ensure num_pix is odd and >= 3
+        if num_pix < 3:
+            num_pix = 3
+        if num_pix % 2 == 0:
+            num_pix += 1
 
-            # Ensure num_pix is odd and >= 3
-            if num_pix < 3:
-                num_pix = 3
-            if num_pix % 2 == 0:
-                num_pix += 1
-
-            kernel = self.pixel_kernel(num_pix)
-            self.kernel_list.append(kernel)
+        kernel = self.pixel_kernel(num_pix)
 
         # Before convolution, images will be padded. The width of the pad is equal to the
         # radius of the gaussian kernel
-        self._pad_width = np.max(self._sigmas_scaled) * self._truncation
-        self._pad_width = self._pad_width.astype(int)
+        self._pad_width = int(self._sigma_scaled * self._truncation)
 
         self.PixelKernelConv = PixelKernelConvolution(
-            self.kernel_list[0], convolution_type="fft"
+            kernel, convolution_type="fft_static"
         )
 
     @partial(jit, static_argnums=0)
     def convolution2d(self, image):
-        """Iterates through the kernel list to convolve the image via FFT convolution.
+        """Convolve the image via FFT convolution.
 
         :param image: 2d numpy array, image to be convolved
         :return: convolved image, 2d numpy array
@@ -242,11 +232,7 @@ class MultiGaussianConvolution(object):
         image = jnp.pad(image, pad_width=self._pad_width, mode="edge")
         image_conv = jnp.zeros_like(image)
 
-        for i in range(self._num_gaussians):
-            self.PixelKernelConv._kernel = self.kernel_list[i]
-            image_conv += (
-                self.PixelKernelConv.convolution2d(image) * self._fraction_list[i]
-            )
+        image_conv = self.PixelKernelConv.convolution2d(image)
 
         # Removes the padding from the final image
         image_conv = image_conv[
@@ -286,10 +272,9 @@ class MultiGaussianConvolution(object):
             raise ValueError("psf kernel size must be 3 or greater")
 
         gaussian = Gaussian()
-        sigma = (num_pix - 1) / (2 * self._truncation)
         # Since sigma is in units of pixels, deltapix is trivially 1 in units of pixels
         x, y = util.make_grid(numPix=num_pix, deltapix=1)
-        kernel = gaussian.function(x, y, amp=1, sigma=sigma)
+        kernel = gaussian.function(x, y, amp=1, sigma=self._sigma_scaled)
         kernel = util.array2image(kernel)
         return kernel / jnp.sum(kernel)
 
