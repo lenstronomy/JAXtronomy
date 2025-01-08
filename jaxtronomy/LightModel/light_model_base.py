@@ -1,6 +1,5 @@
 __author__ = "sibirrer"
 
-# NOTE: Copy pasted from lenstronomy, functions have not been jaxified yet
 # this file contains a class which describes the surface brightness of the light models
 
 from lenstronomy.Util.util import convert_bool_list
@@ -14,6 +13,10 @@ sersic_major_axis_conf = convention_conf.get("sersic_major_axis", False)
 __all__ = ["LightModelBase"]
 
 _JAXXED_MODELS = [
+    "GAUSSIAN",
+    "GAUSSIAN_ELLIPSE",
+    "MULTI_GAUSSIAN",
+    "MULTI_GAUSSIAN_ELLIPSE",
     "SERSIC",
     "SERSIC_ELLIPSE",
     "SERSIC_ELLIPSE_Q_PHI",
@@ -70,29 +73,29 @@ class LightModelBase(object):
         if sersic_major_axis is None:
             sersic_major_axis = sersic_major_axis_conf
         for profile_type in light_model_list:
-            # if profile_type == "GAUSSIAN":
-            #     from lenstronomy.LightModel.Profiles.gaussian import Gaussian
+            if profile_type == "GAUSSIAN":
+                 from jaxtronomy.LightModel.Profiles.gaussian import Gaussian
 
-            #     self.func_list.append(Gaussian())
-            # elif profile_type == "GAUSSIAN_ELLIPSE":
-            #     from lenstronomy.LightModel.Profiles.gaussian import GaussianEllipse
+                 self.func_list.append(Gaussian())
+            elif profile_type == "GAUSSIAN_ELLIPSE":
+                 from jaxtronomy.LightModel.Profiles.gaussian import GaussianEllipse
 
-            #     self.func_list.append(GaussianEllipse())
+                 self.func_list.append(GaussianEllipse())
             # elif profile_type == "ELLIPSOID":
             #     from lenstronomy.LightModel.Profiles.ellipsoid import Ellipsoid
 
             #     self.func_list.append(Ellipsoid())
-            # elif profile_type == "MULTI_GAUSSIAN":
-            #     from lenstronomy.LightModel.Profiles.gaussian import MultiGaussian
+            elif profile_type == "MULTI_GAUSSIAN":
+                 from jaxtronomy.LightModel.Profiles.gaussian import MultiGaussian
 
-            #     self.func_list.append(MultiGaussian())
-            # elif profile_type == "MULTI_GAUSSIAN_ELLIPSE":
-            #     from lenstronomy.LightModel.Profiles.gaussian import (
-            #         MultiGaussianEllipse,
-            #     )
+                 self.func_list.append(MultiGaussian())
+            elif profile_type == "MULTI_GAUSSIAN_ELLIPSE":
+                 from jaxtronomy.LightModel.Profiles.gaussian import (
+                     MultiGaussianEllipse,
+                 )
 
-            #     self.func_list.append(MultiGaussianEllipse())
-            if profile_type == "SERSIC":
+                 self.func_list.append(MultiGaussianEllipse())
+            elif profile_type == "SERSIC":
                 from jaxtronomy.LightModel.Profiles.sersic import Sersic
 
                 self.func_list.append(Sersic(smoothing=smoothing))
@@ -319,17 +322,13 @@ class LightModelBase(object):
                 ]:
                     kwargs_new = kwargs_list_standard[i].copy()
                     if norm is True:
-                        # TODO: Re-implement when these profiles are added to jaxtronomy
-                        # if model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
-                        #     new = {
-                        #         "amp": np.array(kwargs_new["amp"])
-                        #         / kwargs_new["amp"][0]
-                        #     }
-                        # else:
-                        #     new = {"amp": 1}
-                        new = {
-                            "amp": 1
-                        }  # Delete this line when the above if statement is re-implemented
+                        if model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
+                            new = {
+                                "amp": jnp.array(kwargs_new["amp"])
+                                / kwargs_new["amp"][0]
+                            }
+                        else:
+                            new = {"amp": 1}
                         kwargs_new.update(new)
                     norm_flux = self.func_list[i].total_flux(**kwargs_new)
                     norm_flux_list.append(norm_flux)
