@@ -1,4 +1,3 @@
-import jax.lax
 from jax import jit, numpy as jnp, tree_util
 from jax.scipy import signal
 import numpy as np
