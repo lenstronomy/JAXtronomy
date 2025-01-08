@@ -9,8 +9,8 @@ from jax.scipy.special import gamma
 #       whenever c - b - a is not an integer. Other implementations are required
 #       for these situations.
 
-
-def hyp2f1_series(a, b, c, z, nmax=75):
+@jit
+def hyp2f1_series(a, b, c, z):
     """This computation uses the well known relation between successive terms in the
     hypergeometric series hyp2f1(z) = sum_i A_i where.
 
@@ -43,13 +43,13 @@ def hyp2f1_series(a, b, c, z, nmax=75):
 
         return [partial_sum, A_i]
 
-    result = lax.fori_loop(1, nmax, body_fun, [partial_sum, A_i])
+    result = lax.fori_loop(1, 200, body_fun, [partial_sum, A_i])
     return result[0]
 
 
 # TODO: Implement a version that can handle b - a = integer
 @jit
-def hyp2f1_continuation(a, b, c, z, nmax=75):
+def hyp2f1_continuation(a, b, c, z):
     """
     This implementation is based off of the analytic continuation formulas
     Equations 4.21 and 4.22 with z0 = 1/2 in John Pearson's MSc thesis
@@ -119,7 +119,7 @@ def hyp2f1_continuation(a, b, c, z, nmax=75):
         return [prev_prev_da, prev_prev_db, prev_da, prev_db, sum_1, sum_2]
 
     result = lax.fori_loop(
-        1, nmax, body_fun, [prev_prev_da, prev_prev_db, prev_da, prev_db, sum_1, sum_2]
+        1, 200, body_fun, [prev_prev_da, prev_prev_db, prev_da, prev_db, sum_1, sum_2]
     )
 
     # includes the gamma function prefactors in equation 4.21 to compute the final result of 2F1
@@ -134,7 +134,7 @@ def hyp2f1_continuation(a, b, c, z, nmax=75):
 #       This can be done using equations 15.3.10 - 15.3.12 in
 #       Abramowitz and Stegun
 @jit
-def hyp2f1_near_one(a, b, c, z, nmax=75):
+def hyp2f1_near_one(a, b, c, z):
     """This implementation is based off of equation 15.3.6 in Abramowitz and Stegun.
     This transformation formula allows for a calculation of hyp2f1 for points near.
 
@@ -158,7 +158,7 @@ def hyp2f1_near_one(a, b, c, z, nmax=75):
         * gamma(c - a - b)
         / gamma(c - a)
         / gamma(c - b)
-        * hyp2f1_series(a, b, a + b - c + 1.0, 1.0 - z, nmax)
+        * hyp2f1_series(a, b, a + b - c + 1.0, 1.0 - z)
     )
     term2 = (
         (1.0 - z) ** (c - a - b)
@@ -166,13 +166,13 @@ def hyp2f1_near_one(a, b, c, z, nmax=75):
         * gamma(a + b - c)
         / gamma(a)
         / gamma(b)
-        * hyp2f1_series(c - a, c - b, c - a - b + 1.0, 1.0 - z, nmax)
+        * hyp2f1_series(c - a, c - b, c - a - b + 1.0, 1.0 - z)
     )
     return term1 + term2
 
 
 @jit
-def hyp2f1(a, b, c, z, nmax=75):
+def hyp2f1(a, b, c, z):
     """This function looks at where z is located on the complex plane and chooses the
     appropriate hyp2f1 function to use in the interest of maintaining optimal runtime
     and accuracy.
@@ -197,7 +197,7 @@ def hyp2f1(a, b, c, z, nmax=75):
     # Check each z value and evaluate corresponding hyp2f1
     def body_fun(i, val):
         ith_result = lax.switch(
-            case.at[i].get(), hyp2f1_func, a, b, c, z.at[i].get(), nmax
+            case.at[i].get(), hyp2f1_func, a, b, c, z.at[i].get()
         )
         val = val.at[i].set(ith_result)
         return val
