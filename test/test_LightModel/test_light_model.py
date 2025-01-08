@@ -109,11 +109,7 @@ class TestLightModel(object):
         assert kwargs_out[0]["amp"] == 2
 
     def test_total_flux(self):
-        light_model_list = [
-            "SERSIC",
-            "SERSIC_ELLIPSE",
-            "MULTI_GAUSSIAN"
-        ]
+        light_model_list = ["SERSIC", "SERSIC_ELLIPSE", "MULTI_GAUSSIAN"]
         kwargs_list = [
             {
                 "amp": 1.1234,
@@ -135,8 +131,8 @@ class TestLightModel(object):
                 "amp": [1.3894, 32.298324, 21.23498],
                 "sigma": [0.5, 1.5, 2],
                 "center_x": 0.234,
-                "center_y": -1.98342
-            } # MULTI_GAUSSIAN
+                "center_y": -1.98342,
+            },  # MULTI_GAUSSIAN
         ]
         lightModel = LightModel(light_model_list=light_model_list)
         lightModel_ref = LightModel_ref(light_model_list=light_model_list)
