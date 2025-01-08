@@ -101,7 +101,6 @@ def ellipticity2phi_q(e1, e2):
 def transform_e1e2_product_average(x, y, e1, e2, center_x, center_y):
     """Maps the coordinates x, y with eccentricities e1 e2 into a new elliptical
     coordinate system such that R = sqrt(R_major * R_minor)
-
     :param x: x-coordinate
     :param y: y-coordinate
     :param e1: eccentricity
@@ -110,16 +109,13 @@ def transform_e1e2_product_average(x, y, e1, e2, center_x, center_y):
     :param center_y: center of distortion
     :return: distorted coordinates x', y'
     """
-    phi_g, q = ellipticity2phi_q(e1, e2)
     x_shift = x - center_x
     y_shift = y - center_y
 
-    cos_phi = jnp.cos(phi_g)
-    sin_phi = jnp.sin(phi_g)
-
-    xt1 = cos_phi * x_shift + sin_phi * y_shift
-    xt2 = -sin_phi * x_shift + cos_phi * y_shift
-    return xt1 * jnp.sqrt(q), xt2 / jnp.sqrt(q)
+    norm = jnp.maximum(jnp.sqrt(jnp.abs(1 - e1 ** 2 - e2 ** 2)), 0.000001)
+    x_ = ((1 - e1) * x_shift - e2 * y_shift) / norm
+    y_ = (-e2 * x_shift + (1 + e1) * y_shift) / norm
+    return x_, y_
 
 
 @jit
