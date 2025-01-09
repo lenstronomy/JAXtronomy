@@ -201,14 +201,13 @@ class GaussianConvolution(object):
 
         # This num_pix definition is equivalent to that of the scipy ndimage.gaussian_filter
         # num_pix = 2r + 1 where r = round(truncation * sigma) is the radius of the gaussian kernel
-        kernel_radius = round(self._sigma_scaled * self._truncation)
-        if kernel_radius < 1:
-            kernel_radius = 1
+        kernel_radius = max(round(self._sigma_scaled * self._truncation), 1)
         num_pix = 2 * kernel_radius + 1
         kernel = self.pixel_kernel(num_pix)
 
         # Before convolution, images will be padded
-        self._pad_width = kernel_radius
+        # Even though kernel_radius is already an int, we need to apply int because of some JAX nonsense
+        self._pad_width = int(kernel_radius)
 
         self.PixelKernelConv = PixelKernelConvolution(
             kernel, convolution_type="fft_static"
