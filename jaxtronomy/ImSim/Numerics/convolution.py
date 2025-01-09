@@ -200,20 +200,15 @@ class GaussianConvolution(object):
             self._sigma_scaled *= supersampling_factor
 
         # This num_pix definition is equivalent to that of the scipy ndimage.gaussian_filter
-        # num_pix = 2 * r + 1 where r = truncation * sigma is the radius of the gaussian kernel
-        num_pix = int(2 * truncation * self._sigma_scaled + 1)
-
-        # Ensure num_pix is odd and >= 3
-        if num_pix < 3:
-            num_pix = 3
-        if num_pix % 2 == 0:
-            num_pix += 1
-
+        # num_pix = 2r + 1 where r = round(truncation * sigma) is the radius of the gaussian kernel
+        kernel_radius = round(self._sigma_scaled * self._truncation)
+        if kernel_radius < 1:
+            kernel_radius = 1
+        num_pix = 2 * kernel_radius + 1
         kernel = self.pixel_kernel(num_pix)
 
-        # Before convolution, images will be padded. The width of the pad is equal to the
-        # radius of the gaussian kernel
-        self._pad_width = int(self._sigma_scaled * self._truncation)
+        # Before convolution, images will be padded
+        self._pad_width = kernel_radius
 
         self.PixelKernelConv = PixelKernelConvolution(
             kernel, convolution_type="fft_static"

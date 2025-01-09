@@ -272,7 +272,7 @@ class TestGaussianConvolution(object):
         npt.assert_raises(ValueError, g_conv.pixel_kernel, num_pix=2)
 
     def test_convolve2d(self):
-        sigma = 0.5
+        sigma = 0.001
         g_conv = GaussianConvolution(
             sigma=sigma,
             pixel_scale=self.delta_pix,
