@@ -1,7 +1,10 @@
 from jax import jit, numpy as jnp, tree_util
 from jax.scipy import signal
-import lenstronomy.Util.kernel_util as kernel_util
-import jaxtronomy.Util.image_util as image_util
+import numpy as np
+
+from jaxtronomy.LightModel.Profiles.gaussian import Gaussian
+from lenstronomy.Util import kernel_util
+from jaxtronomy.Util import image_util, util
 from functools import partial
 
 from lenstronomy.Util.package_util import exporter
@@ -13,7 +16,7 @@ export, __all__ = exporter()
 class PixelKernelConvolution(object):
     """Class to compute convolutions for a given pixelized kernel (fft, grid)"""
 
-    def __init__(self, kernel, convolution_type="fft"):
+    def __init__(self, kernel, convolution_type="fft_static"):
         """
 
         :param kernel: 2d array, convolution kernel
@@ -22,8 +25,13 @@ class PixelKernelConvolution(object):
         self._kernel = kernel
         if convolution_type not in ["fft", "grid"]:
             if convolution_type == "fft_static":
-                raise ValueError("fft_static convolution not implemented in JAXtronomy")
-            raise ValueError("convolution_type %s not supported!" % convolution_type)
+                self.fftconvolve_static = jit(
+                    partial(signal.fftconvolve, in2=kernel, mode="same")
+                )
+            else:
+                raise ValueError(
+                    "convolution_type %s not supported!" % convolution_type
+                )
         self.convolution_type = convolution_type
 
     # --------------------------------------------------------------------------------
@@ -71,6 +79,8 @@ class PixelKernelConvolution(object):
         """
         if self.convolution_type == "fft":
             image_conv = signal.fftconvolve(image, self._kernel, mode="same")
+        elif self.convolution_type == "fft_static":
+            image_conv = self.fftconvolve_static(image)
         else:
             image_conv = signal.convolve2d(image, self._kernel, mode="same")
         return image_conv
@@ -96,7 +106,7 @@ class SubgridKernelConvolution(object):
         kernel_supersampled,
         supersampling_factor,
         supersampling_kernel_size=None,
-        convolution_type="fft",
+        convolution_type="fft_static",
     ):
         """
 
@@ -107,7 +117,7 @@ class SubgridKernelConvolution(object):
         """
         self._supersampling_factor = supersampling_factor
         if supersampling_kernel_size is None:
-            kernel_low_res, kernel_high_res = jnp.zeros((3, 3)), kernel_supersampled
+            kernel_low_res, kernel_high_res = np.zeros((3, 3)), kernel_supersampled
             self._low_res_convolution = False
         else:
             kernel_low_res, kernel_high_res = kernel_util.split_kernel(
@@ -154,6 +164,113 @@ class SubgridKernelConvolution(object):
         if self._low_res_convolution is True:
             image_resized_conv += self._low_res_conv.convolution2d(image_low_res)
         return image_resized_conv
+
+
+class GaussianConvolution(object):
+    """Class to perform a convolution consisting of multiple 2d Gaussians.
+
+    Since JAX does not have an ndimage.gaussian_filter function, to perform Gaussian
+    convolutions, we first create Gaussian psf kernels and convolve them using
+    fftconvolve.
+    """
+
+    def __init__(
+        self,
+        sigma,
+        pixel_scale,
+        supersampling_factor=1,
+        supersampling_convolution=False,
+        truncation=2,
+    ):
+        """
+        :param sigma: std value of Gaussian kernel
+        :param pixel_scale: scale of pixel width (to convert sigmas into units of pixels)
+        :param supersampling_factor: int, ratio of the number of pixels of the high resolution grid
+            to the number of pixels of the original image
+        :param supersampling convolution: bool, determines whether convolution uses supersampled grid or not
+        :param truncation: float. Truncate the filter at this many standard deviations.
+         Default is 4.0.
+        """
+        self._sigma_scaled = sigma / pixel_scale
+        self._supersampling_factor = supersampling_factor
+        self._supersampling_convolution = supersampling_convolution
+        self._truncation = truncation
+
+        if supersampling_convolution is True:
+            self._sigma_scaled *= supersampling_factor
+
+        # This num_pix definition is equivalent to that of the scipy ndimage.gaussian_filter
+        # num_pix = 2r + 1 where r = round(truncation * sigma) is the radius of the gaussian kernel
+        kernel_radius = max(round(self._sigma_scaled * self._truncation), 1)
+        num_pix = 2 * kernel_radius + 1
+        kernel = self.pixel_kernel(num_pix)
+
+        # Before convolution, images will be padded
+        # Even though kernel_radius is already an int, we need to apply int because of some JAX nonsense
+        self._pad_width = int(kernel_radius)
+
+        self.PixelKernelConv = PixelKernelConvolution(
+            kernel, convolution_type="fft_static"
+        )
+
+    @partial(jit, static_argnums=0)
+    def convolution2d(self, image):
+        """Convolve the image via FFT convolution.
+
+        :param image: 2d numpy array, image to be convolved
+        :return: convolved image, 2d numpy array
+        """
+
+        # Pads the image before convolution. This is equivalent to performing scipy.ndimage.gaussian_filter
+        # with mode "nearest"
+        image = jnp.pad(image, pad_width=self._pad_width, mode="edge")
+        image_conv = jnp.zeros_like(image)
+
+        image_conv = self.PixelKernelConv.convolution2d(image)
+
+        # Removes the padding from the final image
+        image_conv = image_conv[
+            self._pad_width : -self._pad_width, self._pad_width : -self._pad_width
+        ]
+
+        return image_conv
+
+    @partial(jit, static_argnums=0)
+    def re_size_convolve(self, image_low_res, image_high_res):
+        """
+
+        :param image_high_res: supersampled image/model to be convolved on a regular pixel grid
+        :return: convolved and re-sized image
+        """
+        if self._supersampling_convolution is True:
+            image_high_res_conv = self.convolution2d(image_high_res)
+            image_resized_conv = image_util.re_size(
+                image_high_res_conv, self._supersampling_factor
+            )
+        else:
+            image_resized_conv = self.convolution2d(image_low_res)
+        return image_resized_conv
+
+    def pixel_kernel(self, num_pix):
+        """Computes a pixelized kernel from the Gaussian parameters.
+
+        :param num_pix: int, size of kernel (odd number per axis) should be equal to 2 *
+            sigma_scaled * truncation + 1 to be consistent with
+            scipy.ndimage.gaussian_filter
+        :return: pixel kernel centered
+        """
+
+        if num_pix % 2 == 0:
+            raise ValueError("num_pix must be an odd integer")
+        if num_pix < 3:
+            raise ValueError("psf kernel size must be 3 or greater")
+
+        gaussian = Gaussian()
+        # Since sigma is in units of pixels, deltapix is trivially 1 in units of pixels
+        x, y = util.make_grid(numPix=num_pix, deltapix=1)
+        kernel = gaussian.function(x, y, amp=1, sigma=self._sigma_scaled)
+        kernel = util.array2image(kernel)
+        return kernel / jnp.sum(kernel)
 
 
 tree_util.register_pytree_node(

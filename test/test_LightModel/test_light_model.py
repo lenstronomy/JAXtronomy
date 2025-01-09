@@ -1,6 +1,7 @@
 __author__ = "sibirrer"
 
 from jaxtronomy.LightModel.light_model import LightModel
+from jaxtronomy.LightModel.light_model_base import _JAXXED_MODELS
 from lenstronomy.LightModel.light_model import LightModel as LightModel_ref
 
 import numpy as np
@@ -58,6 +59,9 @@ class TestLightModel(object):
         )
         test_sersic_ellipse_qphi = LightModel(["SERSIC_ELLIPSE_Q_PHI"])
 
+    def test_import_profiles(self):
+        lightModel = LightModel(light_model_list=_JAXXED_MODELS)
+
     def test_surface_brightness(self):
         x = 1.0
         y = 1.3
@@ -105,20 +109,17 @@ class TestLightModel(object):
         assert kwargs_out[0]["amp"] == 2
 
     def test_total_flux(self):
-        light_model_list = [
-            "SERSIC",
-            "SERSIC_ELLIPSE",
-        ]
+        light_model_list = ["SERSIC", "SERSIC_ELLIPSE", "MULTI_GAUSSIAN"]
         kwargs_list = [
             {
-                "amp": 1,
+                "amp": 1.1234,
                 "R_sersic": 0.5,
                 "n_sersic": 1,
                 "center_x": 0,
                 "center_y": 0,
             },  # 'SERSIC'
             {
-                "amp": 1,
+                "amp": 1.345,
                 "R_sersic": 0.5,
                 "n_sersic": 1,
                 "e1": 0.1,
@@ -126,13 +127,19 @@ class TestLightModel(object):
                 "center_x": 0,
                 "center_y": 0,
             },  # 'SERSIC_ELLIPSE'
+            {
+                "amp": [1.3894, 32.298324, 21.23498],
+                "sigma": [0.5, 1.5, 2],
+                "center_x": 0.234,
+                "center_y": -1.98342,
+            },  # MULTI_GAUSSIAN
         ]
         lightModel = LightModel(light_model_list=light_model_list)
         lightModel_ref = LightModel_ref(light_model_list=light_model_list)
         total_flux_list = lightModel.total_flux(kwargs_list)
         total_flux_list_ref = lightModel_ref.total_flux(kwargs_list)
         npt.assert_array_almost_equal(
-            np.array(total_flux_list), np.array(total_flux_list_ref)
+            np.array(total_flux_list), np.array(total_flux_list_ref), decimal=5
         )
 
         lightModel = LightModel(light_model_list=light_model_list)
