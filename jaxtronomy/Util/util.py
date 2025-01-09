@@ -60,7 +60,7 @@ def displaceAbs(x, y, sourcePos_x, sourcePos_y):
 
 @jit
 def fwhm2sigma(fwhm):
-    """
+    """Converts the fwhm of a gaussian to std.
 
     :param fwhm: full-width-half-max value
     :return: gaussian sigma (sqrt(var))
@@ -84,7 +84,8 @@ def image2array(image):
 
 @jit
 def rotate(xcoords, ycoords, angle):
-    """
+    """Rotates x and y coordinates by an angle.
+
     :param xcoords: x points
     :param ycoords: y points
     :param angle: angle in radians
@@ -97,7 +98,7 @@ def rotate(xcoords, ycoords, angle):
 
 @jit
 def sigma2fwhm(sigma):
-    """
+    """Converts the std of a gaussian to the fwhm.
 
     :param sigma:
     :return:
