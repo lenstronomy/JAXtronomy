@@ -13,7 +13,7 @@ import numpy as np
 
 __all__ = ["ImageModel"]
 
-# TODO: Implement PointSource and extinction in JAXtronomy
+# TODO: Implement PointSource, extinction, pixelbased solver in JAXtronomy
 
 class ImageModel(object):
     """This class uses functions of lens_model and source_model to make a lensed
@@ -119,10 +119,11 @@ class ImageModel(object):
         self.source_mapping = Image2SourceMapping(
             lens_model=lens_model_class, source_model=source_model_class
         )
-
+        # primary beam is not supported yet
         self._pb = data_class.primary_beam
         if self._pb is not None:
-            self._pb_1d = util.image2array(self._pb)
+            raise ValueError("primary beam not supported in jaxtronomy")
+            #self._pb_1d = util.image2array(self._pb)
         else:
             self._pb_1d = None
 
@@ -310,16 +311,16 @@ class ImageModel(object):
             # dicts and lists evaluate to false if empty and true if not empty
             if kwargs_extinction is not None and kwargs_extinction:
                 raise ValueError("Extinction is not implemented in JAXtronomy yet")
-            source_light *= self._extinction.extinction(
-                ra_grid,
-                dec_grid,
-                kwargs_extinction=kwargs_extinction,
-                kwargs_special=kwargs_special,
-            )
+            #source_light *= self._extinction.extinction(
+            #    ra_grid,
+            #    dec_grid,
+            #    kwargs_extinction=kwargs_extinction,
+            #    kwargs_special=kwargs_special,
+            #)
 
-        # multiply with primary beam before convolution
-        if self._pb is not None:
-            source_light *= self._pb_1d
+        # multiply with primary beam before convolution (not supported yet in jaxtronomy)
+        #if self._pb is not None:
+        #    source_light *= self._pb_1d
         return source_light * self._flux_scaling
 
     # TODO: Re-implement pixelbased solver
@@ -424,9 +425,9 @@ class ImageModel(object):
             ra_grid, dec_grid, kwargs_lens_light, k=k
         )
 
-        # multiply with primary beam before convolution
-        if self._pb is not None:
-            lens_light *= self._pb_1d
+        # multiply with primary beam before convolution (not supported yet in jaxtronomy)
+        #if self._pb is not None:
+        #    lens_light *= self._pb_1d
 
         lens_light_final = self.ImageNumerics.re_size_convolve(
             lens_light, unconvolved=unconvolved
