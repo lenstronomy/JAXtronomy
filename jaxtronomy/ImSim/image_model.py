@@ -124,7 +124,7 @@ class ImageModel(object):
         self._pb = data_class.primary_beam
         if self._pb is not None:
             raise ValueError("primary beam not supported in jaxtronomy")
-            #self._pb_1d = util.image2array(self._pb)
+            # self._pb_1d = util.image2array(self._pb)
         else:
             self._pb_1d = None
 
@@ -312,15 +312,15 @@ class ImageModel(object):
             # dicts and lists evaluate to false if empty and true if not empty
             if kwargs_extinction is not None and kwargs_extinction:
                 raise ValueError("Extinction is not implemented in JAXtronomy yet")
-            #source_light *= self._extinction.extinction(
+            # source_light *= self._extinction.extinction(
             #    ra_grid,
             #    dec_grid,
             #    kwargs_extinction=kwargs_extinction,
             #    kwargs_special=kwargs_special,
-            #)
+            # )
 
         # multiply with primary beam before convolution (not supported yet in jaxtronomy)
-        #if self._pb is not None:
+        # if self._pb is not None:
         #    source_light *= self._pb_1d
         return source_light * self._flux_scaling
 
@@ -427,7 +427,7 @@ class ImageModel(object):
         )
 
         # multiply with primary beam before convolution (not supported yet in jaxtronomy)
-        #if self._pb is not None:
+        # if self._pb is not None:
         #    lens_light *= self._pb_1d
 
         lens_light_final = self.ImageNumerics.re_size_convolve(
