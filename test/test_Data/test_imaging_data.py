@@ -23,6 +23,7 @@ class Test_ImageData_noisemap(object):
             "likelihood_method": "incorrect",
         }
         npt.assert_raises(ValueError, ImageData, **kwargs_data)
+        npt.assert_raises(ValueError, ImageData, antenna_primary_beam=5, **kwargs_data)
 
     def test_log_likelihood(self):
         model = np.tile(np.array([0.3, -0.1, 0.4, 0.7, -0.9]), (self.numPix, 2))
@@ -115,6 +116,23 @@ class Test_ImageData_without_noisemap(object):
         log_likelihood = self.Data_interferometry.log_likelihood(
             model, mask, additional_error_map
         )
+        log_likelihood_ref = self.Data_interferometry_ref.log_likelihood(
+            model, mask, additional_error_map
+        )
+        npt.assert_almost_equal(log_likelihood, log_likelihood_ref, decimal=5)
+
+    def test_update_data(self):
+        self.Data_interferometry.update_data(np.ones((self.numPix, self.numPix)) * 1.1)
+        self.Data_interferometry_ref.update_data(np.ones((self.numPix, self.numPix)) * 1.1)
+
+        # Check that the data is updated
+        npt.assert_array_almost_equal(self.Data.data, self.Data_ref.data)
+
+        # Check that the log likelihoods are correctly calculated after updating the data
+        model = np.tile(np.array([0.3, -0.1, 0.4, 0.7, -0.9]), (self.numPix, 2))
+        mask = np.tile(np.array([0, 1]), (self.numPix, 5))
+        additional_error_map = 0.1
+        log_likelihood = self.Data_interferometry.log_likelihood(model, mask, additional_error_map)
         log_likelihood_ref = self.Data_interferometry_ref.log_likelihood(
             model, mask, additional_error_map
         )
