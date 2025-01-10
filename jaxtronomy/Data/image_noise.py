@@ -78,7 +78,6 @@ class ImageNoise(object):
                         " error function for a Poisson distribution with mean < 1."
                         % (background_rms * np.max(exposure_time))
                     )
-        self.flux_scaling = flux_scaling
 
         # Covariance matrix of all pixel values in 2d numpy array (only diagonal component)
         # The covariance matrix is estimated from the data.
