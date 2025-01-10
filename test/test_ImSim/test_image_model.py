@@ -135,11 +135,16 @@ class TestImageModel(object):
         self.data_class.update_data(image_sim)
         self.data_class_ref.update_data(image_sim)
 
-
     def test_init(self):
-        npt.assert_raises(ValueError, ImageModel, self.data_class, self.psf_class, kwargs_pixelbased={})
+        npt.assert_raises(
+            ValueError,
+            ImageModel,
+            self.data_class,
+            self.psf_class,
+            kwargs_pixelbased={},
+        )
 
-        del(self.data_class.flux_scaling)
+        del self.data_class.flux_scaling
         imageModel = ImageModel(
             self.data_class,
             self.psf_class,
@@ -151,12 +156,10 @@ class TestImageModel(object):
         self.data_class._pb = np.ones((100, 100))
         npt.assert_raises(ValueError, ImageModel, self.data_class, self.psf_class)
 
-
     def test_update_psf(self):
         assert self.imageModel.PSF.psf_type == "PIXEL"
         self.imageModel.update_psf(self.psf_class_gaussian)
         assert self.imageModel.PSF.psf_type == "GAUSSIAN"
-
 
     def test_source_surface_brightness(self):
         flux = self.imageModel.source_surface_brightness(
@@ -172,7 +175,6 @@ class TestImageModel(object):
         empty_imageModel = ImageModel(self.data_class, self.psf_class)
         zero_flux = empty_imageModel.source_surface_brightness(kwargs_source={})
         npt.assert_array_equal(zero_flux, np.zeros_like(self.data_class.data))
-
 
     def test_source_surface_brightness_analytical(self):
 
@@ -199,16 +201,22 @@ class TestImageModel(object):
         flux = self.imageModel._source_surface_brightness_analytical_numerics(
             kwargs_source=self.kwargs_source,
             kwargs_lens=self.kwargs_lens,
-            de_lensed=True
+            de_lensed=True,
         )
         flux_ref = self.imageModel_ref._source_surface_brightness_analytical_numerics(
             kwargs_source=self.kwargs_source,
             kwargs_lens=self.kwargs_lens,
-            de_lensed=True
+            de_lensed=True,
         )
         npt.assert_array_almost_equal(flux, flux_ref, decimal=8)
 
-        npt.assert_raises(ValueError, self.imageModel._source_surface_brightness_analytical_numerics, kwargs_source=self.kwargs_source, kwargs_lens=self.kwargs_lens, kwargs_extinction={"incorrect": 0})
+        npt.assert_raises(
+            ValueError,
+            self.imageModel._source_surface_brightness_analytical_numerics,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens=self.kwargs_lens,
+            kwargs_extinction={"incorrect": 0},
+        )
 
     def test_lens_surface_brightness(self):
         flux = self.imageModel.lens_surface_brightness(
@@ -218,7 +226,6 @@ class TestImageModel(object):
             kwargs_lens_light=self.kwargs_lens_light
         )
         npt.assert_array_almost_equal(flux, flux_ref, decimal=8)
-
 
     def test_image(self):
         image = self.imageModel.image(
