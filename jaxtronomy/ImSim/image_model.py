@@ -15,6 +15,7 @@ __all__ = ["ImageModel"]
 
 # TODO: Implement PointSource, extinction, pixelbased solver in JAXtronomy
 
+
 class ImageModel(object):
     """This class uses functions of lens_model and source_model to make a lensed
     image."""
@@ -93,8 +94,8 @@ class ImageModel(object):
         else:
             raise ValueError("pixelbased solver not currently supported in JAXtronomy")
             # kwargs_pixelbased = kwargs_pixelbased.copy()
-        #self._pixelbased_bool = self._detect_pixelbased_models()
-        #if self._pixelbased_bool is True:
+        # self._pixelbased_bool = self._detect_pixelbased_models()
+        # if self._pixelbased_bool is True:
         #    from slitronomy.Util.class_util import (
         #        create_solver_class,
         #    )  # requirement on SLITronomy is exclusively here
@@ -115,7 +116,7 @@ class ImageModel(object):
         #        kwargs_pixelbased,
         #    )
         #    self.source_mapping = None  # handled with pixelated operator
-        #else:
+        # else:
         self.source_mapping = Image2SourceMapping(
             lens_model=lens_model_class, source_model=source_model_class
         )
@@ -213,7 +214,7 @@ class ImageModel(object):
         """
         if len(self.SourceModel.profile_type_list) == 0:
             return jnp.zeros(self.Data.num_pixel_axes)
-        #if self._pixelbased_bool is True:
+        # if self._pixelbased_bool is True:
         #    return self._source_surface_brightness_pixelbased(
         #        kwargs_source,
         #        kwargs_lens=kwargs_lens,
@@ -224,7 +225,7 @@ class ImageModel(object):
         #        k=k,
         #        update_mapping=update_pixelbased_mapping,
         #    )
-        #else:
+        # else:
         return self._source_surface_brightness_analytical(
             kwargs_source,
             kwargs_lens=kwargs_lens,
@@ -324,7 +325,7 @@ class ImageModel(object):
         return source_light * self._flux_scaling
 
     # TODO: Re-implement pixelbased solver
-    #def _source_surface_brightness_pixelbased(
+    # def _source_surface_brightness_pixelbased(
     #    self,
     #    kwargs_source,
     #    kwargs_lens=None,
@@ -334,7 +335,7 @@ class ImageModel(object):
     #    de_lensed=False,
     #    k=None,
     #    update_mapping=True,
-    #):
+    # ):
     #    """Computes the source surface brightness distribution, using pixel-based solver
     #    for light profiles (from SLITronomy)
 
@@ -434,7 +435,7 @@ class ImageModel(object):
         )
         return lens_light_final * self._flux_scaling
 
-    #def _lens_surface_brightness_pixelbased(self, kwargs_lens_light, k=None):
+    # def _lens_surface_brightness_pixelbased(self, kwargs_lens_light, k=None):
     #    """
 
     #    computes the lens surface brightness distribution , using pixel-based solver for light profiles (from SLITronomy)
@@ -450,14 +451,14 @@ class ImageModel(object):
     #    lens_light_final = util.array2image(lens_light)
     #    return lens_light_final * self._flux_scaling
 
-    #def point_source(
+    # def point_source(
     #    self,
     #    kwargs_ps,
     #    kwargs_lens=None,
     #    kwargs_special=None,
     #    unconvolved=False,
     #    k=None,
-    #):
+    # ):
     #    """Computes the point source positions and paints PSF convolutions on them.
 
     #    :param kwargs_ps:
@@ -475,14 +476,14 @@ class ImageModel(object):
     #        k=k,
     #    )
 
-    #def _point_source(
+    # def _point_source(
     #    self,
     #    kwargs_ps,
     #    kwargs_lens=None,
     #    kwargs_special=None,
     #    unconvolved=False,
     #    k=None,
-    #):
+    # ):
     #    """Computes the point source positions and paints PSF convolutions on them.
 
     #    :param kwargs_ps:
@@ -599,12 +600,12 @@ class ImageModel(object):
             )
         if point_source_add is True:
             raise ValueError("point source has not been implemented in JAXtronomy yet")
-            #model += self._point_source(
+            # model += self._point_source(
             #    kwargs_ps,
             #    kwargs_lens,
             #    kwargs_special=kwargs_special,
             #    unconvolved=unconvolved,
-            #)
+            # )
         return model
 
     # def extinction_map(self, kwargs_extinction=None, kwargs_special=None):
@@ -640,8 +641,8 @@ class ImageModel(object):
     #     )
     #     return extinction
 
-    #@staticmethod
-    #def _displace_astrometry(x_pos, y_pos, kwargs_special=None):
+    # @staticmethod
+    # def _displace_astrometry(x_pos, y_pos, kwargs_special=None):
     #    """Displaces point sources by shifts specified in kwargs_special.
 
     #    :param x_pos: list of point source positions according to point source model
@@ -666,7 +667,7 @@ class ImageModel(object):
     #            y_pos = y_pos + delta_y_new
     #    return x_pos, y_pos
 
-    #def _detect_pixelbased_models(self):
+    # def _detect_pixelbased_models(self):
     #    """Returns True if light profiles specific to pixel-based modelling are present
     #    in source model list. Otherwise returns False.
 
@@ -685,7 +686,7 @@ class ImageModel(object):
     #        return True
     #    return False
 
-    #def _setup_pixelbased_source_numerics(self, kwargs_numerics, kwargs_pixelbased):
+    # def _setup_pixelbased_source_numerics(self, kwargs_numerics, kwargs_pixelbased):
     #    """Check if model requirement are compatible with support pixel-based solver,
     #    and creates a new numerics class specifically for source plane.
 
