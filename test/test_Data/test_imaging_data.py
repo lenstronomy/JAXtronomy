@@ -123,7 +123,9 @@ class Test_ImageData_without_noisemap(object):
 
     def test_update_data(self):
         self.Data_interferometry.update_data(np.ones((self.numPix, self.numPix)) * 1.1)
-        self.Data_interferometry_ref.update_data(np.ones((self.numPix, self.numPix)) * 1.1)
+        self.Data_interferometry_ref.update_data(
+            np.ones((self.numPix, self.numPix)) * 1.1
+        )
 
         # Check that the data is updated
         npt.assert_array_almost_equal(self.Data.data, self.Data_ref.data)
@@ -132,7 +134,9 @@ class Test_ImageData_without_noisemap(object):
         model = np.tile(np.array([0.3, -0.1, 0.4, 0.7, -0.9]), (self.numPix, 2))
         mask = np.tile(np.array([0, 1]), (self.numPix, 5))
         additional_error_map = 0.1
-        log_likelihood = self.Data_interferometry.log_likelihood(model, mask, additional_error_map)
+        log_likelihood = self.Data_interferometry.log_likelihood(
+            model, mask, additional_error_map
+        )
         log_likelihood_ref = self.Data_interferometry_ref.log_likelihood(
             model, mask, additional_error_map
         )
