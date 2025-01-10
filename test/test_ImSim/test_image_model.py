@@ -239,7 +239,14 @@ class TestImageModel(object):
             kwargs_lens_light=self.kwargs_lens_light,
         )
         npt.assert_array_almost_equal(image, image_ref, decimal=8)
-        npt.assert_raises(ValueError, self.imageModel.image, self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, point_source_add=True)
+        npt.assert_raises(
+            ValueError,
+            self.imageModel.image,
+            self.kwargs_lens,
+            self.kwargs_source,
+            self.kwargs_lens_light,
+            point_source_add=True,
+        )
 
 
 if __name__ == "__main__":
