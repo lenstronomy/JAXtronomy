@@ -96,7 +96,9 @@ class TestImageModel(object):
         lens_light_model_list = ["SERSIC"]
         self.kwargs_lens_light = [kwargs_sersic]
         lens_light_model_class = LightModel(light_model_list=lens_light_model_list)
-        lens_light_model_class_ref = LightModel_ref(light_model_list=lens_light_model_list)
+        lens_light_model_class_ref = LightModel_ref(
+            light_model_list=lens_light_model_list
+        )
 
         source_model_list = ["SERSIC_ELLIPSE"]
         self.kwargs_source = [kwargs_sersic_ellipse]
@@ -137,7 +139,13 @@ class TestImageModel(object):
             self.data_class,
             self.psf_class,
         )
-        npt.assert_raises(ValueError, ImageModel, self.data_class, self.psf_class, kwargs_pixelbased={})
+        npt.assert_raises(
+            ValueError,
+            ImageModel,
+            self.data_class,
+            self.psf_class,
+            kwargs_pixelbased={},
+        )
 
     def test_update_psf(self):
         assert self.imageModel.PSF.psf_type == "PIXEL"
@@ -196,6 +204,7 @@ class TestImageModel(object):
             kwargs_lens_light=self.kwargs_lens_light,
         )
         npt.assert_array_almost_equal(image, image_ref, decimal=8)
+
 
 if __name__ == "__main__":
     pytest.main()
