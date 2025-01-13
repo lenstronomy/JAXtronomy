@@ -363,7 +363,7 @@ class ImageLinearFit(ImageModel):
         """
         error_map = jnp.zeros(self.Data.num_pixel_axes)
         # TODO: Point source not in jaxtronomy yet
-        #if self._psf_error_map is True:
+        # if self._psf_error_map is True:
         #    for k, bool_ in enumerate(self._psf_error_map_bool_list):
         #        if bool_ is True:
         #            ra_pos, dec_pos, _ = self.PointSource.point_source_list(

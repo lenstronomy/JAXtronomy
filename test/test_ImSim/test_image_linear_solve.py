@@ -182,7 +182,8 @@ class TestImageLinearFit(object):
             self.imagelinearfit.data_response, self.imagelinearfit_ref.data_response
         )
         npt.assert_array_almost_equal(
-            self.imagelinearfit_nomask.data_response, self.imagelinearfit_nomask_ref.data_response
+            self.imagelinearfit_nomask.data_response,
+            self.imagelinearfit_nomask_ref.data_response,
         )
 
     def test_error(self):
