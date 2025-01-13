@@ -49,7 +49,6 @@ class TestImageModel(object):
         kwargs_psf = {
             "psf_type": "PIXEL",
             "kernel_point_source": kernel,
-            "psf_error_map": np.ones_like(kernel) * 0.001 * kernel**2,
         }
         self.psf_class = PSF(**kwargs_psf)
 
@@ -157,6 +156,16 @@ class TestImageModel(object):
         # primary beam not supported
         self.data_class._pb = np.ones((100, 100))
         npt.assert_raises(ValueError, ImageModel, self.data_class, self.psf_class)
+
+        # psf error map not supported
+        kernel = self.psf_class_gaussian.kernel_point_source
+        kwargs_psf = {
+            "psf_type": "PIXEL",
+            "kernel_point_source": kernel,
+            "psf_error_map": np.ones_like(kernel) * 0.001 * kernel**2,
+        }
+        psf_class = PSF(**kwargs_psf)
+        npt.assert_raises(ValueError, ImageModel, self.data_class, psf_class)
 
     def test_update_psf(self):
         assert self.imageModel.PSF.psf_type == "PIXEL"
