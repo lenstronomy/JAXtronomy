@@ -283,6 +283,7 @@ class TestImageLinearFit(object):
         npt.assert_array_almost_equal(image, image_0 * self.likelihood_mask, decimal=8)
 
     def test_raises(self):
+        # linear solver not supported in jaxtronomy
         npt.assert_raises(
             ValueError,
             ImageLinearFit,
@@ -290,7 +291,11 @@ class TestImageLinearFit(object):
             self.psf_class,
             linear_solver=True,
         )
+
+        # pixelbased solver not supported in jaxtronomy
         npt.assert_raises(Exception, self.imagelinearfit.image_pixelbased_solve)
+
+        # check positive flux not supported in jaxtronomy
         npt.assert_raises(
             ValueError,
             self.imagelinearfit.likelihood_data_given_model,
@@ -299,6 +304,8 @@ class TestImageLinearFit(object):
             kwargs_lens_light=self.kwargs_lens_light,
             check_positive_flux=True,
         )
+
+        # linear solver not supported in jaxtronomy
         npt.assert_raises(
             ValueError,
             self.imagelinearfit.likelihood_data_given_model,
