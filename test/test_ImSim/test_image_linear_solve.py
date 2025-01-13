@@ -66,7 +66,6 @@ class TestImageLinearFit(object):
         kwargs_psf = {
             "psf_type": "PIXEL",
             "kernel_point_source": kernel,
-            "psf_error_map": np.ones_like(kernel) * 0.001 * kernel**2,
         }
         self.psf_class = PSF(**kwargs_psf)
 
@@ -127,6 +126,8 @@ class TestImageLinearFit(object):
             "supersampling_factor": 3,
             "supersampling_convolution": True,
         }
+
+        # Create 2 class instances with likelihood mask
         self.imagelinearfit = ImageLinearFit(
             self.data_class,
             self.psf_class,
@@ -145,6 +146,25 @@ class TestImageLinearFit(object):
             kwargs_numerics=kwargs_numerics,
             likelihood_mask=likelihood_mask,
         )
+
+        # Create 2 class instances without likelihood mask
+        self.imagelinearfit_nomask = ImageLinearFit(
+            self.data_class,
+            self.psf_class,
+            lens_model_class,
+            source_model_class,
+            lens_light_model_class,
+            kwargs_numerics=kwargs_numerics,
+        )
+        self.imagelinearfit_nomask_ref = ImageLinearFit_ref(
+            self.data_class_ref,
+            self.psf_class,
+            lens_model_class_ref,
+            source_model_class_ref,
+            lens_light_model_class_ref,
+            kwargs_numerics=kwargs_numerics,
+        )
+
         image_sim = sim_util.simulate_simple(
             self.imagelinearfit_ref,
             self.kwargs_lens,
@@ -160,6 +180,9 @@ class TestImageLinearFit(object):
     def test_data_response(self):
         npt.assert_array_almost_equal(
             self.imagelinearfit.data_response, self.imagelinearfit_ref.data_response
+        )
+        npt.assert_array_almost_equal(
+            self.imagelinearfit_nomask.data_response, self.imagelinearfit_nomask_ref.data_response
         )
 
     def test_error(self):
