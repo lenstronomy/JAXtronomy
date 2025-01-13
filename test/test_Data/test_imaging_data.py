@@ -132,7 +132,9 @@ class Test_ImageData_without_noisemap(object):
         )
 
         # Check that the data is updated
-        npt.assert_array_almost_equal(self.Data_interferometry.data, self.Data_interferometry_ref.data, decimal=8)
+        npt.assert_array_almost_equal(
+            self.Data_interferometry.data, self.Data_interferometry_ref.data, decimal=8
+        )
 
         # Check that the log likelihoods are correctly calculated after updating the data
         model = np.tile(np.array([0.3, -0.1, 0.4, 0.7, -0.9]), (self.numPix, 2))
