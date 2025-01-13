@@ -78,6 +78,8 @@ class ImageModel(object):
             only_from_unspecified=True,
         )
         self._psf_error_map = self.PSF.psf_error_map_bool
+        if self._psf_error_map:
+            raise ValueError("psf error map not supported in jaxtronomy")
 
         if source_model_class is None:
             source_model_class = LightModel(light_model_list=[])
