@@ -2,7 +2,7 @@ import numpy as np
 from jax import jit, numpy as jnp
 
 from lenstronomy.Data.pixel_grid import PixelGrid
-from jaxtronomy.Data.image_noise import ImageNoise
+from jaxtronomy.Data.image_noise import ImageNoise, covariance_matrix
 
 __all__ = ["ImageData"]
 
@@ -145,6 +145,11 @@ class ImageData(PixelGrid, ImageNoise):
         # Recompile the log likelihood functions
         self.log_likelihood = jit(self._log_likelihood)
         self.log_likelihood_interferometry = jit(self._log_likelihood_interferometry)
+        self.C_D = covariance_matrix(
+            self.data,
+            self.background_rms,
+            self.exp_map,
+        )
 
     def _log_likelihood(self, model, mask, additional_error_map=0):
         """Computes the likelihood of the data given the model p(data|model) The
