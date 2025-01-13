@@ -136,12 +136,13 @@ class TestImageModel(object):
         self.data_class_ref.update_data(image_sim)
 
     def test_init(self):
+        # pixelbased solver not supported
         npt.assert_raises(
             ValueError,
             ImageModel,
             self.data_class,
             self.psf_class,
-            kwargs_pixelbased={},
+            kwargs_pixelbased={"not supported": 1},
         )
 
         del self.data_class.flux_scaling
@@ -153,6 +154,7 @@ class TestImageModel(object):
         assert imageModel._pb is None
         assert imageModel._pb_1d is None
 
+        # primary beam not supported
         self.data_class._pb = np.ones((100, 100))
         npt.assert_raises(ValueError, ImageModel, self.data_class, self.psf_class)
 
@@ -210,6 +212,7 @@ class TestImageModel(object):
         )
         npt.assert_array_almost_equal(flux, flux_ref, decimal=8)
 
+        # extinction not supported
         npt.assert_raises(
             ValueError,
             self.imageModel._source_surface_brightness_analytical_numerics,
@@ -239,6 +242,8 @@ class TestImageModel(object):
             kwargs_lens_light=self.kwargs_lens_light,
         )
         npt.assert_array_almost_equal(image, image_ref, decimal=8)
+
+        # point source not supported
         npt.assert_raises(
             ValueError,
             self.imageModel.image,
