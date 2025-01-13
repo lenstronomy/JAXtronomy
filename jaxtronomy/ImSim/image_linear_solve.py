@@ -76,12 +76,6 @@ class ImageLinearFit(ImageModel):
         #    # update the pixel-based solver with the likelihood mask
         #    self.PixelSolver.set_likelihood_mask(self.likelihood_mask)
 
-        # prepare to use fft convolution for the natwt linear solver
-        if self.Data.likelihood_method() == "interferometry_natwt":
-            self._convolution = PixelKernelConvolution(
-                kernel=self.PSF.kernel_point_source
-            )
-
         # Compile class functions
         self.reduced_residuals = jit(self._reduced_residuals)
         self.likelihood_data_given_model = jit(
@@ -368,23 +362,24 @@ class ImageLinearFit(ImageModel):
         :return: 2d array of size of the image
         """
         error_map = jnp.zeros(self.Data.num_pixel_axes)
-        if self._psf_error_map is True:
-            for k, bool_ in enumerate(self._psf_error_map_bool_list):
-                if bool_ is True:
-                    ra_pos, dec_pos, _ = self.PointSource.point_source_list(
-                        kwargs_ps, kwargs_lens=kwargs_lens, k=k, with_amp=False
-                    )
-                    if len(ra_pos) > 0:
-                        # ra_pos, dec_pos = self._displace_astrometry(
-                        #     ra_pos, dec_pos, kwargs_special=kwargs_special
-                        # )
-                        error_map += self.ImageNumerics.psf_error_map(
-                            ra_pos,
-                            dec_pos,
-                            None,
-                            self.Data.data,
-                            fix_psf_error_map=False,
-                        )
+        # TODO: Point source not in jaxtronomy yet
+        #if self._psf_error_map is True:
+        #    for k, bool_ in enumerate(self._psf_error_map_bool_list):
+        #        if bool_ is True:
+        #            ra_pos, dec_pos, _ = self.PointSource.point_source_list(
+        #                kwargs_ps, kwargs_lens=kwargs_lens, k=k, with_amp=False
+        #            )
+        #            if len(ra_pos) > 0:
+        #                # ra_pos, dec_pos = self._displace_astrometry(
+        #                #     ra_pos, dec_pos, kwargs_special=kwargs_special
+        #                # )
+        #                error_map += self.ImageNumerics.psf_error_map(
+        #                    ra_pos,
+        #                    dec_pos,
+        #                    None,
+        #                    self.Data.data,
+        #                    fix_psf_error_map=False,
+        #                )
         return error_map
 
         # def check_positive_flux(self, kwargs_source, kwargs_lens_light, kwargs_ps):
