@@ -49,7 +49,7 @@ class Test_ImageData_noisemap(object):
         self.Data_ref.update_data(np.ones((self.numPix, self.numPix)) * 1.1)
 
         # Check that the data is updated
-        npt.assert_array_almost_equal(self.Data.data, self.Data_ref.data)
+        npt.assert_array_almost_equal(self.Data.data, self.Data_ref.data, decimal=8)
 
         # Check that the log likelihoods are correctly calculated after updating the data
         model = np.tile(np.array([0.3, -0.1, 0.4, 0.7, -0.9]), (self.numPix, 2))
@@ -122,13 +122,17 @@ class Test_ImageData_without_noisemap(object):
         npt.assert_almost_equal(log_likelihood, log_likelihood_ref, decimal=5)
 
     def test_update_data(self):
+        c_d_old = self.Data_interferometry.C_D
+        c_d_old_ref = self.Data_interferometry_ref.C_D
+        npt.assert_array_almost_equal(c_d_old, c_d_old_ref, decimal=7)
+
         self.Data_interferometry.update_data(np.ones((self.numPix, self.numPix)) * 1.1)
         self.Data_interferometry_ref.update_data(
             np.ones((self.numPix, self.numPix)) * 1.1
         )
 
         # Check that the data is updated
-        npt.assert_array_almost_equal(self.Data.data, self.Data_ref.data)
+        npt.assert_array_almost_equal(self.Data_interferometry.data, self.Data_interferometry_ref.data, decimal=8)
 
         # Check that the log likelihoods are correctly calculated after updating the data
         model = np.tile(np.array([0.3, -0.1, 0.4, 0.7, -0.9]), (self.numPix, 2))
@@ -140,7 +144,12 @@ class Test_ImageData_without_noisemap(object):
         log_likelihood_ref = self.Data_interferometry_ref.log_likelihood(
             model, mask, additional_error_map
         )
-        npt.assert_almost_equal(log_likelihood, log_likelihood_ref, decimal=5)
+        npt.assert_almost_equal(log_likelihood, log_likelihood_ref, decimal=6)
+
+        # Check that the C_D is correctly updated as well
+        c_d_new = self.Data_interferometry.C_D
+        c_d_new_ref = self.Data_interferometry_ref.C_D
+        npt.assert_array_almost_equal(c_d_new, c_d_new_ref, decimal=6)
 
     def test_likelihood_method(self):
         assert self.Data.likelihood_method() == "diagonal"
