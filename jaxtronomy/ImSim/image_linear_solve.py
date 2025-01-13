@@ -61,7 +61,7 @@ class ImageLinearFit(ImageModel):
             kwargs_pixelbased=kwargs_pixelbased,
         )
         if linear_solver:
-            raise ValueError("linear solve is not supported in jaxtronomy") 
+            raise ValueError("linear solve is not supported in jaxtronomy")
         self._linear_solver = linear_solver
         if psf_error_map_bool_list is None:
             psf_error_map_bool_list = [True] * len(
@@ -72,7 +72,7 @@ class ImageLinearFit(ImageModel):
             likelihood_mask = jnp.ones_like(data_class.data)
         self.likelihood_mask = jnp.array(likelihood_mask, dtype=bool)
         self._mask1d = util.image2array(self.likelihood_mask)
-        #if self._pixelbased_bool is True:
+        # if self._pixelbased_bool is True:
         #    # update the pixel-based solver with the likelihood mask
         #    self.PixelSolver.set_likelihood_mask(self.likelihood_mask)
 
@@ -84,12 +84,14 @@ class ImageLinearFit(ImageModel):
 
         # Compile class functions
         self.reduced_residuals = jit(self._reduced_residuals)
-        self.likelihood_data_given_model = jit(self._likelihood_data_given_model, static_argnames=("check_positive_flux"))
+        self.likelihood_data_given_model = jit(
+            self._likelihood_data_given_model, static_argnames=("check_positive_flux")
+        )
         self.array_masked2image = jit(self._array_masked2image)
         self.error_response = jit(self._error_response)
         self._error_map_psf = jit(self.__error_map_psf)
         self.reduced_chi2 = jit(self._reduced_chi2)
-    
+
     def image_pixelbased_solve(
         self,
         kwargs_lens=None,
@@ -100,14 +102,12 @@ class ImageLinearFit(ImageModel):
         kwargs_special=None,
         init_lens_light_model=None,
     ):
-        raise Exception("image_pixelbased_solve is not supported in jaxtronomy")    
+        raise Exception("image_pixelbased_solve is not supported in jaxtronomy")
 
     @property
     def data_response(self):
         """Returns the 1d array of the data element that is fitted for (including
-        masking)
-        :return: 1d numpy array
-        """
+        masking) :return: 1d numpy array."""
         d = self.image2array_masked(self.Data.data)
         return d
 
@@ -176,7 +176,9 @@ class ImageLinearFit(ImageModel):
                 kwargs_lens, kwargs_ps=kwargs_ps, kwargs_special=kwargs_special
             )
         else:
-            raise ValueError("Linear solver not supported in JAXtronomy. Use lenstronomy instead")
+            raise ValueError(
+                "Linear solver not supported in JAXtronomy. Use lenstronomy instead"
+            )
         # compute X^2
         logL = self.likelihood_data_given_model_solution(
             im_sim,
@@ -226,22 +228,24 @@ class ImageLinearFit(ImageModel):
 
         logL = self.Data.log_likelihood(model, self.likelihood_mask, model_error)
 
-        #if self._pixelbased_bool is False:
+        # if self._pixelbased_bool is False:
         #    if cov_matrix is not None and source_marg:
         #        marg_const = de_lens.marginalization_new(
         #            cov_matrix, d_prior=linear_prior
         #        )
         #        logL += marg_const
         if check_positive_flux is True:
-            raise ValueError("check positive flux is not supported in jaxtronomy due to issues with autodifferentiation")
-            #bool_ = self.check_positive_flux(
+            raise ValueError(
+                "check positive flux is not supported in jaxtronomy due to issues with autodifferentiation"
+            )
+            # bool_ = self.check_positive_flux(
             #    kwargs_source, kwargs_lens_light, kwargs_ps
-            #)
-            #if bool_ is False:
+            # )
+            # if bool_ is False:
             #    logL -= 10**8
         return logL
-    
-    #def update_pixel_kwargs(self, kwargs_source, kwargs_lens_light):
+
+        # def update_pixel_kwargs(self, kwargs_source, kwargs_lens_light):
         """Update kwargs arguments for pixel-based profiles with fixed properties such
         as their number of pixels, scale, and center coordinates (fixed to the origin).
 
@@ -293,7 +297,7 @@ class ImageLinearFit(ImageModel):
 
     @property
     def num_data_evaluate(self):
-        """Number of pixels included in the likelihood calculation
+        """Number of pixels included in the likelihood calculation.
 
         :return: number of evaluated pixels
         :rtype: int.
@@ -315,7 +319,9 @@ class ImageLinearFit(ImageModel):
         self.array_masked2image = jit(self._array_masked2image)
         self.error_response = jit(self._error_response)
         self._error_map_psf = jit(self.__error_map_psf)
-        self.likelihood_data_given_model = jit(self._likelihood_data_given_model, static_argnames=("check_positive_flux"))
+        self.likelihood_data_given_model = jit(
+            self._likelihood_data_given_model, static_argnames=("check_positive_flux")
+        )
 
     @partial(jit, static_argnums=0)
     def image2array_masked(self, image):
@@ -381,7 +387,7 @@ class ImageLinearFit(ImageModel):
                         )
         return error_map
 
-    #def check_positive_flux(self, kwargs_source, kwargs_lens_light, kwargs_ps):
+        # def check_positive_flux(self, kwargs_source, kwargs_lens_light, kwargs_ps):
         """Checks whether the surface brightness profiles contain positive fluxes and
         returns bool if True.
 

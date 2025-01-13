@@ -128,7 +128,7 @@ class ImageModel(object):
         else:
             self._pb_1d = None
 
-    #def reset_point_source_cache(self, cache=True):
+    # def reset_point_source_cache(self, cache=True):
     #    """Deletes all the cache in the point source class and saves it from then on.
 
     #    :param cache: boolean, if True, saves the next occuring point source positions

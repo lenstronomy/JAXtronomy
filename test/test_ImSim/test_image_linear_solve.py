@@ -53,7 +53,7 @@ class TestImageLinearFit(object):
         )
 
         self.data_class2 = ImageData(**kwargs_data)
-        self.data_class2_ref = ImageData_ref(**kwargs_data)        
+        self.data_class2_ref = ImageData_ref(**kwargs_data)
 
         kwargs_psf = {
             "psf_type": "GAUSSIAN",
@@ -114,7 +114,9 @@ class TestImageLinearFit(object):
         lens_light_model_list = ["SERSIC"]
         self.kwargs_lens_light = [kwargs_sersic]
         lens_light_model_class = LightModel(light_model_list=lens_light_model_list)
-        lens_light_model_class_ref = LightModel_ref(light_model_list=lens_light_model_list)
+        lens_light_model_class_ref = LightModel_ref(
+            light_model_list=lens_light_model_list
+        )
 
         source_model_list = ["SERSIC_ELLIPSE"]
         self.kwargs_source = [kwargs_sersic_ellipse]
@@ -148,7 +150,7 @@ class TestImageLinearFit(object):
             self.kwargs_lens,
             self.kwargs_source,
             self.kwargs_lens_light,
-            no_noise=True
+            no_noise=True,
         )
         self.data_class.update_data(image_sim + 1.03)
         self.data_class_ref.update_data(image_sim + 1.03)
@@ -156,11 +158,17 @@ class TestImageLinearFit(object):
         self.data_class2_ref.update_data(image_sim - 1.02)
 
     def test_data_response(self):
-        npt.assert_array_almost_equal(self.imagelinearfit.data_response, self.imagelinearfit_ref.data_response)
+        npt.assert_array_almost_equal(
+            self.imagelinearfit.data_response, self.imagelinearfit_ref.data_response
+        )
 
     def test_error(self):
-        cd_response, model_error = self.imagelinearfit.error_response(self.kwargs_lens, [], [])
-        cd_response_ref, model_error_ref = self.imagelinearfit_ref.error_response(self.kwargs_lens, [], [])
+        cd_response, model_error = self.imagelinearfit.error_response(
+            self.kwargs_lens, [], []
+        )
+        cd_response_ref, model_error_ref = self.imagelinearfit_ref.error_response(
+            self.kwargs_lens, [], []
+        )
         npt.assert_array_almost_equal(cd_response, cd_response_ref, decimal=8)
         npt.assert_array_almost_equal(model_error, model_error_ref, decimal=8)
 
@@ -171,8 +179,12 @@ class TestImageLinearFit(object):
         self.imagelinearfit.update_data(self.data_class2)
         self.imagelinearfit_ref.update_data(self.data_class2_ref)
 
-        cd_response, model_error = self.imagelinearfit.error_response(self.kwargs_lens, [], [])
-        cd_response_ref, model_error_ref = self.imagelinearfit_ref.error_response(self.kwargs_lens, [], [])
+        cd_response, model_error = self.imagelinearfit.error_response(
+            self.kwargs_lens, [], []
+        )
+        cd_response_ref, model_error_ref = self.imagelinearfit_ref.error_response(
+            self.kwargs_lens, [], []
+        )
         npt.assert_array_almost_equal(cd_response, cd_response_ref, decimal=8)
         npt.assert_array_almost_equal(model_error, model_error_ref, decimal=8)
 
@@ -190,7 +202,7 @@ class TestImageLinearFit(object):
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
-            linear_solver=False
+            linear_solver=False,
         )
         npt.assert_array_almost_equal(likelihood, likelihood_ref, decimal=8)
 
@@ -206,7 +218,7 @@ class TestImageLinearFit(object):
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
-            linear_solver=False
+            linear_solver=False,
         )
         npt.assert_array_almost_equal(likelihood, likelihood_ref, decimal=8)
 
@@ -254,7 +266,6 @@ class TestImageLinearFit(object):
         chi2_ref = self.imagelinearfit_ref.reduced_chi2(model, error_map)
         npt.assert_array_almost_equal(chi2, chi2_ref, decimal=8)
 
-
     def test_image2array_masked(self):
         image = self.data_class.data
         array = self.imagelinearfit.image2array_masked(image)
@@ -272,19 +283,29 @@ class TestImageLinearFit(object):
         npt.assert_array_almost_equal(image, image_0 * self.likelihood_mask, decimal=8)
 
     def test_raises(self):
-        npt.assert_raises(ValueError, ImageLinearFit, self.data_class, self.psf_class, linear_solver=True)
-        npt.assert_raises(Exception, self.imagelinearfit.image_pixelbased_solve)
-        npt.assert_raises(ValueError, self.imagelinearfit.likelihood_data_given_model,
-            kwargs_lens=self.kwargs_lens,
-            kwargs_source=self.kwargs_source,
-            kwargs_lens_light=self.kwargs_lens_light,
-            check_positive_flux=True
+        npt.assert_raises(
+            ValueError,
+            ImageLinearFit,
+            self.data_class,
+            self.psf_class,
+            linear_solver=True,
         )
-        npt.assert_raises(ValueError, self.imagelinearfit.likelihood_data_given_model,
+        npt.assert_raises(Exception, self.imagelinearfit.image_pixelbased_solve)
+        npt.assert_raises(
+            ValueError,
+            self.imagelinearfit.likelihood_data_given_model,
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
-            linear_solver=True
+            check_positive_flux=True,
+        )
+        npt.assert_raises(
+            ValueError,
+            self.imagelinearfit.likelihood_data_given_model,
+            kwargs_lens=self.kwargs_lens,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
+            linear_solver=True,
         )
 
 
