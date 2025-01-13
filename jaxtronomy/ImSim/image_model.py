@@ -128,15 +128,15 @@ class ImageModel(object):
         else:
             self._pb_1d = None
 
-    # def reset_point_source_cache(self, cache=True):
-    #     """Deletes all the cache in the point source class and saves it from then on.
+    #def reset_point_source_cache(self, cache=True):
+    #    """Deletes all the cache in the point source class and saves it from then on.
 
-    #     :param cache: boolean, if True, saves the next occuring point source positions
-    #         in the cache
-    #     :return: None
-    #     """
-    #     self.PointSource.delete_lens_model_cache()
-    #     self.PointSource.set_save_cache(cache)
+    #    :param cache: boolean, if True, saves the next occuring point source positions
+    #        in the cache
+    #    :return: None
+    #    """
+    #    self.PointSource.delete_lens_model_cache()
+    #    self.PointSource.set_save_cache(cache)
 
     def update_psf(self, psf_class):
         """Update the instance of the class with a new instance of PSF() with a
@@ -309,7 +309,7 @@ class ImageModel(object):
                 kwargs_special=kwargs_special,
                 k=k,
             )
-            # dicts and lists evaluate to false if empty and true if not empty
+            # dicts and lists evaluate to true if not empty
             if kwargs_extinction is not None and kwargs_extinction:
                 raise ValueError("Extinction is not implemented in JAXtronomy yet")
             # source_light *= self._extinction.extinction(
