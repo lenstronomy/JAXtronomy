@@ -4,8 +4,7 @@ import numpy.testing as npt
 import numpy as np
 import pytest
 
-import lenstronomy.Util.param_util as param_util
-import lenstronomy.Util.simulation_util as sim_util
+from lenstronomy.Util import param_util, simulation_util as sim_util
 from lenstronomy.Data.psf import PSF
 
 from lenstronomy.Data.imaging_data import ImageData as ImageData_ref
@@ -187,6 +186,7 @@ class TestImageLinearFit(object):
         )
 
     def test_error(self):
+        # error response
         cd_response, model_error = self.imagelinearfit.error_response(
             self.kwargs_lens, [], []
         )
@@ -196,10 +196,18 @@ class TestImageLinearFit(object):
         npt.assert_array_almost_equal(cd_response, cd_response_ref, decimal=8)
         npt.assert_array_almost_equal(model_error, model_error_ref, decimal=8)
 
+        # error map psf
         error = self.imagelinearfit._error_map_psf(self.kwargs_lens, [], [])
         error_ref = self.imagelinearfit_ref._error_map_psf(self.kwargs_lens, [], [])
         npt.assert_array_almost_equal(error, error_ref, decimal=8)
 
+        # error source
+        x_grid, y_grid = self.data_class.pixel_coordinates
+        error = self.imagelinearfit.error_map_source(self.kwargs_source, x_grid, y_grid, None)
+        error_ref = self.imagelinearfit_ref.error_map_source(self.kwargs_source, x_grid, y_grid, None)
+        npt.assert_array_almost_equal(error, error_ref, decimal=8)
+
+        # redo data-related test after updating data
         self.imagelinearfit.update_data(self.data_class2)
         self.imagelinearfit_ref.update_data(self.data_class2_ref)
 
@@ -211,10 +219,6 @@ class TestImageLinearFit(object):
         )
         npt.assert_array_almost_equal(cd_response, cd_response_ref, decimal=8)
         npt.assert_array_almost_equal(model_error, model_error_ref, decimal=8)
-
-        error = self.imagelinearfit._error_map_psf(self.kwargs_lens, [], [])
-        error_ref = self.imagelinearfit_ref._error_map_psf(self.kwargs_lens, [], [])
-        npt.assert_array_almost_equal(error, error_ref, decimal=8)
 
     def test_likelihood_data_given_model(self):
         likelihood, _ = self.imagelinearfit.likelihood_data_given_model(

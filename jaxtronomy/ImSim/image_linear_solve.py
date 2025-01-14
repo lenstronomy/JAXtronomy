@@ -76,16 +76,6 @@ class ImageLinearFit(ImageModel):
         #    # update the pixel-based solver with the likelihood mask
         #    self.PixelSolver.set_likelihood_mask(self.likelihood_mask)
 
-        # Compile class functions
-        self.reduced_residuals = jit(self._reduced_residuals)
-        self.likelihood_data_given_model = jit(
-            self._likelihood_data_given_model, static_argnames=("check_positive_flux")
-        )
-        self.array_masked2image = jit(self._array_masked2image)
-        self.error_response = jit(self._error_response)
-        self._error_map_psf = jit(self.__error_map_psf)
-        self.reduced_chi2 = jit(self._reduced_chi2)
-
     def image_pixelbased_solve(
         self,
         kwargs_lens=None,
@@ -104,8 +94,16 @@ class ImageLinearFit(ImageModel):
         masking) :return: 1d numpy array."""
         d = self.image2array_masked(self.Data.data)
         return d
+    
+    def error_response(self, kwargs_lens, kwargs_ps, kwargs_special):
+        """Returns the 1d array of the error estimate corresponding to the data
+        response.
 
-    # Don't apply JIT decorator to this function
+        :return: 1d numpy array of response, 2d array of additional errors (e.g. point
+            source uncertainties)
+        """
+        return self._error_response(kwargs_lens, kwargs_ps, kwargs_special)
+
     def _error_response(self, kwargs_lens, kwargs_ps, kwargs_special):
         """Returns the 1d array of the error estimate corresponding to the data
         response.
@@ -120,7 +118,34 @@ class ImageLinearFit(ImageModel):
         C_D_response = self.image2array_masked(self.Data.C_D + model_error)
         return C_D_response, model_error
 
-    # Don't apply JIT decorator to this function
+    def likelihood_data_given_model(
+        self,
+        kwargs_lens=None,
+        kwargs_source=None,
+        kwargs_lens_light=None,
+        kwargs_ps=None,
+        kwargs_extinction=None,
+        kwargs_special=None,
+        source_marg=False,
+        linear_prior=None,
+        check_positive_flux=False,
+        linear_solver=False,
+    ):
+        """See docstring for self._likelihood_data_given_model
+        """
+        return self._likelihood_data_given_model(
+            kwargs_lens=kwargs_lens,
+            kwargs_source=kwargs_source,
+            kwargs_lens_light=kwargs_lens_light,
+            kwargs_ps=kwargs_ps,
+            kwargs_extinction=kwargs_extinction,
+            kwargs_special=kwargs_special,
+            source_marg=source_marg,
+            linear_prior=linear_prior,
+            check_positive_flux=check_positive_flux,
+            linear_solver=linear_solver,
+        )
+
     def _likelihood_data_given_model(
         self,
         kwargs_lens=None,
@@ -189,7 +214,6 @@ class ImageLinearFit(ImageModel):
         )
         return logL, param
 
-    # Don't apply JIT decorator to this function
     def likelihood_data_given_model_solution(
         self,
         model,
@@ -232,11 +256,6 @@ class ImageLinearFit(ImageModel):
             raise ValueError(
                 "check positive flux is not supported in jaxtronomy due to issues with autodifferentiation"
             )
-            # bool_ = self.check_positive_flux(
-            #    kwargs_source, kwargs_lens_light, kwargs_ps
-            # )
-            # if bool_ is False:
-            #    logL -= 10**8
         return logL
 
         # def update_pixel_kwargs(self, kwargs_source, kwargs_lens_light):
@@ -268,8 +287,7 @@ class ImageLinearFit(ImageModel):
             kwargs_lens_light[0]["center_y"] = 0
         return kwargs_source, kwargs_lens_light
 
-    # Don't apply JIT decorator to this function
-    def _reduced_residuals(self, model, error_map=0):
+    def reduced_residuals(self, model, error_map=0):
         """
 
         :param model: 2d numpy array of the modeled image
@@ -281,8 +299,7 @@ class ImageLinearFit(ImageModel):
         residual = (model - self.Data.data) / jnp.sqrt(C_D + jnp.abs(error_map)) * mask
         return residual
 
-    # Don't apply JIT decorator to this function
-    def _reduced_chi2(self, model, error_map=0):
+    def reduced_chi2(self, model, error_map=0):
         """Returns reduced chi2 :param model: 2d numpy array of a model predicted image
         :param error_map: same format as model, additional error component (such as PSF
         errors) :return: reduced chi2."""
@@ -307,16 +324,6 @@ class ImageLinearFit(ImageModel):
         self.Data = data_class
         self.ImageNumerics._PixelGrid = data_class
 
-        # Recompile all functions involving self.Data
-        self.reduced_residuals = jit(self._reduced_residuals)
-        self.reduced_chi2 = jit(self._reduced_chi2)
-        self.array_masked2image = jit(self._array_masked2image)
-        self.error_response = jit(self._error_response)
-        self._error_map_psf = jit(self.__error_map_psf)
-        self.likelihood_data_given_model = jit(
-            self._likelihood_data_given_model, static_argnames=("check_positive_flux")
-        )
-
     @partial(jit, static_argnums=0)
     def image2array_masked(self, image):
         """Returns 1d array of values in image that are not masked out for the
@@ -325,8 +332,7 @@ class ImageLinearFit(ImageModel):
         array = util.image2array(image)
         return array[self._mask1d]
 
-    # Don't apply JIT decorator to this function
-    def _array_masked2image(self, array):
+    def array_masked2image(self, array):
         """
 
         :param array: 1d array of values not masked out
@@ -338,7 +344,6 @@ class ImageLinearFit(ImageModel):
         grid2d = util.array2image(grid1d, nx, ny)
         return grid2d
 
-    # Don't apply JIT decorator to this function
     def _error_map_model(self, kwargs_lens, kwargs_ps, kwargs_special=None):
         """Noise estimate (variances as diagonal of the pixel covariance matrix)
         resulted from inherent model uncertainties This term is currently the psf error
@@ -351,8 +356,7 @@ class ImageLinearFit(ImageModel):
         """
         return self._error_map_psf(kwargs_lens, kwargs_ps, kwargs_special)
 
-    # Don't apply JIT decorator to this function
-    def __error_map_psf(self, kwargs_lens, kwargs_ps, kwargs_special=None):
+    def _error_map_psf(self, kwargs_lens, kwargs_ps, kwargs_special=None):
         """Map of image with error terms (sigma**2) expected from inaccuracies in the
         PSF modeling.
 
@@ -382,32 +386,42 @@ class ImageLinearFit(ImageModel):
         #                )
         return error_map
 
-        # def check_positive_flux(self, kwargs_source, kwargs_lens_light, kwargs_ps):
-        """Checks whether the surface brightness profiles contain positive fluxes and
-        returns bool if True.
+    def error_map_source(self, kwargs_source, x_grid, y_grid, cov_param):
+        """Variance of the linear source reconstruction in the source plane coordinates,
+        computed by the diagonal elements of the covariance matrix of the source
+        reconstruction as a sum of the errors of the basis set.
 
-        :param kwargs_source: source surface brightness keyword argument list
-        :param kwargs_lens_light: lens surface brightness keyword argument list
-        :param kwargs_ps: point source keyword argument list
-        :return: boolean
+        :param kwargs_source: keyword arguments of source model
+        :param x_grid: x-axis of positions to compute error map
+        :param y_grid: y-axis of positions to compute error map
+        :param cov_param: covariance matrix of liner inversion parameters
+        :return: diagonal covariance errors at the positions (x_grid, y_grid)
         """
-        pos_bool_ps = self.PointSource.check_positive_flux(kwargs_ps)
-        if self._pixelbased_bool is True:
-            # this constraint must be handled by the pixel-based solver
-            pos_bool_source = True
-            pos_bool_lens_light = True
-        else:
-            pos_bool_source = self.SourceModel.check_positive_flux_profile(
-                kwargs_source
-            )
-            pos_bool_lens_light = self.LensLightModel.check_positive_flux_profile(
-                kwargs_lens_light
-            )
-        if (
-            pos_bool_ps is True
-            and pos_bool_source is True
-            and pos_bool_lens_light is True
-        ):
-            return True
-        else:
-            return False
+        return self._error_map_source(kwargs_source, x_grid, y_grid, cov_param)
+
+    def _error_map_source(self, kwargs_source, x_grid, y_grid, cov_param):
+        """Variance of the linear source reconstruction in the source plane coordinates,
+        computed by the diagonal elements of the covariance matrix of the source
+        reconstruction as a sum of the errors of the basis set.
+
+        :param kwargs_source: keyword arguments of source model
+        :param x_grid: x-axis of positions to compute error map
+        :param y_grid: y-axis of positions to compute error map
+        :param cov_param: covariance matrix of liner inversion parameters
+        :return: diagonal covariance errors at the positions (x_grid, y_grid)
+        """
+
+        error_map = jnp.zeros_like(x_grid)
+        basis_functions, n_source = self.SourceModel.functions_split(
+            x_grid, y_grid, kwargs_source
+        )
+        basis_functions = jnp.array(basis_functions)
+
+        if cov_param is not None:
+            for i in range(len(error_map)):
+                error_map[i] = (
+                    basis_functions[:, i]
+                    .T.dot(cov_param[:n_source, :n_source])
+                    .dot(basis_functions[:, i])
+                )
+        return error_map
