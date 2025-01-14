@@ -94,7 +94,7 @@ class ImageLinearFit(ImageModel):
         masking) :return: 1d numpy array."""
         d = self.image2array_masked(self.Data.data)
         return d
-    
+
     def error_response(self, kwargs_lens, kwargs_ps, kwargs_special):
         """Returns the 1d array of the error estimate corresponding to the data
         response.
@@ -131,8 +131,7 @@ class ImageLinearFit(ImageModel):
         check_positive_flux=False,
         linear_solver=False,
     ):
-        """See docstring for self._likelihood_data_given_model
-        """
+        """See docstring for self._likelihood_data_given_model."""
         return self._likelihood_data_given_model(
             kwargs_lens=kwargs_lens,
             kwargs_source=kwargs_source,

@@ -203,8 +203,12 @@ class TestImageLinearFit(object):
 
         # error source
         x_grid, y_grid = self.data_class.pixel_coordinates
-        error = self.imagelinearfit.error_map_source(self.kwargs_source, x_grid, y_grid, None)
-        error_ref = self.imagelinearfit_ref.error_map_source(self.kwargs_source, x_grid, y_grid, None)
+        error = self.imagelinearfit.error_map_source(
+            self.kwargs_source, x_grid, y_grid, None
+        )
+        error_ref = self.imagelinearfit_ref.error_map_source(
+            self.kwargs_source, x_grid, y_grid, None
+        )
         npt.assert_array_almost_equal(error, error_ref, decimal=8)
 
         # redo data-related test after updating data
