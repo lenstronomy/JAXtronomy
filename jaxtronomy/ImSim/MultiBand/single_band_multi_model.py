@@ -211,14 +211,14 @@ class SingleBandMultiModel(ImageLinearFit):
             kwargs_lens_light_i, unconvolved=unconvolved, k=k
         )
 
-    #def point_source(
+    # def point_source(
     #    self,
     #    kwargs_ps,
     #    kwargs_lens=None,
     #    kwargs_special=None,
     #    unconvolved=False,
     #    k=None,
-    #):
+    # ):
     #    """Computes the point source positions and paints PSF convolutions on them.
 
     #    :param kwargs_ps:
@@ -242,7 +242,6 @@ class SingleBandMultiModel(ImageLinearFit):
     #        unconvolved=unconvolved,
     #        k=k,
     #    )
-
 
     def likelihood_data_given_model(
         self,
@@ -294,7 +293,6 @@ class SingleBandMultiModel(ImageLinearFit):
         )
         return logL, param
 
-
     def error_response(self, kwargs_lens, kwargs_ps, kwargs_special):
         """Returns the 1d array of the error estimate corresponding to the data
         response.
@@ -319,7 +317,7 @@ class SingleBandMultiModel(ImageLinearFit):
             kwargs_lens_i, kwargs_ps_i, kwargs_special=kwargs_special
         )
 
-    #def extinction_map(self, kwargs_extinction=None, kwargs_special=None):
+        # def extinction_map(self, kwargs_extinction=None, kwargs_special=None):
         """Differential extinction per pixel.
 
         :param kwargs_extinction: list of keyword arguments corresponding to the optical
@@ -331,7 +329,6 @@ class SingleBandMultiModel(ImageLinearFit):
             kwargs_extinction=kwargs_extinction
         )
         return self._extinction_map(kwargs_extinction_i, kwargs_special)
-
 
     def select_kwargs(
         self,

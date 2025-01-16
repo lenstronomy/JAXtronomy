@@ -5,7 +5,9 @@ import numpy as np
 import pytest
 
 from lenstronomy.Util import simulation_util as sim_util, param_util
-from lenstronomy.ImSim.MultiBand.single_band_multi_model import SingleBandMultiModel as SingleBandMultiModel_ref
+from lenstronomy.ImSim.MultiBand.single_band_multi_model import (
+    SingleBandMultiModel as SingleBandMultiModel_ref,
+)
 
 from jaxtronomy.ImSim.MultiBand.single_band_multi_model import SingleBandMultiModel
 
@@ -27,7 +29,7 @@ class TestSingleBandMultiModel(object):
         )
 
         kwargs_data2 = sim_util.data_configure_simple(
-            numPix2, deltaPix, exp_time+30, sigma_bkg+0.01, inverse=True
+            numPix2, deltaPix, exp_time + 30, sigma_bkg + 0.01, inverse=True
         )
 
         # Create likelihood masks
@@ -76,7 +78,6 @@ class TestSingleBandMultiModel(object):
             "e2": e2,
         }
 
-
         lens_model_list = ["SIE", "EPL", "SHEAR"]
         self.kwargs_lens = [kwargs_spemd, kwargs_epl, kwargs_shear]
 
@@ -117,14 +118,17 @@ class TestSingleBandMultiModel(object):
             "supersampling_convolution": False,
         }
 
-        multi_band_list = [[kwargs_data, kwargs_psf, kwargs_numerics], [kwargs_data2, kwargs_psf2, kwargs_numerics2]]
+        multi_band_list = [
+            [kwargs_data, kwargs_psf, kwargs_numerics],
+            [kwargs_data2, kwargs_psf2, kwargs_numerics2],
+        ]
         # band 0 involves the SIE + SHEAR lens models, a SERSIC lens light model, and a SERSIC_ELLIPSE source model
         # band 1 involves the EPL + SHEAR lens models, the same SERSIC lens light model, and the same SERSIC_ELLIPSE source model
         kwargs_model = {
             "lens_model_list": lens_model_list,
             "source_light_model_list": source_model_list,
             "lens_light_model_list": lens_light_model_list,
-            "index_lens_model_list": [[0,2], [1,2]],
+            "index_lens_model_list": [[0, 2], [1, 2]],
             # The next line is not needed if the models are the same for both bands
             "index_source_light_model_list": [[0], [0]],
         }
@@ -134,7 +138,7 @@ class TestSingleBandMultiModel(object):
             likelihood_mask_list,
             band_index=0,
             kwargs_pixelbased=None,
-            linear_solver=False
+            linear_solver=False,
         )
         self.singleband1 = SingleBandMultiModel(
             multi_band_list,
@@ -142,7 +146,7 @@ class TestSingleBandMultiModel(object):
             likelihood_mask_list,
             band_index=1,
             kwargs_pixelbased=None,
-            linear_solver=False
+            linear_solver=False,
         )
         self.singleband0_ref = SingleBandMultiModel_ref(
             multi_band_list,
@@ -150,7 +154,7 @@ class TestSingleBandMultiModel(object):
             likelihood_mask_list,
             band_index=0,
             kwargs_pixelbased=None,
-            linear_solver=False
+            linear_solver=False,
         )
         self.singleband1_ref = SingleBandMultiModel_ref(
             multi_band_list,
@@ -158,7 +162,7 @@ class TestSingleBandMultiModel(object):
             likelihood_mask_list,
             band_index=1,
             kwargs_pixelbased=None,
-            linear_solver=False
+            linear_solver=False,
         )
 
     def test_image(self):
@@ -188,7 +192,6 @@ class TestSingleBandMultiModel(object):
         npt.assert_array_almost_equal(image1, image1_ref, decimal=8)
         assert image1.shape == (self.numPix2, self.numPix2)
 
-
     def test_source_surface_brightness(self):
         flux0 = self.singleband0.source_surface_brightness(
             kwargs_lens=self.kwargs_lens,
@@ -210,7 +213,6 @@ class TestSingleBandMultiModel(object):
         )
         npt.assert_array_almost_equal(flux1, flux1_ref, decimal=8)
 
-
     def test_lens_surface_brightness(self):
         flux0 = self.singleband0.lens_surface_brightness(
             kwargs_lens_light=self.kwargs_lens_light,
@@ -227,7 +229,6 @@ class TestSingleBandMultiModel(object):
             kwargs_lens_light=self.kwargs_lens_light,
         )
         npt.assert_array_almost_equal(flux1, flux1_ref, decimal=8)
-
 
     def test_likelihood_data_given_model(self):
         likelihood0, _ = self.singleband0.likelihood_data_given_model(
@@ -256,15 +257,18 @@ class TestSingleBandMultiModel(object):
         )
         npt.assert_array_almost_equal(likelihood1, likelihood1_ref, decimal=8)
 
-
     def test_error_response(self):
         c_d, error0 = self.singleband0.error_response(self.kwargs_lens, None, None)
-        c_d_ref, error0_ref = self.singleband0_ref.error_response(self.kwargs_lens, None, None)
+        c_d_ref, error0_ref = self.singleband0_ref.error_response(
+            self.kwargs_lens, None, None
+        )
         npt.assert_array_almost_equal(c_d, c_d_ref, decimal=8)
         npt.assert_array_almost_equal(error0, error0_ref, decimal=8)
 
         c_d, error1 = self.singleband1.error_response(self.kwargs_lens, None, None)
-        c_d_ref, error1_ref = self.singleband1_ref.error_response(self.kwargs_lens, None, None)
+        c_d_ref, error1_ref = self.singleband1_ref.error_response(
+            self.kwargs_lens, None, None
+        )
         npt.assert_array_almost_equal(c_d, c_d_ref, decimal=8)
         npt.assert_array_almost_equal(error1, error1_ref, decimal=8)
 
@@ -275,14 +279,18 @@ class TestSingleBandMultiModel(object):
             kwargs_lens_light_i,
             kwargs_ps_i,
             kwargs_extinction_i,
-        ) = self.singleband0.select_kwargs(self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light)
+        ) = self.singleband0.select_kwargs(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+        )
         (
             kwargs_lens_i_ref,
             kwargs_source_i_ref,
             kwargs_lens_light_i_ref,
             kwargs_ps_i_ref,
             kwargs_extinction_i_ref,
-        ) = self.singleband0_ref.select_kwargs(self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light)
+        ) = self.singleband0_ref.select_kwargs(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+        )
         assert kwargs_lens_i == kwargs_lens_i_ref
         assert kwargs_source_i == kwargs_source_i_ref
         assert kwargs_lens_light_i == kwargs_lens_light_i_ref
@@ -295,14 +303,18 @@ class TestSingleBandMultiModel(object):
             kwargs_lens_light_i,
             kwargs_ps_i,
             kwargs_extinction_i,
-        ) = self.singleband1.select_kwargs(self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light)
+        ) = self.singleband1.select_kwargs(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+        )
         (
             kwargs_lens_i_ref,
             kwargs_source_i_ref,
             kwargs_lens_light_i_ref,
             kwargs_ps_i_ref,
             kwargs_extinction_i_ref,
-        ) = self.singleband1_ref.select_kwargs(self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light)
+        ) = self.singleband1_ref.select_kwargs(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+        )
         assert kwargs_lens_i == kwargs_lens_i_ref
         assert kwargs_source_i == kwargs_source_i_ref
         assert kwargs_lens_light_i == kwargs_lens_light_i_ref
@@ -335,14 +347,18 @@ class TestSingleBandMultiModel(object):
             kwargs_lens_light_i,
             kwargs_ps_i,
             kwargs_extinction_i,
-        ) = self.singleband0.select_kwargs(self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light)
+        ) = self.singleband0.select_kwargs(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+        )
         (
             kwargs_lens_i_ref,
             kwargs_source_i_ref,
             kwargs_lens_light_i_ref,
             kwargs_ps_i_ref,
             kwargs_extinction_i_ref,
-        ) = self.singleband1_ref.select_kwargs(self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light)
+        ) = self.singleband1_ref.select_kwargs(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+        )
         assert kwargs_lens_i != kwargs_lens_i_ref
 
 
