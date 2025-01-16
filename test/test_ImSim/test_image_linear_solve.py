@@ -28,32 +28,22 @@ class TestImageLinearFit(object):
         numPix = 100  # cutout pixel size
         deltaPix = 0.05  # pixel size in arcsec (area per pixel = deltaPix**2)
         fwhm = 0.5  # full width half max of PSF
-
         kwargs_data = sim_util.data_configure_simple(
             numPix, deltaPix, exp_time, sigma_bkg, inverse=True
         )
-
-        # Create likelihood mask
-        likelihood_mask = np.ones((numPix, numPix))
-        likelihood_mask[50][::2] -= likelihood_mask[50][::2]
-        likelihood_mask[25][::3] -= likelihood_mask[25][::3]
-        self.likelihood_mask = likelihood_mask
-
         self.data_class = ImageData(**kwargs_data)
         self.data_class_ref = ImageData_ref(**kwargs_data)
 
         # make a second data class for update_data testing
         sigma_bkg = 0.08  # background noise per pixel
         exp_time = 137  # exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
-
-        # PSF specification
         kwargs_data = sim_util.data_configure_simple(
             numPix, deltaPix, exp_time, sigma_bkg, inverse=True
         )
-
         self.data_class2 = ImageData(**kwargs_data)
         self.data_class2_ref = ImageData_ref(**kwargs_data)
 
+        # PSF specification
         kwargs_psf = {
             "psf_type": "GAUSSIAN",
             "fwhm": fwhm,
@@ -125,6 +115,12 @@ class TestImageLinearFit(object):
             "supersampling_factor": 3,
             "supersampling_convolution": True,
         }
+
+        # Create likelihood mask
+        likelihood_mask = np.ones((numPix, numPix))
+        likelihood_mask[50][::2] -= likelihood_mask[50][::2]
+        likelihood_mask[25][::3] -= likelihood_mask[25][::3]
+        self.likelihood_mask = likelihood_mask
 
         # Create 2 class instances with likelihood mask
         self.imagelinearfit = ImageLinearFit(
