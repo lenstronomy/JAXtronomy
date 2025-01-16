@@ -181,7 +181,7 @@ class ImageLinearFit(ImageModel):
         """
         # generate image
         if linear_solver is False:
-            im_sim = self.image(
+            im_sim = super(ImageLinearFit, self).image(
                 kwargs_lens,
                 kwargs_source,
                 kwargs_lens_light,
