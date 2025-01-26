@@ -4,7 +4,8 @@ from jaxtronomy.ImSim.Numerics.convolution import (
     PixelKernelConvolution,
     GaussianConvolution,
 )
-from jaxtronomy.Util import util
+
+from lenstronomy.Util import util as util_lenstronomy
 from lenstronomy.ImSim.Numerics.point_source_rendering import PointSourceRendering
 from lenstronomy.Util import kernel_util
 from jax import jit
@@ -122,7 +123,8 @@ class Numerics(PointSourceRendering):
         elif self._psf_type == "GAUSSIAN":
             pixel_scale = pixel_grid.pixel_width
             fwhm = psf.fwhm  # FWHM  in units of angle
-            sigma = util.fwhm2sigma(fwhm)
+            # sigma cannot be a traced value; must be concrete
+            sigma = util_lenstronomy.fwhm2sigma(fwhm)
             self._conv = GaussianConvolution(
                 sigma,
                 pixel_scale,
