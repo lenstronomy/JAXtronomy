@@ -110,7 +110,7 @@ class ImageModel(object):
         self._psf_error_map = self.PSF.psf_error_map_bool
         if self._psf_error_map:
             raise ValueError("psf error map not supported in jaxtronomy")
-        
+
         # NOTE: likelihood mask cannot be traced jnp array; must be concrete np array
         if likelihood_mask is None:
             likelihood_mask = np.ones(data_class.num_pixel_axes)
@@ -129,8 +129,8 @@ class ImageModel(object):
         else:
             self._pb_1d = None
 
-# --------------------------------------------------------------------------
-# JAX pytree methods
+    # --------------------------------------------------------------------------
+    # JAX pytree methods
 
     def _tree_flatten(self):
         children = ()
@@ -152,8 +152,8 @@ class ImageModel(object):
     @classmethod
     def _tree_unflatten(cls, aux_data, children):
         return cls(**aux_data)
-    
-# --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
 
     # def reset_point_source_cache(self, cache=True):
     #    """Deletes all the cache in the point source class and saves it from then on.
@@ -165,7 +165,7 @@ class ImageModel(object):
     #    self.PointSource.delete_lens_model_cache()
     #    self.PointSource.set_save_cache(cache)
 
-    @partial(jit, static_argnums=(7,8,9))
+    @partial(jit, static_argnums=(7, 8, 9))
     def likelihood_data_given_model(
         self,
         kwargs_lens=None,
@@ -200,9 +200,7 @@ class ImageModel(object):
         :return: log likelihood (natural logarithm), linear parameter list
         """
         if check_positive_flux:
-            raise ValueError(
-                "check positive flux is not supported in jaxtronomy"
-            )
+            raise ValueError("check positive flux is not supported in jaxtronomy")
         # generate image
         im_sim = ImageModel.image(
             self,
@@ -220,7 +218,7 @@ class ImageModel(object):
         logL = self.Data.log_likelihood(im_sim, self.likelihood_mask, model_error)
         return logL
 
-    @partial(jit, static_argnums=(5,6,7,8))
+    @partial(jit, static_argnums=(5, 6, 7, 8))
     def source_surface_brightness(
         self,
         kwargs_source,
@@ -248,7 +246,7 @@ class ImageModel(object):
         """
         if len(self.SourceModel.profile_type_list) == 0:
             return jnp.zeros(self.Data.num_pixel_axes)
-        
+
         return self._source_surface_brightness_analytical(
             kwargs_source,
             kwargs_lens=kwargs_lens,
@@ -258,8 +256,8 @@ class ImageModel(object):
             de_lensed=de_lensed,
             k=k,
         )
-    
-    @partial(jit, static_argnums=(5,6,7))
+
+    @partial(jit, static_argnums=(5, 6, 7))
     def _source_surface_brightness_analytical(
         self,
         kwargs_source,
@@ -298,7 +296,7 @@ class ImageModel(object):
         )
         return source_light_final
 
-    @partial(jit, static_argnums=(5,6))
+    @partial(jit, static_argnums=(5, 6))
     def _source_surface_brightness_analytical_numerics(
         self,
         kwargs_source,
@@ -349,7 +347,7 @@ class ImageModel(object):
         #    source_light *= self._pb_1d
         return source_light * self._flux_scaling
 
-    @partial(jit, static_argnums=(2,3))
+    @partial(jit, static_argnums=(2, 3))
     def lens_surface_brightness(self, kwargs_lens_light, unconvolved=False, k=None):
         """Computes the lens surface brightness distribution.
 
@@ -410,7 +408,7 @@ class ImageModel(object):
     #    )
     #    return point_source_image * self._flux_scaling
 
-    @partial(jit, static_argnums=(7,8,9,10))
+    @partial(jit, static_argnums=(7, 8, 9, 10))
     def image(
         self,
         kwargs_lens=None,
@@ -504,11 +502,11 @@ class ImageModel(object):
 
     @jit
     def reduced_chi2(self, model, error_map=0):
-        """Returns reduced chi2
-        
+        """Returns reduced chi2.
+
         :param model: 2d numpy array of a model predicted image
         :param error_map: same format as model, additional error component (such as PSF
-        errors)
+            errors)
         :return: reduced chi2.
         """
         norm_res = self.reduced_residuals(model, error_map)
@@ -517,13 +515,13 @@ class ImageModel(object):
     @jit
     def image2array_masked(self, image):
         """Returns 1d array of values in image that are not masked out for the
-        likelihood computation/linear minimization
-        
+        likelihood computation/linear minimization.
+
         :param image: 2d numpy array of full image
         :return: 1d array.
         """
         array = util.image2array(image)
-        #array = array[jnp.nonzero(self._mask1d, size=self.num_data_evaluate)]
+        # array = array[jnp.nonzero(self._mask1d, size=self.num_data_evaluate)]
         return array[self._mask1d]
 
     @jit
@@ -557,9 +555,7 @@ class ImageModel(object):
         :return: 1d numpy array of response, 2d array of additional errors (e.g. point
             source uncertainties)
         """
-        model_error = self._error_map_model(
-            kwargs_lens, kwargs_ps, kwargs_special
-        )
+        model_error = self._error_map_model(kwargs_lens, kwargs_ps, kwargs_special)
         # adding the uncertainties estimated from the data with the ones from the model
         C_D_response = self.image2array_masked(self.Data.C_D + model_error)
         return C_D_response, model_error
@@ -578,7 +574,7 @@ class ImageModel(object):
         return self._error_map_psf(kwargs_lens, kwargs_ps, kwargs_special)
 
     @jit
-    #@partial(jit, static_argnums=0)
+    # @partial(jit, static_argnums=0)
     def _error_map_psf(self, kwargs_lens, kwargs_ps, kwargs_special=None):
         """Map of image with error terms (sigma**2) expected from inaccuracies in the
         PSF modeling.
@@ -608,7 +604,6 @@ class ImageModel(object):
         #                    fix_psf_error_map=False,
         #                )
         return error_map
-
 
     # @staticmethod
     # def _displace_astrometry(x_pos, y_pos, kwargs_special=None):
@@ -658,4 +653,7 @@ class ImageModel(object):
         self.Data = data_class
         self.ImageNumerics._PixelGrid = data_class
 
-tree_util.register_pytree_node(ImageModel, ImageModel._tree_flatten, ImageModel._tree_unflatten)
+
+tree_util.register_pytree_node(
+    ImageModel, ImageModel._tree_flatten, ImageModel._tree_unflatten
+)

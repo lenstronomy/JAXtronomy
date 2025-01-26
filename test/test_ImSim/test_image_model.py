@@ -55,7 +55,7 @@ class TestImageModel(object):
         self.psf_class_gaussian1 = PSF(**kwargs_psf)
         kwargs_psf = {
             "psf_type": "GAUSSIAN",
-            "fwhm": fwhm+0.1,
+            "fwhm": fwhm + 0.1,
             "truncation": 3,
             "pixel_size": deltaPix,
         }
@@ -204,7 +204,9 @@ class TestImageModel(object):
 
         # primary beam not supported
         self.data_class._pb = np.ones((100, 100))
-        npt.assert_raises(ValueError, ImageModel, self.data_class, self.psf_class_gaussian1)
+        npt.assert_raises(
+            ValueError, ImageModel, self.data_class, self.psf_class_gaussian1
+        )
 
         # psf error map not supported
         kernel = self.psf_class_gaussian1.kernel_point_source
@@ -229,38 +231,26 @@ class TestImageModel(object):
 
     def test_likelihood_data_given_model(self):
         logL = self.imageModel.likelihood_data_given_model(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         logL_ref = self.imageModel_ref.likelihood_data_given_model(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
         logL = self.imageModel.likelihood_data_given_model(
-            self.kwargs_lens2,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
         )
         logL_ref = self.imageModel_ref.likelihood_data_given_model(
-            self.kwargs_lens2,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
         logL = self.imageModel_nomask.likelihood_data_given_model(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         logL_ref = self.imageModel_nomask_ref.likelihood_data_given_model(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
@@ -275,38 +265,26 @@ class TestImageModel(object):
         self.imageModel_nomask_ref.update_data(self.data_class2_ref)
 
         logL = self.imageModel.likelihood_data_given_model(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         logL_ref = self.imageModel_ref.likelihood_data_given_model(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
         logL = self.imageModel.likelihood_data_given_model(
-            self.kwargs_lens2,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
         )
         logL_ref = self.imageModel_ref.likelihood_data_given_model(
-            self.kwargs_lens2,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
         logL = self.imageModel_nomask.likelihood_data_given_model(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         logL_ref = self.imageModel_nomask_ref.likelihood_data_given_model(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
@@ -467,7 +445,6 @@ class TestImageModel(object):
         )
         npt.assert_array_almost_equal(cd_response, cd_response_ref, decimal=8)
         npt.assert_array_almost_equal(model_error, model_error_ref, decimal=8)
-
 
     def test_reduced_residuals(self):
         model = self.data_class.data
