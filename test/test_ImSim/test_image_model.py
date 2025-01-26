@@ -75,11 +75,19 @@ class TestImageModel(object):
             "e1": e1,
             "e2": e2,
         }
+        kwargs_spemd2 = {
+            "theta_E": 1.8,
+            "center_x": 0.1,
+            "center_y": -0.4,
+            "e1": e1,
+            "e2": e2,
+        }
 
         lens_model_list = ["SIE", "SHEAR"]
         lens_model_class_ref = LensModel_ref(lens_model_list=lens_model_list)
         lens_model_class = LensModel(lens_model_list=lens_model_list)
         self.kwargs_lens = [kwargs_spemd, kwargs_shear]
+        self.kwargs_lens2 = [kwargs_spemd2, kwargs_shear]
         # list of light profiles (for lens and source)
         # 'SERSIC': spherical Sersic profile
         kwargs_sersic = {
@@ -232,6 +240,18 @@ class TestImageModel(object):
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
+        logL = self.imageModel.likelihood_data_given_model(
+            self.kwargs_lens2,
+            self.kwargs_source,
+            self.kwargs_lens_light
+        )
+        logL_ref = self.imageModel_ref.likelihood_data_given_model(
+            self.kwargs_lens2,
+            self.kwargs_source,
+            self.kwargs_lens_light
+        )
+        npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
+
         logL = self.imageModel_nomask.likelihood_data_given_model(
             self.kwargs_lens,
             self.kwargs_source,
@@ -261,6 +281,18 @@ class TestImageModel(object):
         )
         logL_ref = self.imageModel_ref.likelihood_data_given_model(
             self.kwargs_lens,
+            self.kwargs_source,
+            self.kwargs_lens_light
+        )
+        npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
+
+        logL = self.imageModel.likelihood_data_given_model(
+            self.kwargs_lens2,
+            self.kwargs_source,
+            self.kwargs_lens_light
+        )
+        logL_ref = self.imageModel_ref.likelihood_data_given_model(
+            self.kwargs_lens2,
             self.kwargs_source,
             self.kwargs_lens_light
         )
