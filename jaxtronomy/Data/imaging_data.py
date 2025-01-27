@@ -141,7 +141,9 @@ class ImageData(PixelGrid, ImageNoise):
         :param image_data: 2D array representing the new image to be stored in self.data
         """
         if image_data.shape != self.data.shape:
-            raise ValueError(f"New data shape {image_data.shape} should match old data shape {self.data.shape}")
+            raise ValueError(
+                f"New data shape {image_data.shape} should match old data shape {self.data.shape}"
+            )
         self.data = image_data
 
         # Recompile the log likelihood functions

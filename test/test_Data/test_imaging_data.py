@@ -62,7 +62,7 @@ class Test_ImageData_noisemap(object):
         npt.assert_almost_equal(log_likelihood, log_likelihood_ref, decimal=5)
 
         # New data shape should match old data shape
-        new_data = np.ones((self.numPix+2, self.numPix+2))
+        new_data = np.ones((self.numPix + 2, self.numPix + 2))
         npt.assert_raises(ValueError, self.Data.update_data, new_data)
 
 
