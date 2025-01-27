@@ -36,6 +36,7 @@ class ImageModel(object):
         likelihood_mask=None,
         psf_error_map_bool_list=None,
         kwargs_pixelbased=None,
+        _numerics_class=None,
     ):
         """
         :param data_class: instance of ImageData() or PixelGrid() class
@@ -50,6 +51,8 @@ class ImageModel(object):
         :param psf_error_map_bool_list: list of boolean of length of point source models.
          Indicates whether PSF error map is used for the point source model stated as the index.
         :param kwargs_pixelbased: kwargs for pixelbased solver; not supported in jaxtronomy. Must be None
+        :param _numerics_class: Set to None. This argument is not intended for the user and is only used
+            as a way to register this class as a JAX pytree.
         """
 
         self.type = "single-band"
@@ -63,9 +66,12 @@ class ImageModel(object):
         self.PSF.set_pixel_size(self.Data.pixel_width)
         if kwargs_numerics is None:
             kwargs_numerics = {}
-        self.ImageNumerics = NumericsSubFrame(
-            pixel_grid=self.Data, psf=self.PSF, **kwargs_numerics
-        )
+        if _numerics_class is not None:
+            self.ImageNumerics = _numerics_class
+        else:
+            self.ImageNumerics = NumericsSubFrame(
+                pixel_grid=self.Data, psf=self.PSF, **kwargs_numerics
+            )
         if lens_model_class is None:
             lens_model_class = LensModel(lens_model_list=[])
         self.LensModel = lens_model_class
@@ -111,11 +117,11 @@ class ImageModel(object):
         if self._psf_error_map:
             raise ValueError("psf error map not supported in jaxtronomy")
 
-        # NOTE: likelihood mask cannot be traced jnp array; must be concrete np array
+        # NOTE: likelihood mask cannot be a traced jnp array; must be concrete np array
         if likelihood_mask is None:
             likelihood_mask = np.ones(data_class.num_pixel_axes)
-        self.likelihood_mask_list = list(likelihood_mask)
         self.likelihood_mask = np.array(likelihood_mask, dtype=bool)
+
         # number of pixels used in likelihood calculation
         self.num_data_evaluate = np.sum(self.likelihood_mask)
         # conversion of likelihood mask into 1d array
@@ -133,6 +139,7 @@ class ImageModel(object):
     # JAX pytree methods
 
     def _tree_flatten(self):
+        likelihood_mask_as_list = self.likelihood_mask.tolist()
         children = ()
         aux_data = {
             "data_class": self.Data,
@@ -142,10 +149,9 @@ class ImageModel(object):
             "lens_light_model_class": self.LensLightModel,
             "point_source_class": self.PointSource,
             "extinction_class": self._extinction,
-            "kwargs_numerics": self._kwargs_numerics,
-            "likelihood_mask": self.likelihood_mask_list,
+            "likelihood_mask": likelihood_mask_as_list,
             "psf_error_map_bool_list": self._psf_error_map_bool_list,
-            "kwargs_pixelbased": None,
+            "_numerics_class": self.ImageNumerics,
         }
         return (children, aux_data)
 
@@ -521,7 +527,6 @@ class ImageModel(object):
         :return: 1d array.
         """
         array = util.image2array(image)
-        # array = array[jnp.nonzero(self._mask1d, size=self.num_data_evaluate)]
         return array[self._mask1d]
 
     @jit
@@ -574,7 +579,6 @@ class ImageModel(object):
         return self._error_map_psf(kwargs_lens, kwargs_ps, kwargs_special)
 
     @jit
-    # @partial(jit, static_argnums=0)
     def _error_map_psf(self, kwargs_lens, kwargs_ps, kwargs_special=None):
         """Map of image with error terms (sigma**2) expected from inaccuracies in the
         PSF modeling.
