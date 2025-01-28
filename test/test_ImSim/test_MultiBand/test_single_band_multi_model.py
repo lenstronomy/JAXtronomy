@@ -135,7 +135,7 @@ class TestSingleBandMultiModel(object):
             "index_lens_model_list": [[0, 2], [1, 2]],
             "index_source_light_model_list": [[0], [0]],
             # leaving out the index list is the same as giving each band the entire model list
-            "index_lens_light_model_list": [[0], [0]]
+            "index_lens_light_model_list": [[0], [0]],
         }
         self.kwargs_model = kwargs_model
         self.singleband0 = SingleBandMultiModel(
@@ -172,8 +172,21 @@ class TestSingleBandMultiModel(object):
         )
 
     def test_raises(self):
-        npt.assert_raises(ValueError, SingleBandMultiModel, self.multi_band_list, self.kwargs_model, linear_solver=True)
-        npt.assert_raises(ValueError, self.singleband0.likelihood_data_given_model, self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, linear_solver=True)
+        npt.assert_raises(
+            ValueError,
+            SingleBandMultiModel,
+            self.multi_band_list,
+            self.kwargs_model,
+            linear_solver=True,
+        )
+        npt.assert_raises(
+            ValueError,
+            self.singleband0.likelihood_data_given_model,
+            self.kwargs_lens,
+            self.kwargs_source,
+            self.kwargs_lens_light,
+            linear_solver=True,
+        )
 
     def test_image(self):
         image0 = self.singleband0.image(

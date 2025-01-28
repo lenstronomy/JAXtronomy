@@ -280,7 +280,8 @@ class SingleBandMultiModel(ImageModel):
             lens light surface brightness profiles
         :param kwargs_ps: keyword arguments corresponding to "other" parameters, such as
             external shear and point source image positions
-        :param check_positive_flux: bool, should be false. True not supported in jaxtronomy
+        :param check_positive_flux: bool, should be false. True not supported in
+            jaxtronomy
         :return: log likelihood (natural logarithm) (sum of the log likelihoods of the
             individual images)
         """
@@ -379,13 +380,13 @@ class SingleBandMultiModel(ImageModel):
         else:
             kwargs_lens_light_i = [kwargs_lens_light[k] for k in self._index_lens_light]
         # TODO: Implement point source and extinction
-        #if self._index_point_source is None or kwargs_ps is None:
+        # if self._index_point_source is None or kwargs_ps is None:
         #    kwargs_ps_i = kwargs_ps
-        #else:
+        # else:
         #    kwargs_ps_i = [kwargs_ps[k] for k in self._index_point_source]
-        #if self._index_optical_depth is None or kwargs_extinction is None:
+        # if self._index_optical_depth is None or kwargs_extinction is None:
         #    kwargs_extinction_i = kwargs_extinction
-        #else:
+        # else:
         #    kwargs_extinction_i = [
         #        kwargs_extinction[k] for k in self._index_optical_depth
         #    ]
@@ -393,6 +394,6 @@ class SingleBandMultiModel(ImageModel):
             kwargs_lens_i,
             kwargs_source_i,
             kwargs_lens_light_i,
-            None, # kwargs_ps_i,
-            None #kwargs_extinction_i,
+            None,  # kwargs_ps_i,
+            None,  # kwargs_extinction_i,
         )
