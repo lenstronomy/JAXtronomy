@@ -230,7 +230,9 @@ class TestSingleBandMultiModel(object):
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
         )
-        npt.assert_raises(AssertionError, npt.assert_array_almost_equal, image1, image1_ref, decimal=8)
+        npt.assert_raises(
+            AssertionError, npt.assert_array_almost_equal, image1, image1_ref, decimal=8
+        )
         image1_ref = self.singleband1_ref.image(
             kwargs_lens=self.kwargs_lens2,
             kwargs_source=self.kwargs_source,
