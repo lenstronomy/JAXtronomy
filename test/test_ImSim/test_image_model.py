@@ -35,31 +35,14 @@ class TestImageModel(object):
         self.data_class = ImageData(**kwargs_data)
         self.data_class_ref = ImageData_ref(**kwargs_data)
 
-        # make a second data class for update_data testing
-        sigma_bkg = 0.08  # background noise per pixel
-        exp_time = 137  # exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
-        kwargs_data = sim_util.data_configure_simple(
-            numPix, deltaPix, exp_time, sigma_bkg, inverse=True
-        )
-        self.data_class2 = ImageData(**kwargs_data)
-        self.data_class2_ref = ImageData_ref(**kwargs_data)
-
         # PSF specification
-        # Create 2 PSF classes to test update_psf
         kwargs_psf = {
             "psf_type": "GAUSSIAN",
             "fwhm": fwhm,
             "truncation": 5,
             "pixel_size": deltaPix,
         }
-        self.psf_class_gaussian1 = PSF(**kwargs_psf)
-        kwargs_psf = {
-            "psf_type": "GAUSSIAN",
-            "fwhm": fwhm + 0.1,
-            "truncation": 3,
-            "pixel_size": deltaPix,
-        }
-        self.psf_class_gaussian2 = PSF(**kwargs_psf)
+        self.psf_class_gaussian = PSF(**kwargs_psf)
 
         # 'EXERNAL_SHEAR': external shear
         kwargs_shear = {
@@ -136,7 +119,7 @@ class TestImageModel(object):
         # Create 2 class instances with likelihood mask
         self.imageModel = ImageModel(
             self.data_class,
-            self.psf_class_gaussian1,
+            self.psf_class_gaussian,
             lens_model_class,
             source_model_class,
             lens_light_model_class,
@@ -145,7 +128,7 @@ class TestImageModel(object):
         )
         self.imageModel_ref = ImageModel_ref(
             self.data_class_ref,
-            self.psf_class_gaussian1,
+            self.psf_class_gaussian,
             lens_model_class_ref,
             source_model_class_ref,
             lens_light_model_class_ref,
@@ -156,7 +139,7 @@ class TestImageModel(object):
         # Create 2 class instances without likelihood mask
         self.imageModel_nomask = ImageModel(
             self.data_class,
-            self.psf_class_gaussian1,
+            self.psf_class_gaussian,
             lens_model_class,
             source_model_class,
             lens_light_model_class,
@@ -164,7 +147,7 @@ class TestImageModel(object):
         )
         self.imageModel_nomask_ref = ImageModel_ref(
             self.data_class_ref,
-            self.psf_class_gaussian1,
+            self.psf_class_gaussian,
             lens_model_class_ref,
             source_model_class_ref,
             lens_light_model_class_ref,
@@ -178,10 +161,8 @@ class TestImageModel(object):
             self.kwargs_lens_light,
             no_noise=True,
         )
-        self.data_class.update_data(image_sim + 1.03)
-        self.data_class_ref.update_data(image_sim + 1.03)
-        self.data_class2.update_data(image_sim - 1.02)
-        self.data_class2_ref.update_data(image_sim - 1.02)
+        self.data_class.update_data(image_sim)
+        self.data_class_ref.update_data(image_sim)
 
     def test_init(self):
         # pixelbased solver not supported
@@ -189,14 +170,14 @@ class TestImageModel(object):
             ValueError,
             ImageModel,
             self.data_class,
-            self.psf_class_gaussian1,
+            self.psf_class_gaussian,
             kwargs_pixelbased={"not supported": 1},
         )
 
         del self.data_class.flux_scaling
         imageModel = ImageModel(
             self.data_class,
-            self.psf_class_gaussian1,
+            self.psf_class_gaussian,
         )
         assert imageModel._flux_scaling == 1
         assert imageModel._pb is None
@@ -205,11 +186,11 @@ class TestImageModel(object):
         # primary beam not supported
         self.data_class._pb = np.ones((100, 100))
         npt.assert_raises(
-            ValueError, ImageModel, self.data_class, self.psf_class_gaussian1
+            ValueError, ImageModel, self.data_class, self.psf_class_gaussian
         )
 
         # psf error map not supported
-        kernel = self.psf_class_gaussian1.kernel_point_source
+        kernel = self.psf_class_gaussian.kernel_point_source
         kwargs_psf = {
             "psf_type": "PIXEL",
             "kernel_point_source": kernel,
@@ -217,17 +198,7 @@ class TestImageModel(object):
         }
         psf_class = PSF(**kwargs_psf)
         npt.assert_raises(ValueError, ImageModel, self.data_class, psf_class)
-
-    def test_update_psf(self):
-        assert self.imageModel.PSF.psf_type == "GAUSSIAN"
-        kernel = self.psf_class_gaussian1.kernel_point_source
-        kwargs_psf = {
-            "psf_type": "PIXEL",
-            "kernel_point_source": kernel,
-        }
-        psf_class = PSF(**kwargs_psf)
-        self.imageModel.update_psf(psf_class)
-        assert self.imageModel.PSF.psf_type == "PIXEL"
+        
 
     def test_likelihood_data_given_model(self):
         logL = self.imageModel.likelihood_data_given_model(
@@ -254,37 +225,11 @@ class TestImageModel(object):
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
-        # Test logL again after Updating psf and data
-        self.imageModel.update_psf(self.psf_class_gaussian2)
-        self.imageModel_ref.update_psf(self.psf_class_gaussian2)
-        self.imageModel_nomask.update_psf(self.psf_class_gaussian2)
-        self.imageModel_nomask_ref.update_psf(self.psf_class_gaussian2)
-        self.imageModel.update_data(self.data_class2)
-        self.imageModel_nomask.update_data(self.data_class2)
-        self.imageModel_ref.update_data(self.data_class2_ref)
-        self.imageModel_nomask_ref.update_data(self.data_class2_ref)
-
-        logL = self.imageModel.likelihood_data_given_model(
-            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
-        )
-        logL_ref = self.imageModel_ref.likelihood_data_given_model(
-            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
-        )
-        npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
-
-        logL = self.imageModel.likelihood_data_given_model(
-            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
-        )
-        logL_ref = self.imageModel_ref.likelihood_data_given_model(
-            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
-        )
-        npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
-
         logL = self.imageModel_nomask.likelihood_data_given_model(
-            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
         )
         logL_ref = self.imageModel_nomask_ref.likelihood_data_given_model(
-            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
@@ -309,7 +254,7 @@ class TestImageModel(object):
         )
         npt.assert_array_almost_equal(flux, flux_ref, decimal=8)
 
-        empty_imageModel = ImageModel(self.data_class, self.psf_class_gaussian1)
+        empty_imageModel = ImageModel(self.data_class, self.psf_class_gaussian)
         zero_flux = empty_imageModel.source_surface_brightness(kwargs_source={})
         npt.assert_array_equal(zero_flux, np.zeros_like(self.data_class.data))
 
@@ -347,15 +292,6 @@ class TestImageModel(object):
         )
         npt.assert_array_almost_equal(flux, flux_ref, decimal=8)
 
-        # extinction not supported
-        npt.assert_raises(
-            ValueError,
-            self.imageModel._source_surface_brightness_analytical_numerics,
-            kwargs_source=self.kwargs_source,
-            kwargs_lens=self.kwargs_lens,
-            kwargs_extinction={"incorrect": 0},
-        )
-
     def test_lens_surface_brightness(self):
         flux = self.imageModel.lens_surface_brightness(
             kwargs_lens_light=self.kwargs_lens_light
@@ -386,6 +322,18 @@ class TestImageModel(object):
         )
         npt.assert_array_almost_equal(image, image_ref, decimal=8)
 
+        image = self.imageModel.image(
+            kwargs_lens=self.kwargs_lens2,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
+        )
+        image_ref = self.imageModel_ref.image(
+            kwargs_lens=self.kwargs_lens2,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
+        )
+        npt.assert_array_almost_equal(image, image_ref, decimal=8)
+
         image = self.imageModel_nomask.image(
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
@@ -398,15 +346,17 @@ class TestImageModel(object):
         )
         npt.assert_array_almost_equal(image, image_ref, decimal=8)
 
-        # point source not supported
-        npt.assert_raises(
-            ValueError,
-            self.imageModel.image,
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light,
-            point_source_add=True,
+        image = self.imageModel_nomask.image(
+            kwargs_lens=self.kwargs_lens2,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
         )
+        image_ref = self.imageModel_nomask_ref.image(
+            kwargs_lens=self.kwargs_lens2,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
+        )
+        npt.assert_array_almost_equal(image, image_ref, decimal=8)
 
     def test_data_response(self):
         npt.assert_array_almost_equal(
@@ -433,19 +383,6 @@ class TestImageModel(object):
         error_ref = self.imageModel_ref._error_map_psf(self.kwargs_lens, [], [])
         npt.assert_array_almost_equal(error, error_ref, decimal=8)
 
-        # redo data-related test after updating data
-        self.imageModel.update_data(self.data_class2)
-        self.imageModel_ref.update_data(self.data_class2_ref)
-
-        cd_response, model_error = self.imageModel.error_response(
-            self.kwargs_lens, [], []
-        )
-        cd_response_ref, model_error_ref = self.imageModel_ref.error_response(
-            self.kwargs_lens, [], []
-        )
-        npt.assert_array_almost_equal(cd_response, cd_response_ref, decimal=8)
-        npt.assert_array_almost_equal(model_error, model_error_ref, decimal=8)
-
     def test_reduced_residuals(self):
         model = self.data_class.data
         residuals = self.imageModel.reduced_residuals(model)
@@ -453,17 +390,6 @@ class TestImageModel(object):
         npt.assert_array_almost_equal(residuals, residuals_ref, decimal=8)
 
         error_map = np.ones_like(model) * 0.5
-        residuals = self.imageModel.reduced_residuals(model, error_map)
-        residuals_ref = self.imageModel_ref.reduced_residuals(model, error_map)
-        npt.assert_array_almost_equal(residuals, residuals_ref, decimal=8)
-
-        self.imageModel.update_data(self.data_class2)
-        self.imageModel_ref.update_data(self.data_class2_ref)
-
-        residuals = self.imageModel.reduced_residuals(model)
-        residuals_ref = self.imageModel_ref.reduced_residuals(model)
-        npt.assert_array_almost_equal(residuals, residuals_ref, decimal=8)
-
         residuals = self.imageModel.reduced_residuals(model, error_map)
         residuals_ref = self.imageModel_ref.reduced_residuals(model, error_map)
         npt.assert_array_almost_equal(residuals, residuals_ref, decimal=8)
@@ -479,16 +405,6 @@ class TestImageModel(object):
         chi2_ref = self.imageModel_ref.reduced_chi2(model, error_map)
         npt.assert_array_almost_equal(chi2, chi2_ref, decimal=8)
 
-        self.imageModel.update_data(self.data_class2)
-        self.imageModel_ref.update_data(self.data_class2_ref)
-
-        chi2 = self.imageModel.reduced_chi2(model)
-        chi2_ref = self.imageModel_ref.reduced_chi2(model)
-        npt.assert_array_almost_equal(chi2, chi2_ref, decimal=8)
-
-        chi2 = self.imageModel.reduced_chi2(model, error_map)
-        chi2_ref = self.imageModel_ref.reduced_chi2(model, error_map)
-        npt.assert_array_almost_equal(chi2, chi2_ref, decimal=8)
 
     def test_image2array_masked(self):
         image = self.data_class.data
@@ -515,6 +431,29 @@ class TestImageModel(object):
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
             check_positive_flux=True,
+        )
+
+        # Update psf and update data not supported
+        npt.assert_raises(ValueError, self.imageModel.update_psf, self.psf_class_gaussian)
+        npt.assert_raises(ValueError, self.imageModel.update_data, self.data_class)
+
+        # point source not supported
+        npt.assert_raises(
+            ValueError,
+            self.imageModel.image,
+            self.kwargs_lens,
+            self.kwargs_source,
+            self.kwargs_lens_light,
+            point_source_add=True,
+        )
+
+        # extinction not supported
+        npt.assert_raises(
+            ValueError,
+            self.imageModel._source_surface_brightness_analytical_numerics,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens=self.kwargs_lens,
+            kwargs_extinction={"incorrect": 0},
         )
 
 

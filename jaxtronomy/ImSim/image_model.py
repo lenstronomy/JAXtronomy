@@ -10,7 +10,7 @@ from jaxtronomy.Util import util
 from lenstronomy.Util import util as util_lenstronomy
 
 from functools import partial
-from jax import jit, numpy as jnp, tree_util
+from jax import jit, numpy as jnp
 import numpy as np
 
 __all__ = ["ImageModel"]
@@ -36,7 +36,6 @@ class ImageModel(object):
         likelihood_mask=None,
         psf_error_map_bool_list=None,
         kwargs_pixelbased=None,
-        _numerics_class=None,
     ):
         """
         :param data_class: instance of ImageData() or PixelGrid() class
@@ -51,8 +50,6 @@ class ImageModel(object):
         :param psf_error_map_bool_list: list of boolean of length of point source models.
          Indicates whether PSF error map is used for the point source model stated as the index.
         :param kwargs_pixelbased: kwargs for pixelbased solver; not supported in jaxtronomy. Must be None
-        :param _numerics_class: Set to None. This argument is not intended for the user and is only used
-            as a way to register this class as a JAX pytree.
         """
 
         self.type = "single-band"
@@ -66,12 +63,9 @@ class ImageModel(object):
         self.PSF.set_pixel_size(self.Data.pixel_width)
         if kwargs_numerics is None:
             kwargs_numerics = {}
-        if _numerics_class is not None:
-            self.ImageNumerics = _numerics_class
-        else:
-            self.ImageNumerics = NumericsSubFrame(
-                pixel_grid=self.Data, psf=self.PSF, **kwargs_numerics
-            )
+        self.ImageNumerics = NumericsSubFrame(
+            pixel_grid=self.Data, psf=self.PSF, **kwargs_numerics
+        )
         if lens_model_class is None:
             lens_model_class = LensModel(lens_model_list=[])
         self.LensModel = lens_model_class
@@ -135,32 +129,6 @@ class ImageModel(object):
         else:
             self._pb_1d = None
 
-    # --------------------------------------------------------------------------
-    # JAX pytree methods
-
-    def _tree_flatten(self):
-        likelihood_mask_as_list = self.likelihood_mask.tolist()
-        children = ()
-        aux_data = {
-            "data_class": self.Data,
-            "psf_class": self.PSF,
-            "lens_model_class": self.LensModel,
-            "source_model_class": self.SourceModel,
-            "lens_light_model_class": self.LensLightModel,
-            "point_source_class": self.PointSource,
-            "extinction_class": self._extinction,
-            "likelihood_mask": likelihood_mask_as_list,
-            "psf_error_map_bool_list": self._psf_error_map_bool_list,
-            "_numerics_class": self.ImageNumerics,
-        }
-        return (children, aux_data)
-
-    @classmethod
-    def _tree_unflatten(cls, aux_data, children):
-        return cls(**aux_data)
-
-    # --------------------------------------------------------------------------
-
     # def reset_point_source_cache(self, cache=True):
     #    """Deletes all the cache in the point source class and saves it from then on.
 
@@ -171,7 +139,7 @@ class ImageModel(object):
     #    self.PointSource.delete_lens_model_cache()
     #    self.PointSource.set_save_cache(cache)
 
-    @partial(jit, static_argnums=(7, 8, 9))
+    @partial(jit, static_argnums=(0, 7, 8, 9))
     def likelihood_data_given_model(
         self,
         kwargs_lens=None,
@@ -224,7 +192,7 @@ class ImageModel(object):
         logL = self.Data.log_likelihood(im_sim, self.likelihood_mask, model_error)
         return logL
 
-    @partial(jit, static_argnums=(5, 6, 7, 8))
+    @partial(jit, static_argnums=(0, 5, 6, 7, 8))
     def source_surface_brightness(
         self,
         kwargs_source,
@@ -263,7 +231,7 @@ class ImageModel(object):
             k=k,
         )
 
-    @partial(jit, static_argnums=(5, 6, 7))
+    @partial(jit, static_argnums=(0, 5, 6, 7))
     def _source_surface_brightness_analytical(
         self,
         kwargs_source,
@@ -302,7 +270,7 @@ class ImageModel(object):
         )
         return source_light_final
 
-    @partial(jit, static_argnums=(5, 6))
+    @partial(jit, static_argnums=(0, 5, 6))
     def _source_surface_brightness_analytical_numerics(
         self,
         kwargs_source,
@@ -353,7 +321,7 @@ class ImageModel(object):
         #    source_light *= self._pb_1d
         return source_light * self._flux_scaling
 
-    @partial(jit, static_argnums=(2, 3))
+    @partial(jit, static_argnums=(0, 2, 3))
     def lens_surface_brightness(self, kwargs_lens_light, unconvolved=False, k=None):
         """Computes the lens surface brightness distribution.
 
@@ -414,7 +382,7 @@ class ImageModel(object):
     #    )
     #    return point_source_image * self._flux_scaling
 
-    @partial(jit, static_argnums=(7, 8, 9, 10))
+    @partial(jit, static_argnums=(0, 7, 8, 9, 10))
     def image(
         self,
         kwargs_lens=None,
@@ -493,7 +461,7 @@ class ImageModel(object):
     #     )
     #     return extinction
 
-    @jit
+    @partial(jit, static_argnums=0)
     def reduced_residuals(self, model, error_map=0):
         """
 
@@ -506,7 +474,7 @@ class ImageModel(object):
         residual = (model - self.Data.data) / jnp.sqrt(C_D + jnp.abs(error_map)) * mask
         return residual
 
-    @jit
+    @partial(jit, static_argnums=0)
     def reduced_chi2(self, model, error_map=0):
         """Returns reduced chi2.
 
@@ -518,7 +486,7 @@ class ImageModel(object):
         norm_res = self.reduced_residuals(model, error_map)
         return jnp.sum(norm_res**2) / self.num_data_evaluate
 
-    @jit
+    @partial(jit, static_argnums=0)
     def image2array_masked(self, image):
         """Returns 1d array of values in image that are not masked out for the
         likelihood computation/linear minimization.
@@ -529,7 +497,7 @@ class ImageModel(object):
         array = util.image2array(image)
         return array[self._mask1d]
 
-    @jit
+    @partial(jit, static_argnums=0)
     def array_masked2image(self, array):
         """Converts the 1d masked array into a 2d image.
 
@@ -552,7 +520,7 @@ class ImageModel(object):
         d = self.image2array_masked(self.Data.data)
         return d
 
-    @jit
+    @partial(jit, static_argnums=0)
     def error_response(self, kwargs_lens, kwargs_ps, kwargs_special):
         """Returns the 1d array of the error estimate corresponding to the data
         response.
@@ -565,7 +533,7 @@ class ImageModel(object):
         C_D_response = self.image2array_masked(self.Data.C_D + model_error)
         return C_D_response, model_error
 
-    @jit
+    @partial(jit, static_argnums=0)
     def _error_map_model(self, kwargs_lens, kwargs_ps, kwargs_special=None):
         """Noise estimate (variances as diagonal of the pixel covariance matrix)
         resulted from inherent model uncertainties. This term is currently the psf error
@@ -578,7 +546,7 @@ class ImageModel(object):
         """
         return self._error_map_psf(kwargs_lens, kwargs_ps, kwargs_special)
 
-    @jit
+    @partial(jit, static_argnums=0)
     def _error_map_psf(self, kwargs_lens, kwargs_ps, kwargs_special=None):
         """Map of image with error terms (sigma**2) expected from inaccuracies in the
         PSF modeling.
@@ -636,28 +604,9 @@ class ImageModel(object):
     #    return x_pos, y_pos
 
     def update_psf(self, psf_class):
-        """Update the instance of the class with a new instance of PSF() with a
-        potentially different point spread function.
-
-        :param psi_class: instance of lenstronomy.Data.psf.PSF class
-        :return: no return. Class is updated.
-        """
-        psf_class.set_pixel_size(self.Data.pixel_width)
-        self.PSF = psf_class
-        self.ImageNumerics = NumericsSubFrame(
-            pixel_grid=self.Data, psf=self.PSF, **self._kwargs_numerics
-        )
+        """Update the psf class. Not supported in jaxtronomy."""
+        raise ValueError("Updating psf class not supported in jaxtronomy. Create a new instance of ImageModel instead.")
 
     def update_data(self, data_class):
-        """
-
-        :param data_class: instance of Data() class
-        :return: no return. Class is updated.
-        """
-        self.Data = data_class
-        self.ImageNumerics._PixelGrid = data_class
-
-
-tree_util.register_pytree_node(
-    ImageModel, ImageModel._tree_flatten, ImageModel._tree_unflatten
-)
+        """Update the data class. Not supported in jaxtronomy."""
+        raise ValueError("Updating data class not supported in jaxtronomy. Create a new instance of ImageModel instead.")
