@@ -146,7 +146,7 @@ class TestClassCreator(object):
         }
 
         multi_band_list = [[kwargs_data, kwargs_psf, {}]]
-        multi_band_type = "multi-linear"
+        multi_band_type = "incorrect"
 
         npt.assert_raises(
             ValueError,
@@ -157,18 +157,7 @@ class TestClassCreator(object):
             bands_compute=None,
             image_likelihood_mask_list=None,
             band_index=0,
-        )
-
-        multi_band_type = "joint-linear"
-        npt.assert_raises(
-            ValueError,
-            class_creator.create_im_sim,
-            multi_band_list,
-            multi_band_type,
-            kwargs_model,
-            bands_compute=None,
-            image_likelihood_mask_list=None,
-            band_index=0,
+            
         )
 
         multi_band_type = "single-band"

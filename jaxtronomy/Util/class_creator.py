@@ -344,9 +344,8 @@ def create_im_sim(
 
     :param multi_band_list: list of [[kwargs_data, kwargs_psf, kwargs_numerics], [], ..]
     :param multi_band_type: string, option when having multiple imaging data sets modelled simultaneously. Options are:
-     - 'multi-linear': linear amplitudes are inferred on single data set
-     - 'linear-joint': linear amplitudes ae jointly inferred
      - 'single-band': single band
+     - 'multi-linear' and joint-linear are not supported in jaxtronomy
     :param kwargs_model: model keyword arguments
     :param bands_compute: (optional), bool list to indicate which band to be included in the modeling
     :param image_likelihood_mask_list: list of image likelihood mask
@@ -357,36 +356,7 @@ def create_im_sim(
      that they get overwritten by the linear solver solution.
     :return: MultiBand class instance
     """
-    if linear_solver is False and multi_band_type not in [
-        "single-band",
-        "multi-linear",
-    ]:
-        raise ValueError(
-            'setting "linear_solver" to False is only supported in "single-band" mode '
-            'or if "multi-linear" model has only one band.'
-        )
 
-    if multi_band_type == "multi-linear":
-        raise ValueError("multi-linear not supported in jaxtronomy yet")
-    #     from lenstronomy.ImSim.MultiBand.multi_linear import MultiLinear
-
-    #     multiband = MultiLinear(
-    #         multi_band_list,
-    #         kwargs_model,
-    #         compute_bool=bands_compute,
-    #         likelihood_mask_list=image_likelihood_mask_list,
-    #         linear_solver=linear_solver,
-    #     )
-    elif multi_band_type == "joint-linear":
-        raise ValueError("joint-linear not supported in jaxtronomy yet")
-    #     from lenstronomy.ImSim.MultiBand.joint_linear import JointLinear
-
-    #     multiband = JointLinear(
-    #         multi_band_list,
-    #         kwargs_model,
-    #         compute_bool=bands_compute,
-    #         likelihood_mask_list=image_likelihood_mask_list,
-    #     )
     if multi_band_type == "single-band":
         from jaxtronomy.ImSim.MultiBand.single_band_multi_model import (
             SingleBandMultiModel,
