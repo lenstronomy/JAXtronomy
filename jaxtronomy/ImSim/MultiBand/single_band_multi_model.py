@@ -157,7 +157,7 @@ class SingleBandMultiModel(ImageModel):
             point_source_add=point_source_add,
         )
 
-    @partial(jit, static_argnums=(0, 5,6,7,8))
+    @partial(jit, static_argnums=(0, 5, 6, 7, 8))
     def source_surface_brightness(
         self,
         kwargs_source,
@@ -202,7 +202,7 @@ class SingleBandMultiModel(ImageModel):
             update_pixelbased_mapping=update_pixelbased_mapping,
         )
 
-    @partial(jit, static_argnums=(0, 2,3))
+    @partial(jit, static_argnums=(0, 2, 3))
     def lens_surface_brightness(self, kwargs_lens_light, unconvolved=False, k=None):
         """Computes the lens surface brightness distribution.
 
@@ -255,7 +255,7 @@ class SingleBandMultiModel(ImageModel):
     #        k=k,
     #    )
 
-    @partial(jit, static_argnums=(0, 7,8,9,10))
+    @partial(jit, static_argnums=(0, 7, 8, 9, 10))
     def likelihood_data_given_model(
         self,
         kwargs_lens=None,
@@ -300,7 +300,7 @@ class SingleBandMultiModel(ImageModel):
             kwargs_ps_i,
             kwargs_extinction_i,
             kwargs_special,
-            check_positive_flux=check_positive_flux
+            check_positive_flux=check_positive_flux,
         )
         return logL, None
 
@@ -329,7 +329,7 @@ class SingleBandMultiModel(ImageModel):
             kwargs_lens_i, kwargs_ps_i, kwargs_special=kwargs_special
         )
 
-    #def extinction_map(self, kwargs_extinction=None, kwargs_special=None):
+    # def extinction_map(self, kwargs_extinction=None, kwargs_special=None):
     #    """Differential extinction per pixel.
 
     #    :param kwargs_extinction: list of keyword arguments corresponding to the optical

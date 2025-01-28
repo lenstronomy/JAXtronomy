@@ -6,7 +6,8 @@ from jaxtronomy.ImSim.image_model import ImageModel
 from lenstronomy.PointSource.point_source import PointSource
 from lenstronomy.ImSim.differential_extinction import DifferentialExtinction
 from lenstronomy.Data.psf import PSF
-#from lenstronomy.ImSim.tracer_model import TracerModelSource
+
+# from lenstronomy.ImSim.tracer_model import TracerModelSource
 
 from lenstronomy.Util.package_util import exporter
 
@@ -400,11 +401,14 @@ def create_im_sim(
             linear_solver=linear_solver,
         )
     else:
-        raise ValueError("Type %s is not supported in JAXtronomy! Use lenstronomy instead." % multi_band_type)
+        raise ValueError(
+            "Type %s is not supported in JAXtronomy! Use lenstronomy instead."
+            % multi_band_type
+        )
     return multiband
 
 
-#def create_tracer_model(tracer_data, kwargs_model, tracer_likelihood_mask=None):
+# def create_tracer_model(tracer_data, kwargs_model, tracer_likelihood_mask=None):
 #    """
 #
 #    :param tracer_data:

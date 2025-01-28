@@ -66,7 +66,10 @@ class TestClassCreator(object):
         }
 
         self.kwargs_psf = {"psf_type": "NONE"}
-        self.kwargs_data = {"image_data": np.ones((10, 10)), "noise_map": np.ones((10,10))*0.1}
+        self.kwargs_data = {
+            "image_data": np.ones((10, 10)),
+            "noise_map": np.ones((10, 10)) * 0.1,
+        }
 
     def test_create_class_instances(self):
         (
@@ -137,12 +140,17 @@ class TestClassCreator(object):
             "point_source_model_list": ["LENSED_POSITION"],
         }
         kwargs_psf = {"psf_type": "NONE"}
-        kwargs_data = {"image_data": np.ones((10, 10)), "noise_map": np.ones((10,10))*0.1}
+        kwargs_data = {
+            "image_data": np.ones((10, 10)),
+            "noise_map": np.ones((10, 10)) * 0.1,
+        }
 
         multi_band_list = [[kwargs_data, kwargs_psf, {}]]
         multi_band_type = "multi-linear"
 
-        npt.assert_raises(ValueError, class_creator.create_im_sim,
+        npt.assert_raises(
+            ValueError,
+            class_creator.create_im_sim,
             multi_band_list,
             multi_band_type,
             kwargs_model,
@@ -152,7 +160,9 @@ class TestClassCreator(object):
         )
 
         multi_band_type = "joint-linear"
-        npt.assert_raises(ValueError, class_creator.create_im_sim,
+        npt.assert_raises(
+            ValueError,
+            class_creator.create_im_sim,
             multi_band_list,
             multi_band_type,
             kwargs_model,
