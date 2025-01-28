@@ -80,9 +80,18 @@ class TestSingleBandMultiModel(object):
             "e1": e1,
             "e2": e2,
         }
+        kwargs_epl2 = {
+            "theta_E": 2.3,
+            "gamma": 1.9,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "e1": e1,
+            "e2": e2,
+        }
 
         lens_model_list = ["SIE", "EPL", "SHEAR"]
         self.kwargs_lens = [kwargs_spemd, kwargs_epl, kwargs_shear]
+        self.kwargs_lens2 = [kwargs_spemd, kwargs_epl2, kwargs_shear]
 
         # list of light profiles (for lens and source)
         # 'SERSIC': spherical Sersic profile
@@ -214,6 +223,20 @@ class TestSingleBandMultiModel(object):
         )
         npt.assert_array_almost_equal(image1, image1_ref, decimal=8)
         assert image1.shape == (self.numPix2, self.numPix2)
+
+        # Use kwargs_lens2 and make sure we get a different result
+        image1 = self.singleband1.image(
+            kwargs_lens=self.kwargs_lens2,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
+        )
+        npt.assert_raises(AssertionError, npt.assert_array_almost_equal, image1, image1_ref, decimal=8)
+        image1_ref = self.singleband1_ref.image(
+            kwargs_lens=self.kwargs_lens2,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
+        )
+        npt.assert_array_almost_equal(image1, image1_ref, decimal=8)
 
     def test_source_surface_brightness(self):
         flux0 = self.singleband0.source_surface_brightness(
