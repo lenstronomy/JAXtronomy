@@ -198,7 +198,6 @@ class TestImageModel(object):
         }
         psf_class = PSF(**kwargs_psf)
         npt.assert_raises(ValueError, ImageModel, self.data_class, psf_class)
-        
 
     def test_likelihood_data_given_model(self):
         logL = self.imageModel.likelihood_data_given_model(
@@ -405,7 +404,6 @@ class TestImageModel(object):
         chi2_ref = self.imageModel_ref.reduced_chi2(model, error_map)
         npt.assert_array_almost_equal(chi2, chi2_ref, decimal=8)
 
-
     def test_image2array_masked(self):
         image = self.data_class.data
         array = self.imageModel.image2array_masked(image)
@@ -434,7 +432,9 @@ class TestImageModel(object):
         )
 
         # Update psf and update data not supported
-        npt.assert_raises(ValueError, self.imageModel.update_psf, self.psf_class_gaussian)
+        npt.assert_raises(
+            ValueError, self.imageModel.update_psf, self.psf_class_gaussian
+        )
         npt.assert_raises(ValueError, self.imageModel.update_data, self.data_class)
 
         # point source not supported

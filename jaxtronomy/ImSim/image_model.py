@@ -604,9 +604,19 @@ class ImageModel(object):
     #    return x_pos, y_pos
 
     def update_psf(self, psf_class):
-        """Update the psf class. Not supported in jaxtronomy."""
-        raise ValueError("Updating psf class not supported in jaxtronomy. Create a new instance of ImageModel instead.")
+        """Update the psf class.
+
+        Not supported in jaxtronomy.
+        """
+        raise ValueError(
+            "Updating psf class not supported in jaxtronomy. Create a new instance of ImageModel instead."
+        )
 
     def update_data(self, data_class):
-        """Update the data class. Not supported in jaxtronomy."""
-        raise ValueError("Updating data class not supported in jaxtronomy. Create a new instance of ImageModel instead.")
+        """Update the data class.
+
+        Not supported in jaxtronomy.
+        """
+        raise ValueError(
+            "Updating data class not supported in jaxtronomy. Create a new instance of ImageModel instead."
+        )
