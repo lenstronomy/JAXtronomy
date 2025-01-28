@@ -1,5 +1,6 @@
 __author__ = "sibirrer"
 
+from jax import grad
 import numpy.testing as npt
 import numpy as np
 import pytest
@@ -231,6 +232,33 @@ class TestImageModel(object):
             self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
+
+
+    def test_autodifferentiate_likelihood(self):
+        # NOTE: For autodifferentiation to work, input values need to be floats, not ints
+        for key, value in self.kwargs_source[0].items():
+            self.kwargs_source[0][key] = float(value)
+        for key, value in self.kwargs_lens_light[0].items():
+            self.kwargs_lens_light[0][key] = float(value)
+
+        # differentiates with respect to the 0th argument by default
+        grad_log_func = grad(self.imageModel_nomask.likelihood_data_given_model)
+        grad_log = grad_log_func(self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light)
+        assert len(grad_log[0]) == len(self.kwargs_lens2[0])
+        assert len(grad_log[1]) == len(self.kwargs_lens2[1])
+
+        # kwargs_lens has ints so this will result in an error
+        npt.assert_raises(TypeError, grad_log_func, self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light)
+
+        # differentiates with respect to kwargs_source
+        grad_log_func = grad(self.imageModel_nomask.likelihood_data_given_model, argnums=1)
+        grad_log = grad_log_func(self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light)
+        assert len(grad_log[0]) == len(self.kwargs_source[0])
+
+        # differentiates with respect to kwargs_lens_light
+        grad_log_func = grad(self.imageModel_nomask.likelihood_data_given_model, argnums=2)
+        grad_log = grad_log_func(self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light)
+        assert len(grad_log[0]) == len(self.kwargs_lens_light[0])
 
     def test_source_surface_brightness(self):
         flux = self.imageModel.source_surface_brightness(
