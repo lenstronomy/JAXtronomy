@@ -219,8 +219,8 @@ class SingleBandMultiModel(ImageModel):
             kwargs_ps=None,
             kwargs_extinction=None,
         )
-        return super().lens_surface_brightness(
-            kwargs_lens_light_i, unconvolved=unconvolved, k=k
+        return ImageModel.lens_surface_brightness(
+            self, kwargs_lens_light_i, unconvolved=unconvolved, k=k
         )
 
     # def point_source(
@@ -296,7 +296,8 @@ class SingleBandMultiModel(ImageModel):
         ) = self.select_kwargs(
             kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps, kwargs_extinction
         )
-        logL = super().likelihood_data_given_model(
+        logL = ImageModel.likelihood_data_given_model(
+            self,
             kwargs_lens_i,
             kwargs_source_i,
             kwargs_lens_light_i,
@@ -328,8 +329,8 @@ class SingleBandMultiModel(ImageModel):
             kwargs_ps=kwargs_ps,
             kwargs_extinction=None,
         )
-        return super().error_response(
-            kwargs_lens_i, kwargs_ps_i, kwargs_special=kwargs_special
+        return ImageModel.error_response(
+            self, kwargs_lens_i, kwargs_ps_i, kwargs_special=kwargs_special
         )
 
     # def extinction_map(self, kwargs_extinction=None, kwargs_special=None):
