@@ -272,13 +272,15 @@ class SingleBandMultiModel(ImageModel):
         """Computes the likelihood of the data given a model. This is specified with the
         non-linear parameters and a linear inversion and prior marginalisation.
 
-        :param kwargs_lens:
-        :param kwargs_source:
-        :param kwargs_lens_light:
-        :param kwargs_ps:
-        :param check_positive_flux: bool, if True, checks whether the linear inversion
-            resulted in non-negative flux components and applies a punishment in the
-            likelihood if so.
+        :param kwargs_lens: list of keyword arguments corresponding to the superposition
+            of different lens profiles
+        :param kwargs_source: list of keyword arguments corresponding to the
+            superposition of different source light profiles
+        :param kwargs_lens_light: list of keyword arguments corresponding to different
+            lens light surface brightness profiles
+        :param kwargs_ps: keyword arguments corresponding to "other" parameters, such as
+            external shear and point source image positions
+        :param check_positive_flux: bool, should be false. True not supported in jaxtronomy
         :return: log likelihood (natural logarithm) (sum of the log likelihoods of the
             individual images)
         """
@@ -354,11 +356,15 @@ class SingleBandMultiModel(ImageModel):
     ):
         """Select subset of kwargs lists referenced to this imaging band.
 
-        :param kwargs_lens:
-        :param kwargs_source:
-        :param kwargs_lens_light:
-        :param kwargs_ps:
-        :return:
+        :param kwargs_lens: list of keyword arguments corresponding to the superposition
+            of different lens profiles
+        :param kwargs_source: list of keyword arguments corresponding to the
+            superposition of different source light profiles
+        :param kwargs_lens_light: list of keyword arguments corresponding to different
+            lens light surface brightness profiles
+        :param kwargs_ps: keyword arguments corresponding to "other" parameters, such as
+            external shear and point source image positions
+        :return: Select subset of kwargs lists
         """
         if self._index_lens_model is None or kwargs_lens is None:
             kwargs_lens_i = kwargs_lens
