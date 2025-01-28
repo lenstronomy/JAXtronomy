@@ -13,8 +13,7 @@ from lenstronomy.Util.package_util import exporter
 
 # This file is the same as lenstronomy but with import statements changed
 # Functions here do not need to be JIT compiled
-# TODO: Implement joint-linear and multilinear in jaxtronomy
-# TODO: Implement TracerModel in jaxtronomy
+# TODO: Implement TracerModel, PointSource, and Extinction in jaxtronomy
 
 export, __all__ = exporter()
 
