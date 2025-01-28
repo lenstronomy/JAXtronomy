@@ -2,6 +2,7 @@ from functools import partial
 from jax import jit, numpy as jnp
 import numpy as np
 
+from lenstronomy.Util import util as util_lenstronomy
 from jaxtronomy.Util import util
 from jaxtronomy.Util import image_util
 from lenstronomy.Data.coord_transforms import Coordinates1D
@@ -38,16 +39,20 @@ class RegularGrid(Coordinates1D):
         :param supersampling_factor: int, factor (per axis) of super-sampling
         :param flux_evaluate_indexes: bool array of shape nx x ny, corresponding to pixels being evaluated
          (for both low and high res). Default is None, replaced by setting all pixels to being evaluated.
+         This cannot be a jnp array; must be a np array
         """
         super(RegularGrid, self).__init__(transform_pix2angle, ra_at_xy_0, dec_at_xy_0)
         self._supersampling_factor = supersampling_factor
         self._nx = nx
         self._ny = ny
         self._x_grid, self._y_grid = self.coordinate_grid(nx, ny)
+
+        # This cannot be a jnp array
         if flux_evaluate_indexes is None:
             flux_evaluate_indexes = np.ones_like(self._x_grid)
         else:
-            flux_evaluate_indexes = util.image2array(flux_evaluate_indexes)
+            flux_evaluate_indexes = util_lenstronomy.image2array(flux_evaluate_indexes)
+        # This cannot be a jnp array
         self._compute_indexes = self._subgrid_index(
             flux_evaluate_indexes, self._supersampling_factor, self._nx, self._ny
         ).astype(bool)
@@ -120,9 +125,9 @@ class RegularGrid(Coordinates1D):
         :return: 1d array of equivalent mask in subgrid resolution
         """
         idex_sub = np.repeat(idex_mask, subgrid_res, axis=0)
-        idex_sub = util.array2image(idex_sub, nx=nx, ny=ny * subgrid_res)
+        idex_sub = util_lenstronomy.array2image(idex_sub, nx=nx, ny=ny * subgrid_res)
         idex_sub = np.repeat(idex_sub, subgrid_res, axis=0)
-        idex_sub = util.image2array(idex_sub)
+        idex_sub = util_lenstronomy.image2array(idex_sub)
         return idex_sub
 
     @partial(jit, static_argnums=(0))

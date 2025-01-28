@@ -2,7 +2,7 @@ import numpy as np
 from jax import jit, numpy as jnp
 
 from lenstronomy.Data.pixel_grid import PixelGrid
-from jaxtronomy.Data.image_noise import ImageNoise
+from jaxtronomy.Data.image_noise import ImageNoise, covariance_matrix
 
 __all__ = ["ImageData"]
 
@@ -79,9 +79,8 @@ class ImageData(PixelGrid, ImageNoise):
         :param dec_at_xy_0: dec coordinate at pixel (0,0)
         :param ra_shift: RA shift of pixel grid
         :param dec_shift: DEC shift of pixel grid
-        :param log_likelihood_constant: float, allows user to input a constant that will be added to the log likelihood. Note that, as for now, this variable is ONLY used for interferometric mode.
-        :param antenna_primary_beam: 2d numpy array with the same size of imaga_data;
         :param phi_rot: rotation angle in regard to pixel coordinate transform_pix2angle
+        :param log_likelihood_constant: float, allows user to input a constant that will be added to the log likelihood. Note that, as for now, this variable is ONLY used for interferometric mode.
         :param antenna_primary_beam: 2d numpy array with the same size of image_data;
          more descriptions of the primary beam can be found in the AngularSensitivity class
         :param likelihood_method: string, type of method of log_likelihood computation: options are 'diagonal', 'interferometry_natwt'.
@@ -91,6 +90,9 @@ class ImageData(PixelGrid, ImageNoise):
          when modeling multiple exposures that have different magnitude zero points (or flux normalizations) but demand
          the same model normalization
         """
+        if antenna_primary_beam is not None:
+            raise ValueError("primary beam is not supported in jaxtronomy")
+
         nx, ny = np.shape(image_data)
         if transform_pix2angle is None:
             transform_pix2angle = np.array([[1, 0], [0, 1]])
@@ -138,11 +140,21 @@ class ImageData(PixelGrid, ImageNoise):
 
         :param image_data: 2D array representing the new image to be stored in self.data
         """
+        if image_data.shape != self.data.shape:
+            raise ValueError(
+                f"New data shape {image_data.shape} should match old data shape {self.data.shape}"
+            )
         self.data = image_data
 
         # Recompile the log likelihood functions
         self.log_likelihood = jit(self._log_likelihood)
         self.log_likelihood_interferometry = jit(self._log_likelihood_interferometry)
+        if self._noise_map is None:
+            self.C_D = covariance_matrix(
+                self.data,
+                self.background_rms,
+                self.exp_map,
+            )
 
     def _log_likelihood(self, model, mask, additional_error_map=0):
         """Computes the likelihood of the data given the model p(data|model) The
