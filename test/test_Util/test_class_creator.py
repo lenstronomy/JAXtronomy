@@ -157,7 +157,6 @@ class TestClassCreator(object):
             bands_compute=None,
             image_likelihood_mask_list=None,
             band_index=0,
-            
         )
 
         multi_band_type = "single-band"
