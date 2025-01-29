@@ -94,7 +94,7 @@ class ImageLikelihood(object):
         return self.imSim.num_data_evaluate
 
     # TODO: Implement point source
-    #def reset_point_source_cache(self, cache=True):
+    # def reset_point_source_cache(self, cache=True):
     #    """
 
     #    :param cache: boolean
