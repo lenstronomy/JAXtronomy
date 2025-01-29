@@ -88,7 +88,7 @@ class ImageLikelihood(object):
             kwargs_special=kwargs_special,
             source_marg=False,
             linear_prior=None,
-            check_positive_flux=False
+            check_positive_flux=False,
         )
         logL = jnp.nan_to_num(logL, nan=-(10**15))
         return logL, param

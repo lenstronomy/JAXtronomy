@@ -154,7 +154,7 @@ class TestImageLikelihood(object):
             self.multi_band_list,
             "single-band",
             self.kwargs_model,
-            source_marg=True
+            source_marg=True,
         )
         npt.assert_raises(
             ValueError,
@@ -162,7 +162,7 @@ class TestImageLikelihood(object):
             self.multi_band_list,
             "single-band",
             self.kwargs_model,
-            linear_solver=True
+            linear_solver=True,
         )
         npt.assert_raises(
             ValueError,
@@ -170,7 +170,7 @@ class TestImageLikelihood(object):
             self.multi_band_list,
             "single-band",
             self.kwargs_model,
-            check_positive_flux=True
+            check_positive_flux=True,
         )
         npt.assert_raises(
             ValueError,
@@ -178,7 +178,7 @@ class TestImageLikelihood(object):
             self.multi_band_list,
             "single-band",
             self.kwargs_model,
-            kwargs_pixelbased={"error": 1}
+            kwargs_pixelbased={"error": 1},
         )
         npt.assert_raises(
             ValueError,
@@ -186,7 +186,7 @@ class TestImageLikelihood(object):
             self.multi_band_list,
             "single-band",
             self.kwargs_model,
-            linear_prior=1
+            linear_prior=1,
         )
 
     def test_logL(self):
