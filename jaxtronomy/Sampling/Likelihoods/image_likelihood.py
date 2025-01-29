@@ -29,12 +29,23 @@ class ImageLikelihood(object):
             fitting. Only relevant for joint-linear and multi-liner. For single-band, the band index is zero by default.
         :param image_likelihood_mask_list: list of boolean 2d arrays of size of images marking the pixels to be
             evaluated in the likelihood
-        :param source_marg: should be None; not supported in jaxtronomy
+        :param source_marg: should be False; not supported in jaxtronomy
         :param linear_prior: should be None; not supported in jaxtronomy
         :param check_positive_flux: bool, should be False. True is not supported in jaxtronomy
         :param kwargs_pixelbased: should be None; not supported in jaxtronomy
         :param linear_solver: bool, should be False. True is not supported in jaxtronomy
         """
+
+        if source_marg != False:
+            raise ValueError("source_marg not supported in jaxtronomy")
+        if linear_prior is not None:
+            raise ValueError("linear_prior not supported in jaxtronomy")
+        if check_positive_flux != False:
+            raise ValueError("check_positive_flux not supported in jaxtronomy")
+        if kwargs_pixelbased is not None:
+            raise ValueError("pixelbased solver not supported in jaxtronomy")
+        if linear_solver != False:
+            raise ValueError("linear_solver not supported in jaxtronomy")
 
         self.imSim = class_creator.create_im_sim(
             multi_band_list,
@@ -46,9 +57,6 @@ class ImageLikelihood(object):
             linear_solver=linear_solver,
         )
         self._model_type = self.imSim.type
-        self._source_marg = source_marg
-        self._linear_prior = linear_prior
-        self._check_positive_flux = check_positive_flux
 
     @partial(jit, static_argnums=0)
     def logL(
@@ -78,9 +86,9 @@ class ImageLikelihood(object):
             kwargs_ps,
             kwargs_extinction=kwargs_extinction,
             kwargs_special=kwargs_special,
-            source_marg=self._source_marg,
-            linear_prior=self._linear_prior,
-            check_positive_flux=self._check_positive_flux,
+            source_marg=False,
+            linear_prior=None,
+            check_positive_flux=False
         )
         logL = jnp.nan_to_num(logL, nan=-(10**15))
         return logL, param

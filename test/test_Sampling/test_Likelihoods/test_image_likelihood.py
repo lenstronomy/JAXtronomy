@@ -117,13 +117,14 @@ class TestImageLikelihood(object):
             "supersampling_convolution": False,
         }
 
-        multi_band_list = [
+        self.multi_band_list = [
             [kwargs_data, kwargs_psf, kwargs_numerics],
             [kwargs_data2, kwargs_psf2, kwargs_numerics2],
         ]
+
         # band 0 involves the SIE + SHEAR lens models, a SERSIC lens light model, and a SERSIC_ELLIPSE source model
         # band 1 involves the EPL + SHEAR lens models, the same SERSIC lens light model, and the same SERSIC_ELLIPSE source model
-        kwargs_model = {
+        self.kwargs_model = {
             "lens_model_list": lens_model_list,
             "source_light_model_list": source_model_list,
             "lens_light_model_list": lens_light_model_list,
@@ -131,18 +132,61 @@ class TestImageLikelihood(object):
             # The next line is not needed if the models are the same for both bands
             "index_source_light_model_list": [[0], [0]],
         }
+
         self.image_likelihood = ImageLikelihood(
-            multi_band_list,
+            self.multi_band_list,
             "single-band",
-            kwargs_model,
+            self.kwargs_model,
             image_likelihood_mask_list=likelihood_mask_list,
         )
         self.image_likelihood_ref = ImageLikelihood_ref(
-            multi_band_list,
+            self.multi_band_list,
             "single-band",
-            kwargs_model,
+            self.kwargs_model,
             image_likelihood_mask_list=likelihood_mask_list,
             linear_solver=False
+        )
+
+    def test_raises(self):
+        npt.assert_raises(
+            ValueError,
+            ImageLikelihood,
+            self.multi_band_list,
+            "single-band",
+            self.kwargs_model,
+            source_marg=True
+        )
+        npt.assert_raises(
+            ValueError,
+            ImageLikelihood,
+            self.multi_band_list,
+            "single-band",
+            self.kwargs_model,
+            linear_solver=True
+        )
+        npt.assert_raises(
+            ValueError,
+            ImageLikelihood,
+            self.multi_band_list,
+            "single-band",
+            self.kwargs_model,
+            check_positive_flux=True
+        )
+        npt.assert_raises(
+            ValueError,
+            ImageLikelihood,
+            self.multi_band_list,
+            "single-band",
+            self.kwargs_model,
+            kwargs_pixelbased={"error": 1}
+        )
+        npt.assert_raises(
+            ValueError,
+            ImageLikelihood,
+            self.multi_band_list,
+            "single-band",
+            self.kwargs_model,
+            linear_prior=1
         )
 
     def test_logL(self):
