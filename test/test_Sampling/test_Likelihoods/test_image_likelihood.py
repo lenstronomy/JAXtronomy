@@ -1,6 +1,8 @@
 from jaxtronomy.Sampling.Likelihoods.image_likelihood import ImageLikelihood
 
-from lenstronomy.Sampling.Likelihoods.image_likelihood import ImageLikelihood as ImageLikelihood_ref
+from lenstronomy.Sampling.Likelihoods.image_likelihood import (
+    ImageLikelihood as ImageLikelihood_ref,
+)
 from lenstronomy.Util import simulation_util as sim_util, param_util
 import numpy as np
 import numpy.testing as npt
@@ -24,10 +26,8 @@ class TestImageLikelihood(object):
         kwargs_data2 = sim_util.data_configure_simple(
             numPix2, deltaPix, exp_time + 30, sigma_bkg + 0.01, inverse=True
         )
-        kwargs_data['image_data'] = np.ones((numPix, numPix)) * 0.9392
-        kwargs_data2['image_data'] = np.ones((numPix, numPix)) * 0.3262
-
-
+        kwargs_data["image_data"] = np.ones((numPix, numPix)) * 0.9392
+        kwargs_data2["image_data"] = np.ones((numPix, numPix)) * 0.3262
 
         # Create likelihood masks
         # Likelihood mask 1 will mask out 70 pixels
@@ -144,7 +144,7 @@ class TestImageLikelihood(object):
             "single-band",
             self.kwargs_model,
             image_likelihood_mask_list=likelihood_mask_list,
-            linear_solver=False
+            linear_solver=False,
         )
 
     def test_raises(self):
@@ -191,34 +191,27 @@ class TestImageLikelihood(object):
 
     def test_logL(self):
         logL, _ = self.image_likelihood.logL(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         logL_ref, _ = self.image_likelihood_ref.logL(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         npt.assert_almost_equal(logL, logL_ref, decimal=8)
 
-        self.kwargs_lens[2]['gamma1'] = 0.05
+        self.kwargs_lens[2]["gamma1"] = 0.05
 
         logL, _ = self.image_likelihood.logL(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         logL_ref, _ = self.image_likelihood_ref.logL(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
         )
         npt.assert_almost_equal(logL, logL_ref, decimal=8)
 
     def test_num_data(self):
         assert self.image_likelihood.num_data == self.image_likelihood_ref.num_data
         assert self.image_likelihood.num_data == 100 * 100 - 70
+
 
 if __name__ == "__main__":
     pytest.main()
