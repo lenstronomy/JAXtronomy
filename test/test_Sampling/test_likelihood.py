@@ -107,7 +107,6 @@ class TestLikelihoodModule(object):
         self.kwargs_model = kwargs_model
         self.kwargs_numerics = kwargs_numerics
 
-        
         def condition_definition(
             kwargs_lens,
             kwargs_source,
@@ -119,7 +118,8 @@ class TestLikelihoodModule(object):
         ):
             logL = jnp.where(
                 kwargs_lens_light[0]["R_sersic"] > kwargs_source[0]["R_sersic"],
-                -10**15, 0
+                -(10**15),
+                0,
             )
             return logL
 
@@ -129,7 +129,7 @@ class TestLikelihoodModule(object):
         }
         self.kwargs_data_joint = {
             "multi_band_list": [[kwargs_data, kwargs_psf, kwargs_numerics]],
-            "multi_band_type": "single-band"
+            "multi_band_type": "single-band",
         }
 
         self.param_class = Param(self.kwargs_model, linear_solver=False)
@@ -165,7 +165,7 @@ class TestLikelihoodModule(object):
             self.kwargs_data_joint,
             self.kwargs_model,
             self.param_class,
-            time_delay_likelihood=True
+            time_delay_likelihood=True,
         )
         npt.assert_raises(
             ValueError,
@@ -173,7 +173,7 @@ class TestLikelihoodModule(object):
             self.kwargs_data_joint,
             self.kwargs_model,
             self.param_class,
-            tracer_likelihood=True
+            tracer_likelihood=True,
         )
         npt.assert_raises(
             ValueError,
@@ -181,7 +181,7 @@ class TestLikelihoodModule(object):
             self.kwargs_data_joint,
             self.kwargs_model,
             self.param_class,
-            image_position_likelihood=True
+            image_position_likelihood=True,
         )
         npt.assert_raises(
             ValueError,
@@ -189,7 +189,7 @@ class TestLikelihoodModule(object):
             self.kwargs_data_joint,
             self.kwargs_model,
             self.param_class,
-            source_position_likelihood=True
+            source_position_likelihood=True,
         )
         npt.assert_raises(
             ValueError,
@@ -197,7 +197,7 @@ class TestLikelihoodModule(object):
             self.kwargs_data_joint,
             self.kwargs_model,
             self.param_class,
-            flux_ratio_likelihood=True
+            flux_ratio_likelihood=True,
         )
         npt.assert_raises(
             ValueError,
@@ -205,7 +205,7 @@ class TestLikelihoodModule(object):
             self.kwargs_data_joint,
             self.kwargs_model,
             self.param_class,
-            kinematic_2d_likelihood=True
+            kinematic_2d_likelihood=True,
         )
         npt.assert_raises(
             ValueError,
@@ -213,7 +213,7 @@ class TestLikelihoodModule(object):
             self.kwargs_data_joint,
             self.kwargs_model,
             self.param_class,
-            astrometric_likelihood=True
+            astrometric_likelihood=True,
         )
 
     def test_logL(self):
@@ -247,8 +247,12 @@ class TestLikelihoodModule(object):
         assert num_data_effective == num_data_effective_ref
 
     def test_check_bounds(self):
-        npt.assert_array_equal(self.Likelihood._lower_limit, self.Likelihood_ref._lower_limit)
-        npt.assert_array_equal(self.Likelihood._upper_limit, self.Likelihood_ref._upper_limit)
+        npt.assert_array_equal(
+            self.Likelihood._lower_limit, self.Likelihood_ref._lower_limit
+        )
+        npt.assert_array_equal(
+            self.Likelihood._upper_limit, self.Likelihood_ref._upper_limit
+        )
 
         penalty, bound_hit = self.Likelihood.check_bounds(
             args=[0, 1], lowerLimit=[1, 0], upperLimit=[2, 2], verbose=True

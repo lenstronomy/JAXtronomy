@@ -123,15 +123,17 @@ class LikelihoodModule(object):
             derived from imaging or spectroscopy
         """
         if (
-            time_delay_likelihood or 
-            tracer_likelihood or 
-            image_position_likelihood or
-            source_position_likelihood or
-            flux_ratio_likelihood or 
-            kinematic_2d_likelihood or
-            astrometric_likelihood
+            time_delay_likelihood
+            or tracer_likelihood
+            or image_position_likelihood
+            or source_position_likelihood
+            or flux_ratio_likelihood
+            or kinematic_2d_likelihood
+            or astrometric_likelihood
         ):
-            raise ValueError("Only image_likelihood is currently supported in JAXtronomy")
+            raise ValueError(
+                "Only image_likelihood is currently supported in JAXtronomy"
+            )
         # TODO unpack also tracer model from kwargs_data
         (
             multi_band_list,
@@ -285,7 +287,7 @@ class LikelihoodModule(object):
     def __call__(self, a):
         return self.logL(a)
 
-    @partial(jit, static_argnums=(0,2))
+    @partial(jit, static_argnums=(0, 2))
     def logL(self, args, verbose=False):
         """Routine to compute X2 given variable parameters for a MCMC/PSO chain.
 
@@ -305,10 +307,12 @@ class LikelihoodModule(object):
         # extract parameters
         kwargs_return = self.param.args2kwargs(args)
 
-        logL = jnp.where(bound_hit, -(10.0**10), self.log_likelihood(kwargs_return, verbose=verbose))
+        logL = jnp.where(
+            bound_hit, -(10.0**10), self.log_likelihood(kwargs_return, verbose=verbose)
+        )
         return logL
 
-    @partial(jit, static_argnums=(0,2))
+    @partial(jit, static_argnums=(0, 2))
     def log_likelihood(self, kwargs_return, verbose=False):
         """
 
@@ -365,16 +369,22 @@ class LikelihoodModule(object):
         lowerLimit = jnp.atleast_1d(jnp.array(lowerLimit))
         upperLimit = jnp.atleast_1d(jnp.array(upperLimit))
 
-        bound_hit_array = jnp.where(args < lowerLimit, True, jnp.where(args > upperLimit, True, False))
+        bound_hit_array = jnp.where(
+            args < lowerLimit, True, jnp.where(args > upperLimit, True, False)
+        )
         bound_hit = jnp.any(bound_hit_array)
         penalty = jnp.where(bound_hit, 10.0**5, 0.0)
 
         if verbose is True:
+
             def true_fun():
                 i = jnp.nonzero(bound_hit_array, size=1)[0][0]
                 jax.debug.print(
-                    "parameter args[{}] with value {} hit the bounds [{}, {}] "
-                    , i, args[i], lowerLimit[i], upperLimit[i]
+                    "parameter args[{}] with value {} hit the bounds [{}, {}] ",
+                    i,
+                    args[i],
+                    lowerLimit[i],
+                    upperLimit[i],
                 )
 
             def false_fun():
@@ -458,9 +468,8 @@ class LikelihoodModule(object):
             tracer_data,
         )
 
-    #def _reset_point_source_cache(self, bool_input=True):
+    # def _reset_point_source_cache(self, bool_input=True):
     #    self.PointSource.delete_lens_model_cache()
     #    self.PointSource.set_save_cache(bool_input)
     #    if self._image_likelihood is True:
     #        self.image_likelihood.reset_point_source_cache(bool_input)
-
