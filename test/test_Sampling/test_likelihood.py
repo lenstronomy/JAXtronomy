@@ -146,6 +146,7 @@ class TestLikelihoodModule(object):
             kwargs_data_joint=self.kwargs_data_joint,
             kwargs_model=kwargs_model,
             param_class=self.param_class,
+            check_bounds=True,
             **kwargs_likelihood,
         )
         self.Likelihood_ref = LikelihoodModule_ref(
@@ -223,6 +224,10 @@ class TestLikelihoodModule(object):
             kwargs_lens_light=self.kwargs_lens_light,
         )
 
+        logL = self.Likelihood(args)
+        logL_ref = self.Likelihood_ref(args)
+        npt.assert_almost_equal(logL, logL_ref, decimal=8)
+
         logL = self.Likelihood.logL(args, verbose=True)
         logL_ref = self.Likelihood_ref.logL(args, verbose=True)
         npt.assert_almost_equal(logL, logL_ref, decimal=8)
@@ -247,11 +252,13 @@ class TestLikelihoodModule(object):
         assert num_data_effective == num_data_effective_ref
 
     def test_check_bounds(self):
+        lower_limit, upper_limit = self.Likelihood.param_limits
+        lower_limit_ref, upper_limit_ref = self.Likelihood_ref.param_limits
         npt.assert_array_equal(
-            self.Likelihood._lower_limit, self.Likelihood_ref._lower_limit
+            lower_limit, lower_limit_ref
         )
         npt.assert_array_equal(
-            self.Likelihood._upper_limit, self.Likelihood_ref._upper_limit
+            upper_limit, upper_limit_ref
         )
 
         penalty, bound_hit = self.Likelihood.check_bounds(
@@ -268,6 +275,39 @@ class TestLikelihoodModule(object):
             args=[1, 2], lowerLimit=[1, 0], upperLimit=[2, 2], verbose=True
         )
         assert not bound_hit
+
+    def test_kwargs_imaging(self):
+        kwargs_imaging = self.Likelihood.kwargs_imaging
+        kwargs_imaging_ref = self.Likelihood_ref.kwargs_imaging
+        assert kwargs_imaging == kwargs_imaging_ref
+
+    def test_no_multiband(self):
+        args = self.param_class.kwargs2args(
+            kwargs_lens=self.kwargs_lens,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
+        )
+
+        self.kwargs_data_joint['multi_band_list'] = None
+        Likelihood = LikelihoodModule(
+            kwargs_data_joint=self.kwargs_data_joint,
+            kwargs_model=self.kwargs_model,
+            param_class=self.param_class,
+            check_bounds=True
+        )
+        Likelihood_ref = LikelihoodModule_ref(
+            kwargs_data_joint=self.kwargs_data_joint,
+            kwargs_model=self.kwargs_model,
+            param_class=self.param_class,
+            check_bounds=True
+        )
+
+        assert Likelihood.logL(args) == 0
+
+        args[0] = 1000000
+        assert Likelihood.logL(args) == -1e18
+        assert Likelihood.logL(args) == Likelihood_ref.logL(args)
+
 
 
 if __name__ == "__main__":
