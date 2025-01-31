@@ -1,4 +1,4 @@
-lenstronomy @ "https://github.com/lenstronomy/lenstronomy/archive/1.12.4.tar.gz"
+lenstronomy @ https://github.com/lenstronomy/lenstronomy/archive/refs/tags/v1.12.4.tar.gz
 numpy>=1.17.0
 scipy>=0.19.1
 jax>=0.4.12
