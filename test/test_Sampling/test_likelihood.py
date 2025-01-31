@@ -254,12 +254,8 @@ class TestLikelihoodModule(object):
     def test_check_bounds(self):
         lower_limit, upper_limit = self.Likelihood.param_limits
         lower_limit_ref, upper_limit_ref = self.Likelihood_ref.param_limits
-        npt.assert_array_equal(
-            lower_limit, lower_limit_ref
-        )
-        npt.assert_array_equal(
-            upper_limit, upper_limit_ref
-        )
+        npt.assert_array_equal(lower_limit, lower_limit_ref)
+        npt.assert_array_equal(upper_limit, upper_limit_ref)
 
         penalty, bound_hit = self.Likelihood.check_bounds(
             args=[0, 1], lowerLimit=[1, 0], upperLimit=[2, 2], verbose=True
@@ -288,18 +284,18 @@ class TestLikelihoodModule(object):
             kwargs_lens_light=self.kwargs_lens_light,
         )
 
-        self.kwargs_data_joint['multi_band_list'] = None
+        self.kwargs_data_joint["multi_band_list"] = None
         Likelihood = LikelihoodModule(
             kwargs_data_joint=self.kwargs_data_joint,
             kwargs_model=self.kwargs_model,
             param_class=self.param_class,
-            check_bounds=True
+            check_bounds=True,
         )
         Likelihood_ref = LikelihoodModule_ref(
             kwargs_data_joint=self.kwargs_data_joint,
             kwargs_model=self.kwargs_model,
             param_class=self.param_class,
-            check_bounds=True
+            check_bounds=True,
         )
 
         assert Likelihood.logL(args) == 0
@@ -307,7 +303,6 @@ class TestLikelihoodModule(object):
         args[0] = 1000000
         assert Likelihood.logL(args) == -1e18
         assert Likelihood.logL(args) == Likelihood_ref.logL(args)
-
 
 
 if __name__ == "__main__":
