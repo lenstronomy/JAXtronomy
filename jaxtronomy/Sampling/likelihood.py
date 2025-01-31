@@ -305,7 +305,7 @@ class LikelihoodModule(object):
             )
 
         # extract parameters
-        kwargs_return = self.param.args2kwargs(args)
+        kwargs_return = self.param.args2kwargs(args, jax=True)
 
         logL = jnp.where(
             bound_hit, -(10.0**10), self.log_likelihood(kwargs_return, verbose=verbose)
