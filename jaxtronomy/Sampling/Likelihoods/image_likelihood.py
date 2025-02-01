@@ -69,16 +69,22 @@ class ImageLikelihood(object):
         kwargs_extinction=None,
         **kwargs,
     ):
-        """Computes the log likelihood of the data given a model. The model kwargs are used
-        to simulate an image which is compared to the data image.
+        """Computes the log likelihood of the data given a model. The model kwargs are
+        used to simulate an image which is compared to the data image.
 
-        :param kwargs_lens: lens model keyword argument list according to LensModel module
-        :param kwargs_source: source light keyword argument list according to LightModel module
-        :param kwargs_lens_light: deflector light (not lensed) keyword argument list according to LightModel module
-        :param kwargs_ps: point source keyword argument list according to PointSource module
+        :param kwargs_lens: lens model keyword argument list according to LensModel
+            module
+        :param kwargs_source: source light keyword argument list according to LightModel
+            module
+        :param kwargs_lens_light: deflector light (not lensed) keyword argument list
+            according to LightModel module
+        :param kwargs_ps: point source keyword argument list according to PointSource
+            module
         :param kwargs_special: special keyword argument list as part of the Param module
-        :param kwargs_extinction: extinction parameter keyword argument list according to LightModel module
-        :return: log likelihood of the data given the model, linear parameter inversion list (None in jaxtronomy)
+        :param kwargs_extinction: extinction parameter keyword argument list according
+            to LightModel module
+        :return: log likelihood of the data given the model, linear parameter inversion
+            list (None in jaxtronomy)
         """
         logL, param = self.imSim.likelihood_data_given_model(
             kwargs_lens,
