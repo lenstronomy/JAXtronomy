@@ -260,7 +260,6 @@ class TestLikelihoodModule(object):
         grad_func = grad(self.Likelihood.logL)
         assert len(args) == len(grad_func(args))
 
-
     def test_check_bounds(self):
         lower_limit, upper_limit = self.Likelihood.param_limits
         lower_limit_ref, upper_limit_ref = self.Likelihood_ref.param_limits
