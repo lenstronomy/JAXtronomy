@@ -132,7 +132,9 @@ class LikelihoodModule(object):
             or astrometric_likelihood
         ):
             raise ValueError(
-                "Only image_likelihood is currently supported in JAXtronomy"
+                "Only image_likelihood is currently supported in JAXtronomy.\n"
+                "tracer, image_position, source_position, flux_ratio, kinematic_2d, and astrometric \n"
+                "likelihoods are not currently supported and should be set to False."
             )
         # TODO unpack also tracer model from kwargs_data
         (
