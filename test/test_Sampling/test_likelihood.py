@@ -1,6 +1,6 @@
 __author__ = "sibirrer"
 
-from jax import numpy as jnp
+from jax import numpy as jnp, grad
 import pytest
 import numpy as np
 import numpy.testing as npt
@@ -250,6 +250,16 @@ class TestLikelihoodModule(object):
         num_data_effective = self.Likelihood.effective_num_data_points()
         num_data_effective_ref = self.Likelihood_ref.effective_num_data_points()
         assert num_data_effective == num_data_effective_ref
+
+    def test_grad_logL(self):
+        args = self.param_class.kwargs2args(
+            kwargs_lens=self.kwargs_lens,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
+        )
+        grad_func = grad(self.Likelihood.logL)
+        assert len(args) == len(grad_func(args))
+
 
     def test_check_bounds(self):
         lower_limit, upper_limit = self.Likelihood.param_limits
