@@ -982,12 +982,6 @@ class TestFittingSequence(object):
         lens_light_model_list = ["SERSIC_ELLIPSE"]
         kwargs_lens_light = [kwargs_sersic_lens]
 
-        kwargs_truth = {
-            "kwargs_lens": kwargs_lens,
-            "kwargs_source": kwargs_source,
-            "kwargs_lens_light": kwargs_lens_light,
-        }
-
         lens_light_model_class = LightModel(lens_light_model_list)
         # generate the coordinate grid and image properties (we only read out the relevant lines we need)
         _, _, ra_at_xy_0, dec_at_xy_0, _, _, Mpix2coord, _ = (
@@ -1262,6 +1256,7 @@ class TestFittingSequence(object):
         npt.assert_almost_equal(
             kwargs_result["kwargs_lens"][0]["theta_E"], 0.66, decimal=3
         )
+        npt.assert_almost_equal(logL_history[-1], 0, decimal=-2)
 
 
 if __name__ == "__main__":
