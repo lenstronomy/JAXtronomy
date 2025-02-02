@@ -144,7 +144,7 @@ class TestFittingSequence(object):
         self.kwargs_likelihood = {
             # This is false by default anyways
             "check_positive_flux": False,
-            "source_marg": False
+            "source_marg": False,
         }
 
         lens_sigma = [
