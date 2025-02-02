@@ -3,3 +3,5 @@ zeus-mcmc
 cobaya
 nautilus-sampler>=0.7
 emcee>=3.0.0
+nestcheck
+dyPolyChord @ https://github.com/ejhigson/dyPolyChord/archive/refs/heads/master.zip

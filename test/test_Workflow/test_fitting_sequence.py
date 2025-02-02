@@ -866,6 +866,11 @@ class TestFittingSequence(object):
 
         fitting_list.append(["dyPolyChord", kwargs_dypolychord])
 
+        kwargs_dypolychord2 = copy.deepcopy(kwargs_dypolychord)
+        kwargs_dypolychord2["kwargs_run"]["resume_dyn_run"] = True
+        kwargs_dypolychord2["prior_type"] = "gaussian"
+        fitting_list.append(["dyPolyChord", kwargs_dypolychord2])
+
         chain_list = fittingSequence.fit_sequence(fitting_list)
 
     def test_minimizer(self):
@@ -918,7 +923,6 @@ class TestFittingSequence(object):
         )
         npt.assert_raises(ValueError, fittingSequence.fit_sequence, fitting_list)
         kwargs_mcmc["init_samples"] = None
-        fitting_list[-1][1] = kwargs_mcmc
 
         args = fittingSequence.param_class.kwargs2args(
             kwargs_lens=[{"theta_E": 1, "center_x": 0, "center_y": 0}]
