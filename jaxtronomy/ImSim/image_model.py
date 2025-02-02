@@ -107,7 +107,7 @@ class ImageModel(object):
                 self.PointSource.point_source_type_list
             )
         self._psf_error_map_bool_list = psf_error_map_bool_list
-        self._psf_error_map = self.PSF.psf_error_map_bool
+        self._psf_error_map = self.PSF.psf_variance_map_bool
         if self._psf_error_map:
             raise ValueError("psf error map not supported in jaxtronomy")
 

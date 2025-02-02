@@ -195,7 +195,7 @@ class TestImageModel(object):
         kwargs_psf = {
             "psf_type": "PIXEL",
             "kernel_point_source": kernel,
-            "psf_error_map": np.ones_like(kernel) * 0.001 * kernel**2,
+            "psf_variance_map": np.ones_like(kernel) * 0.001 * kernel**2,
         }
         psf_class = PSF(**kwargs_psf)
         npt.assert_raises(ValueError, ImageModel, self.data_class, psf_class)

@@ -269,8 +269,8 @@ class SingleBandMultiModel(ImageModel):
         check_positive_flux=False,
         linear_solver=False,
     ):
-        """Computes the likelihood of the data given a model. This is specified with the
-        non-linear parameters and a linear inversion and prior marginalisation.
+        """Computes the log likelihood of the data given a model. The model kwargs are
+        used to simulate an image which is compared to the data image.
 
         :param kwargs_lens: list of keyword arguments corresponding to the superposition
             of different lens profiles
