@@ -454,7 +454,7 @@ class TestFittingSequence(object):
             kwargs_numerics=kwargs_numerics,
         )
         image_sim = sim_util.simulate_simple(
-            imageModel, kwargs_lens, kwargs_source, point_source_add=False
+            imageModel, kwargs_lens, kwargs_source, point_source_add=False, no_noise=True
         )
 
         data_class.update_data(image_sim)
@@ -483,7 +483,7 @@ class TestFittingSequence(object):
         ]
         source_lower = [
             {
-                "amp": 0,
+                "amp": 9.5,
                 "R_sersic": 0.01,
                 "n_sersic": 0.5,
                 "center_x": -1,
@@ -491,7 +491,7 @@ class TestFittingSequence(object):
             }
         ]
         source_upper = [
-            {"amp": 20, "R_sersic": 1.0, "n_sersic": 6.0, "center_x": 1, "center_y": 1}
+            {"amp": 10.5, "R_sersic": 1.0, "n_sersic": 6.0, "center_x": 1, "center_y": 1}
         ]
 
         lens_param = [kwargs_lens, lens_sigma, lens_fixed, lens_lower, lens_upper]
@@ -522,7 +522,7 @@ class TestFittingSequence(object):
 
         kwargs_cobaya = {
             "proposal_widths": [0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
-            "Rminus1_stop": 100,  # does this need to be large? can we run in test mode?
+            "Rminus1_stop": 100,
             "force_overwrite": True,
         }
 
@@ -594,7 +594,7 @@ class TestFittingSequence(object):
             kwargs_numerics=kwargs_numerics,
         )
         image_sim = sim_util.simulate_simple(
-            imageModel, kwargs_lens, kwargs_source, point_source_add=False
+            imageModel, kwargs_lens, kwargs_source, point_source_add=False, no_noise=True
         )
 
         data_class.update_data(image_sim)
@@ -652,7 +652,7 @@ class TestFittingSequence(object):
         ]
         source_lower = [
             {
-                "amp": 0,
+                "amp": 9.5,
                 "R_sersic": 0.01,
                 "n_sersic": 0.5,
                 "center_x": -2,
@@ -663,7 +663,7 @@ class TestFittingSequence(object):
         ]
         source_upper = [
             {
-                "amp": 20,
+                "amp": 10.5,
                 "R_sersic": 10,
                 "n_sersic": 5.5,
                 "center_x": 2,
