@@ -870,7 +870,9 @@ class TestFittingSequence(object):
         kwargs_dypolychord2["kwargs_run"]["resume_dyn_run"] = True
         kwargs_dypolychord2["prior_type"] = "gaussian"
         fitting_list.append(["dyPolyChord", kwargs_dypolychord2])
+        npt.assert_raises(ValueError, fittingSequence.fit_sequence, fitting_list)
 
+        kwargs_dypolychord2["kwargs_run"]["resume_dyn_run"] = False
         chain_list = fittingSequence.fit_sequence(fitting_list)
 
     def test_minimizer(self):
