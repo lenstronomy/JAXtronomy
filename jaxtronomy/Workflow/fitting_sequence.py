@@ -128,13 +128,12 @@ class FittingSequence(object):
 
             elif fitting_type == "psf_iteration":
                 raise ValueError("psf_iteration not supported in jaxtronomy")
-                # self.psf_iteration(**kwargs)
 
             elif fitting_type == "align_images":
                 self.align_images(**kwargs)
 
             elif fitting_type == "calibrate_images":
-                self.flux_calibration(**kwargs)
+                raise ValueError("calibrate_images not supported in jaxtronomy")
 
             elif fitting_type == "PSO":
                 kwargs_result, chain, param = self.pso(**kwargs)
@@ -630,50 +629,6 @@ class FittingSequence(object):
 
         return output
 
-    def psf_iteration(self, compute_bands=None, **kwargs_psf_iter):
-        """Iterative PSF reconstruction.
-
-        :param compute_bands: bool list, if multiple bands, this process can be limited
-            to a subset of bands
-        :param kwargs_psf_iter: keyword arguments as used or available in
-            PSFIteration.update_iterative() definition
-        :return: 0, updated PSF is stored in self.multi_band_list
-        """
-        kwargs_model = self._updateManager.kwargs_model
-        kwargs_likelihood = self._updateManager.kwargs_likelihood
-        likelihood_mask_list = kwargs_likelihood.get("image_likelihood_mask_list", None)
-        kwargs_pixelbased = kwargs_likelihood.get("kwargs_pixelbased", None)
-        kwargs_temp = self.best_fit(bijective=False)
-        if compute_bands is None:
-            compute_bands = [True] * len(self.multi_band_list)
-
-        for band_index in range(len(self.multi_band_list)):
-            if compute_bands[band_index] is True:
-                kwargs_psf = self.multi_band_list[band_index][1]
-                kwargs_psf_before = copy.deepcopy(kwargs_psf)
-                image_model = SingleBandMultiModel(
-                    self.multi_band_list,
-                    kwargs_model,
-                    likelihood_mask_list=likelihood_mask_list,
-                    band_index=band_index,
-                    kwargs_pixelbased=kwargs_pixelbased,
-                )
-                psf_iter = PsfFitting(image_model_class=image_model)
-                kwargs_psf = psf_iter.update_iterative(
-                    kwargs_psf, kwargs_params=kwargs_temp, **kwargs_psf_iter
-                )
-                self.multi_band_list[band_index][1] = kwargs_psf
-                self._psf_iteration_memory.append(
-                    {
-                        "sequence": self._psf_iteration_index,
-                        "band": band_index,
-                        "psf_before": kwargs_psf_before,
-                        "psf_after": kwargs_psf,
-                    }
-                )
-        self._psf_iteration_index += 1
-        return 0
-
     def align_images(
         self,
         n_particles=10,
@@ -740,51 +695,6 @@ class FittingSequence(object):
                     )
                 )
                 self.multi_band_list[i][0] = kwargs_data
-        return 0
-
-    def flux_calibration(
-        self,
-        n_particles=10,
-        n_iterations=10,
-        threadCount=1,
-        calibrate_bands=None,
-        scaling_lower_limit=0,
-        scaling_upper_limit=1000,
-    ):
-        """Calibrates flux_scaling between multiple images. This routine only works in
-        'join-linear' model when fluxes are meant to be identical for different bands.
-
-        :param n_particles: number of particles in the Particle Swarm Optimization
-        :param n_iterations: number of iterations in the optimization process
-        :param calibrate_bands: state which bands the flux calibration is applied to
-        :type calibrate_bands: list of booleans of length of the imaging bands
-        :param threadCount: number of CPU threads. If MPI option is set, threadCount=1
-        :type threadCount: integer
-        :param scaling_lower_limit: lower limit of flux_scaling
-        :param scaling_upper_limit: upper limit of flux scaling
-        :return: 0, updated coordinate system for the band(s)
-        """
-        kwargs_model = self._updateManager.kwargs_model
-        kwargs_temp = self.best_fit(bijective=False)
-        multi_band_type = self.kwargs_data_joint.get("multi_band_type", "multi-linear")
-        kwargs_imaging = self.likelihoodModule.kwargs_imaging
-
-        calibration_fitting = FluxCalibration(
-            kwargs_imaging=kwargs_imaging,
-            kwargs_model=kwargs_model,
-            kwargs_params=kwargs_temp,
-            calibrate_bands=calibrate_bands,
-        )
-
-        multi_band_list, chain = calibration_fitting.pso(
-            n_particles=n_particles,
-            n_iterations=n_iterations,
-            threadCount=threadCount,
-            mpi=self._mpi,
-            scaling_lower_limit=scaling_lower_limit,
-            scaling_upper_limit=scaling_upper_limit,
-        )
-        self.multi_band_list = multi_band_list
         return 0
 
     def update_settings(

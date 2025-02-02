@@ -392,13 +392,9 @@ class TestFittingSequence(object):
         fitting_list4 = [["psf_iteration", kwargs_psf_iter]]
         with t.assertRaises(ValueError):
             fittingSequence.fit_sequence(fitting_list4)
-
-        # psf_iteration_list = fittingSequence.psf_iteration_memory
-        # assert len(psf_iteration_list) == 1
-        # assert "sequence" in psf_iteration_list[0]
-        # assert "band" in psf_iteration_list[0]
-        # assert "psf_before" in psf_iteration_list[0]
-        # assert "psf_after" in psf_iteration_list[0]
+        fitting_list5 = [["calibrate_images", {}]]
+        with t.assertRaises(ValueError):
+            fittingSequence.fit_sequence(fitting_list5)
 
     def test_cobaya(self):
         np.random.seed(42)
@@ -536,6 +532,7 @@ class TestFittingSequence(object):
         }
 
         chain_list = fittingSequence.fit_sequence([["Cobaya", kwargs_cobaya]])
+        assert fittingSequence.kwargs_fixed == (lens_fixed, source_fixed, [], [], {}, [], [])
 
     def test_zeus(self):
         np.random.seed(42)
