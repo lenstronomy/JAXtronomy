@@ -432,7 +432,7 @@ class TestFittingSequence(object):
         source_model_list = ["SERSIC"]
         kwargs_source = [
             {
-                "amp": 1.0,
+                "amp": 10.0,
                 "R_sersic": 0.3,
                 "n_sersic": 3.0,
                 "center_x": 0.1,
@@ -467,9 +467,9 @@ class TestFittingSequence(object):
         }
 
         lens_fixed = [{"center_x": 0.0, "center_y": 0.0}]
-        lens_sigma = [{"theta_E": 0.01, "center_x": 0.1, "center_y": 0.1}]
-        lens_lower = [{"theta_E": 0.1, "center_x": -10, "center_y": -10}]
-        lens_upper = [{"theta_E": 3.0, "center_x": 10, "center_y": 10}]
+        lens_sigma = [{"theta_E": 0.1, "center_x": 0.1, "center_y": 0.1}]
+        lens_lower = [{"theta_E": 1.0, "center_x": -10, "center_y": -10}]
+        lens_upper = [{"theta_E": 2.0, "center_x": 10, "center_y": 10}]
 
         source_fixed = [{}]
         source_sigma = [
@@ -491,7 +491,7 @@ class TestFittingSequence(object):
             }
         ]
         source_upper = [
-            {"amp": 100, "R_sersic": 1.0, "n_sersic": 6.0, "center_x": 1, "center_y": 1}
+            {"amp": 20, "R_sersic": 1.0, "n_sersic": 6.0, "center_x": 1, "center_y": 1}
         ]
 
         lens_param = [kwargs_lens, lens_sigma, lens_fixed, lens_lower, lens_upper]
@@ -521,7 +521,7 @@ class TestFittingSequence(object):
         )
 
         kwargs_cobaya = {
-            "proposal_widths": [0.001, 0.001, 0.001, 0.001, 0.001, 0.001],
+            "proposal_widths": [0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
             "Rminus1_stop": 100,  # does this need to be large? can we run in test mode?
             "force_overwrite": True,
         }
@@ -570,7 +570,7 @@ class TestFittingSequence(object):
         # make a source
         source_model_list = ["SERSIC_ELLIPSE"]
         kwargs_sersic_ellipse = {
-            "amp": 1.0,
+            "amp": 10.0,
             "R_sersic": 0.6,
             "n_sersic": 3,
             "center_x": 0.0,
@@ -663,7 +663,7 @@ class TestFittingSequence(object):
         ]
         source_upper = [
             {
-                "amp": 100,
+                "amp": 20,
                 "R_sersic": 10,
                 "n_sersic": 5.5,
                 "center_x": 2,
