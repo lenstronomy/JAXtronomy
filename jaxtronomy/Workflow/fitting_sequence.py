@@ -418,10 +418,10 @@ class FittingSequence(object):
     ):
         """Uses the Jaxopt Scipy Minimizer.
 
-        :param method: string. Otions are BFGS and TNC.
-            Other options such as Nelder-Mead, Powell, CG, Newton-CG, L-BFGS-B, COBYLA,
-            SLSQP, trust-constr, dogleg, trust-ncg, trust-exact, trust-krylov
-            either do not work yet or do not perform as well as BFGS and TNC
+        :param method: string. Otions are BFGS and TNC. Other options such as Nelder-
+            Mead, Powell, CG, Newton-CG, L-BFGS-B, COBYLA, SLSQP, trust-constr, dogleg,
+            trust-ncg, trust-exact, trust-krylov either do not work yet or do not
+            perform as well as BFGS and TNC
         :param maxiter: int, number of iterations to perform during minimization of the
             loss function
         """
