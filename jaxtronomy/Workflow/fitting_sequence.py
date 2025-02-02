@@ -128,7 +128,7 @@ class FittingSequence(object):
 
             elif fitting_type == "psf_iteration":
                 raise ValueError("psf_iteration not supported in jaxtronomy")
-                #self.psf_iteration(**kwargs)
+                # self.psf_iteration(**kwargs)
 
             elif fitting_type == "align_images":
                 self.align_images(**kwargs)
@@ -209,7 +209,9 @@ class FittingSequence(object):
             elif fitting_type == "Jaxopt":
                 args_history, logL_history, kwargs_result = self.jaxopt(**kwargs)
                 self._updateManager.update_param_state(**kwargs_result)
-                chain_list.append([fitting_type, args_history, logL_history, kwargs_result])
+                chain_list.append(
+                    [fitting_type, args_history, logL_history, kwargs_result]
+                )
             else:
                 raise ValueError(
                     "fitting_sequence {} is not supported. Please use: 'PSO', 'SIMPLEX', "
@@ -277,7 +279,6 @@ class FittingSequence(object):
         """
         return self._updateManager.param_class
 
-    
     @property
     def likelihoodModule(self):
         """
@@ -290,7 +291,6 @@ class FittingSequence(object):
             self.kwargs_data_joint, kwargs_model, self.param_class, **kwargs_likelihood
         )
         return likelihoodModule
-    
 
     def simplex(self, n_iterations, method="Nelder-Mead"):
         """Downhill simplex optimization using the Nelder-Mead algorithm.
@@ -324,7 +324,7 @@ class FittingSequence(object):
         progress=True,
         backend_filename=None,
         start_from_backend=False,
-        **kwargs_zeus
+        **kwargs_zeus,
     ):
         """MCMC routine.
 
@@ -389,7 +389,7 @@ class FittingSequence(object):
                 progress=progress,
                 initpos=initpos,
                 backend_filename=backend_filename,
-                **kwargs_zeus
+                **kwargs_zeus,
             )
             output = [sampler_type, samples, param_list, dist]
         else:
@@ -417,26 +417,28 @@ class FittingSequence(object):
         method="BFGS",
         maxiter=100,
     ):
-        """Uses the Jaxopt Scipy Minimizer
-        
-        :param method: string, options are BFGS, Nelder-Mead, Powell, CG, BFGS, Newton-CG,
-            L-BFGS-B, TNC, COBYLA, SLSQP, trust-constr, dogleg, trust-ncg, trust-exact, trust-krylov
-        :param maxiter: int, number of iterations to perform during minimization of the loss function
+        """Uses the Jaxopt Scipy Minimizer.
+
+        :param method: string, options are BFGS, Nelder-Mead, Powell, CG, BFGS, Newton-
+            CG, L-BFGS-B, TNC, COBYLA, SLSQP, trust-constr, dogleg, trust-ncg, trust-
+            exact, trust-krylov
+        :param maxiter: int, number of iterations to perform during minimization of the
+            loss function
         """
         print(f"Running {method} minimization with {maxiter} iterations:")
         param_class = self.param_class
-        likelihood_module=self.likelihoodModule
+        likelihood_module = self.likelihoodModule
 
         # Coonverts kwargs to args for the mean, sigma, lower, and upper parameter values
         kwargs_temp = self._updateManager.parameter_state
         args_mean = param_class.kwargs2args(**kwargs_temp)
-        
+
         kwargs_sigma = self._updateManager.sigma_kwargs
         args_sigma = param_class.kwargs2args(**kwargs_sigma)
-        
+
         kwargs_lower = self._updateManager._lower_kwargs
         args_lower = param_class.kwargs2args(*kwargs_lower)
-        
+
         kwargs_upper = self._updateManager._upper_kwargs
         args_upper = param_class.kwargs2args(*kwargs_upper)
 
@@ -448,7 +450,7 @@ class FittingSequence(object):
             args_sigma=args_sigma,
             args_lower=args_lower,
             args_upper=args_upper,
-            maxiter=maxiter
+            maxiter=maxiter,
         )
 
         # Runs the minimizer and prints results
@@ -456,9 +458,8 @@ class FittingSequence(object):
         kwargs_result = param_class.args2kwargs(args_result)
         print("best fit log_likelihood:", final_logL)
         print("kwargs_result:", kwargs_result)
-        
-        return minimizer.parameter_history, minimizer.logL_history, kwargs_result
 
+        return minimizer.parameter_history, minimizer.logL_history, kwargs_result
 
     def pso(
         self, n_particles, n_iterations, sigma_scale=1, print_key="PSO", threadCount=1

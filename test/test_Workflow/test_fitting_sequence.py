@@ -90,15 +90,15 @@ class TestFittingSequence(object):
         self.kwargs_ps = [
             {"ra_source": 0.0, "dec_source": 0.0, "source_amp": 1.0}
         ]  # quasar point source position in the source plane and intrinsic brightness
-        point_source_list = []#["SOURCE_POSITION"]
+        point_source_list = []  # ["SOURCE_POSITION"]
         point_source_class = PointSource(
-            point_source_type_list=point_source_list, #fixed_magnification_list=[True]
+            point_source_type_list=point_source_list,  # fixed_magnification_list=[True]
         )
         kwargs_numerics = {
             "supersampling_factor": 3,
             "supersampling_convolution": True,
             "compute_mode": "regular",
-            #"point_source_supersampling_factor": 1,
+            # "point_source_supersampling_factor": 1,
         }
         imageModel = ImageModel(
             data_class,
@@ -114,8 +114,8 @@ class TestFittingSequence(object):
             self.kwargs_lens,
             self.kwargs_source,
             self.kwargs_lens_light,
-            #self.kwargs_psf,
-            point_source_add=False
+            # self.kwargs_psf,
+            point_source_add=False,
         )
 
         data_class.update_data(image_sim)
@@ -133,11 +133,11 @@ class TestFittingSequence(object):
         }
         self.kwargs_numerics = kwargs_numerics
 
-        #num_source_model = len(source_model_list)
+        # num_source_model = len(source_model_list)
 
         self.kwargs_constraints = {
-            #"num_point_source_list": [4],
-            #"image_plane_source_list": [False] * num_source_model,
+            # "num_point_source_list": [4],
+            # "image_plane_source_list": [False] * num_source_model,
             "linear_solver": False
         }
 
@@ -214,10 +214,22 @@ class TestFittingSequence(object):
         ]
 
         lens_light_sigma = [
-            {"amp": 0.1, "R_sersic": 0.05, "n_sersic": 0.5, "center_x": 0.1, "center_y": 0.1}
+            {
+                "amp": 0.1,
+                "R_sersic": 0.05,
+                "n_sersic": 0.5,
+                "center_x": 0.1,
+                "center_y": 0.1,
+            }
         ]
         lens_light_lower = [
-            {"amp": 0, "R_sersic": 0.01, "n_sersic": 0.5, "center_x": -2, "center_y": -2}
+            {
+                "amp": 0,
+                "R_sersic": 0.01,
+                "n_sersic": 0.5,
+                "center_x": -2,
+                "center_y": -2,
+            }
         ]
         lens_light_upper = [
             {"amp": 100, "R_sersic": 10, "n_sersic": 5.5, "center_x": 2, "center_y": 2}
@@ -308,7 +320,7 @@ class TestFittingSequence(object):
             "stacking_method": "mean",
             "new_procedure": False,
         }
-        #fitting_list.append(["psf_iteration", kwargs_psf_iter])
+        # fitting_list.append(["psf_iteration", kwargs_psf_iter])
         fitting_list.append(["restart", None])
         fitting_list.append(["fix_not_computed", {"free_bands": [True]}])
         n_sersic_overwrite = 4
@@ -350,7 +362,7 @@ class TestFittingSequence(object):
             ["set_param_value", {"lens": [[1, ["gamma1"], [0.013]]]}],
             ["set_param_value", {"lens_light": [[0, ["center_x"], [0.009]]]}],
             ["set_param_value", {"source": [[0, ["n_sersic"], [2.993]]]}],
-            #["set_param_value", {"ps": [[0, ["ra_source"], [0.007]]]}],
+            # ["set_param_value", {"ps": [[0, ["ra_source"], [0.007]]]}],
         ]
 
         fittingSequence.fit_sequence(fitting_list)
@@ -359,7 +371,7 @@ class TestFittingSequence(object):
         assert kwargs_set["kwargs_lens"][1]["gamma1"] == 0.013
         assert kwargs_set["kwargs_lens_light"][0]["center_x"] == 0.009
         assert kwargs_set["kwargs_source"][0]["n_sersic"] == 2.993
-        #assert kwargs_set["kwargs_ps"][0]["ra_source"] == 0.007
+        # assert kwargs_set["kwargs_ps"][0]["ra_source"] == 0.007
 
         from unittest import TestCase
 
@@ -380,12 +392,12 @@ class TestFittingSequence(object):
         with t.assertRaises(ValueError):
             fittingSequence.fit_sequence(fitting_list4)
 
-        #psf_iteration_list = fittingSequence.psf_iteration_memory
-        #assert len(psf_iteration_list) == 1
-        #assert "sequence" in psf_iteration_list[0]
-        #assert "band" in psf_iteration_list[0]
-        #assert "psf_before" in psf_iteration_list[0]
-        #assert "psf_after" in psf_iteration_list[0]
+        # psf_iteration_list = fittingSequence.psf_iteration_memory
+        # assert len(psf_iteration_list) == 1
+        # assert "sequence" in psf_iteration_list[0]
+        # assert "band" in psf_iteration_list[0]
+        # assert "psf_before" in psf_iteration_list[0]
+        # assert "psf_after" in psf_iteration_list[0]
 
     def test_cobaya(self):
         np.random.seed(42)
@@ -441,7 +453,9 @@ class TestFittingSequence(object):
             source_model_class,
             kwargs_numerics=kwargs_numerics,
         )
-        image_sim = sim_util.simulate_simple(imageModel, kwargs_lens, kwargs_source, point_source_add=False)
+        image_sim = sim_util.simulate_simple(
+            imageModel, kwargs_lens, kwargs_source, point_source_add=False
+        )
 
         data_class.update_data(image_sim)
 
@@ -459,10 +473,22 @@ class TestFittingSequence(object):
 
         source_fixed = [{}]
         source_sigma = [
-            {"amp": 0.1, "R_sersic": 0.01, "n_sersic": 0.01, "center_x": 0.01, "center_y": 0.01}
+            {
+                "amp": 0.1,
+                "R_sersic": 0.01,
+                "n_sersic": 0.01,
+                "center_x": 0.01,
+                "center_y": 0.01,
+            }
         ]
         source_lower = [
-            {"amp": 0, "R_sersic": 0.01, "n_sersic": 0.5, "center_x": -1, "center_y": -1}
+            {
+                "amp": 0,
+                "R_sersic": 0.01,
+                "n_sersic": 0.5,
+                "center_x": -1,
+                "center_y": -1,
+            }
         ]
         source_upper = [
             {"amp": 100, "R_sersic": 1.0, "n_sersic": 6.0, "center_x": 1, "center_y": 1}
@@ -567,7 +593,9 @@ class TestFittingSequence(object):
             source_model_class,
             kwargs_numerics=kwargs_numerics,
         )
-        image_sim = sim_util.simulate_simple(imageModel, kwargs_lens, kwargs_source, point_source_add=False)
+        image_sim = sim_util.simulate_simple(
+            imageModel, kwargs_lens, kwargs_source, point_source_add=False
+        )
 
         data_class.update_data(image_sim)
 
@@ -697,7 +725,7 @@ class TestFittingSequence(object):
         )
         fitting_list = []
         kwargs_update = {
-            #"ps_add_fixed": [[0, ["ra_source", "dec_source"], [0, 0]]],
+            # "ps_add_fixed": [[0, ["ra_source", "dec_source"], [0, 0]]],
             "lens_light_add_fixed": [
                 [0, ["n_sersic", "R_sersic", "center_x", "center_y"], [4, 0.1, 0, 0]]
             ],
@@ -851,7 +879,10 @@ class TestFittingSequence(object):
 
         kwargs_likelihood = {"custom_logL_addition": custom_likelihood}
 
-        kwargs_data_joint = {"multi_band_list": [], "multi_band_type": "single-band",}
+        kwargs_data_joint = {
+            "multi_band_list": [],
+            "multi_band_type": "single-band",
+        }
         kwargs_model = {"lens_model_list": ["SIS"]}
         lens_param = (
             [{"theta_E": 1, "center_x": 0, "center_y": 0}],
@@ -883,70 +914,125 @@ class TestFittingSequence(object):
 
     def test_jaxopt_minimizer(self):
         # data specifics
-        background_rms = .005  #  background noise per pixel
-        exp_time = 100.  #  exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
+        background_rms = 0.005  #  background noise per pixel
+        exp_time = 100.0  #  exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
         numPix = 60  #  cutout pixel size per axis
         pixel_scale = 0.11  #  pixel size in arcsec (area per pixel = pixel_scale**2)
         fwhm = 0.5  # full width at half maximum of PSF
 
         # lensing quantities
-        lens_model_list = ['EPL', 'SHEAR']
-        kwargs_epl = {'theta_E': 0.66, 'gamma': 1.7, 'e1': .07, 'e2': -0.03, 'center_x': 0.05, 'center_y': 0.1}  # parameters of the deflector lens model
-        kwargs_shear = {'gamma1': 0.0, 'gamma2': -0.05}  # shear values to the source plane
+        lens_model_list = ["EPL", "SHEAR"]
+        kwargs_epl = {
+            "theta_E": 0.66,
+            "gamma": 1.7,
+            "e1": 0.07,
+            "e2": -0.03,
+            "center_x": 0.05,
+            "center_y": 0.1,
+        }  # parameters of the deflector lens model
+        kwargs_shear = {
+            "gamma1": 0.0,
+            "gamma2": -0.05,
+        }  # shear values to the source plane
 
         kwargs_lens = [kwargs_epl, kwargs_shear]
 
         lens_model_class = LensModel(lens_model_list)
 
         # Sersic parameters in the initial simulation for the source
-        kwargs_sersic = {'amp': 16., 'R_sersic': 0.1, 'n_sersic': 1., 'e1': -0.1, 'e2': 0.1, 'center_x': 0.1, 'center_y': 0.}
-        source_model_list = ['SERSIC_ELLIPSE']
+        kwargs_sersic = {
+            "amp": 16.0,
+            "R_sersic": 0.1,
+            "n_sersic": 1.0,
+            "e1": -0.1,
+            "e2": 0.1,
+            "center_x": 0.1,
+            "center_y": 0.0,
+        }
+        source_model_list = ["SERSIC_ELLIPSE"]
         kwargs_source = [kwargs_sersic]
 
         source_model_class = LightModel(source_model_list)
 
+        kwargs_sersic_lens = {
+            "amp": 16.0,
+            "R_sersic": 0.6,
+            "n_sersic": 2.0,
+            "e1": -0.1,
+            "e2": 0.1,
+            "center_x": 0.05,
+            "center_y": 0.0,
+        }
 
-        kwargs_sersic_lens = {'amp': 16., 'R_sersic': 0.6, 'n_sersic': 2., 'e1': -0.1, 'e2': 0.1, 'center_x': 0.05, 'center_y': 0.}
-
-        lens_light_model_list = ['SERSIC_ELLIPSE']
+        lens_light_model_list = ["SERSIC_ELLIPSE"]
         kwargs_lens_light = [kwargs_sersic_lens]
 
-        kwargs_truth = {'kwargs_lens': kwargs_lens,
-                        'kwargs_source': kwargs_source,
-                        'kwargs_lens_light': kwargs_lens_light}
-
+        kwargs_truth = {
+            "kwargs_lens": kwargs_lens,
+            "kwargs_source": kwargs_source,
+            "kwargs_lens_light": kwargs_lens_light,
+        }
 
         lens_light_model_class = LightModel(lens_light_model_list)
         # generate the coordinate grid and image properties (we only read out the relevant lines we need)
-        _, _, ra_at_xy_0, dec_at_xy_0, _, _, Mpix2coord, _ = util.make_grid_with_coordtransform(numPix=numPix, deltapix=pixel_scale, center_ra=0, center_dec=0, subgrid_res=1, inverse=False)
+        _, _, ra_at_xy_0, dec_at_xy_0, _, _, Mpix2coord, _ = (
+            util.make_grid_with_coordtransform(
+                numPix=numPix,
+                deltapix=pixel_scale,
+                center_ra=0,
+                center_dec=0,
+                subgrid_res=1,
+                inverse=False,
+            )
+        )
 
-
-        kwargs_data = {'background_rms': background_rms,  # rms of background noise
-                       'exposure_time': exp_time,  # exposure time (or a map per pixel)
-                       'ra_at_xy_0': ra_at_xy_0,  # RA at (0,0) pixel
-                       'dec_at_xy_0': dec_at_xy_0,  # DEC at (0,0) pixel 
-                       'transform_pix2angle': Mpix2coord,  # matrix to translate shift in pixel in shift in relative RA/DEC (2x2 matrix). Make sure it's units are arcseconds or the angular un
-                       'image_data': np.zeros((numPix, numPix))  # 2d data vector, here initialized with zeros as place holders that get's overwritten once a simulated image with noise is cre
-                      }
+        kwargs_data = {
+            "background_rms": background_rms,  # rms of background noise
+            "exposure_time": exp_time,  # exposure time (or a map per pixel)
+            "ra_at_xy_0": ra_at_xy_0,  # RA at (0,0) pixel
+            "dec_at_xy_0": dec_at_xy_0,  # DEC at (0,0) pixel
+            "transform_pix2angle": Mpix2coord,  # matrix to translate shift in pixel in shift in relative RA/DEC (2x2 matrix). Make sure it's units are arcseconds or the angular un
+            "image_data": np.zeros(
+                (numPix, numPix)
+            ),  # 2d data vector, here initialized with zeros as place holders that get's overwritten once a simulated image with noise is cre
+        }
 
         data_class = ImageData(**kwargs_data)
         # generate the psf variables
-        #kwargs_psf = {'psf_type': psf_type, 'fwhm': fwhm, 'pixel_size': pixel_scale, 'truncation': 3}
+        # kwargs_psf = {'psf_type': psf_type, 'fwhm': fwhm, 'pixel_size': pixel_scale, 'truncation': 3}
 
         # if you are using a PSF estimate from e.g. a star in the FoV of your exposure, you can set
-        kwargs_psf_gaussian = {'psf_type': 'GAUSSIAN', 'pixel_size': pixel_scale, 'fwhm': fwhm}
-
+        kwargs_psf_gaussian = {
+            "psf_type": "GAUSSIAN",
+            "pixel_size": pixel_scale,
+            "fwhm": fwhm,
+        }
 
         psf_class = PSF(**kwargs_psf_gaussian)
-        kwargs_numerics = {'supersampling_factor': 1, 'supersampling_convolution': False, 'convolution_type': 'fft_static'}
+        kwargs_numerics = {
+            "supersampling_factor": 1,
+            "supersampling_convolution": False,
+            "convolution_type": "fft_static",
+        }
 
-        imageModel = ImageModel(data_class, psf_class, lens_model_class=lens_model_class, 
-                                source_model_class=source_model_class, lens_light_model_class=lens_light_model_class,
-                                kwargs_numerics=kwargs_numerics)
+        imageModel = ImageModel(
+            data_class,
+            psf_class,
+            lens_model_class=lens_model_class,
+            source_model_class=source_model_class,
+            lens_light_model_class=lens_light_model_class,
+            kwargs_numerics=kwargs_numerics,
+        )
 
         # generate image
-        image_model = imageModel.image(kwargs_lens, kwargs_source, kwargs_lens_light=kwargs_lens_light, kwargs_ps=None, point_source_add=False)
-        kwargs_data['image_data'] = image_model
+        image_model = imageModel.image(
+            kwargs_lens,
+            kwargs_source,
+            kwargs_lens_light=kwargs_lens_light,
+            kwargs_ps=None,
+            point_source_add=False,
+        )
+        kwargs_data["image_data"] = image_model
 
         data_class.update_data(image_model)
 
@@ -957,27 +1043,49 @@ class TestFittingSequence(object):
         kwargs_upper_lens = []
 
         fixed_lens.append({})
-        kwargs_lens_init.append({'center_x': 0.1, 'center_y': 0.2,
-                                  'e1': 0.13, 'e2': -0.06, 'theta_E': 0.6, })
-        kwargs_lens_sigma.append({'theta_E': 0.1, 'e1': 0.1, 'e2': 0.1,
-                                 'center_x': 0.1, 'center_y': 0.1})
-        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'center_x': -10., 'center_y': -10.})
-        kwargs_upper_lens.append({'theta_E': 10., 'e1': 0.5, 'e2': 0.5, 'center_x': 10., 'center_y': 10.})
+        kwargs_lens_init.append(
+            {
+                "center_x": 0.1,
+                "center_y": 0.2,
+                "e1": 0.13,
+                "e2": -0.06,
+                "theta_E": 0.6,
+            }
+        )
+        kwargs_lens_sigma.append(
+            {"theta_E": 0.1, "e1": 0.1, "e2": 0.1, "center_x": 0.1, "center_y": 0.1}
+        )
+        kwargs_lower_lens.append(
+            {
+                "theta_E": 0.01,
+                "e1": -0.5,
+                "e2": -0.5,
+                "center_x": -10.0,
+                "center_y": -10.0,
+            }
+        )
+        kwargs_upper_lens.append(
+            {"theta_E": 10.0, "e1": 0.5, "e2": 0.5, "center_x": 10.0, "center_y": 10.0}
+        )
 
+        kwargs_lens_init[0]["gamma"] = 2.1
+        kwargs_lens_sigma[0]["gamma"] = 0.1
+        kwargs_lower_lens[0]["gamma"] = 1.5
+        kwargs_upper_lens[0]["gamma"] = 2.5
 
-        kwargs_lens_init[0]['gamma'] = 2.1
-        kwargs_lens_sigma[0]['gamma'] = 0.1
-        kwargs_lower_lens[0]['gamma'] = 1.5
-        kwargs_upper_lens[0]['gamma'] = 2.5
+        fixed_lens.append({"ra_0": 0, "dec_0": 0})
+        kwargs_lens_init.append({"gamma1": 0.1, "gamma2": 0.04})
+        kwargs_lens_sigma.append({"gamma1": 0.01, "gamma2": 0.01})
+        kwargs_lower_lens.append({"gamma1": -0.2, "gamma2": -0.2})
+        kwargs_upper_lens.append({"gamma1": 0.2, "gamma2": 0.2})
 
-        fixed_lens.append({'ra_0': 0, 'dec_0': 0})
-        kwargs_lens_init.append({'gamma1': 0.1, 'gamma2': 0.04})
-        kwargs_lens_sigma.append({'gamma1': 0.01, 'gamma2': 0.01})
-        kwargs_lower_lens.append({'gamma1': -0.2, 'gamma2': -0.2})
-        kwargs_upper_lens.append({'gamma1': 0.2, 'gamma2': 0.2})
-
-        lens_params = [kwargs_lens_init, kwargs_lens_sigma, fixed_lens, kwargs_lower_lens, kwargs_upper_lens]
-
+        lens_params = [
+            kwargs_lens_init,
+            kwargs_lens_sigma,
+            fixed_lens,
+            kwargs_lower_lens,
+            kwargs_upper_lens,
+        ]
 
         fixed_source = []
         kwargs_source_init = []
@@ -985,15 +1093,59 @@ class TestFittingSequence(object):
         kwargs_lower_source = []
         kwargs_upper_source = []
 
-
         fixed_source.append({})
-        kwargs_source_init.append({'R_sersic': 0.2, 'n_sersic': 2.5, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.3, 'center_y': 0., 'amp': 26.})
-        kwargs_source_sigma.append({'n_sersic': 1, 'R_sersic': 0.01, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.2, 'center_y': 0.2, 'amp': 10})
-        kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': 0.001, 'n_sersic': .5, 'center_x': -10., 'center_y': -10., 'amp': 0.})
-        kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': 10, 'n_sersic': 5., 'center_x': 10, 'center_y': 10, 'amp': 100})
+        kwargs_source_init.append(
+            {
+                "R_sersic": 0.2,
+                "n_sersic": 2.5,
+                "e1": 0.1,
+                "e2": 0.1,
+                "center_x": 0.3,
+                "center_y": 0.0,
+                "amp": 26.0,
+            }
+        )
+        kwargs_source_sigma.append(
+            {
+                "n_sersic": 1,
+                "R_sersic": 0.01,
+                "e1": 0.1,
+                "e2": 0.1,
+                "center_x": 0.2,
+                "center_y": 0.2,
+                "amp": 10,
+            }
+        )
+        kwargs_lower_source.append(
+            {
+                "e1": -0.5,
+                "e2": -0.5,
+                "R_sersic": 0.001,
+                "n_sersic": 0.5,
+                "center_x": -10.0,
+                "center_y": -10.0,
+                "amp": 0.0,
+            }
+        )
+        kwargs_upper_source.append(
+            {
+                "e1": 0.5,
+                "e2": 0.5,
+                "R_sersic": 10,
+                "n_sersic": 5.0,
+                "center_x": 10,
+                "center_y": 10,
+                "amp": 100,
+            }
+        )
 
-        source_params = [kwargs_source_init, kwargs_source_sigma, fixed_source, kwargs_lower_source, kwargs_upper_source]
-
+        source_params = [
+            kwargs_source_init,
+            kwargs_source_sigma,
+            fixed_source,
+            kwargs_lower_source,
+            kwargs_upper_source,
+        ]
 
         fixed_lens_light = []
         kwargs_lens_light_init = []
@@ -1001,38 +1153,97 @@ class TestFittingSequence(object):
         kwargs_lower_lens_light = []
         kwargs_upper_lens_light = []
 
-
         fixed_lens_light.append({})
-        kwargs_lens_light_init.append({'R_sersic': 0.5, 'n_sersic': 2., 'e1': 0.1, 'e2': 0.3, 'center_x': 0.1, 'center_y': 0., 'amp': 7.})
-        kwargs_lens_light_sigma.append({'n_sersic': 0.01, 'R_sersic': 0.03, 'e1': 0.5, 'e2': 0.5, 'center_x': 0.01, 'center_y': 0.01, 'amp': 10})
-        kwargs_lower_lens_light.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': 0.001, 'n_sersic': .5, 'center_x': -10., 'center_y': -10., 'amp': 0.})
-        kwargs_upper_lens_light.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': 10., 'n_sersic': 5., 'center_x': 10., 'center_y': 10., 'amp': 100.})
+        kwargs_lens_light_init.append(
+            {
+                "R_sersic": 0.5,
+                "n_sersic": 2.0,
+                "e1": 0.1,
+                "e2": 0.3,
+                "center_x": 0.1,
+                "center_y": 0.0,
+                "amp": 7.0,
+            }
+        )
+        kwargs_lens_light_sigma.append(
+            {
+                "n_sersic": 0.01,
+                "R_sersic": 0.03,
+                "e1": 0.5,
+                "e2": 0.5,
+                "center_x": 0.01,
+                "center_y": 0.01,
+                "amp": 10,
+            }
+        )
+        kwargs_lower_lens_light.append(
+            {
+                "e1": -0.5,
+                "e2": -0.5,
+                "R_sersic": 0.001,
+                "n_sersic": 0.5,
+                "center_x": -10.0,
+                "center_y": -10.0,
+                "amp": 0.0,
+            }
+        )
+        kwargs_upper_lens_light.append(
+            {
+                "e1": 0.5,
+                "e2": 0.5,
+                "R_sersic": 10.0,
+                "n_sersic": 5.0,
+                "center_x": 10.0,
+                "center_y": 10.0,
+                "amp": 100.0,
+            }
+        )
 
-        lens_light_params = [kwargs_lens_light_init, kwargs_lens_light_sigma, fixed_lens_light, kwargs_lower_lens_light, kwargs_upper_lens_light]
+        lens_light_params = [
+            kwargs_lens_light_init,
+            kwargs_lens_light_sigma,
+            fixed_lens_light,
+            kwargs_lower_lens_light,
+            kwargs_upper_lens_light,
+        ]
 
-        kwargs_params = {'lens_model': lens_params,
-                        'source_model': source_params,
-                        'lens_light_model': lens_light_params}
-        
-        kwargs_model = {'lens_model_list': lens_model_list, 'source_light_model_list': source_model_list, 'lens_light_model_list': lens_light_model_list}
+        kwargs_params = {
+            "lens_model": lens_params,
+            "source_model": source_params,
+            "lens_light_model": lens_light_params,
+        }
+
+        kwargs_model = {
+            "lens_model_list": lens_model_list,
+            "source_light_model_list": source_model_list,
+            "lens_light_model_list": lens_light_model_list,
+        }
 
         multi_band_list = [[kwargs_data, kwargs_psf_gaussian, kwargs_numerics]]
 
-        kwargs_data_joint = {'multi_band_list': multi_band_list, 
-                             'multi_band_type': 'single-band' 
-                            }
+        kwargs_data_joint = {
+            "multi_band_list": multi_band_list,
+            "multi_band_type": "single-band",
+        }
 
-        fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, self.kwargs_constraints, self.kwargs_likelihood, kwargs_params)
+        fitting_seq = FittingSequence(
+            kwargs_data_joint,
+            kwargs_model,
+            self.kwargs_constraints,
+            self.kwargs_likelihood,
+            kwargs_params,
+        )
 
         # options are BFGS(), Nelder-Mead, Powell, CG, Newton-CG, L-BFGS-B, TNC(), COBYLA, SLSQP!, trust-constr!, dogleg!, trust-ncg!, trust-exact!, trust-krylov!
-        fitting_kwargs_list_jaxopt = [['Jaxopt', {'method': "BFGS", 'maxiter': 200}]]
+        fitting_kwargs_list_jaxopt = [["Jaxopt", {"method": "BFGS", "maxiter": 200}]]
         chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_jaxopt)
         fitting_type, args_history, logL_history, kwargs_result = chain_list[0]
 
         assert fitting_type == "Jaxopt"
         assert len(args_history) == len(logL_history)
-        npt.assert_almost_equal(kwargs_result['kwargs_lens'][0]['theta_E'], 0.66, decimal=3)
-
+        npt.assert_almost_equal(
+            kwargs_result["kwargs_lens"][0]["theta_E"], 0.66, decimal=3
+        )
 
 
 if __name__ == "__main__":
