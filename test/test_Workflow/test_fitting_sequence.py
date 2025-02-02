@@ -6,11 +6,13 @@ import pytest
 import numpy.testing as npt
 import numpy as np
 from lenstronomy.Util import simulation_util as sim_util, util
-from jaxtronomy.ImSim.image_model import ImageModel
-from jaxtronomy.PointSource.point_source import PointSource
+
 from jaxtronomy.LensModel.lens_model import LensModel
 from jaxtronomy.LightModel.light_model import LightModel
+from lenstronomy.PointSource.point_source import PointSource
+
 from jaxtronomy.Workflow.fitting_sequence import FittingSequence
+from jaxtronomy.ImSim.image_model import ImageModel
 from jaxtronomy.Data.imaging_data import ImageData
 from lenstronomy.Data.psf import PSF
 
