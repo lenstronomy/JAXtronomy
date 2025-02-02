@@ -811,7 +811,7 @@ class TestFittingSequence(object):
             },
         }
 
-        fitting_list.append(["dynesty", kwargs_dynesty])
+        fitting_list.append(["nested_sampling", kwargs_dynesty])
 
         chain_list = fittingSequence.fit_sequence(fitting_list)
 
@@ -883,10 +883,11 @@ class TestFittingSequence(object):
         kwargs_mcmc = {"sigma_scale": 1, "n_burn": 1, "n_run": 1, "n_walkers": 10}
         fitting_list.append(["emcee", kwargs_mcmc])
         kwargs_mcmc["re_use_samples"] = True
+        # Change the number of parameters from 1 to 2; this should raise an error
         kwargs_mcmc["init_samples"] = np.array(
-            [[np.random.normal(1, 0.001)] for i in range(100)]
+            [[np.random.normal(1, 0.001)] * 2 for i in range(100)]
         )
-        fitting_list.append(["emcee", kwargs_mcmc])
+        fitting_list.append(["MCMC", kwargs_mcmc])
 
         def custom_likelihood(kwargs_lens, **kwargs):
             theta_E = kwargs_lens[0]["theta_E"]
@@ -915,6 +916,10 @@ class TestFittingSequence(object):
             kwargs_likelihood,
             kwargs_params,
         )
+        npt.assert_raises(ValueError, fittingSequence.fit_sequence, fitting_list)
+        kwargs_mcmc["init_samples"] = None
+        fitting_list[-1][1] = kwargs_mcmc
+
         args = fittingSequence.param_class.kwargs2args(
             kwargs_lens=[{"theta_E": 1, "center_x": 0, "center_y": 0}]
         )
