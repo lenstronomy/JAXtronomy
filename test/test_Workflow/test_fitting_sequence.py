@@ -144,6 +144,7 @@ class TestFittingSequence(object):
         self.kwargs_likelihood = {
             # This is false by default anyways
             "check_positive_flux": False,
+            "source_marg": False
         }
 
         lens_sigma = [
@@ -432,7 +433,7 @@ class TestFittingSequence(object):
         source_model_list = ["SERSIC"]
         kwargs_source = [
             {
-                "amp": 10.0,
+                "amp": 1.0,
                 "R_sersic": 0.3,
                 "n_sersic": 3.0,
                 "center_x": 0.1,
@@ -472,13 +473,12 @@ class TestFittingSequence(object):
 
         lens_fixed = [{"center_x": 0.0, "center_y": 0.0}]
         lens_sigma = [{"theta_E": 0.1, "center_x": 0.1, "center_y": 0.1}]
-        lens_lower = [{"theta_E": 1.0, "center_x": -10, "center_y": -10}]
-        lens_upper = [{"theta_E": 2.0, "center_x": 10, "center_y": 10}]
+        lens_lower = [{"theta_E": 0.1, "center_x": -10, "center_y": -10}]
+        lens_upper = [{"theta_E": 3.0, "center_x": 10, "center_y": 10}]
 
-        source_fixed = [{}]
+        source_fixed = [{"amp": 1.0}]
         source_sigma = [
             {
-                "amp": 0.1,
                 "R_sersic": 0.01,
                 "n_sersic": 0.01,
                 "center_x": 0.01,
@@ -487,7 +487,6 @@ class TestFittingSequence(object):
         ]
         source_lower = [
             {
-                "amp": 9.5,
                 "R_sersic": 0.01,
                 "n_sersic": 0.5,
                 "center_x": -1,
@@ -496,7 +495,6 @@ class TestFittingSequence(object):
         ]
         source_upper = [
             {
-                "amp": 10.5,
                 "R_sersic": 1.0,
                 "n_sersic": 6.0,
                 "center_x": 1,
@@ -531,8 +529,9 @@ class TestFittingSequence(object):
         )
 
         kwargs_cobaya = {
-            "proposal_widths": [0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
+            "proposal_widths": [0.001, 0.001, 0.001, 0.001, 0.001],
             "Rminus1_stop": 100,
+            "max_tries": 1000,
             "force_overwrite": True,
         }
 
@@ -580,7 +579,7 @@ class TestFittingSequence(object):
         # make a source
         source_model_list = ["SERSIC_ELLIPSE"]
         kwargs_sersic_ellipse = {
-            "amp": 10.0,
+            "amp": 1.0,
             "R_sersic": 0.6,
             "n_sersic": 3,
             "center_x": 0.0,
@@ -652,10 +651,9 @@ class TestFittingSequence(object):
             }
         ]
 
-        source_fixed = [{}]
+        source_fixed = [{"amp": 1.0}]
         source_sigma = [
             {
-                "amp": 0.1,
                 "R_sersic": 0.05,
                 "n_sersic": 0.5,
                 "center_x": 0.1,
@@ -666,7 +664,6 @@ class TestFittingSequence(object):
         ]
         source_lower = [
             {
-                "amp": 9.5,
                 "R_sersic": 0.01,
                 "n_sersic": 0.5,
                 "center_x": -2,
@@ -677,7 +674,6 @@ class TestFittingSequence(object):
         ]
         source_upper = [
             {
-                "amp": 10.5,
                 "R_sersic": 10,
                 "n_sersic": 5.5,
                 "center_x": 2,
