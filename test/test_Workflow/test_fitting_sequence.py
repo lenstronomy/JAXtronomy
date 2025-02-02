@@ -454,7 +454,11 @@ class TestFittingSequence(object):
             kwargs_numerics=kwargs_numerics,
         )
         image_sim = sim_util.simulate_simple(
-            imageModel, kwargs_lens, kwargs_source, point_source_add=False, no_noise=True
+            imageModel,
+            kwargs_lens,
+            kwargs_source,
+            point_source_add=False,
+            no_noise=True,
         )
 
         data_class.update_data(image_sim)
@@ -491,7 +495,13 @@ class TestFittingSequence(object):
             }
         ]
         source_upper = [
-            {"amp": 10.5, "R_sersic": 1.0, "n_sersic": 6.0, "center_x": 1, "center_y": 1}
+            {
+                "amp": 10.5,
+                "R_sersic": 1.0,
+                "n_sersic": 6.0,
+                "center_x": 1,
+                "center_y": 1,
+            }
         ]
 
         lens_param = [kwargs_lens, lens_sigma, lens_fixed, lens_lower, lens_upper]
@@ -594,7 +604,11 @@ class TestFittingSequence(object):
             kwargs_numerics=kwargs_numerics,
         )
         image_sim = sim_util.simulate_simple(
-            imageModel, kwargs_lens, kwargs_source, point_source_add=False, no_noise=True
+            imageModel,
+            kwargs_lens,
+            kwargs_source,
+            point_source_add=False,
+            no_noise=True,
         )
 
         data_class.update_data(image_sim)
