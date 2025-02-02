@@ -532,7 +532,15 @@ class TestFittingSequence(object):
         }
 
         chain_list = fittingSequence.fit_sequence([["Cobaya", kwargs_cobaya]])
-        assert fittingSequence.kwargs_fixed == (lens_fixed, source_fixed, [], [], {}, [], [])
+        assert fittingSequence.kwargs_fixed == (
+            lens_fixed,
+            source_fixed,
+            [],
+            [],
+            {},
+            [],
+            [],
+        )
 
     def test_zeus(self):
         np.random.seed(42)
