@@ -555,7 +555,7 @@ class FittingSequence(object):
 
         if sampler_type == "dyPolyChord":
             if "resume_dyn_run" in kwargs_run and kwargs_run["resume_dyn_run"] is True:
-                #resume_dyn_run = True
+                # resume_dyn_run = True
                 raise ValueError("resume_dyn_run feature doesn't work")
             else:
                 resume_dyn_run = False
