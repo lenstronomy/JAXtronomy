@@ -1249,7 +1249,10 @@ class TestFittingSequence(object):
             kwargs_params,
         )
 
-        # options are BFGS(), Nelder-Mead, Powell, CG, Newton-CG, L-BFGS-B, TNC(), COBYLA, SLSQP!, trust-constr!, dogleg!, trust-ncg!, trust-exact!, trust-krylov!
+        # options are BFGS and TNC
+        # Other options such as Nelder-Mead, Powell, CG, Newton-CG, L-BFGS-B, COBYLA,
+        # SLSQP, trust-constr, dogleg, trust-ncg, trust-exact, trust-krylov
+        # either do not work yet or do not perform as well as BFGS and TNC
         fitting_kwargs_list_jaxopt = [["Jaxopt", {"method": "BFGS", "maxiter": 200}]]
         chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_jaxopt)
         fitting_type, args_history, logL_history, kwargs_result = chain_list[0]
