@@ -2,3 +2,4 @@ dynesty
 zeus-mcmc
 cobaya
 nautilus-sampler>=0.7
+emcee>=3.0.0
