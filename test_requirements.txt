@@ -1,0 +1,4 @@
+dynesty
+zeus-mcmc
+cobaya
+nautilus-sampler>=0.7
