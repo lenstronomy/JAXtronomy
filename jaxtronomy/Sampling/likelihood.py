@@ -10,6 +10,7 @@ import jaxtronomy.Util.class_creator as class_creator
 import jax
 from jax import jit, lax, numpy as jnp
 from functools import partial
+import numpy as np
 
 __all__ = ["LikelihoodModule"]
 
@@ -32,7 +33,7 @@ class LikelihoodModule(object):
         kwargs_model,
         param_class,
         image_likelihood=True,
-        check_bounds=False,
+        check_bounds=True,
         astrometric_likelihood=False,
         image_position_likelihood=False,
         source_position_likelihood=False,
@@ -417,8 +418,10 @@ class LikelihoodModule(object):
         num_param, param_names = self.param.num_param()
         return self.num_data - num_param
 
+    # This function should be used to convert the jax type to a normal float
+    # Required for samplers e.g. Cobaya which do not work with jax types
     def likelihood(self, a):
-        return self.logL(a)
+        return np.float64(self.logL(a))
 
     def negativelogL(self, a):
         """For minimizer function, the negative value of the logl value is requested.

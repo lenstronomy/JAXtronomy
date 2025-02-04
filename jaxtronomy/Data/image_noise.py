@@ -49,7 +49,7 @@ class ImageNoise(object):
                 )
         else:
             # make sure no negative exposure values are present no dividing by zero
-            self.exp_map = jnp.where(
+            self.exposure_map = jnp.where(
                 exposure_time <= 10 ** (-10), 10 ** (-10), exposure_time
             )
 
@@ -88,7 +88,7 @@ class ImageNoise(object):
             self.C_D = covariance_matrix(
                 self.data,
                 self.background_rms,
-                self.exp_map,
+                self.exposure_map,
             )
 
         if gradient_boost_factor is not None:
@@ -107,7 +107,7 @@ class ImageNoise(object):
         if self._noise_map is not None:
             return self._noise_map**2
         else:
-            return covariance_matrix(model, self.background_rms, self.exp_map)
+            return covariance_matrix(model, self.background_rms, self.exposure_map)
 
 
 @export

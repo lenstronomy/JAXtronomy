@@ -153,7 +153,7 @@ class ImageData(PixelGrid, ImageNoise):
             self.C_D = covariance_matrix(
                 self.data,
                 self.background_rms,
-                self.exp_map,
+                self.exposure_map,
             )
 
     def _log_likelihood(self, model, mask, additional_error_map=0):
