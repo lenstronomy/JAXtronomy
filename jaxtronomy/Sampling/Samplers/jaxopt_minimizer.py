@@ -153,7 +153,7 @@ class JaxoptMinimizer:
         """
         rng = jax.random.split(jax.random.PRNGKey(rng_int), 1)[0]
         array_of_init_params = numpyro.sample(
-            "args", self.dist, rng_key=rng, chain_shape=(num_chains,)
+            "args", self.dist, rng_key=rng, sample_shape=(num_chains,)
         )
         return array_of_init_params
 
