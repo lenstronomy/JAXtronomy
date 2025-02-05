@@ -25,12 +25,8 @@ class TestJaxoptMinimizer(object):
         args_lower = np.array([0.0])
         args_upper = np.array([0.9])
         args = (args_mean, args_sigma, args_lower, args_upper)
-        self.minimizer = JaxoptMinimizer(
-            "BFGS", self._logL, *args, maxiter=200
-        )
-        self.minimizer2 = JaxoptMinimizer(
-            "BFGS", self._logL2, *args, maxiter=500
-        )
+        self.minimizer = JaxoptMinimizer("BFGS", self._logL, *args, maxiter=200)
+        self.minimizer2 = JaxoptMinimizer("BFGS", self._logL2, *args, maxiter=500)
         self.args_mean = args_mean
 
     def test_run(self):
