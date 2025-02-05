@@ -58,15 +58,15 @@ class JaxoptMinimizer:
 
     def run(self, num_chains, rng_int=0, tolerance=0):
         """Runs the minimizer for a certain number of chains.
-        
-        :param num_chains: int, number of chains to run the minimizer on.
-            Initial parameters for each chain are sampled from the user-provided distribution.
+
+        :param num_chains: int, number of chains to run the minimizer on. Initial
+            parameters for each chain are sampled from the user-provided distribution.
             Running more chains takes more time but can help avoid local minima.
         :param rng_int: int, used to seed the JAX RNG
-        :param tolerance: float, only relevant when num_chains > 1.
-            If |logL| < tolerance at the end of a chain, the rest of the chains are not run.
-
-        :return: Index of best chain along with the param and logL histories of all chains
+        :param tolerance: float, only relevant when num_chains > 1. If |logL| <
+            tolerance at the end of a chain, the rest of the chains are not run.
+        :return: Index of best chain along with the param and logL histories of all
+            chains
         """
 
         # Saves the param and logL histories for all chains in case the user wants to access them
@@ -109,7 +109,11 @@ class JaxoptMinimizer:
                 best_logL = new_logL
                 best_chain_index = i
 
-        return best_chain_index, self.multi_chain_param_history, self.multi_chain_logL_history
+        return (
+            best_chain_index,
+            self.multi_chain_param_history,
+            self.multi_chain_logL_history,
+        )
 
     def run_single_chain(self, init_args):
         """Runs the minimizer. The initial parameters are assumed to be in constrained
@@ -118,7 +122,8 @@ class JaxoptMinimizer:
 
         :param init_args: array of initial parameters in the constrained space. Obtained
             by using Param.kwargs2args
-        :return: None, just updates class variables containg the single chain param and logL histories
+        :return: None, just updates class variables containg the single chain param and
+            logL histories
         """
 
         # Reset the parameter and logL histories with initial values only
@@ -146,8 +151,8 @@ class JaxoptMinimizer:
     def _draw_init_params(self, num_chains, rng_int):
         """Draws initial parameters to be passed to the minimizer.
 
-        :param num_chains: int, number of chains to run the minimizer on.
-            Initial parameters for each chain are sampled from the user-provided distribution.
+        :param num_chains: int, number of chains to run the minimizer on. Initial
+            parameters for each chain are sampled from the user-provided distribution.
             Running more chains takes more time but can help avoid local minima.
         :param rng_int: int, used to seed the JAX RNG
         """
