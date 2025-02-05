@@ -1260,11 +1260,9 @@ class TestFittingSequence(object):
             "maxiter": 300,
             "num_init_samples": 5,
             "tolerance": 1,
-            "sigma_scale": 2
+            "sigma_scale": 2,
         }
-        fitting_kwargs_list_jaxopt = [
-            ["Jaxopt", jaxopt_kwargs]
-        ]
+        fitting_kwargs_list_jaxopt = [["Jaxopt", jaxopt_kwargs]]
         chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_jaxopt)
         fitting_type, args_history, logL_history, kwargs_result = chain_list[0]
 
