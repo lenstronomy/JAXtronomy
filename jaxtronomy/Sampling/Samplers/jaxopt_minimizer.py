@@ -88,16 +88,25 @@ class JaxoptMinimizer:
         for i in range(1, self.num_init_samples):
 
             if -best_logL < self.tolerance:
-                print("Tolerance criteria |logL| < tolerance has been met. Stopping samples.")
-                print("---------------------------------------------------------------------")
+                print(
+                    "Tolerance criteria |logL| < tolerance has been met. Stopping samples."
+                )
+                print(
+                    "---------------------------------------------------------------------"
+                )
                 break
 
-            print(f"Running sample {i+1} with initial parameters: \n", array_of_init_samples[i])
+            print(
+                f"Running sample {i+1} with initial parameters: \n",
+                array_of_init_samples[i],
+            )
             print("Initial log likelihood: ", self.logL(array_of_init_samples[i]))
             self.run_single_sample(array_of_init_samples[i])
             new_logL = self.single_sample_logL_history[-1]
             print(f"Final log likelihood: ", new_logL)
-            print("---------------------------------------------------------------------")
+            print(
+                "---------------------------------------------------------------------"
+            )
 
             if new_logL > best_logL:
                 best_logL = new_logL
@@ -135,10 +144,12 @@ class JaxoptMinimizer:
         self.minimizer.run(init_args_unconstrained)
         self.multi_sample_logL_history.append(self.single_sample_logL_history)
         self.multi_sample_parameter_history.append(self.single_sample_parameter_history)
-    
+
     def _draw_init_samples(self, rng_int):
         rng = jax.random.split(jax.random.PRNGKey(rng_int), 1)[0]
-        array_of_init_samples = numpyro.sample("args", self.dist, rng_key=rng, sample_shape=(self.num_init_samples,))
+        array_of_init_samples = numpyro.sample(
+            "args", self.dist, rng_key=rng, sample_shape=(self.num_init_samples,)
+        )
         return array_of_init_samples
 
     def _loss(self, args_unconstrained):
@@ -183,7 +194,9 @@ class JaxoptMinimizer:
 
     def _numpyro_model(self):
         """This numpyro model is required to convert parameters between the constrained
-        and unconstrained space. This function does not actually do anything.
+        and unconstrained space.
+
+        This function does not actually do anything.
         """
-        
+
         numpyro.sample("args", self.dist)

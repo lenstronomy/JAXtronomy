@@ -420,16 +420,20 @@ class FittingSequence(object):
             trust-ncg, trust-exact, trust-krylov either do not work yet or do not
             perform as well as BFGS and TNC
         :param num_init_samples: int, number of initial samples to run the minimizer on.
-            Running more initial samples takes more time but can help avoid local minima.
+            Running more initial samples takes more time but can help avoid local
+            minima.
         :param maxiter: int, number of iterations to perform during minimization of the
             loss function
-        :param tolerance: float or None, only relevant when num_init_samples > 1.
-            If |logL| < tolerance at the end of a sample, the rest of the samples are not run.
-        :param sigma_scale: float, scales the values in kwargs_sigma which can allow the minimizer
-            to sample initial states from a wider distribution.
+        :param tolerance: float or None, only relevant when num_init_samples > 1. If
+            |logL| < tolerance at the end of a sample, the rest of the samples are not
+            run.
+        :param sigma_scale: float, scales the values in kwargs_sigma which can allow the
+            minimizer to sample initial states from a wider distribution.
         :param rng_int: int which seeds the JAX RNG.
         """
-        print(f"Running {method} minimization for {num_init_samples} initial sample(s) with {maxiter} max iterations each:")
+        print(
+            f"Running {method} minimization for {num_init_samples} initial sample(s) with {maxiter} max iterations each:"
+        )
         param_class = self.param_class
         likelihood_module = self.likelihoodModule
 
@@ -456,7 +460,7 @@ class FittingSequence(object):
             args_upper=args_upper,
             num_init_samples=num_init_samples,
             maxiter=maxiter,
-            tolerance=tolerance
+            tolerance=tolerance,
         )
 
         # Runs the minimizer and prints results
