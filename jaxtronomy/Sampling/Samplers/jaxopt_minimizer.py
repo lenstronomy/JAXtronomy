@@ -55,6 +55,8 @@ class JaxoptMinimizer:
             callback=self._update_logL_history,
             maxiter=maxiter,
         )
+        self.single_chain_param_history = []
+        self.single_chain_logL_history = []
 
     def run(self, num_chains, rng_int=0, tolerance=0):
         """Runs the minimizer for a certain number of chains.
@@ -69,21 +71,31 @@ class JaxoptMinimizer:
         :return: Index of best chain along with the param and logL histories of all chains
         """
 
-        # Saves the param and logL histories for all chains in case the user wants to access them
-        self.multi_chain_param_history = []
-        self.multi_chain_logL_history = []
+        # Saves the param and logL histories for all chains
+        multi_chain_param_history = []
+        multi_chain_logL_history = []
 
         array_of_init_params = self._draw_init_params(num_chains, rng_int)
 
-        print("Running chain 1 with initial parameters: \n", array_of_init_params[0])
-        print("Initial log likelihood: ", self.logL(array_of_init_params[0]))
-        self.run_single_chain(array_of_init_params[0])
-        best_logL = self.single_chain_logL_history[-1]
-        print("Final log likelihood: ", best_logL)
-        print("---------------------------------------------------------------------")
-        best_chain_index = 0
+        for i in range(0, num_chains):
+            print(
+                f"Running chain {i+1} with initial parameters: \n",
+                array_of_init_params[i],
+            )
+            print("Initial log likelihood: ", self.logL(array_of_init_params[i]))
+            self.run_single_chain(array_of_init_params[i])
+            multi_chain_logL_history.append(self.single_chain_logL_history)
+            multi_chain_param_history.append(self.single_chain_param_history)
+            new_logL = self.single_chain_logL_history[-1]
+            print(f"Final log likelihood: ", new_logL)
+            print(
+                "---------------------------------------------------------------------"
+            )
 
-        for i in range(1, num_chains):
+            if i == 0 or new_logL > best_logL:
+                best_logL = new_logL
+                best_chain_index = i
+
             if -best_logL < tolerance:
                 print(
                     "Tolerance criteria |logL| < tolerance has been met. Remaining chains will be skipped."
@@ -93,23 +105,7 @@ class JaxoptMinimizer:
                 )
                 break
 
-            print(
-                f"Running chain {i+1} with initial parameters: \n",
-                array_of_init_params[i],
-            )
-            print("Initial log likelihood: ", self.logL(array_of_init_params[i]))
-            self.run_single_chain(array_of_init_params[i])
-            new_logL = self.single_chain_logL_history[-1]
-            print(f"Final log likelihood: ", new_logL)
-            print(
-                "---------------------------------------------------------------------"
-            )
-
-            if new_logL > best_logL:
-                best_logL = new_logL
-                best_chain_index = i
-
-        return best_chain_index, self.multi_chain_param_history, self.multi_chain_logL_history
+        return best_chain_index, multi_chain_param_history, multi_chain_logL_history
 
     def run_single_chain(self, init_args):
         """Runs the minimizer. The initial parameters are assumed to be in constrained
@@ -140,8 +136,6 @@ class JaxoptMinimizer:
         # Run the minimizer
         # After each iteration, the single chain logL and param histories are updated using the callback function
         self.minimizer.run(init_args_unconstrained)
-        self.multi_chain_logL_history.append(self.single_chain_logL_history)
-        self.multi_chain_param_history.append(self.single_chain_param_history)
 
     def _draw_init_params(self, num_chains, rng_int):
         """Draws initial parameters to be passed to the minimizer.

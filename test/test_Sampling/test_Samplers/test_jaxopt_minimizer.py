@@ -26,25 +26,32 @@ class TestJaxoptMinimizer(object):
         args_upper = np.array([0.9])
         args = (args_mean, args_sigma, args_lower, args_upper)
         self.minimizer = JaxoptMinimizer(
-            "BFGS", self._logL, *args, maxiter=200, num_chains=3, tolerance=1e-14
+            "BFGS", self._logL, *args, maxiter=200
         )
         self.minimizer2 = JaxoptMinimizer(
-            "BFGS", self._logL2, *args, maxiter=500, num_chains=3
+            "BFGS", self._logL2, *args, maxiter=500
         )
         self.args_mean = args_mean
 
     def test_run(self):
         # Tests to see if the minimizer gets close to the analytical answer
-        best_chain_index = self.minimizer.run(rng_int=0)
-        final_result = self.minimizer.multi_chain_param_history[best_chain_index][-1]
-        final_logL = self.minimizer.multi_chain_logL_history[best_chain_index][-1]
-
+        (
+            best_chain_index,
+            multi_chain_param_history,
+            multi_chain_logL_history,
+        ) = self.minimizer.run(num_chains=3, rng_int=0, tolerance=1e-14)
+        final_result = multi_chain_param_history[best_chain_index][-1]
+        final_logL = multi_chain_logL_history[best_chain_index][-1]
         npt.assert_array_almost_equal(final_result, [0.6], decimal=6)
         npt.assert_almost_equal(final_logL, 0.0, decimal=8)
 
-        best_chain_index = self.minimizer2.run(rng_int=0)
-        final_result = self.minimizer2.multi_chain_param_history[best_chain_index][-1]
-        final_logL = self.minimizer2.multi_chain_logL_history[best_chain_index][-1]
+        (
+            best_chain_index,
+            multi_chain_param_history,
+            multi_chain_logL_history,
+        ) = self.minimizer2.run(num_chains=3, rng_int=0)
+        final_result = multi_chain_param_history[best_chain_index][-1]
+        final_logL = multi_chain_logL_history[best_chain_index][-1]
         npt.assert_array_almost_equal(final_result, [0.25], decimal=2)
         npt.assert_almost_equal(final_logL, 0.0, decimal=7)
 
