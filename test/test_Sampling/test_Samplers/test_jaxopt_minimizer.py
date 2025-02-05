@@ -25,8 +25,12 @@ class TestJaxoptMinimizer(object):
         args_lower = np.array([0.0])
         args_upper = np.array([0.9])
         args = (args_mean, args_sigma, args_lower, args_upper)
-        self.minimizer = JaxoptMinimizer("BFGS", self._logL, *args, maxiter=200, num_init_samples=3, tolerance=1e-14)
-        self.minimizer2 = JaxoptMinimizer("BFGS", self._logL2, *args, maxiter=500, num_init_samples=3)
+        self.minimizer = JaxoptMinimizer(
+            "BFGS", self._logL, *args, maxiter=200, num_init_samples=3, tolerance=1e-14
+        )
+        self.minimizer2 = JaxoptMinimizer(
+            "BFGS", self._logL2, *args, maxiter=500, num_init_samples=3
+        )
         self.args_mean = args_mean
 
     def test_run(self):
@@ -46,7 +50,9 @@ class TestJaxoptMinimizer(object):
 
     def test_run_single_sample(self):
         self.minimizer.run_single_sample(self.args_mean)
-        npt.assert_array_equal(self.args_mean, self.minimizer.single_sample_param_history[0])
+        npt.assert_array_equal(
+            self.args_mean, self.minimizer.single_sample_param_history[0]
+        )
 
         final_result = self.minimizer.single_sample_param_history[-1]
         final_logL = self.minimizer.single_sample_logL_history[-1]
@@ -83,8 +89,12 @@ class TestJaxoptMinimizer(object):
             params={"args": current_parameter},
         )["args"]
         self.minimizer._update_logL_history(args_unconstrained)
-        npt.assert_almost_equal(self.minimizer.single_sample_logL_history[-1], -0.01, decimal=8)
-        npt.assert_array_equal(self.minimizer.single_sample_param_history[-1], current_parameter)
+        npt.assert_almost_equal(
+            self.minimizer.single_sample_logL_history[-1], -0.01, decimal=8
+        )
+        npt.assert_array_equal(
+            self.minimizer.single_sample_param_history[-1], current_parameter
+        )
 
         current_parameter = np.array([0.225])
         args_unconstrained = unconstrain_fn(
@@ -94,9 +104,13 @@ class TestJaxoptMinimizer(object):
             params={"args": current_parameter},
         )["args"]
         self.minimizer2._update_logL_history(args_unconstrained)
-        npt.assert_almost_equal(self.minimizer2.single_sample_logL_history[-1], -0.0001, decimal=8)
+        npt.assert_almost_equal(
+            self.minimizer2.single_sample_logL_history[-1], -0.0001, decimal=8
+        )
         npt.assert_array_almost_equal(
-            self.minimizer2.single_sample_param_history[-1], current_parameter, decimal=8
+            self.minimizer2.single_sample_param_history[-1],
+            current_parameter,
+            decimal=8,
         )
 
 
