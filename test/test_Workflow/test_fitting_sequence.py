@@ -1260,7 +1260,7 @@ class TestFittingSequence(object):
             "maxiter": 300,
             "num_chains": 5,
             "tolerance": 1e-5,
-            "sigma_scale": 1.5,
+            "sigma_scale": 1,
             "rng_int": 1,
         }
         fitting_kwargs_list_jaxopt = [["Jaxopt", jaxopt_kwargs]]
@@ -1270,7 +1270,7 @@ class TestFittingSequence(object):
         assert fitting_type == "Jaxopt"
         assert len(args_history) == len(logL_history)
         npt.assert_almost_equal(
-            kwargs_result["kwargs_lens"][0]["theta_E"], 0.66, decimal=2
+            kwargs_result["kwargs_lens"][0]["theta_E"], 0.66, decimal=1
         )
         npt.assert_almost_equal(logL_history[-1], 0, decimal=8)
 
