@@ -26,9 +26,7 @@ class JaxoptMinimizer:
         args_sigma,
         args_lower,
         args_upper,
-        num_init_samples=3,
         maxiter=500,
-        tolerance=None,
     ):
         """
         :param method: string, options are BFGS and TNC. Other options such as Nelder-Mead, Powell, CG, Newton-CG,
@@ -42,20 +40,12 @@ class JaxoptMinimizer:
             obtained by using Param.kwargs2args
         :param args_upper: array of args, to be used as the upper bound of a normal distribution
             obtained by using Param.kwargs2args
-        :param num_init_samples: int, number of initial samples to run the minimizer on.
-            Running more initial samples takes more time but can help avoid local minima.
         :param maxiter: int, maximum number of iterations to perform during minimization of the loss function
-        :param tolerance: float or None, only relevant when num_init_samples > 1.
-            If |logL| < tolerance at the end of a sample, the rest of the samples are not run.
         """
         self.logL = logL_func
         self.dist = dist.TruncatedNormal(
             args_mean, args_sigma, low=args_lower, high=args_upper
         )
-        self.num_init_samples = num_init_samples
-        if tolerance is None:
-            tolerance = 0
-        self.tolerance = tolerance
 
         # Create an instance of the minimizer class. The negative logL is used as the loss function to be minimized
         # After each iteration, the logL and param history is updated using the callback function
@@ -66,30 +56,37 @@ class JaxoptMinimizer:
             maxiter=maxiter,
         )
 
-        self.single_sample_param_history = []
-        self.single_sample_logL_history = []
-        self.multi_sample_param_history = []
-        self.multi_sample_logL_history = []
+    def run(self, num_chains, rng_int=0, tolerance=0):
+        """Runs the minimizer for a certain number of chains.
+        
+        :param num_chains: int, number of chains to run the minimizer on.
+            Initial parameters for each chain are sampled from the user-provided distribution.
+            Running more chains takes more time but can help avoid local minima.
+        :param rng_int: int, used to seed the JAX RNG
+        :param tolerance: float, only relevant when num_chains > 1.
+            If |logL| < tolerance at the end of a chain, the rest of the chains are not run.
 
-    def run(self, rng_int):
-        self.multi_sample_param_history = []
-        self.multi_sample_logL_history = []
+        :return: Index of best chain along with the param and logL histories of all chains
+        """
 
-        array_of_init_samples = self._draw_init_samples(rng_int)
+        # Saves the param and logL histories for all chains in case the user wants to access them
+        self.multi_chain_param_history = []
+        self.multi_chain_logL_history = []
 
-        print("Running sample 1 with initial parameters: \n", array_of_init_samples[0])
-        print("Initial log likelihood: ", self.logL(array_of_init_samples[0]))
-        self.run_single_sample(array_of_init_samples[0])
-        best_logL = self.single_sample_logL_history[-1]
+        array_of_init_params = self._draw_init_params(num_chains, rng_int)
+
+        print("Running chain 1 with initial parameters: \n", array_of_init_params[0])
+        print("Initial log likelihood: ", self.logL(array_of_init_params[0]))
+        self.run_single_chain(array_of_init_params[0])
+        best_logL = self.single_chain_logL_history[-1]
         print("Final log likelihood: ", best_logL)
         print("---------------------------------------------------------------------")
-        best_sample_index = 0
+        best_chain_index = 0
 
-        for i in range(1, self.num_init_samples):
-
-            if -best_logL < self.tolerance:
+        for i in range(1, num_chains):
+            if -best_logL < tolerance:
                 print(
-                    "Tolerance criteria |logL| < tolerance has been met. Stopping samples."
+                    "Tolerance criteria |logL| < tolerance has been met. Remaining chains will be skipped."
                 )
                 print(
                     "---------------------------------------------------------------------"
@@ -97,12 +94,12 @@ class JaxoptMinimizer:
                 break
 
             print(
-                f"Running sample {i+1} with initial parameters: \n",
-                array_of_init_samples[i],
+                f"Running chain {i+1} with initial parameters: \n",
+                array_of_init_params[i],
             )
-            print("Initial log likelihood: ", self.logL(array_of_init_samples[i]))
-            self.run_single_sample(array_of_init_samples[i])
-            new_logL = self.single_sample_logL_history[-1]
+            print("Initial log likelihood: ", self.logL(array_of_init_params[i]))
+            self.run_single_chain(array_of_init_params[i])
+            new_logL = self.single_chain_logL_history[-1]
             print(f"Final log likelihood: ", new_logL)
             print(
                 "---------------------------------------------------------------------"
@@ -110,24 +107,25 @@ class JaxoptMinimizer:
 
             if new_logL > best_logL:
                 best_logL = new_logL
-                best_sample_index = i
+                best_chain_index = i
 
-        return best_sample_index
+        return best_chain_index, self.multi_chain_param_history, self.multi_chain_logL_history
 
-    def run_single_sample(self, init_args):
+    def run_single_chain(self, init_args):
         """Runs the minimizer. The initial parameters are assumed to be in constrained
         space. They are converted to the unconstrained space to be passed into the
         minimizer.
 
         :param init_args: array of initial parameters in the constrained space. Obtained
             by using Param.kwargs2args
+        :return: None, just updates class variables containg the single chain param and logL histories
         """
 
         # Reset the parameter and logL histories with initial values only
-        self.single_sample_param_history = [
+        self.single_chain_param_history = [
             init_args,
         ]
-        self.single_sample_logL_history = [
+        self.single_chain_logL_history = [
             self.logL(init_args),
         ]
 
@@ -140,17 +138,24 @@ class JaxoptMinimizer:
         )["args"]
 
         # Run the minimizer
-        # After each iteration, the single sample logL and param histories are updated using the callback function
+        # After each iteration, the single chain logL and param histories are updated using the callback function
         self.minimizer.run(init_args_unconstrained)
-        self.multi_sample_logL_history.append(self.single_sample_logL_history)
-        self.multi_sample_param_history.append(self.single_sample_param_history)
+        self.multi_chain_logL_history.append(self.single_chain_logL_history)
+        self.multi_chain_param_history.append(self.single_chain_param_history)
 
-    def _draw_init_samples(self, rng_int):
+    def _draw_init_params(self, num_chains, rng_int):
+        """Draws initial parameters to be passed to the minimizer.
+
+        :param num_chains: int, number of chains to run the minimizer on.
+            Initial parameters for each chain are sampled from the user-provided distribution.
+            Running more chains takes more time but can help avoid local minima.
+        :param rng_int: int, used to seed the JAX RNG
+        """
         rng = jax.random.split(jax.random.PRNGKey(rng_int), 1)[0]
-        array_of_init_samples = numpyro.sample(
-            "args", self.dist, rng_key=rng, sample_shape=(self.num_init_samples,)
+        array_of_init_params = numpyro.sample(
+            "args", self.dist, rng_key=rng, chain_shape=(num_chains,)
         )
-        return array_of_init_samples
+        return array_of_init_params
 
     def _loss(self, args_unconstrained):
         """Since LikelihoodModule.logL uses parameters in the constrained space while
@@ -187,10 +192,10 @@ class JaxoptMinimizer:
             model_kwargs={},
             params={"args": current_parameters},
         )["args"]
-        self.single_sample_param_history.append(args_constrained)
+        self.single_chain_param_history.append(args_constrained)
 
         # Update logL history
-        self.single_sample_logL_history.append(self.logL(args_constrained))
+        self.single_chain_logL_history.append(self.logL(args_constrained))
 
     def _numpyro_model(self):
         """This numpyro model is required to convert parameters between the constrained

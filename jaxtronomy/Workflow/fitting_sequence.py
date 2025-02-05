@@ -407,9 +407,9 @@ class FittingSequence(object):
     def jaxopt(
         self,
         method="BFGS",
-        num_init_samples=3,
+        num_chains=3,
         maxiter=500,
-        tolerance=None,
+        tolerance=0,
         sigma_scale=1,
         rng_int=0,
     ):
@@ -419,20 +419,20 @@ class FittingSequence(object):
             Mead, Powell, CG, Newton-CG, L-BFGS-B, COBYLA, SLSQP, trust-constr, dogleg,
             trust-ncg, trust-exact, trust-krylov either do not work yet or do not
             perform as well as BFGS and TNC
-        :param num_init_samples: int, number of initial samples to run the minimizer on.
-            Running more initial samples takes more time but can help avoid local
-            minima.
+        :param num_chains: int, number of chains to run the minimizer on.
+            Initial parameters for each chain are sampled from the user-provided distribution.
+            Running more chains takes more time but can help avoid local minima.
         :param maxiter: int, number of iterations to perform during minimization of the
             loss function
-        :param tolerance: float or None, only relevant when num_init_samples > 1. If
-            |logL| < tolerance at the end of a sample, the rest of the samples are not
+        :param tolerance: float, only relevant when num_chains > 1. If
+            |logL| < tolerance at the end of a chain, the rest of the chains are not
             run.
         :param sigma_scale: float, scales the values in kwargs_sigma which can allow the
             minimizer to sample initial states from a wider distribution.
         :param rng_int: int which seeds the JAX RNG.
         """
         print(
-            f"Running {method} minimization for {num_init_samples} initial sample(s) with {maxiter} max iterations each:"
+            f"Running {method} minimization for {num_chains} chain(s) with {maxiter} max iterations each:"
         )
         param_class = self.param_class
         likelihood_module = self.likelihoodModule
@@ -458,16 +458,21 @@ class FittingSequence(object):
             args_sigma=args_sigma,
             args_lower=args_lower,
             args_upper=args_upper,
-            num_init_samples=num_init_samples,
             maxiter=maxiter,
-            tolerance=tolerance,
         )
 
-        # Runs the minimizer and prints results
-        best_sample_index = minimizer.run(rng_int)
-        logL_history = minimizer.multi_sample_logL_history[best_sample_index]
-        parameter_history = minimizer.multi_sample_param_history[best_sample_index]
+        # Runs the minimizer
+        (
+            best_chain_index,
+            multi_chain_param_history,
+            multi_chain_logL_history,
+        ) = minimizer.run(num_chains, rng_int, tolerance)
 
+        # Select the best chain
+        logL_history = multi_chain_logL_history[best_chain_index]
+        parameter_history = multi_chain_param_history[best_chain_index]
+
+        # Print results
         kwargs_result = param_class.args2kwargs(parameter_history[-1])
         print("best fit log_likelihood:", logL_history[-1])
         print("Final parameters:", parameter_history[-1])

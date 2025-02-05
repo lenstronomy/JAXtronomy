@@ -1258,7 +1258,7 @@ class TestFittingSequence(object):
         jaxopt_kwargs = {
             "method": "BFGS",
             "maxiter": 400,
-            "num_init_samples": 5,
+            "num_chains": 5,
             "tolerance": 1e-5,
             "sigma_scale": 1.5,
             "rng_int": 1,
