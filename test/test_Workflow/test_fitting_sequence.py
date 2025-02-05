@@ -1257,10 +1257,11 @@ class TestFittingSequence(object):
         # either do not work yet or do not perform as well as BFGS and TNC
         jaxopt_kwargs = {
             "method": "BFGS",
-            "maxiter": 300,
+            "maxiter": 400,
             "num_init_samples": 5,
-            "tolerance": 1,
-            "sigma_scale": 2,
+            "tolerance": 1e-5,
+            "sigma_scale": 1.5,
+            "rng_int": 1,
         }
         fitting_kwargs_list_jaxopt = [["Jaxopt", jaxopt_kwargs]]
         chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_jaxopt)
@@ -1269,9 +1270,9 @@ class TestFittingSequence(object):
         assert fitting_type == "Jaxopt"
         assert len(args_history) == len(logL_history)
         npt.assert_almost_equal(
-            kwargs_result["kwargs_lens"][0]["theta_E"], 0.66, decimal=3
+            kwargs_result["kwargs_lens"][0]["theta_E"], 0.66, decimal=8
         )
-        npt.assert_almost_equal(logL_history[-1], 0, decimal=-2)
+        npt.assert_almost_equal(logL_history[-1], 0, decimal=8)
 
 
 if __name__ == "__main__":
