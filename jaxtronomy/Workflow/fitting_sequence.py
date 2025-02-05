@@ -419,14 +419,13 @@ class FittingSequence(object):
             Mead, Powell, CG, Newton-CG, L-BFGS-B, COBYLA, SLSQP, trust-constr, dogleg,
             trust-ncg, trust-exact, trust-krylov either do not work yet or do not
             perform as well as BFGS and TNC
-        :param num_chains: int, number of chains to run the minimizer on.
-            Initial parameters for each chain are sampled from the user-provided distribution.
+        :param num_chains: int, number of chains to run the minimizer on. Initial
+            parameters for each chain are sampled from the user-provided distribution.
             Running more chains takes more time but can help avoid local minima.
         :param maxiter: int, number of iterations to perform during minimization of the
             loss function
-        :param tolerance: float, only relevant when num_chains > 1. If
-            |logL| < tolerance at the end of a chain, the rest of the chains are not
-            run.
+        :param tolerance: float, only relevant when num_chains > 1. If |logL| <
+            tolerance at the end of a chain, the rest of the chains are not run.
         :param sigma_scale: float, scales the values in kwargs_sigma which can allow the
             minimizer to sample initial states from a wider distribution.
         :param rng_int: int which seeds the JAX RNG.
