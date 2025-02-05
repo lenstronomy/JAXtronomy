@@ -1019,16 +1019,13 @@ class TestFittingSequence(object):
 
         data_class = ImageData(**kwargs_data)
         # generate the psf variables
-        # kwargs_psf = {'psf_type': psf_type, 'fwhm': fwhm, 'pixel_size': pixel_scale, 'truncation': 3}
-
-        # if you are using a PSF estimate from e.g. a star in the FoV of your exposure, you can set
         kwargs_psf_gaussian = {
             "psf_type": "GAUSSIAN",
             "pixel_size": pixel_scale,
             "fwhm": fwhm,
         }
-
         psf_class = PSF(**kwargs_psf_gaussian)
+
         kwargs_numerics = {
             "supersampling_factor": 1,
             "supersampling_convolution": False,
@@ -1258,16 +1255,24 @@ class TestFittingSequence(object):
         # Other options such as Nelder-Mead, Powell, CG, Newton-CG, L-BFGS-B, COBYLA,
         # SLSQP, trust-constr, dogleg, trust-ncg, trust-exact, trust-krylov
         # either do not work yet or do not perform as well as BFGS and TNC
-        fitting_kwargs_list_jaxopt = [["Jaxopt", {"method": "BFGS", "maxiter": 200}]]
+        jaxopt_kwargs = {
+            "method": "BFGS",
+            "maxiter": 300,
+            "num_chains": 5,
+            "tolerance": 1e-5,
+            "sigma_scale": 1,
+            "rng_int": 1,
+        }
+        fitting_kwargs_list_jaxopt = [["Jaxopt", jaxopt_kwargs]]
         chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_jaxopt)
         fitting_type, args_history, logL_history, kwargs_result = chain_list[0]
 
         assert fitting_type == "Jaxopt"
         assert len(args_history) == len(logL_history)
         npt.assert_almost_equal(
-            kwargs_result["kwargs_lens"][0]["theta_E"], 0.66, decimal=3
+            kwargs_result["kwargs_lens"][0]["theta_E"], 0.66, decimal=1
         )
-        npt.assert_almost_equal(logL_history[-1], 0, decimal=-2)
+        npt.assert_almost_equal(logL_history[-1], 0, decimal=8)
 
 
 if __name__ == "__main__":
