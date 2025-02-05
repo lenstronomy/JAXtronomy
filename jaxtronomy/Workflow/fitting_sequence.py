@@ -466,7 +466,7 @@ class FittingSequence(object):
         # Runs the minimizer and prints results
         best_sample_index = minimizer.run(rng_int)
         logL_history = minimizer.multi_sample_logL_history[best_sample_index]
-        parameter_history = minimizer.multi_sample_parameter_history[best_sample_index]
+        parameter_history = minimizer.multi_sample_param_history[best_sample_index]
 
         kwargs_result = param_class.args2kwargs(parameter_history[-1])
         print("best fit log_likelihood:", logL_history[-1])
