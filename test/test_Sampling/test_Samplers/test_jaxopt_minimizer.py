@@ -25,25 +25,39 @@ class TestJaxoptMinimizer(object):
         args_lower = np.array([0.0])
         args_upper = np.array([0.9])
         args = (args_mean, args_sigma, args_lower, args_upper)
-        self.minimizer = JaxoptMinimizer("BFGS", self._logL, *args, maxiter=200)
-        self.minimizer2 = JaxoptMinimizer("BFGS", self._logL2, *args, maxiter=200)
+        self.minimizer = JaxoptMinimizer("BFGS", self._logL, *args, maxiter=200, num_init_samples=3, tolerance=1e-14)
+        self.minimizer2 = JaxoptMinimizer("BFGS", self._logL2, *args, maxiter=500, num_init_samples=3)
         self.args_mean = args_mean
 
     def test_run(self):
         # Tests to see if the minimizer gets close to the analytical answer
-        final_result, final_logL = self.minimizer.run(self.args_mean)
-        npt.assert_almost_equal(final_result.item(), 0.6, decimal=6)
+        best_sample_index = self.minimizer.run(rng_int=0)
+        final_result = self.minimizer.multi_sample_param_history[best_sample_index][-1]
+        final_logL = self.minimizer.multi_sample_logL_history[best_sample_index][-1]
+
+        npt.assert_array_almost_equal(final_result, [0.6], decimal=6)
         npt.assert_almost_equal(final_logL, 0.0, decimal=8)
 
-        final_result, final_logL = self.minimizer2.run(self.args_mean)
-        npt.assert_almost_equal(final_result.item(), 0.25, decimal=2)
+        best_sample_index = self.minimizer2.run(rng_int=0)
+        final_result = self.minimizer2.multi_sample_param_history[best_sample_index][-1]
+        final_logL = self.minimizer2.multi_sample_logL_history[best_sample_index][-1]
+        npt.assert_array_almost_equal(final_result, [0.25], decimal=2)
         npt.assert_almost_equal(final_logL, 0.0, decimal=7)
+
+    def test_run_single_sample(self):
+        self.minimizer.run_single_sample(self.args_mean)
+        npt.assert_array_equal(self.args_mean, self.minimizer.single_sample_param_history[0])
+
+        final_result = self.minimizer.single_sample_param_history[-1]
+        final_logL = self.minimizer.single_sample_logL_history[-1]
+        npt.assert_array_almost_equal(final_result, [0.6], decimal=6)
+        npt.assert_almost_equal(final_logL, 0.0, decimal=8)
 
     def test_loss(self):
         args_constrained = np.array([0.7])
         args_unconstrained = unconstrain_fn(
             self.minimizer._numpyro_model,
-            model_args=self.minimizer.model_args,
+            model_args=(),
             model_kwargs={},
             params={"args": args_constrained},
         )["args"]
@@ -53,7 +67,7 @@ class TestJaxoptMinimizer(object):
         args_constrained = np.array([0.275])
         args_unconstrained = unconstrain_fn(
             self.minimizer2._numpyro_model,
-            model_args=self.minimizer2.model_args,
+            model_args=(),
             model_kwargs={},
             params={"args": args_constrained},
         )["args"]
@@ -64,25 +78,25 @@ class TestJaxoptMinimizer(object):
         current_parameter = np.array([0.5])
         args_unconstrained = unconstrain_fn(
             self.minimizer._numpyro_model,
-            model_args=self.minimizer.model_args,
+            model_args=(),
             model_kwargs={},
             params={"args": current_parameter},
         )["args"]
         self.minimizer._update_logL_history(args_unconstrained)
-        npt.assert_almost_equal(self.minimizer.logL_history[-1], -0.01, decimal=8)
-        npt.assert_array_equal(self.minimizer.parameter_history[-1], current_parameter)
+        npt.assert_almost_equal(self.minimizer.single_sample_logL_history[-1], -0.01, decimal=8)
+        npt.assert_array_equal(self.minimizer.single_sample_param_history[-1], current_parameter)
 
         current_parameter = np.array([0.225])
         args_unconstrained = unconstrain_fn(
             self.minimizer2._numpyro_model,
-            model_args=self.minimizer2.model_args,
+            model_args=(),
             model_kwargs={},
             params={"args": current_parameter},
         )["args"]
         self.minimizer2._update_logL_history(args_unconstrained)
-        npt.assert_almost_equal(self.minimizer2.logL_history[-1], -0.0001, decimal=8)
+        npt.assert_almost_equal(self.minimizer2.single_sample_logL_history[-1], -0.0001, decimal=8)
         npt.assert_array_almost_equal(
-            self.minimizer2.parameter_history[-1], current_parameter, decimal=8
+            self.minimizer2.single_sample_param_history[-1], current_parameter, decimal=8
         )
 
 

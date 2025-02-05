@@ -1019,16 +1019,13 @@ class TestFittingSequence(object):
 
         data_class = ImageData(**kwargs_data)
         # generate the psf variables
-        # kwargs_psf = {'psf_type': psf_type, 'fwhm': fwhm, 'pixel_size': pixel_scale, 'truncation': 3}
-
-        # if you are using a PSF estimate from e.g. a star in the FoV of your exposure, you can set
         kwargs_psf_gaussian = {
             "psf_type": "GAUSSIAN",
             "pixel_size": pixel_scale,
             "fwhm": fwhm,
         }
-
         psf_class = PSF(**kwargs_psf_gaussian)
+
         kwargs_numerics = {
             "supersampling_factor": 1,
             "supersampling_convolution": False,
@@ -1258,7 +1255,16 @@ class TestFittingSequence(object):
         # Other options such as Nelder-Mead, Powell, CG, Newton-CG, L-BFGS-B, COBYLA,
         # SLSQP, trust-constr, dogleg, trust-ncg, trust-exact, trust-krylov
         # either do not work yet or do not perform as well as BFGS and TNC
-        fitting_kwargs_list_jaxopt = [["Jaxopt", {"method": "BFGS", "maxiter": 200}]]
+        jaxopt_kwargs = {
+            "method": "BFGS",
+            "maxiter": 300,
+            "num_init_samples": 5,
+            "tolerance": 1,
+            "sigma_scale": 2
+        }
+        fitting_kwargs_list_jaxopt = [
+            ["Jaxopt", jaxopt_kwargs]
+        ]
         chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_jaxopt)
         fitting_type, args_history, logL_history, kwargs_result = chain_list[0]
 

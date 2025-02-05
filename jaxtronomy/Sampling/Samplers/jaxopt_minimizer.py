@@ -66,13 +66,13 @@ class JaxoptMinimizer:
             maxiter=maxiter,
         )
 
-        self.single_sample_parameter_history = []
+        self.single_sample_param_history = []
         self.single_sample_logL_history = []
-        self.multi_sample_parameter_history = []
+        self.multi_sample_param_history = []
         self.multi_sample_logL_history = []
 
     def run(self, rng_int):
-        self.multi_sample_parameter_history = []
+        self.multi_sample_param_history = []
         self.multi_sample_logL_history = []
 
         array_of_init_samples = self._draw_init_samples(rng_int)
@@ -124,7 +124,7 @@ class JaxoptMinimizer:
         """
 
         # Reset the parameter and logL histories with initial values only
-        self.single_sample_parameter_history = [
+        self.single_sample_param_history = [
             init_args,
         ]
         self.single_sample_logL_history = [
@@ -143,7 +143,7 @@ class JaxoptMinimizer:
         # After each iteration, the single sample logL and param histories are updated using the callback function
         self.minimizer.run(init_args_unconstrained)
         self.multi_sample_logL_history.append(self.single_sample_logL_history)
-        self.multi_sample_parameter_history.append(self.single_sample_parameter_history)
+        self.multi_sample_param_history.append(self.single_sample_param_history)
 
     def _draw_init_samples(self, rng_int):
         rng = jax.random.split(jax.random.PRNGKey(rng_int), 1)[0]
@@ -187,7 +187,7 @@ class JaxoptMinimizer:
             model_kwargs={},
             params={"args": current_parameters},
         )["args"]
-        self.single_sample_parameter_history.append(args_constrained)
+        self.single_sample_param_history.append(args_constrained)
 
         # Update logL history
         self.single_sample_logL_history.append(self.logL(args_constrained))
