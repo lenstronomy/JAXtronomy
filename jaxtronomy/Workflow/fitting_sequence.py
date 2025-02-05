@@ -406,8 +406,12 @@ class FittingSequence(object):
 
     def jaxopt(
         self,
-        method="TNC",
-        maxiter=100,
+        method="BFGS",
+        num_init_samples=3,
+        maxiter=500,
+        tolerance=None,
+        sigma_scale=1,
+        rng_int=0,
     ):
         """Uses the Jaxopt Scipy Minimizer.
 
@@ -415,10 +419,17 @@ class FittingSequence(object):
             Mead, Powell, CG, Newton-CG, L-BFGS-B, COBYLA, SLSQP, trust-constr, dogleg,
             trust-ncg, trust-exact, trust-krylov either do not work yet or do not
             perform as well as BFGS and TNC
+        :param num_init_samples: int, number of initial samples to run the minimizer on.
+            Running more initial samples takes more time but can help avoid local minima.
         :param maxiter: int, number of iterations to perform during minimization of the
             loss function
+        :param tolerance: float or None, only relevant when num_init_samples > 1.
+            If |logL| < tolerance at the end of a sample, the rest of the samples are not run.
+        :param sigma_scale: float, scales the values in kwargs_sigma which can allow the minimizer
+            to sample initial states from a wider distribution.
+        :param rng_int: int which seeds the JAX RNG.
         """
-        print(f"Running {method} minimization with {maxiter} iterations:")
+        print(f"Running {method} minimization for {num_init_samples} initial sample(s) with {maxiter} max iterations each:")
         param_class = self.param_class
         likelihood_module = self.likelihoodModule
 
@@ -427,7 +438,7 @@ class FittingSequence(object):
         args_mean = param_class.kwargs2args(**kwargs_temp)
 
         kwargs_sigma = self._updateManager.sigma_kwargs
-        args_sigma = param_class.kwargs2args(**kwargs_sigma)
+        args_sigma = param_class.kwargs2args(**kwargs_sigma) * sigma_scale
 
         kwargs_lower = self._updateManager._lower_kwargs
         args_lower = param_class.kwargs2args(*kwargs_lower)
@@ -443,16 +454,21 @@ class FittingSequence(object):
             args_sigma=args_sigma,
             args_lower=args_lower,
             args_upper=args_upper,
+            num_init_samples=num_init_samples,
             maxiter=maxiter,
+            tolerance=tolerance
         )
 
         # Runs the minimizer and prints results
-        args_result, final_logL = minimizer.run(args_mean)
-        kwargs_result = param_class.args2kwargs(args_result)
-        print("best fit log_likelihood:", final_logL)
-        print("kwargs_result:", kwargs_result)
+        best_sample_index = minimizer.run(rng_int)
+        logL_history = minimizer.multi_sample_logL_history[best_sample_index]
+        parameter_history = minimizer.multi_sample_parameter_history[best_sample_index]
 
-        return minimizer.parameter_history, minimizer.logL_history, kwargs_result
+        kwargs_result = param_class.args2kwargs(parameter_history[-1])
+        print("best fit log_likelihood:", logL_history[-1])
+        print("Final parameters:", parameter_history[-1])
+
+        return parameter_history, logL_history, kwargs_result
 
     def pso(
         self, n_particles, n_iterations, sigma_scale=1, print_key="PSO", threadCount=1
