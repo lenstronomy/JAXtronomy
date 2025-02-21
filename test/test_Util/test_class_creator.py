@@ -210,7 +210,9 @@ class TestRaise(unittest.TestCase):
             "point_source_frame_list": [[0]],
         }
         with self.assertRaises(ValueError):
-            class_creator.create_class_instances(source_redshift_list=[1], **kwargs_model)
+            class_creator.create_class_instances(
+                source_redshift_list=[1], **kwargs_model
+            )
 
         kwargs_model = {
             "lens_model_list": ["SIS", "SIS"],
