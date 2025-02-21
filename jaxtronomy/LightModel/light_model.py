@@ -48,6 +48,6 @@ class LightModel(LinearBasis):
             sersic_major_axis=sersic_major_axis,
         )
         self.deflection_scaling_list = deflection_scaling_list
-        if source_redshift_list is not None or source_redshift_list != []:
+        if source_redshift_list is not None and source_redshift_list != []:
             raise ValueError("multi plane sources not supported in jaxtronomy yet")
         self.redshift_list = source_redshift_list
