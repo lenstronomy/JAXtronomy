@@ -1,5 +1,7 @@
 __author__ = "pierrefleury"
 
+from jax import jit
+
 __all__ = ["LOS"]
 
 
@@ -45,6 +47,7 @@ class LOS(object):
         self._static = False
 
     @staticmethod
+    @jit
     def distort_vector(x, y, kappa=0, gamma1=0, gamma2=0, omega=0):
         """This function applies a distortion matrix to a vector (x, y) and returns (x',
         y') as follows:
@@ -82,6 +85,7 @@ class LOS(object):
         return x_, y_
 
     @staticmethod
+    @jit
     def left_multiply(f_xx, f_xy, f_yx, f_yy, kappa=0, gamma1=0, gamma2=0, omega=0):
         """Left-multiplies the Hessian matrix of a lens with a distortion matrix with
         convergence kappa, shear gamma1, gamma2, and rotation omega:
@@ -115,6 +119,7 @@ class LOS(object):
         return f__xx, f__xy, f__yx, f__yy
 
     @staticmethod
+    @jit
     def right_multiply(f_xx, f_xy, f_yx, f_yy, kappa=0, gamma1=0, gamma2=0, omega=0):
         """Right-multiplies the Hessian matrix of a lens with a distortion matrix with
         convergence kappa and shear gamma1, gamma2:

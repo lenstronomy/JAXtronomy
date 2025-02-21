@@ -2,12 +2,12 @@ __author__ = ["nataliehogg", "pierrefleury", "danjohnson98"]
 
 from jaxtronomy.LensModel.single_plane import SinglePlane
 from jaxtronomy.LensModel.profile_list_base import lens_class
-import jax.numpy as jnp
+
 import copy
+from functools import partial
+from jax import config, debug, jit, numpy as jnp
 
-import jax
-
-jax.config.update("jax_enable_x64", True)  # 64-bit floats
+config.update("jax_enable_x64", True)  # 64-bit floats
 
 
 __all__ = ["SinglePlaneLOS"]
@@ -75,6 +75,7 @@ class SinglePlaneLOS(SinglePlane):
             kwargs_synthesis=kwargs_synthesis,
         )
 
+    @partial(jit, static_argnums=0)
     def split_lens_los(self, kwargs):
         """This function splits the list of key-word arguments given to the lens model
         into those that correspond to the lens itself (kwargs_main), and those that
@@ -102,6 +103,7 @@ class SinglePlaneLOS(SinglePlane):
 
         return kwargs_main, kwargs_los
 
+    @partial(jit, static_argnums=0)
     def fermat_potential(
         self, x_image, y_image, kwargs_lens, x_source=None, y_source=None, k=None
     ):
@@ -109,10 +111,12 @@ class SinglePlaneLOS(SinglePlane):
 
         :param x_image: image position
         :param y_image: image position
-        :param x_source: source position
-        :param y_source: source position
         :param kwargs_lens: list of keyword arguments of lens model parameters matching
             the lens model classes
+        :param x_source: source position
+        :param y_source: source position
+        :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: fermat potential in arcsec**2 as a list
         """
 
@@ -200,6 +204,7 @@ class SinglePlaneLOS(SinglePlane):
 
         return geometry - effective_potential
 
+    @partial(jit, static_argnums=(0, 4))
     def alpha(self, x, y, kwargs, k=None):
         """Displacement angle including the line-of-sight corrections.
 
@@ -210,6 +215,7 @@ class SinglePlaneLOS(SinglePlane):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes, including line-of-sight corrections
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: deflection angles in units of arcsec
         """
 
@@ -254,6 +260,7 @@ class SinglePlaneLOS(SinglePlane):
 
         return f_x, f_y
 
+    @partial(jit, static_argnums=0)
     def hessian(self, x, y, kwargs, k=None):
         """Hessian matrix.
 
@@ -264,6 +271,7 @@ class SinglePlaneLOS(SinglePlane):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: f_xx, f_xy, f_yx, f_yy components
         """
 
@@ -316,6 +324,7 @@ class SinglePlaneLOS(SinglePlane):
 
         return f_xx, f_xy, f_yx, f_yy
 
+    @partial(jit, static_argnums=(0,3))
     def mass_3d(self, r, kwargs, k=None):
         """Computes the mass within a 3d sphere of radius r *for the main lens only*
 
@@ -334,6 +343,7 @@ class SinglePlaneLOS(SinglePlane):
 
         return mass_3d
 
+    @partial(jit, static_argnums=(0,3))
     def mass_2d(self, r, kwargs, k=None):
         """Computes the mass enclosed a projected (2d) radius r *for the main lens only*
 
@@ -358,6 +368,7 @@ class SinglePlaneLOS(SinglePlane):
 
         return mass_2d
 
+    @partial(jit, static_argnums=(0,3))
     def density(self, r, kwargs, k=None):
         """3d mass density at radius r *for the main lens only* The integral in the LOS
         projection of this quantity results in the convergence quantity.
@@ -377,6 +388,7 @@ class SinglePlaneLOS(SinglePlane):
 
         return density
 
+    @partial(jit, static_argnums=(0,4))
     def potential(self, x, y, kwargs, k=None):
         """Lensing potential *of the main lens only* In the presence of LOS corrections,
         the system generally does not admit a potential, in the sense that the curl of
@@ -389,10 +401,11 @@ class SinglePlaneLOS(SinglePlane):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: lensing potential in units of arcsec^2
         """
 
-        print(
+        debug.print(
             "Note: The computation of the potential ignores the LOS corrections.\
               In the presence of LOS corrections, a lensing system does not always\
               derive from a potential."
