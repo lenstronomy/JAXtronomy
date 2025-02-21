@@ -1,11 +1,12 @@
 __author__ = "sibirrer"
-from jaxtronomy.LensModel.single_plane import SinglePlane  # NH: import from jaxtronomy
+from jaxtronomy.LensModel.single_plane import SinglePlane
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
-from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane
 
-from lenstronomy.LensModel.MultiPlane.decoupled_multi_plane import MultiPlaneDecoupled
 from lenstronomy.Cosmo.lens_cosmo import LensCosmo
 from lenstronomy.Util import constants as const
+
+from functools import partial
+from jax import jit
 
 __all__ = ["LensModel"]
 
@@ -111,37 +112,39 @@ class LensModel(object):
                 )
 
             if decouple_multi_plane:
-                self.lens_model = MultiPlaneDecoupled(
-                    z_source,
-                    lens_model_list,
-                    lens_redshift_list,
-                    cosmo=cosmo,
-                    numerical_alpha_class=numerical_alpha_class,
-                    observed_convention_index=observed_convention_index,
-                    z_source_convention=z_source_convention,
-                    cosmo_interp=cosmo_interp,
-                    z_interp_stop=z_interp_stop,
-                    num_z_interp=num_z_interp,
-                    kwargs_interp=kwargs_interp,
-                    kwargs_synthesis=kwargs_synthesis,
-                    **kwargs_multiplane_model
-                )
+                raise ValueError("decouple multi plane lens model not supported in jaxtronomy yet")
+                #self.lens_model = MultiPlaneDecoupled(
+                #    z_source,
+                #    lens_model_list,
+                #    lens_redshift_list,
+                #    cosmo=cosmo,
+                #    numerical_alpha_class=numerical_alpha_class,
+                #    observed_convention_index=observed_convention_index,
+                #    z_source_convention=z_source_convention,
+                #    cosmo_interp=cosmo_interp,
+                #    z_interp_stop=z_interp_stop,
+                #    num_z_interp=num_z_interp,
+                #    kwargs_interp=kwargs_interp,
+                #    kwargs_synthesis=kwargs_synthesis,
+                #    **kwargs_multiplane_model
+                #)
             else:
-                self.lens_model = MultiPlane(
-                    z_source,
-                    lens_model_list,
-                    lens_redshift_list,
-                    cosmo=cosmo,
-                    numerical_alpha_class=numerical_alpha_class,
-                    observed_convention_index=observed_convention_index,
-                    z_source_convention=z_source_convention,
-                    cosmo_interp=cosmo_interp,
-                    z_interp_stop=z_interp_stop,
-                    num_z_interp=num_z_interp,
-                    kwargs_interp=kwargs_interp,
-                    kwargs_synthesis=kwargs_synthesis,
-                    distance_ratio_sampling=distance_ratio_sampling,
-                )
+                raise ValueError("multi plane lens model not supported in jaxtronomy yet")
+                #self.lens_model = MultiPlane(
+                #    z_source,
+                #    lens_model_list,
+                #    lens_redshift_list,
+                #    cosmo=cosmo,
+                #    numerical_alpha_class=numerical_alpha_class,
+                #    observed_convention_index=observed_convention_index,
+                #    z_source_convention=z_source_convention,
+                #    cosmo_interp=cosmo_interp,
+                #    z_interp_stop=z_interp_stop,
+                #    num_z_interp=num_z_interp,
+                #    kwargs_interp=kwargs_interp,
+                #    kwargs_synthesis=kwargs_synthesis,
+                #    distance_ratio_sampling=distance_ratio_sampling,
+                #)
 
         else:
             if los_effects is True:
@@ -167,6 +170,7 @@ class LensModel(object):
         if z_lens is not None and z_source is not None:
             self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
 
+    @partial(jit, static_argnums=(0, 4))
     def ray_shooting(self, x, y, kwargs, k=None):
         """Maps image to source position (inverse deflection)
 
@@ -177,10 +181,12 @@ class LensModel(object):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: source plane positions corresponding to (x, y) in the image plane
         """
         return self.lens_model.ray_shooting(x, y, kwargs, k=k)
 
+    @partial(jit, static_argnums=(0))
     def fermat_potential(
         self, x_image, y_image, kwargs_lens, x_source=None, y_source=None
     ):
@@ -202,54 +208,55 @@ class LensModel(object):
             return self.lens_model.fermat_potential(
                 x_image, y_image, kwargs_lens, x_source, y_source
             )
-        elif hasattr(self.lens_model, "arrival_time") and hasattr(self, "_lensCosmo"):
-            dt = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
-            fermat_pot_eff = (
-                dt
-                * const.c
-                / self._lensCosmo.ddt
-                / const.Mpc
-                * const.day_s
-                / const.arcsec**2
-            )
-            return fermat_pot_eff
+        #elif hasattr(self.lens_model, "arrival_time") and hasattr(self, "_lensCosmo"):
+        #    dt = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
+        #    fermat_pot_eff = (
+        #        dt
+        #        * const.c
+        #        / self._lensCosmo.ddt
+        #        / const.Mpc
+        #        * const.day_s
+        #        / const.arcsec**2
+        #    )
+        #    return fermat_pot_eff
         else:
             raise ValueError(
                 "In multi-plane lensing you need to provide a specific z_lens and z_source for which the "
                 "effective Fermat potential is evaluated"
             )
 
-    def arrival_time(
-        self, x_image, y_image, kwargs_lens, kappa_ext=0, x_source=None, y_source=None
-    ):
-        """Arrival time of images relative to a straight line without lensing. Negative
-        values correspond to images arriving earlier, and positive signs correspond to
-        images arriving later.
+    #def arrival_time(
+    #    self, x_image, y_image, kwargs_lens, kappa_ext=0, x_source=None, y_source=None
+    #):
+    #    """Arrival time of images relative to a straight line without lensing. Negative
+    #    values correspond to images arriving earlier, and positive signs correspond to
+    #    images arriving later.
 
-        :param x_image: image position
-        :param y_image: image position
-        :param kwargs_lens: lens model parameter keyword argument list
-        :param kappa_ext: external convergence contribution not accounted in the lens
-            model that leads to the same observables in position and relative fluxes but
-            rescales the time delays
-        :param x_source: source position (optional), otherwise computed with ray-tracing
-        :param y_source: source position (optional), otherwise computed with ray-tracing
-        :return: arrival time of image positions in units of days
-        """
-        if hasattr(self.lens_model, "arrival_time"):
-            arrival_time = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
-        else:
-            fermat_pot = self.lens_model.fermat_potential(
-                x_image, y_image, kwargs_lens, x_source=x_source, y_source=y_source
-            )
-            if not hasattr(self, "_lensCosmo"):
-                raise ValueError(
-                    "LensModel class was not initialized with lens and source redshifts!"
-                )
-            arrival_time = self._lensCosmo.time_delay_units(fermat_pot)
-        arrival_time *= 1 - kappa_ext
-        return arrival_time
+    #    :param x_image: image position
+    #    :param y_image: image position
+    #    :param kwargs_lens: lens model parameter keyword argument list
+    #    :param kappa_ext: external convergence contribution not accounted in the lens
+    #        model that leads to the same observables in position and relative fluxes but
+    #        rescales the time delays
+    #    :param x_source: source position (optional), otherwise computed with ray-tracing
+    #    :param y_source: source position (optional), otherwise computed with ray-tracing
+    #    :return: arrival time of image positions in units of days
+    #    """
+    #    if hasattr(self.lens_model, "arrival_time"):
+    #        arrival_time = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
+    #    else:
+    #        fermat_pot = self.lens_model.fermat_potential(
+    #            x_image, y_image, kwargs_lens, x_source=x_source, y_source=y_source
+    #        )
+    #        if not hasattr(self, "_lensCosmo"):
+    #            raise ValueError(
+    #                "LensModel class was not initialized with lens and source redshifts!"
+    #            )
+    #        arrival_time = self._lensCosmo.time_delay_units(fermat_pot)
+    #    arrival_time *= 1 - kappa_ext
+    #    return arrival_time
 
+    @partial(jit, static_argnums=(0, 4))
     def potential(self, x, y, kwargs, k=None):
         """Lensing potential.
 
@@ -260,10 +267,12 @@ class LensModel(object):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :return: lensing potential in units of arcsec^2
         """
         return self.lens_model.potential(x, y, kwargs, k=k)
 
+    @partial(jit, static_argnums=(0, 4))
     def alpha(self, x, y, kwargs, k=None, diff=None):
         """Deflection angles.
 
@@ -274,6 +283,7 @@ class LensModel(object):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :param diff: None or float. If set, computes the deflection as a finite
             numerical differential of the lensing potential. This differential is only
             applicable in the single lensing plane where the form of the lensing
@@ -290,6 +300,7 @@ class LensModel(object):
                 "setting as analytical form of lensing potential is not available."
             )
 
+    @partial(jit, static_argnums=(0, 4, 6))
     def hessian(self, x, y, kwargs, k=None, diff=None, diff_method="square"):
         """Hessian matrix.
 
@@ -300,6 +311,7 @@ class LensModel(object):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :param diff: float, scale over which the finite numerical differential is
             computed. If None, then using the exact (if available) differentials.
         :param diff_method: string, 'square' or 'cross', indicating whether finite
@@ -318,6 +330,7 @@ class LensModel(object):
                 % diff_method
             )
 
+    @partial(jit, static_argnums=(0, 4, 6))
     def kappa(self, x, y, kwargs, k=None, diff=None, diff_method="square"):
         """Lensing convergence k = 1/2 laplacian(phi)
 
@@ -328,6 +341,7 @@ class LensModel(object):
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :param diff: float, scale over which the finite numerical differential is
             computed. If None, then using the exact (if available) differentials.
         :param diff_method: string, 'square' or 'cross', indicating whether finite
@@ -341,6 +355,7 @@ class LensModel(object):
         kappa = 1.0 / 2 * (f_xx + f_yy)
         return kappa
 
+    @partial(jit, static_argnums=(0, 4, 6))
     def curl(self, x, y, kwargs, k=None, diff=None, diff_method="square"):
         """
         curl computation F_xy - F_yx
@@ -351,6 +366,7 @@ class LensModel(object):
         :type y: numpy array
         :param kwargs: list of keyword arguments of lens model parameters matching the lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :param diff: float, scale over which the finite numerical differential is computed. If None, then using the
          exact (if available) differentials.
         :param diff_method: string, 'square' or 'cross', indicating whether finite differentials are computed from a
@@ -362,6 +378,7 @@ class LensModel(object):
         )
         return f_xy - f_yx
 
+    @partial(jit, static_argnums=(0, 4, 6))
     def gamma(self, x, y, kwargs, k=None, diff=None, diff_method="square"):
         """
         shear computation
@@ -374,6 +391,7 @@ class LensModel(object):
         :type y: numpy array
         :param kwargs: list of keyword arguments of lens model parameters matching the lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :param diff: float, scale over which the finite numerical differential is computed. If None, then using the
          exact (if available) differentials.
         :param diff_method: string, 'square' or 'cross', indicating whether finite differentials are computed from a
@@ -388,6 +406,7 @@ class LensModel(object):
         gamma2 = f_xy
         return gamma1, gamma2
 
+    @partial(jit, static_argnums=(0, 4, 6))
     def magnification(self, x, y, kwargs, k=None, diff=None, diff_method="square"):
         """magnification.
 
@@ -400,6 +419,7 @@ class LensModel(object):
         :type y: numpy array
         :param kwargs: list of keyword arguments of lens model parameters matching the lens model classes
         :param k: only evaluate the k-th lens model
+        :type k: None, int, or tuple of ints
         :param diff: float, scale over which the finite numerical differential is computed. If None, then using the
          exact (if available) differentials.
         :param diff_method: string, 'square' or 'cross', indicating whether finite differentials are computed from a
@@ -413,7 +433,8 @@ class LensModel(object):
         det_A = (1 - f_xx) * (1 - f_yy) - f_xy * f_yx
         return 1.0 / det_A  # attention, if dividing by zero
 
-    def flexion(self, x, y, kwargs, k=None, diff=0.000001, hessian_diff=True):
+    @partial(jit, static_argnums=(0, 4, 6))
+    def flexion(self, x, y, kwargs, k=None, diff=0.0001, hessian_diff=False):
         """Third derivatives (flexion)
 
         :param x: x-position (preferentially arcsec)
@@ -422,27 +443,29 @@ class LensModel(object):
         :type y: numpy array
         :param kwargs: list of keyword arguments of lens model parameters matching the
             lens model classes
-        :param k: int or None, if set, only evaluates the differential from one model
-            component
+        :param k: if set, only evaluates the differential from one model component
+        :type k: None, int, or tuple of ints
         :param diff: numerical differential length of Flexion
         :param hessian_diff: boolean, if true also computes the numerical differential
             length of Hessian (optional)
         :return: f_xxx, f_xxy, f_xyy, f_yyy
         """
-        if hessian_diff is not True:
-            hessian_diff = None
+        if hessian_diff:
+            hessian_diff_ = diff/4
+        else:
+            hessian_diff_ = None
         f_xx_dx, f_xy_dx, f_yx_dx, f_yy_dx = self.hessian(
-            x + diff / 2, y, kwargs, k=k, diff=hessian_diff
+            x + diff / 2, y, kwargs, k=k, diff=hessian_diff_
         )
         f_xx_dy, f_xy_dy, f_yx_dy, f_yy_dy = self.hessian(
-            x, y + diff / 2, kwargs, k=k, diff=hessian_diff
+            x, y + diff / 2, kwargs, k=k, diff=hessian_diff_
         )
 
         f_xx_dx_, f_xy_dx_, f_yx_dx_, f_yy_dx_ = self.hessian(
-            x - diff / 2, y, kwargs, k=k, diff=hessian_diff
+            x - diff / 2, y, kwargs, k=k, diff=hessian_diff_
         )
         f_xx_dy_, f_xy_dy_, f_yx_dy_, f_yy_dy_ = self.hessian(
-            x, y - diff / 2, kwargs, k=k, diff=hessian_diff
+            x, y - diff / 2, kwargs, k=k, diff=hessian_diff_
         )
 
         f_xxx = (f_xx_dx - f_xx_dx_) / diff
@@ -472,6 +495,7 @@ class LensModel(object):
         """
         self.lens_model.set_dynamic()
 
+    @partial(jit, static_argnums=(0, 4))
     def _deflection_differential(self, x, y, kwargs, k=None, diff=0.00001):
         """
 
@@ -479,6 +503,7 @@ class LensModel(object):
         :param y: y-coordinate
         :param kwargs: keyword argument list
         :param k: int or None, if set, only evaluates the differential from one model component
+        :type k: None, int, or tuple of ints
         :param diff: finite differential length
         :return: f_x, f_y
         """
@@ -490,6 +515,7 @@ class LensModel(object):
         f_y = (phi_dy - phi_dy_) / diff
         return f_x, f_y
 
+    @partial(jit, static_argnums=(0, 4))
     def _hessian_differential_cross(self, x, y, kwargs, k=None, diff=0.00001):
         """Computes the numerical differentials over a finite range for f_xx, f_yy, f_xy
         from f_x and f_y The differentials are computed along the cross centered at (x,
@@ -498,7 +524,7 @@ class LensModel(object):
         :param x: x-coordinate
         :param y: y-coordinate
         :param kwargs: lens model keyword argument list
-        :param k: int, list of bools or None, indicating a subset of lens models to be
+        :param k: int, tuple of ints or None, indicating a subset of lens models to be
             evaluated
         :param diff: float, scale of the finite differential (diff/2 in each direction
             used to compute the differential
@@ -521,6 +547,7 @@ class LensModel(object):
         f_yx = dalpha_decra
         return f_xx, f_xy, f_yx, f_yy
 
+    @partial(jit, static_argnums=(0, 4))
     def _hessian_differential_square(self, x, y, kwargs, k=None, diff=0.00001):
         """Computes the numerical differentials over a finite range for f_xx, f_yy, f_xy
         from f_x and f_y The differentials are computed on the square around (x, y).
@@ -529,7 +556,7 @@ class LensModel(object):
         :param x: x-coordinate
         :param y: y-coordinate
         :param kwargs: lens model keyword argument list
-        :param k: int, list of booleans or None, indicating a subset of lens models to
+        :param k: int, list of ints or None, indicating a subset of lens models to
             be evaluated
         :param diff: float, scale of the finite differential (diff/2 in each direction
             used to compute the differential
@@ -548,26 +575,28 @@ class LensModel(object):
 
         return f_xx, f_xy, f_yx, f_yy
 
-    def hessian_z1z2(self, z1, z2, theta_x, theta_y, kwargs_lens, diff=0.00000001):
-        """Computes Hessian matrix when Observed at z1 with rays going to z2 with z1 <
-        z2 for multi_plane.
+    #@partial(jit, static_argnums=(0,))
+    #def hessian_z1z2(self, z1, z2, theta_x, theta_y, kwargs_lens, diff=0.00000001):
+    #    """Computes Hessian matrix when Observed at z1 with rays going to z2 with z1 <
+    #    z2 for multi_plane.
 
-        :param z1: Observer redshift
-        :param z2: source redshift
-        :param theta_x: angular position and direction of the ray
-        :param theta_y: angular position and direction of the ray
-        :param kwargs_lens: list of keyword arguments of lens model parameters matching
-            the lens model classes
-        :param diff: numerical differential step (float)
-        :return: f_xx, f_xy, f_yx, f_yy
-        """
-        if self.multi_plane is False:
-            raise ValueError("Hessian z1z2 need to be compute in multi-plane mode")
-        if z1 >= z2:
-            raise ValueError("z1 needs to be smaller than z2")
+    #    :param z1: Observer redshift
+    #    :param z2: source redshift
+    #    :param theta_x: angular position and direction of the ray
+    #    :param theta_y: angular position and direction of the ray
+    #    :param kwargs_lens: list of keyword arguments of lens model parameters matching
+    #        the lens model classes
+    #    :param diff: numerical differential step (float)
+    #    :return: f_xx, f_xy, f_yx, f_yy
+    #    """
+    #    if self.multi_plane is False:
+    #        raise ValueError("Hessian z1z2 need to be compute in multi-plane mode")
+    #    # TODO: This doesn't work. Replace with jax.experimental.checkify
+    #    #if z1 >= z2:
+    #    #    raise ValueError("z1 needs to be smaller than z2")
 
-        f_xx, f_xy, f_yx, f_yy = self.lens_model.hessian_z1z2(
-            z1, z2, theta_x, theta_y, kwargs_lens, diff=diff
-        )
+    #    f_xx, f_xy, f_yx, f_yy = self.lens_model.hessian_z1z2(
+    #        z1, z2, theta_x, theta_y, kwargs_lens, diff=diff
+    #    )
 
-        return f_xx, f_xy, f_yx, f_yy
+    #    return f_xx, f_xy, f_yx, f_yy

@@ -5,8 +5,6 @@ import numpy.testing as npt
 import pytest
 from jaxtronomy.LensModel.lens_model import LensModel
 from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
-from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane
-from lenstronomy.LensModel.MultiPlane.decoupled_multi_plane import MultiPlaneDecoupled
 
 from lenstronomy.Util.util import make_grid
 import unittest
@@ -112,10 +110,10 @@ class TestLensModel(object):
 
     def test_flexion(self):
         f_xxx, f_xxy, f_xyy, f_yyy = self.lensModel.flexion(
-            self.x, self.y, kwargs=self.kwargs
+            self.x, self.y, kwargs=self.kwargs, hessian_diff=True
         )
         f_xxx_ref, f_xxy_ref, f_xyy_ref, f_yyy_ref = self.lensModel_ref.flexion(
-            self.x, self.y, kwargs=self.kwargs
+            self.x, self.y, kwargs=self.kwargs, hessian_diff=True
         )
         npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=6)
         npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=6)
@@ -143,84 +141,98 @@ class TestLensModel(object):
         npt.assert_array_almost_equal(delta_x, delta_x_ref, decimal=6)
         npt.assert_array_almost_equal(delta_y, delta_y_ref, decimal=6)
 
-    def test_arrival_time(self):
-        z_lens = 0.5
-        z_source = 1.5
-        x_image, y_image = 1.0, 0.0
-        lensModel_mp = LensModel(
-            lens_model_list=["SIS"],
-            multi_plane=True,
-            lens_redshift_list=[z_lens],
-            z_source=z_source,
-        )
-        lensModel_mp_ref = LensModel_ref(
-            lens_model_list=["SIS"],
-            multi_plane=True,
-            lens_redshift_list=[z_lens],
-            z_source=z_source,
-        )
-        kwargs = [
-            {
-                "theta_E": 1.0,
-                "center_x": 0.0,
-                "center_y": 0.0,
-            }
-        ]
-        arrival_time_mp = lensModel_mp.arrival_time(x_image, y_image, kwargs)
-        arrival_time_mp_ref = lensModel_mp_ref.arrival_time(x_image, y_image, kwargs)
-        lensModel_sp = LensModel(
-            lens_model_list=["SIS"], z_source=z_source, z_lens=z_lens
-        )
-        lensModel_sp_ref = LensModel_ref(
-            lens_model_list=["SIS"], z_source=z_source, z_lens=z_lens
-        )
-        arrival_time_sp = lensModel_sp.arrival_time(x_image, y_image, kwargs)
-        arrival_time_sp_ref = lensModel_sp_ref.arrival_time(x_image, y_image, kwargs)
-        npt.assert_array_almost_equal(arrival_time_sp, arrival_time_mp, decimal=8)
-        npt.assert_array_almost_equal(arrival_time_sp, arrival_time_sp_ref, decimal=6)
-        npt.assert_array_almost_equal(arrival_time_mp, arrival_time_mp_ref, decimal=6)
+    #def test_arrival_time(self):
+    #    z_lens = 0.5
+    #    z_source = 1.5
+    #    x_image, y_image = 1.0, 0.0
+    #    lensModel_mp = LensModel(
+    #        lens_model_list=["SIS"],
+    #        multi_plane=True,
+    #        lens_redshift_list=[z_lens],
+    #        z_source=z_source,
+    #    )
+    #    lensModel_mp_ref = LensModel_ref(
+    #        lens_model_list=["SIS"],
+    #        multi_plane=True,
+    #        lens_redshift_list=[z_lens],
+    #        z_source=z_source,
+    #    )
+    #    kwargs = [
+    #        {
+    #            "theta_E": 1.0,
+    #            "center_x": 0.0,
+    #            "center_y": 0.0,
+    #        }
+    #    ]
+    #    arrival_time_mp = lensModel_mp.arrival_time(x_image, y_image, kwargs)
+    #    arrival_time_mp_ref = lensModel_mp_ref.arrival_time(x_image, y_image, kwargs)
+    #    lensModel_sp = LensModel(
+    #        lens_model_list=["SIS"], z_source=z_source, z_lens=z_lens
+    #    )
+    #    lensModel_sp_ref = LensModel_ref(
+    #        lens_model_list=["SIS"], z_source=z_source, z_lens=z_lens
+    #    )
+    #    arrival_time_sp = lensModel_sp.arrival_time(x_image, y_image, kwargs)
+    #    arrival_time_sp_ref = lensModel_sp_ref.arrival_time(x_image, y_image, kwargs)
+    #    npt.assert_array_almost_equal(arrival_time_sp, arrival_time_mp, decimal=8)
+    #    npt.assert_array_almost_equal(arrival_time_sp, arrival_time_sp_ref, decimal=6)
+    #    npt.assert_array_almost_equal(arrival_time_mp, arrival_time_mp_ref, decimal=6)
 
     def test_fermat_potential(self):
         z_lens = 0.5
         z_source = 1.5
-        x_image, y_image = 1.0, 0.0
+        x_image, y_image = 1.032, -2.0234
         lensModel = LensModel(
             lens_model_list=["SIS"],
-            multi_plane=True,
-            lens_redshift_list=[z_lens],
-            z_lens=z_lens,
-            z_source=z_source,
+            #multi_plane=True,
+            #lens_redshift_list=[z_lens],
+            #z_lens=z_lens,
+            #z_source=z_source,
+        )
+        lensModel_ref = LensModel_ref(
+            lens_model_list=["SIS"],
+            #multi_plane=True,
+            #lens_redshift_list=[z_lens],
+            #z_lens=z_lens,
+            #z_source=z_source,
         )
         kwargs = [{"theta_E": 1.0, "center_x": 0.0, "center_y": 0.0}]
         fermat_pot = lensModel.fermat_potential(x_image, y_image, kwargs)
-        arrival_time = lensModel.arrival_time(x_image, y_image, kwargs)
-        arrival_time_from_fermat_pot = lensModel._lensCosmo.time_delay_units(fermat_pot)
-        npt.assert_almost_equal(arrival_time_from_fermat_pot, arrival_time, decimal=8)
+        fermat_pot_ref = lensModel_ref.fermat_potential(x_image, y_image, kwargs)
+        #arrival_time = lensModel.arrival_time(x_image, y_image, kwargs)
+        #arrival_time_from_fermat_pot = lensModel._lensCosmo.time_delay_units(fermat_pot)
+        npt.assert_allclose(fermat_pot, fermat_pot_ref, rtol=1e-10, atol=1e-10)
 
     def test_curl(self):
-        z_lens_list = [0.2, 0.8]
-        z_source = 1.5
+        #z_lens_list = [0.2, 0.8]
+        #z_source = 1.5
         lensModel = LensModel(
             lens_model_list=["SIS", "SIS"],
-            multi_plane=True,
-            lens_redshift_list=z_lens_list,
-            z_source=z_source,
+            #multi_plane=True,
+            #lens_redshift_list=z_lens_list,
+            #z_source=z_source,
+        )
+        lensModel_ref = LensModel_ref(
+            lens_model_list=["SIS", "SIS"],
+            #multi_plane=True,
+            #lens_redshift_list=z_lens_list,
+            #z_source=z_source,
         )
         kwargs = [
             {"theta_E": 1.0, "center_x": 0.0, "center_y": 0.0},
-            {"theta_E": 0.0, "center_x": 0.0, "center_y": 0.2},
+            {"theta_E": 0.1, "center_x": 0.0, "center_y": 0.2},
         ]
-
-        curl = lensModel.curl(x=1, y=1, kwargs=kwargs)
-        assert curl == 0
+        curl = lensModel.curl(x=1.2438, y=1.37485, kwargs=kwargs)
+        curl_ref = lensModel_ref.curl(x=1.2438, y=1.37485, kwargs=kwargs)
+        npt.assert_allclose(curl, curl_ref, rtol=1e-10, atol=1e-10)
 
         kwargs = [
-            {"theta_E": 1.0, "center_x": 0.0, "center_y": 0.0},
-            {"theta_E": 1.0, "center_x": 0.0, "center_y": 0.2},
+            {"theta_E": 1.35, "center_x": -0.348, "center_y": 0.102},
+            {"theta_E": 1.23, "center_x": 0.329, "center_y": 0.2},
         ]
-
-        curl = lensModel.curl(x=1, y=1, kwargs=kwargs)
-        assert curl != 0
+        curl = lensModel.curl(x=1.2438, y=1.37485, kwargs=kwargs)
+        curl_ref = lensModel_ref.curl(x=1.2438, y=1.37485, kwargs=kwargs)
+        npt.assert_allclose(curl, curl_ref, rtol=1e-10, atol=1e-10)
 
     def test_hessian_differentials(self):
         """Routine to test the private numerical differentials, both cross and square
@@ -246,45 +258,45 @@ class TestLensModel(object):
         npt.assert_array_almost_equal(f_yx_sq, f_yx, decimal=5)
         npt.assert_array_almost_equal(f_yy_sq, f_yy, decimal=5)
 
-    def test_hessian_z1z2(self):
-        z_source = 1.5
-        lens_model_list = ["SIS"]
-        kwargs_lens = [{"theta_E": 1}]
-        redshift_list = [0.5]
-        lensModel = LensModel(
-            lens_model_list=lens_model_list,
-            multi_plane=True,
-            lens_redshift_list=redshift_list,
-            z_source=z_source,
-        )
-        z1, z2 = 0.5, 1.5
-        theta_x, theta_y = jnp.linspace(start=-1, stop=1, num=10), jnp.linspace(
-            start=-1, stop=1, num=10
-        )
+    #def test_hessian_z1z2(self):
+    #    z_source = 1.5
+    #    lens_model_list = ["SIS"]
+    #    kwargs_lens = [{"theta_E": 1}]
+    #    redshift_list = [0.5]
+    #    lensModel = LensModel(
+    #        lens_model_list=lens_model_list,
+    #        multi_plane=True,
+    #        lens_redshift_list=redshift_list,
+    #        z_source=z_source,
+    #    )
+    #    z1, z2 = 0.5, 1.5
+    #    theta_x, theta_y = jnp.linspace(start=-1, stop=1, num=10), jnp.linspace(
+    #        start=-1, stop=1, num=10
+    #    )
 
-        f_xx, f_xy, f_yx, f_yy = lensModel.hessian_z1z2(
-            z1, z2, theta_x, theta_y, kwargs_lens
-        )
-        # Use the method in multi_plane.hessian_z1z2 as a comparison
-        multi_plane = MultiPlane(
-            z_source=1.5,
-            lens_model_list=lens_model_list,
-            lens_redshift_list=redshift_list,
-            z_interp_stop=3,
-            cosmo_interp=False,
-        )
-        (
-            f_xx_expected,
-            f_xy_expected,
-            f_yx_expected,
-            f_yy_expected,
-        ) = multi_plane.hessian_z1z2(
-            z1=z1, z2=z2, theta_x=theta_x, theta_y=theta_y, kwargs_lens=kwargs_lens
-        )
-        npt.assert_array_almost_equal(f_xx, f_xx_expected, decimal=5)
-        npt.assert_array_almost_equal(f_xy, f_xy_expected, decimal=5)
-        npt.assert_array_almost_equal(f_yx, f_yx_expected, decimal=5)
-        npt.assert_array_almost_equal(f_yy, f_yy_expected, decimal=5)
+    #    f_xx, f_xy, f_yx, f_yy = lensModel.hessian_z1z2(
+    #        z1, z2, theta_x, theta_y, kwargs_lens
+    #    )
+    #    # Use the method in multi_plane.hessian_z1z2 as a comparison
+    #    multi_plane = MultiPlane(
+    #        z_source=1.5,
+    #        lens_model_list=lens_model_list,
+    #        lens_redshift_list=redshift_list,
+    #        z_interp_stop=3,
+    #        cosmo_interp=False,
+    #    )
+    #    (
+    #        f_xx_expected,
+    #        f_xy_expected,
+    #        f_yx_expected,
+    #        f_yy_expected,
+    #    ) = multi_plane.hessian_z1z2(
+    #        z1=z1, z2=z2, theta_x=theta_x, theta_y=theta_y, kwargs_lens=kwargs_lens
+    #    )
+    #    npt.assert_array_almost_equal(f_xx, f_xx_expected, decimal=5)
+    #    npt.assert_array_almost_equal(f_xy, f_xy_expected, decimal=5)
+    #    npt.assert_array_almost_equal(f_yx, f_yx_expected, decimal=5)
+    #    npt.assert_array_almost_equal(f_yy, f_yy_expected, decimal=5)
 
 
 class TestRaise(unittest.TestCase):
@@ -297,10 +309,10 @@ class TestRaise(unittest.TestCase):
             f_x, f_y = lensModel.alpha(1, 1, kwargs, diff=0.0001)
         with self.assertRaises(ValueError):
             lensModel = LensModel(["NFW"], multi_plane=True, lens_redshift_list=[1])
-        with self.assertRaises(ValueError):
-            kwargs = [{"alpha_Rs": 1, "Rs": 0.5, "center_x": 0, "center_y": 0}]
-            lensModel = LensModel(["NFW"], multi_plane=False)
-            t_arrival = lensModel.arrival_time(1, 1, kwargs)
+        #with self.assertRaises(ValueError):
+        #    kwargs = [{"alpha_Rs": 1, "Rs": 0.5, "center_x": 0, "center_y": 0}]
+        #    lensModel = LensModel(["NFW"], multi_plane=False)
+        #    t_arrival = lensModel.arrival_time(1, 1, kwargs)
         with self.assertRaises(ValueError):
             z_lens = 0.5
             z_source = 1.5
@@ -345,30 +357,30 @@ class TestRaise(unittest.TestCase):
                 lens_redshift_list=[0.5, 0.5, 0.5],
             )
 
-    def test_hessian_z1z2_raise(self):
-        lensModel = LensModel(
-            lens_model_list=["SIS"],
-            multi_plane=True,
-            lens_redshift_list=[1],
-            z_source=2,
-        )
-        kwargs = [{"theta_E": 1, "center_x": 0, "center_y": 0}]
+    #def test_hessian_z1z2_raise(self):
+    #    lensModel = LensModel(
+    #        lens_model_list=["SIS"],
+    #        multi_plane=True,
+    #        lens_redshift_list=[1],
+    #        z_source=2,
+    #    )
+    #    kwargs = [{"theta_E": 1, "center_x": 0, "center_y": 0}]
 
-        # Test when the model is not in multi-plane mode
-        lensModel_non_multi = LensModel(
-            lens_model_list=["SIS"],
-            multi_plane=False,
-            lens_redshift_list=[1],
-            z_source=2,
-        )
-        with self.assertRaises(ValueError):
-            lensModel_non_multi.hessian_z1z2(0.5, 1.5, 1, 1, kwargs)
+    #    # Test when the model is not in multi-plane mode
+    #    lensModel_non_multi = LensModel(
+    #        lens_model_list=["SIS"],
+    #        multi_plane=False,
+    #        lens_redshift_list=[1],
+    #        z_source=2,
+    #    )
+    #    with self.assertRaises(ValueError):
+    #        lensModel_non_multi.hessian_z1z2(0.5, 1.5, 1, 1, kwargs)
 
-        # Test when z1 >= z2
-        with self.assertRaises(ValueError):
-            lensModel.hessian_z1z2(1.5, 1.5, 1, 1, kwargs)
-        with self.assertRaises(ValueError):
-            lensModel.hessian_z1z2(2.0, 1.5, 1, 1, kwargs)
+    #    # Test when z1 >= z2
+    #    with self.assertRaises(ValueError):
+    #        lensModel.hessian_z1z2(1.5, 1.5, 1, 1, kwargs)
+    #    with self.assertRaises(ValueError):
+    #        lensModel.hessian_z1z2(2.0, 1.5, 1, 1, kwargs)
 
 
 if __name__ == "__main__":
