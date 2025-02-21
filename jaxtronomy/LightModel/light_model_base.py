@@ -20,6 +20,7 @@ _JAXXED_MODELS = [
     "SERSIC",
     "SERSIC_ELLIPSE",
     "SERSIC_ELLIPSE_Q_PHI",
+    "SHAPELETS",
     "CORE_SERSIC",
 ]
 
@@ -124,10 +125,10 @@ class LightModelBase(object):
                     CoreSersic(smoothing=smoothing, sersic_major_axis=sersic_major_axis)
                 )
 
-            # elif profile_type == "SHAPELETS":
-            #     from lenstronomy.LightModel.Profiles.shapelets import ShapeletSet
+            elif profile_type == "SHAPELETS":
+                from jaxtronomy.LightModel.Profiles.shapelets import ShapeletSet
 
-            #     self.func_list.append(ShapeletSet())
+                self.func_list.append(ShapeletSet())
             # elif profile_type == "SHAPELETS_ELLIPSE":
             #     from lenstronomy.LightModel.Profiles.shapelets_ellipse import (
             #         ShapeletSetEllipse,
