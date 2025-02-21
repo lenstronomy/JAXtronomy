@@ -117,7 +117,7 @@ class TestSinglePlane(object):
         )
 
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.lensModel_ref.hessian(
-            x=1.0, y=1.0, kwargs=self.kwargs, k=(0,1)
+            x=1.0, y=1.0, kwargs=self.kwargs, k=(0, 1)
         )
 
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=6)
