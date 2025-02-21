@@ -141,7 +141,7 @@ class TestLensModel(object):
         npt.assert_array_almost_equal(delta_x, delta_x_ref, decimal=6)
         npt.assert_array_almost_equal(delta_y, delta_y_ref, decimal=6)
 
-    #def test_arrival_time(self):
+    # def test_arrival_time(self):
     #    z_lens = 0.5
     #    z_source = 1.5
     #    x_image, y_image = 1.0, 0.0
@@ -184,39 +184,39 @@ class TestLensModel(object):
         x_image, y_image = 1.032, -2.0234
         lensModel = LensModel(
             lens_model_list=["SIS"],
-            #multi_plane=True,
-            #lens_redshift_list=[z_lens],
-            #z_lens=z_lens,
-            #z_source=z_source,
+            # multi_plane=True,
+            # lens_redshift_list=[z_lens],
+            # z_lens=z_lens,
+            # z_source=z_source,
         )
         lensModel_ref = LensModel_ref(
             lens_model_list=["SIS"],
-            #multi_plane=True,
-            #lens_redshift_list=[z_lens],
-            #z_lens=z_lens,
-            #z_source=z_source,
+            # multi_plane=True,
+            # lens_redshift_list=[z_lens],
+            # z_lens=z_lens,
+            # z_source=z_source,
         )
         kwargs = [{"theta_E": 1.0, "center_x": 0.0, "center_y": 0.0}]
         fermat_pot = lensModel.fermat_potential(x_image, y_image, kwargs)
         fermat_pot_ref = lensModel_ref.fermat_potential(x_image, y_image, kwargs)
-        #arrival_time = lensModel.arrival_time(x_image, y_image, kwargs)
-        #arrival_time_from_fermat_pot = lensModel._lensCosmo.time_delay_units(fermat_pot)
+        # arrival_time = lensModel.arrival_time(x_image, y_image, kwargs)
+        # arrival_time_from_fermat_pot = lensModel._lensCosmo.time_delay_units(fermat_pot)
         npt.assert_allclose(fermat_pot, fermat_pot_ref, rtol=1e-10, atol=1e-10)
 
     def test_curl(self):
-        #z_lens_list = [0.2, 0.8]
-        #z_source = 1.5
+        # z_lens_list = [0.2, 0.8]
+        # z_source = 1.5
         lensModel = LensModel(
             lens_model_list=["SIS", "SIS"],
-            #multi_plane=True,
-            #lens_redshift_list=z_lens_list,
-            #z_source=z_source,
+            # multi_plane=True,
+            # lens_redshift_list=z_lens_list,
+            # z_source=z_source,
         )
         lensModel_ref = LensModel_ref(
             lens_model_list=["SIS", "SIS"],
-            #multi_plane=True,
-            #lens_redshift_list=z_lens_list,
-            #z_source=z_source,
+            # multi_plane=True,
+            # lens_redshift_list=z_lens_list,
+            # z_source=z_source,
         )
         kwargs = [
             {"theta_E": 1.0, "center_x": 0.0, "center_y": 0.0},
@@ -258,7 +258,7 @@ class TestLensModel(object):
         npt.assert_array_almost_equal(f_yx_sq, f_yx, decimal=5)
         npt.assert_array_almost_equal(f_yy_sq, f_yy, decimal=5)
 
-    #def test_hessian_z1z2(self):
+    # def test_hessian_z1z2(self):
     #    z_source = 1.5
     #    lens_model_list = ["SIS"]
     #    kwargs_lens = [{"theta_E": 1}]
@@ -309,7 +309,7 @@ class TestRaise(unittest.TestCase):
             f_x, f_y = lensModel.alpha(1, 1, kwargs, diff=0.0001)
         with self.assertRaises(ValueError):
             lensModel = LensModel(["NFW"], multi_plane=True, lens_redshift_list=[1])
-        #with self.assertRaises(ValueError):
+        # with self.assertRaises(ValueError):
         #    kwargs = [{"alpha_Rs": 1, "Rs": 0.5, "center_x": 0, "center_y": 0}]
         #    lensModel = LensModel(["NFW"], multi_plane=False)
         #    t_arrival = lensModel.arrival_time(1, 1, kwargs)
@@ -357,7 +357,7 @@ class TestRaise(unittest.TestCase):
                 lens_redshift_list=[0.5, 0.5, 0.5],
             )
 
-    #def test_hessian_z1z2_raise(self):
+    # def test_hessian_z1z2_raise(self):
     #    lensModel = LensModel(
     #        lens_model_list=["SIS"],
     #        multi_plane=True,

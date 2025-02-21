@@ -112,8 +112,10 @@ class LensModel(object):
                 )
 
             if decouple_multi_plane:
-                raise ValueError("decouple multi plane lens model not supported in jaxtronomy yet")
-                #self.lens_model = MultiPlaneDecoupled(
+                raise ValueError(
+                    "decouple multi plane lens model not supported in jaxtronomy yet"
+                )
+                # self.lens_model = MultiPlaneDecoupled(
                 #    z_source,
                 #    lens_model_list,
                 #    lens_redshift_list,
@@ -127,10 +129,12 @@ class LensModel(object):
                 #    kwargs_interp=kwargs_interp,
                 #    kwargs_synthesis=kwargs_synthesis,
                 #    **kwargs_multiplane_model
-                #)
+                # )
             else:
-                raise ValueError("multi plane lens model not supported in jaxtronomy yet")
-                #self.lens_model = MultiPlane(
+                raise ValueError(
+                    "multi plane lens model not supported in jaxtronomy yet"
+                )
+                # self.lens_model = MultiPlane(
                 #    z_source,
                 #    lens_model_list,
                 #    lens_redshift_list,
@@ -144,7 +148,7 @@ class LensModel(object):
                 #    kwargs_interp=kwargs_interp,
                 #    kwargs_synthesis=kwargs_synthesis,
                 #    distance_ratio_sampling=distance_ratio_sampling,
-                #)
+                # )
 
         else:
             if los_effects is True:
@@ -208,7 +212,7 @@ class LensModel(object):
             return self.lens_model.fermat_potential(
                 x_image, y_image, kwargs_lens, x_source, y_source
             )
-        #elif hasattr(self.lens_model, "arrival_time") and hasattr(self, "_lensCosmo"):
+        # elif hasattr(self.lens_model, "arrival_time") and hasattr(self, "_lensCosmo"):
         #    dt = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
         #    fermat_pot_eff = (
         #        dt
@@ -225,9 +229,9 @@ class LensModel(object):
                 "effective Fermat potential is evaluated"
             )
 
-    #def arrival_time(
+    # def arrival_time(
     #    self, x_image, y_image, kwargs_lens, kappa_ext=0, x_source=None, y_source=None
-    #):
+    # ):
     #    """Arrival time of images relative to a straight line without lensing. Negative
     #    values correspond to images arriving earlier, and positive signs correspond to
     #    images arriving later.
@@ -451,7 +455,7 @@ class LensModel(object):
         :return: f_xxx, f_xxy, f_xyy, f_yyy
         """
         if hessian_diff:
-            hessian_diff_ = diff/4
+            hessian_diff_ = diff / 4
         else:
             hessian_diff_ = None
         f_xx_dx, f_xy_dx, f_yx_dx, f_yy_dx = self.hessian(
@@ -556,8 +560,8 @@ class LensModel(object):
         :param x: x-coordinate
         :param y: y-coordinate
         :param kwargs: lens model keyword argument list
-        :param k: int, list of ints or None, indicating a subset of lens models to
-            be evaluated
+        :param k: int, list of ints or None, indicating a subset of lens models to be
+            evaluated
         :param diff: float, scale of the finite differential (diff/2 in each direction
             used to compute the differential
         :return: f_xx, f_xy, f_yx, f_yy
@@ -575,8 +579,8 @@ class LensModel(object):
 
         return f_xx, f_xy, f_yx, f_yy
 
-    #@partial(jit, static_argnums=(0,))
-    #def hessian_z1z2(self, z1, z2, theta_x, theta_y, kwargs_lens, diff=0.00000001):
+    # @partial(jit, static_argnums=(0,))
+    # def hessian_z1z2(self, z1, z2, theta_x, theta_y, kwargs_lens, diff=0.00000001):
     #    """Computes Hessian matrix when Observed at z1 with rays going to z2 with z1 <
     #    z2 for multi_plane.
 
