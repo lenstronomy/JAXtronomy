@@ -110,11 +110,6 @@ class LensModel(object):
                 raise ValueError(
                     "LOS effects and multi-plane lensing are incompatible."
                 )
-
-            if decouple_multi_plane:
-                raise ValueError(
-                    "decouple multi plane lens model not supported in jaxtronomy yet"
-                )
                 # self.lens_model = MultiPlaneDecoupled(
                 #    z_source,
                 #    lens_model_list,
