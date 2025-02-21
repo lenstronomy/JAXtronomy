@@ -171,6 +171,8 @@ class TestRaise(unittest.TestCase):
             lighModel = LightModel(light_model_list=["SERSIC"])
             lighModel.profile_type_list = ["WRONG"]
             lighModel.total_flux(kwargs_list=[{}])
+        with self.assertRaises(ValueError):
+            lightmodel = LightModel(light_model_list=["SERSIC"], source_redshift_list=[1, 3])
 
 
 if __name__ == "__main__":
