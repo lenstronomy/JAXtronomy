@@ -42,26 +42,51 @@ class TestSinglePlane(object):
             {
                 "gamma1": 0.1,
                 "gamma2": 0.3,
-            }
+            },
         ]
 
     def test_fermat_potential(self):
-        output = self.lensModel.fermat_potential(x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=0)
-        output_ref = self.lensModel_ref.fermat_potential(x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=0)
+        output = self.lensModel.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=0
+        )
+        output_ref = self.lensModel_ref.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=0
+        )
         npt.assert_array_almost_equal(output, output_ref, decimal=8)
 
-        output = self.lensModel.fermat_potential(x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs)
-        output_ref = self.lensModel_ref.fermat_potential(x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs)
+        output = self.lensModel.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs
+        )
+        output_ref = self.lensModel_ref.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs
+        )
         npt.assert_array_almost_equal(output, output_ref, decimal=8)
 
-        output = self.lensModel.fermat_potential(x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=(0,1))
-        output_ref = self.lensModel_ref.fermat_potential(x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=(0,1))
+        output = self.lensModel.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=(0, 1)
+        )
+        output_ref = self.lensModel_ref.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=(0, 1)
+        )
         npt.assert_array_almost_equal(output, output_ref, decimal=8)
 
-        output = self.lensModel.fermat_potential(x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, x_source=3.1, y_source=2.7, k=(0,1))
-        output_ref = self.lensModel_ref.fermat_potential(x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, x_source=3.1, y_source=2.7, k=(0,1))
+        output = self.lensModel.fermat_potential(
+            x_image=1.0,
+            y_image=1.0,
+            kwargs_lens=self.kwargs,
+            x_source=3.1,
+            y_source=2.7,
+            k=(0, 1),
+        )
+        output_ref = self.lensModel_ref.fermat_potential(
+            x_image=1.0,
+            y_image=1.0,
+            kwargs_lens=self.kwargs,
+            x_source=3.1,
+            y_source=2.7,
+            k=(0, 1),
+        )
         npt.assert_array_almost_equal(output, output_ref, decimal=8)
-
 
     def test_potential(self):
         output = self.lensModel.potential(x=1.0, y=1.0, kwargs=self.kwargs, k=0)
@@ -72,8 +97,10 @@ class TestSinglePlane(object):
         output_ref = self.lensModel_ref.potential(x=1.0, y=1.0, kwargs=self.kwargs)
         npt.assert_array_almost_equal(output, output_ref, decimal=8)
 
-        output = self.lensModel.potential(x=1.0, y=1.0, kwargs=self.kwargs, k=(0,1))
-        output_ref = self.lensModel_ref.potential(x=1.0, y=1.0, kwargs=self.kwargs, k=(0,1))
+        output = self.lensModel.potential(x=1.0, y=1.0, kwargs=self.kwargs, k=(0, 1))
+        output_ref = self.lensModel_ref.potential(
+            x=1.0, y=1.0, kwargs=self.kwargs, k=(0, 1)
+        )
         npt.assert_array_almost_equal(output, output_ref, decimal=8)
 
     def test_alpha(self):

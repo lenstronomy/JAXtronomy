@@ -324,7 +324,7 @@ class SinglePlaneLOS(SinglePlane):
 
         return f_xx, f_xy, f_yx, f_yy
 
-    @partial(jit, static_argnums=(0,3))
+    @partial(jit, static_argnums=(0, 3))
     def mass_3d(self, r, kwargs, k=None):
         """Computes the mass within a 3d sphere of radius r *for the main lens only*
 
@@ -343,7 +343,7 @@ class SinglePlaneLOS(SinglePlane):
 
         return mass_3d
 
-    @partial(jit, static_argnums=(0,3))
+    @partial(jit, static_argnums=(0, 3))
     def mass_2d(self, r, kwargs, k=None):
         """Computes the mass enclosed a projected (2d) radius r *for the main lens only*
 
@@ -368,7 +368,7 @@ class SinglePlaneLOS(SinglePlane):
 
         return mass_2d
 
-    @partial(jit, static_argnums=(0,3))
+    @partial(jit, static_argnums=(0, 3))
     def density(self, r, kwargs, k=None):
         """3d mass density at radius r *for the main lens only* The integral in the LOS
         projection of this quantity results in the convergence quantity.
@@ -388,7 +388,7 @@ class SinglePlaneLOS(SinglePlane):
 
         return density
 
-    @partial(jit, static_argnums=(0,4))
+    @partial(jit, static_argnums=(0, 4))
     def potential(self, x, y, kwargs, k=None):
         """Lensing potential *of the main lens only* In the presence of LOS corrections,
         the system generally does not admit a potential, in the sense that the curl of
