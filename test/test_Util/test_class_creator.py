@@ -43,6 +43,9 @@ class TestClassCreator(object):
             "index_lens_light_model_list": [[0]],
             "index_point_source_model_list": [[0]],
             "point_source_frame_list": [[0]],
+            "optical_depth_model_list": ["UNIFORM"],
+            "index_optical_depth_model_list": [[0]],
+            "tau0_index_list": [0],
         }
         self.kwargs_model_4 = {
             "lens_model_list": ["SIS", "SIS"],
@@ -213,21 +216,6 @@ class TestRaise(unittest.TestCase):
             class_creator.create_class_instances(
                 source_redshift_list=[1], **kwargs_model
             )
-
-        kwargs_model = {
-            "lens_model_list": ["SIS", "SIS"],
-            "lens_redshift_list": [0.3, 0.4],
-            "multi_plane": True,
-            "observed_convention_index": [0],
-            "index_lens_model_list": [[0]],
-            "z_source": 1,
-            "optical_depth_model_list": ["UNIFORM"],
-            "index_optical_depth_model_list": [[0]],
-            "tau0_index_list": [0],
-            "point_source_frame_list": [[0]],
-        }
-        with self.assertRaises(ValueError):
-            class_creator.create_class_instances(**kwargs_model)
 
 
 if __name__ == "__main__":
