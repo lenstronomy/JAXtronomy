@@ -3,8 +3,8 @@ from jaxtronomy.LensModel.single_plane import SinglePlane
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
 
 # TODO: Implement multi plane
-#from lenstronomy.Cosmo.lens_cosmo import LensCosmo
-#from lenstronomy.Util import constants as const
+# from lenstronomy.Cosmo.lens_cosmo import LensCosmo
+# from lenstronomy.Util import constants as const
 
 from functools import partial
 from jax import jit
@@ -167,7 +167,7 @@ class LensModel(object):
                     kwargs_synthesis=kwargs_synthesis,
                 )
 
-        #if z_lens is not None and z_source is not None:
+        # if z_lens is not None and z_source is not None:
         #    self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
 
     @partial(jit, static_argnums=(0, 4))
@@ -292,10 +292,10 @@ class LensModel(object):
         """
         if diff is None:
             return self.lens_model.alpha(x, y, kwargs, k=k)
-        #elif self.multi_plane is False:
+        # elif self.multi_plane is False:
         else:
             return self._deflection_differential(x, y, kwargs, k=k, diff=diff)
-        #else:
+        # else:
         #    raise ValueError(
         #        "numerical differentiation of lensing potential is not available in the multi-plane "
         #        "setting as analytical form of lensing potential is not available."
