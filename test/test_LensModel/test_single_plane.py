@@ -113,11 +113,24 @@ class TestSinglePlane(object):
 
     def test_hessian(self):
         f_xx, f_xy, f_yx, f_yy = self.lensModel.hessian(
-            x=1.0, y=1.0, kwargs=self.kwargs
+            x=1.0, y=1.0, kwargs=self.kwargs, k=(0, 1)
         )
 
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.lensModel_ref.hessian(
-            x=1.0, y=1.0, kwargs=self.kwargs
+            x=1.0, y=1.0, kwargs=self.kwargs, k=(0,1)
+        )
+
+        npt.assert_almost_equal(f_xx, f_xx_ref, decimal=6)
+        npt.assert_almost_equal(f_xy, f_xy_ref, decimal=6)
+        npt.assert_almost_equal(f_yx, f_yx_ref, decimal=6)
+        npt.assert_almost_equal(f_yy, f_yy_ref, decimal=6)
+
+        f_xx, f_xy, f_yx, f_yy = self.lensModel.hessian(
+            x=1.0, y=1.0, kwargs=self.kwargs, k=0
+        )
+
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.lensModel_ref.hessian(
+            x=1.0, y=1.0, kwargs=self.kwargs, k=0
         )
 
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=6)
