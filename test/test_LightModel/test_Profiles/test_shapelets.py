@@ -51,6 +51,16 @@ class TestShapelets_StableCut(object):
         )
         npt.assert_allclose(result, result_ref, atol=1e-10, rtol=1e-15)
 
+        n1, n2 = 2, 3
+        precalc_shapelet = Shapelets(precalc=True)
+        precalc_shapelet_ref = Shapelets_ref(precalc=True)
+        result = precalc_shapelet.function(x, y, amp, beta, n1, n2, center_x, center_y)
+        result_ref = precalc_shapelet_ref.function(
+            x, y, amp, beta, n1, n2, center_x, center_y
+        )
+        npt.assert_allclose(result, result_ref, atol=1e-10, rtol=1e-15)
+
+
     def test_Hn(self):
         x = np.array([1.3, 3.5, 6.7, 2.5, 13.54, 99])
         n1 = 6

@@ -121,9 +121,7 @@ class Shapelets(object):
         """
 
         if self._precalc:
-            x = jnp.array(x)
-            y = jnp.array(y)
-            return amp * x.at[n1].get() * y.at[n2].get()
+            return amp * x[n1] * y[n2]
 
         x_ = x - center_x
         y_ = y - center_y
