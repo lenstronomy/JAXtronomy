@@ -2,8 +2,9 @@ __author__ = "sibirrer"
 from jaxtronomy.LensModel.single_plane import SinglePlane
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
 
-from lenstronomy.Cosmo.lens_cosmo import LensCosmo
-from lenstronomy.Util import constants as const
+# TODO: Implement multi plane
+#from lenstronomy.Cosmo.lens_cosmo import LensCosmo
+#from lenstronomy.Util import constants as const
 
 from functools import partial
 from jax import jit
