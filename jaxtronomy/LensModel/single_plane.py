@@ -31,6 +31,7 @@ class SinglePlane(ProfileListBase):
         dx, dy = self.alpha(x, y, kwargs, k=k)
         return x - dx, y - dy
 
+    @partial(jit, static_argnums=(0, 6))
     def fermat_potential(
         self, x_image, y_image, kwargs_lens, x_source=None, y_source=None, k=None
     ):

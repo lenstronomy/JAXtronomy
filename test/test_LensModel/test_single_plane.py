@@ -23,12 +23,12 @@ except:
     bool_test = False
 
 
-class TestLensModel(object):
-    """Tests the source model routines."""
+class TestSinglePlane(object):
+    """Tests the Single Plane lens model routines."""
 
     def setup_method(self):
-        self.lensModel = SinglePlane(["EPL"])
-        self.lensModel_ref = SinglePlane_ref(["EPL"])
+        self.lensModel = SinglePlane(["EPL", "SHEAR"])
+        self.lensModel_ref = SinglePlane_ref(["EPL", "SHEAR"])
 
         self.kwargs = [
             {
@@ -38,12 +38,69 @@ class TestLensModel(object):
                 "center_x": 0.3,
                 "center_y": 0.1,
                 "gamma": 1.73,
-            }
+            },
+            {
+                "gamma1": 0.1,
+                "gamma2": 0.3,
+            },
         ]
 
+    def test_fermat_potential(self):
+        output = self.lensModel.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=0
+        )
+        output_ref = self.lensModel_ref.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=0
+        )
+        npt.assert_array_almost_equal(output, output_ref, decimal=8)
+
+        output = self.lensModel.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs
+        )
+        output_ref = self.lensModel_ref.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs
+        )
+        npt.assert_array_almost_equal(output, output_ref, decimal=8)
+
+        output = self.lensModel.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=(0, 1)
+        )
+        output_ref = self.lensModel_ref.fermat_potential(
+            x_image=1.0, y_image=1.0, kwargs_lens=self.kwargs, k=(0, 1)
+        )
+        npt.assert_array_almost_equal(output, output_ref, decimal=8)
+
+        output = self.lensModel.fermat_potential(
+            x_image=1.0,
+            y_image=1.0,
+            kwargs_lens=self.kwargs,
+            x_source=3.1,
+            y_source=2.7,
+            k=(0, 1),
+        )
+        output_ref = self.lensModel_ref.fermat_potential(
+            x_image=1.0,
+            y_image=1.0,
+            kwargs_lens=self.kwargs,
+            x_source=3.1,
+            y_source=2.7,
+            k=(0, 1),
+        )
+        npt.assert_array_almost_equal(output, output_ref, decimal=8)
+
     def test_potential(self):
+        output = self.lensModel.potential(x=1.0, y=1.0, kwargs=self.kwargs, k=0)
+        output_ref = self.lensModel_ref.potential(x=1.0, y=1.0, kwargs=self.kwargs, k=0)
+        npt.assert_array_almost_equal(output, output_ref, decimal=8)
+
         output = self.lensModel.potential(x=1.0, y=1.0, kwargs=self.kwargs)
         output_ref = self.lensModel_ref.potential(x=1.0, y=1.0, kwargs=self.kwargs)
+        npt.assert_array_almost_equal(output, output_ref, decimal=8)
+
+        output = self.lensModel.potential(x=1.0, y=1.0, kwargs=self.kwargs, k=(0, 1))
+        output_ref = self.lensModel_ref.potential(
+            x=1.0, y=1.0, kwargs=self.kwargs, k=(0, 1)
+        )
         npt.assert_array_almost_equal(output, output_ref, decimal=8)
 
     def test_alpha(self):
@@ -56,11 +113,24 @@ class TestLensModel(object):
 
     def test_hessian(self):
         f_xx, f_xy, f_yx, f_yy = self.lensModel.hessian(
-            x=1.0, y=1.0, kwargs=self.kwargs
+            x=1.0, y=1.0, kwargs=self.kwargs, k=(0, 1)
         )
 
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.lensModel_ref.hessian(
-            x=1.0, y=1.0, kwargs=self.kwargs
+            x=1.0, y=1.0, kwargs=self.kwargs, k=(0, 1)
+        )
+
+        npt.assert_almost_equal(f_xx, f_xx_ref, decimal=6)
+        npt.assert_almost_equal(f_xy, f_xy_ref, decimal=6)
+        npt.assert_almost_equal(f_yx, f_yx_ref, decimal=6)
+        npt.assert_almost_equal(f_yy, f_yy_ref, decimal=6)
+
+        f_xx, f_xy, f_yx, f_yy = self.lensModel.hessian(
+            x=1.0, y=1.0, kwargs=self.kwargs, k=0
+        )
+
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.lensModel_ref.hessian(
+            x=1.0, y=1.0, kwargs=self.kwargs, k=0
         )
 
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=6)

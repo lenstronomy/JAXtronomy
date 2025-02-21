@@ -21,10 +21,10 @@ class TestClassCreator(object):
             "index_point_source_model_list": [[0]],
             "band_index": 0,
             "source_deflection_scaling_list": [1],
-            "source_redshift_list": [1],
+            # "source_redshift_list": [1],
             "fixed_magnification_list": [True],
             "additional_images_list": [False],
-            "lens_redshift_list": [0.5],
+            # "lens_redshift_list": [0.5],
             "point_source_frame_list": [[0]],
         }
         self.kwargs_model_2 = {
@@ -43,6 +43,9 @@ class TestClassCreator(object):
             "index_lens_light_model_list": [[0]],
             "index_point_source_model_list": [[0]],
             "point_source_frame_list": [[0]],
+            "optical_depth_model_list": ["UNIFORM"],
+            "index_optical_depth_model_list": [[0]],
+            "tau0_index_list": [0],
         }
         self.kwargs_model_4 = {
             "lens_model_list": ["SIS", "SIS"],
@@ -58,11 +61,11 @@ class TestClassCreator(object):
         }
         self.kwargs_model_5 = {
             "lens_model_list": ["SIS", "SIS"],
-            "lens_redshift_list": [0.3, 0.4],
-            "multi_plane": True,
-            "z_source": 1,
+            # "lens_redshift_list": [0.3, 0.4],
+            # "multi_plane": True,
+            # "z_source": 1,
             "kwargs_multiplane_model_point_source": {},
-            "decouple_multi_plane": False,
+            # "decouple_multi_plane": False,
         }
 
         self.kwargs_psf = {"psf_type": "NONE"}
@@ -99,15 +102,16 @@ class TestClassCreator(object):
         ) = class_creator.create_class_instances(**self.kwargs_model_3)
         assert lens_model_class.lens_model_list[0] == "SIS"
 
-        (
-            lens_model_class,
-            source_model_class,
-            lens_light_model_class,
-            point_source_class,
-            extinction_class,
-        ) = class_creator.create_class_instances(**self.kwargs_model_4)
-        assert lens_model_class.lens_model_list[0] == "SIS"
-        assert lens_model_class.lens_model._observed_convention_index[0] == 0
+        # TODO: implement multiplane
+        # (
+        #    lens_model_class,
+        #    source_model_class,
+        #    lens_light_model_class,
+        #    point_source_class,
+        #    extinction_class,
+        # ) = class_creator.create_class_instances(**self.kwargs_model_4)
+        # assert lens_model_class.lens_model_list[0] == "SIS"
+        # assert lens_model_class.lens_model._observed_convention_index[0] == 0
 
         (
             lens_model_class,
@@ -192,6 +196,38 @@ class TestRaise(unittest.TestCase):
                 image_likelihood_mask_list=None,
                 band_index=0,
             )
+        kwargs_model = {
+            "lens_model_list": ["SIS"],
+            "source_light_model_list": ["SERSIC"],
+            "lens_light_model_list": ["SERSIC"],
+            "point_source_model_list": ["LENSED_POSITION"],
+            "index_lens_model_list": [[0]],
+            "index_source_light_model_list": [[0]],
+            "index_lens_light_model_list": [[0]],
+            "index_point_source_model_list": [[0]],
+            "band_index": 0,
+            "source_deflection_scaling_list": [1],
+            "fixed_magnification_list": [True],
+            "additional_images_list": [False],
+            "lens_redshift_list": [0.5],
+            "point_source_frame_list": [[0]],
+        }
+        with self.assertRaises(ValueError):
+            class_creator.create_class_instances(
+                source_redshift_list=[1], **kwargs_model
+            )
+
+        kwargs_model = {
+            "lens_model_list": ["SIS", "SIS"],
+            "lens_redshift_list": [0.3, 0.4],
+            "multi_plane": True,
+            "observed_convention_index": [0],
+            "index_lens_model_list": [[0]],
+            "z_source": 1,
+            "point_source_frame_list": [[0]],
+        }
+        with self.assertRaises(ValueError):
+            class_creator.create_class_instances(**kwargs_model)
 
 
 if __name__ == "__main__":
