@@ -166,8 +166,8 @@ class LensModel(object):
                     kwargs_synthesis=kwargs_synthesis,
                 )
 
-        if z_lens is not None and z_source is not None:
-            self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
+        #if z_lens is not None and z_source is not None:
+        #    self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
 
     @partial(jit, static_argnums=(0, 4))
     def ray_shooting(self, x, y, kwargs, k=None):
@@ -203,10 +203,10 @@ class LensModel(object):
         :return: fermat potential in arcsec**2 without geometry term (second part of Eqn
             1 in Suyu et al. 2013) as a list
         """
-        if hasattr(self.lens_model, "fermat_potential"):
-            return self.lens_model.fermat_potential(
-                x_image, y_image, kwargs_lens, x_source, y_source
-            )
+        # if hasattr(self.lens_model, "fermat_potential"):
+        return self.lens_model.fermat_potential(
+            x_image, y_image, kwargs_lens, x_source, y_source
+        )
         # elif hasattr(self.lens_model, "arrival_time") and hasattr(self, "_lensCosmo"):
         #    dt = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
         #    fermat_pot_eff = (
@@ -218,11 +218,11 @@ class LensModel(object):
         #        / const.arcsec**2
         #    )
         #    return fermat_pot_eff
-        else:
-            raise ValueError(
-                "In multi-plane lensing you need to provide a specific z_lens and z_source for which the "
-                "effective Fermat potential is evaluated"
-            )
+        # else:
+        #     raise ValueError(
+        #         "In multi-plane lensing you need to provide a specific z_lens and z_source for which the "
+        #         "effective Fermat potential is evaluated"
+        #     )
 
     # def arrival_time(
     #    self, x_image, y_image, kwargs_lens, kappa_ext=0, x_source=None, y_source=None
@@ -291,13 +291,14 @@ class LensModel(object):
         """
         if diff is None:
             return self.lens_model.alpha(x, y, kwargs, k=k)
-        elif self.multi_plane is False:
-            return self._deflection_differential(x, y, kwargs, k=k, diff=diff)
+        #elif self.multi_plane is False:
         else:
-            raise ValueError(
-                "numerical differentiation of lensing potential is not available in the multi-plane "
-                "setting as analytical form of lensing potential is not available."
-            )
+            return self._deflection_differential(x, y, kwargs, k=k, diff=diff)
+        #else:
+        #    raise ValueError(
+        #        "numerical differentiation of lensing potential is not available in the multi-plane "
+        #        "setting as analytical form of lensing potential is not available."
+        #    )
 
     @partial(jit, static_argnums=(0, 4, 6))
     def hessian(self, x, y, kwargs, k=None, diff=None, diff_method="square"):
