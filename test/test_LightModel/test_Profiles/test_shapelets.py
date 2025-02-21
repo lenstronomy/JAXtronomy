@@ -3,10 +3,15 @@ import pytest
 import numpy.testing as npt
 
 import jax
+
 jax.config.update("jax_enable_x64", True)
 
 from jaxtronomy.LightModel.Profiles.shapelets import Shapelets, ShapeletSet
-from lenstronomy.LightModel.Profiles.shapelets import Shapelets as Shapelets_ref, ShapeletSet as ShapeletSet_ref
+from lenstronomy.LightModel.Profiles.shapelets import (
+    Shapelets as Shapelets_ref,
+    ShapeletSet as ShapeletSet_ref,
+)
+
 
 class TestShapelets_StableCut(object):
 
@@ -41,7 +46,9 @@ class TestShapelets_StableCut(object):
         center_y = np.linspace(-0.5, 0.1, 6)
 
         result = self.shapelet.function(x, y, amp, beta, n1, n2, center_x, center_y)
-        result_ref = self.shapelet_ref.function(x, y, amp, beta, n1, n2, center_x, center_y)
+        result_ref = self.shapelet_ref.function(
+            x, y, amp, beta, n1, n2, center_x, center_y
+        )
         npt.assert_allclose(result, result_ref, atol=1e-10, rtol=1e-15)
 
     def test_Hn(self):
@@ -78,15 +85,19 @@ class TestShapelets_StableCut(object):
         center_x = np.linspace(-0.3, 0.4, 6)
         center_y = np.linspace(-0.5, 0.1, 6)
         phi_x, phi_y = self.shapelet.pre_calc(x, y, beta, n1, center_x, center_y)
-        phi_x_ref, phi_y_ref = self.shapelet_ref.pre_calc(x, y, beta, n1, center_x, center_y)
+        phi_x_ref, phi_y_ref = self.shapelet_ref.pre_calc(
+            x, y, beta, n1, center_x, center_y
+        )
         npt.assert_allclose(phi_x, phi_x_ref, atol=1e-10, rtol=1e-15)
         npt.assert_allclose(phi_y, phi_y_ref, atol=1e-10, rtol=1e-15)
-        npt.assert_raises(ValueError, self.shapelet.pre_calc, x, y, beta, 171, center_x, center_y)
+        npt.assert_raises(
+            ValueError, self.shapelet.pre_calc, x, y, beta, 171, center_x, center_y
+        )
 
 
 class TestShapelets_NoStableCut(object):
 
-    def setup_method(self):  
+    def setup_method(self):
         self.shapelet = Shapelets(stable_cut=False)
         self.shapelet_ref = Shapelets_ref(stable_cut=False)
 
@@ -114,7 +125,9 @@ class TestShapelets_NoStableCut(object):
         center_y = np.linspace(-0.5, 0.1, 6)
 
         result = self.shapelet.function(x, y, amp, beta, n1, n2, center_x, center_y)
-        result_ref = self.shapelet_ref.function(x, y, amp, beta, n1, n2, center_x, center_y)
+        result_ref = self.shapelet_ref.function(
+            x, y, amp, beta, n1, n2, center_x, center_y
+        )
         npt.assert_allclose(result, result_ref, atol=1e-10, rtol=1e-15)
 
     def test_Hn(self):
@@ -152,7 +165,9 @@ class TestShapelets_NoStableCut(object):
         center_x = np.linspace(-0.3, 0.4, 6)
         center_y = np.linspace(-0.5, 0.1, 6)
         phi_x, phi_y = self.shapelet.pre_calc(x, y, beta, n1, center_x, center_y)
-        phi_x_ref, phi_y_ref = self.shapelet_ref.pre_calc(x, y, beta, n1, center_x, center_y)
+        phi_x_ref, phi_y_ref = self.shapelet_ref.pre_calc(
+            x, y, beta, n1, center_x, center_y
+        )
         npt.assert_allclose(phi_x, phi_x_ref, atol=1e-10, rtol=1e-15)
         npt.assert_allclose(phi_y, phi_y_ref, atol=1e-10, rtol=1e-15)
 
@@ -172,16 +187,20 @@ class TestShapeletSet(object):
 
         n_max = 4
         num_param = int((n_max + 1) * (n_max + 2) / 2)
-        amp = np.linspace(1., 100., num_param)
+        amp = np.linspace(1.0, 100.0, num_param)
         result = self.shapeletset.function(x, y, amp, n_max, beta, center_x, center_y)
-        result_ref = self.shapeletset_ref.function(x, y, amp, n_max, beta, center_x, center_y)
+        result_ref = self.shapeletset_ref.function(
+            x, y, amp, n_max, beta, center_x, center_y
+        )
         npt.assert_allclose(result, result_ref, atol=1e-10, rtol=1e-15)
 
         n_max = 12
         num_param = int((n_max + 1) * (n_max + 2) / 2)
-        amp = np.linspace(1., 100., num_param)
+        amp = np.linspace(1.0, 100.0, num_param)
         result = self.shapeletset.function(y, x, amp, n_max, beta, center_x, center_y)
-        result_ref = self.shapeletset_ref.function(y, x, amp, n_max, beta, center_x, center_y)
+        result_ref = self.shapeletset_ref.function(
+            y, x, amp, n_max, beta, center_x, center_y
+        )
         npt.assert_allclose(result, result_ref, atol=1e-10, rtol=1e-15)
 
 

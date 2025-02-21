@@ -7,6 +7,7 @@ import numpy as np
 
 from jaxtronomy.Util.herm_util import eval_hermite, hermval
 
+
 class Shapelets(object):
     """Class for 2d cartesian Shapelets.
 
@@ -74,7 +75,9 @@ class Shapelets(object):
         """
         # Interpolation is actually slower than calculating the hermite polynomials normally using JAX
         if interpolation:
-            raise ValueError("interpolation feature for Shapelets is not supported in jaxtronomy")
+            raise ValueError(
+                "interpolation feature for Shapelets is not supported in jaxtronomy"
+            )
 
         self._precalc = precalc
         self._stable_cut = stable_cut
@@ -121,7 +124,7 @@ class Shapelets(object):
             x = jnp.array(x)
             y = jnp.array(y)
             return amp * x.at[n1].get() * y.at[n2].get()
-        
+
         x_ = x - center_x
         y_ = y - center_y
         return jnp.nan_to_num(
@@ -158,8 +161,8 @@ class Shapelets(object):
 
     @partial(jit, static_argnums=(0, 4))
     def pre_calc(self, x, y, beta, n_order, center_x, center_y):
-        """Calculates the phi_n(x) and phi_n(y) for a given x-array and y-array for the full
-        order in the polynomials.
+        """Calculates the phi_n(x) and phi_n(y) for a given x-array and y-array for the
+        full order in the polynomials.
 
         :param x: x-coordinates (jax.numpy array)
         :param y: y-coordinates (jax.numpy array)
@@ -184,7 +187,7 @@ class Shapelets(object):
         H_y = H_y.at[1].set(2 * y_)
 
         prefactor = jnp.zeros(n_order + 1, dtype=float)
-        prefactor = prefactor.at[0].set(1.0 / (jnp.pi)**(1./4.))
+        prefactor = prefactor.at[0].set(1.0 / (jnp.pi) ** (1.0 / 4.0))
         prefactor = prefactor.at[1].set(prefactor[0] / jnp.sqrt(2))
 
         exp_x = jnp.exp(-(x_**2) / 2.0)
@@ -193,25 +196,29 @@ class Shapelets(object):
         def body_fun(n, val):
             H_x, H_y, prefactor = val
 
-            new_Hx = 2 * x_ * H_x.at[n-1].get() - 2 * (n-1) * H_x.at[n-2].get()
+            new_Hx = 2 * x_ * H_x.at[n - 1].get() - 2 * (n - 1) * H_x.at[n - 2].get()
             H_x = H_x.at[n].set(new_Hx)
 
-            new_Hy = 2 * y_ * H_y.at[n-1].get() - 2 * (n-1) * H_y.at[n-2].get()
+            new_Hy = 2 * y_ * H_y.at[n - 1].get() - 2 * (n - 1) * H_y.at[n - 2].get()
             H_y = H_y.at[n].set(new_Hy)
 
-            new_prefactor = prefactor.at[n-1].get() / jnp.sqrt(2 * n)
+            new_prefactor = prefactor.at[n - 1].get() / jnp.sqrt(2 * n)
             prefactor = prefactor.at[n].set(new_prefactor)
 
             return H_x, H_y, prefactor
-        
-        H_x, H_y, prefactor = lax.fori_loop(2, n_order + 1, body_fun, (H_x, H_y, prefactor))
+
+        H_x, H_y, prefactor = lax.fori_loop(
+            2, n_order + 1, body_fun, (H_x, H_y, prefactor)
+        )
 
         if self._stable_cut:
             cut_threshold = np.sqrt(n_order + 2) * self._cut_scale
-            cut_x, cut_y = jnp.where(x_ < cut_threshold, 1, 0), jnp.where(y_ < cut_threshold, 1, 0)
+            cut_x, cut_y = jnp.where(x_ < cut_threshold, 1, 0), jnp.where(
+                y_ < cut_threshold, 1, 0
+            )
         else:
             cut_x, cut_y = jnp.ones_like(x_), jnp.ones_like(y_)
-            
+
         phi_x = ((H_x * cut_x * exp_x).T * prefactor).T
         phi_y = ((H_y * cut_y * exp_y).T * prefactor).T
         return phi_x, phi_y
@@ -253,6 +260,7 @@ class ShapeletSet(object):
         n1 = 0
         n2 = 0
         phi_x, phi_y = self.shapelets.pre_calc(x, y, beta, n_max, center_x, center_y)
+
         def body_fun(i, val):
             f_, n1, n2 = val
             f_ += amp[i] * phi_x.at[n1].get() * phi_y.at[n2].get()
