@@ -189,7 +189,7 @@ class TestGaussian(object):
         npt.assert_array_almost_equal(amp3d_ref, amp3d, decimal=6)
 
     def test_num_integral(self):
-        r = np.array([0.1, 1.0, 2.7, 3.4, 5.9])
+        r = np.array([0.1, 1.0, 2.7, 3.4, 5.9, 85])
         c = 0.4
         result_ref = []
         for i in range(len(r)):
