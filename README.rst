@@ -38,7 +38,119 @@ The goal of this library is to reimplement lenstronomy functionalities in pure J
 - Code should be pip installable on any machine, no compilation required.
 - Any notable differences between the JAX and reference implementations will be clearly documented.
 
+Performance comparison between jaxtronomy and lenstronomy
+---------------------------------------------------------
 
+We compare the runtimes between jaxtronomy and lenstronomy by timing 10,000 function executions. These tests were done on one CPU. We expect the performance boosts to be even higher on GPU. A notebook for runtime comparisons is provided.
+
+**LensModel ray-tracing**
+
+The table below shows the approximate ratios of jaxtronomy runtimes to lenstronomy runtimes in percentages for different deflector profiles and different grid sizes.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Deflector Profile
+     - 60x60 grid
+     - 180x180 grid
+   * - CONVERGENCE
+     - 64%
+     - 58%
+   * - CSE
+     - 24%
+     - 18%
+   * - EPL
+     - 8%
+     - 8%
+   * - EPL_Q_PHI
+     - 322%
+     - 321%
+   * - GAUSSIAN
+     - 47%
+     - 46%
+   * - GAUSSIAN_POTENTIAL
+     - 53%
+     - 49%
+   * - HERNQUIST
+     - 49%
+     - 68%
+   * - HERNQUIST_ELLIPSE_CSE
+     - 24%
+     - 25%
+   * - LOS
+     - 42%
+     - 38%
+   * - LOS_MINIMAL
+     - 39%
+     - 39%
+   * - NFW
+     - 49%
+     - 47%
+   * - NFW_ELLIPSE_CSE
+     - 19%
+     - 21%
+   * - NIE
+     - 77%
+     - 81%
+   * - PJAFFE
+     - 42%
+     - 42%
+   * - PJAFFE_ELLIPSE_POTENTIAL
+     - 32%
+     - 32%
+   * - SHEAR
+     - 54%
+     - 49%
+   * - SIE
+     - 83%
+     - 84%
+   * - SIS
+     - 30%
+     - 25%
+   * - SPP
+     - 69%
+     - 65%
+
+**LightModel surface brightness**
+
+The table below shows the approximate ratios of jaxtronomy runtimes to lenstronomy runtimes in percentages for different source profiles and different grid sizes.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Source Profile
+     - 60x60 grid
+     - 180x180 grid
+   * - CORE_SERSIC
+     - 24%
+     - 20%
+   * - GAUSSIAN
+     - 28%
+     - 30%
+   * - GAUSSIAN_ELLIPSE
+     - 43%
+     - 44%
+   * - MULTI_GAUSSIAN (5 components)
+     - 17%
+     - 15%
+   * - MULTI_GAUSSIAN_ELLIPSE (5 components)
+     - 13%
+     - 17%
+   * - SERSIC
+     - 27%
+     - 26%
+   * - SERSIC_ELLIPSE
+     - 27%
+     - 25%
+   * - SERSIC_ELLIPSE_Q_PHI
+     - 31%
+     - 26%
+   * - SHAPELETS (n_max = 6)
+     - 11%
+     - 12%
+   * - SHAPELETS (n_max = 10)
+     - 5%
+     - 5%
 
 Related software packages
 -------------------------
