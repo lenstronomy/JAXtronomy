@@ -1,7 +1,7 @@
 from jaxtronomy.LensModel.Profiles.pseudo_jaffe import PseudoJaffe
 import jaxtronomy.Util.param_util as param_util
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
-import jax.numpy as jnp
+from jax import jit, numpy as jnp
 import numpy as np
 
 __all__ = ["PseudoJaffeEllipsePotential"]
@@ -61,20 +61,24 @@ class PseudoJaffeEllipsePotential(LensProfileBase):
         "center_y": 100,
     }
 
-    def __init__(self):
-        self.spherical = PseudoJaffe()
-        self._diff = 0.000001
-        super(PseudoJaffeEllipsePotential, self).__init__()
+    # Define these as class variables instead of instance variables to avoid recompiling
+    # upon creating multiple instances of PseudoJaffeEllipsePotential
+    spherical = PseudoJaffe()
+    _diff = 0.000001
 
-    def function(self, x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0):
+    @staticmethod
+    @jit
+    def function(x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0):
         """Returns double integral of NFW profile."""
         x_, y_ = param_util.transform_e1e2_square_average(
             x, y, e1, e2, center_x, center_y
         )
-        f_ = self.spherical.function(x_, y_, sigma0, Ra, Rs)
+        f_ = PseudoJaffeEllipsePotential.spherical.function(x_, y_, sigma0, Ra, Rs)
         return f_
 
-    def derivatives(self, x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0):
+    @staticmethod
+    @jit
+    def derivatives(x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0):
         """Returns df/dx and df/dy of the function (integral of NFW)"""
         phi_G, q = param_util.ellipticity2phi_q(e1, e2)
         x_, y_ = param_util.transform_e1e2_square_average(
@@ -83,7 +87,7 @@ class PseudoJaffeEllipsePotential(LensProfileBase):
         e = param_util.q2e(q)
         cos_phi = jnp.cos(phi_G)
         sin_phi = jnp.sin(phi_G)
-        f_x_prim, f_y_prim = self.spherical.derivatives(
+        f_x_prim, f_y_prim = PseudoJaffeEllipsePotential.spherical.derivatives(
             x_, y_, sigma0, Ra, Rs, center_x=0, center_y=0
         )
         f_x_prim *= jnp.sqrt(1 - e)
@@ -92,17 +96,19 @@ class PseudoJaffeEllipsePotential(LensProfileBase):
         f_y = sin_phi * f_x_prim + cos_phi * f_y_prim
         return f_x, f_y
 
-    def hessian(self, x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0):
+    @staticmethod
+    @jit
+    def hessian(x, y, sigma0, Ra, Rs, e1, e2, center_x=0, center_y=0):
         """Returns Hessian matrix of function d^2f/dx^2, d^2/dxdy, d^2/dydx,
         d^f/dy^2."""
-        alpha_ra, alpha_dec = self.derivatives(
+        alpha_ra, alpha_dec = PseudoJaffeEllipsePotential.derivatives(
             x, y, sigma0, Ra, Rs, e1, e2, center_x, center_y
         )
-        diff = self._diff
-        alpha_ra_dx, alpha_dec_dx = self.derivatives(
+        diff = PseudoJaffeEllipsePotential._diff
+        alpha_ra_dx, alpha_dec_dx = PseudoJaffeEllipsePotential.derivatives(
             x + diff, y, sigma0, Ra, Rs, e1, e2, center_x, center_y
         )
-        alpha_ra_dy, alpha_dec_dy = self.derivatives(
+        alpha_ra_dy, alpha_dec_dy = PseudoJaffeEllipsePotential.derivatives(
             x, y + diff, sigma0, Ra, Rs, e1, e2, center_x, center_y
         )
 
@@ -113,7 +119,9 @@ class PseudoJaffeEllipsePotential(LensProfileBase):
 
         return f_xx, f_xy, f_yx, f_yy
 
-    def mass_3d_lens(self, r, sigma0, Ra, Rs, e1=0, e2=0):
+    @staticmethod
+    @jit
+    def mass_3d_lens(r, sigma0, Ra, Rs, e1=0, e2=0):
         """
 
         :param r:
@@ -124,4 +132,4 @@ class PseudoJaffeEllipsePotential(LensProfileBase):
         :param e2:
         :return:
         """
-        return self.spherical.mass_3d_lens(r, sigma0, Ra, Rs)
+        return PseudoJaffeEllipsePotential.spherical.mass_3d_lens(r, sigma0, Ra, Rs)

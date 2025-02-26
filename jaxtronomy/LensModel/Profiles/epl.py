@@ -131,6 +131,7 @@ class EPL(LensProfileBase):
         return b, t, q, phi_G
 
     # NOTE: Do not jit-decorate this function; it won't work correctly
+    # This function would also need to be called outside of a jit'd environment
     def set_static(self, theta_E, gamma, e1, e2, center_x=0, center_y=0):
         """
 
@@ -151,6 +152,7 @@ class EPL(LensProfileBase):
         ) = EPL._param_conv(theta_E, gamma, e1, e2)
 
     # NOTE: Do not jit-decorate this function; it won't work correctly
+    # This function would also need to be called outside of a jit'd environment
     def set_dynamic(self):
         """
         :return:
@@ -399,26 +401,11 @@ class EPLQPhi(LensProfileBase):
         "center_y": 100,
     }
 
-    def __init__(self):
-        self._EPL = EPL()
-        super(EPLQPhi, self).__init__()
+    _EPL = EPL()
 
-    # --------------------------------------------------------------------------------
-    # Makes it so that the functions in this class will not recompile when new
-    # instances of EPLQPhi are created
-    def _tree_flatten(self):
-        children = ()
-        aux_data = {}
-        return (children, aux_data)
-
-    @classmethod
-    def _tree_unflatten(cls, aux_data, children):
-        return cls(*children, **aux_data)
-
-    # --------------------------------------------------------------------------------
-
+    @staticmethod
     @jit
-    def function(self, x, y, theta_E, gamma, q, phi, center_x=0, center_y=0):
+    def function(x, y, theta_E, gamma, q, phi, center_x=0, center_y=0):
         """
 
         :param x: x-coordinate in image plane
@@ -432,10 +419,11 @@ class EPLQPhi(LensProfileBase):
         :return: lensing potential
         """
         e1, e2 = param_util.phi_q2_ellipticity(phi, q)
-        return self._EPL.function(x, y, theta_E, gamma, e1, e2, center_x, center_y)
+        return EPLQPhi._EPL.function(x, y, theta_E, gamma, e1, e2, center_x, center_y)
 
+    @staticmethod
     @jit
-    def derivatives(self, x, y, theta_E, gamma, q, phi, center_x=0, center_y=0):
+    def derivatives(x, y, theta_E, gamma, q, phi, center_x=0, center_y=0):
         """
 
         :param x: x-coordinate in image plane
@@ -449,10 +437,11 @@ class EPLQPhi(LensProfileBase):
         :return: alpha_x, alpha_y
         """
         e1, e2 = param_util.phi_q2_ellipticity(phi, q)
-        return self._EPL.derivatives(x, y, theta_E, gamma, e1, e2, center_x, center_y)
+        return EPLQPhi._EPL.derivatives(x, y, theta_E, gamma, e1, e2, center_x, center_y)
 
+    @staticmethod
     @jit
-    def hessian(self, x, y, theta_E, gamma, q, phi, center_x=0, center_y=0):
+    def hessian(x, y, theta_E, gamma, q, phi, center_x=0, center_y=0):
         """
 
         :param x: x-coordinate in image plane
@@ -466,10 +455,11 @@ class EPLQPhi(LensProfileBase):
         :return: f_xx, f_xy, f_yx, f_yy
         """
         e1, e2 = param_util.phi_q2_ellipticity(phi, q)
-        return self._EPL.hessian(x, y, theta_E, gamma, e1, e2, center_x, center_y)
+        return EPLQPhi._EPL.hessian(x, y, theta_E, gamma, e1, e2, center_x, center_y)
 
+    @staticmethod
     @jit
-    def mass_3d_lens(self, r, theta_E, gamma, q=None, phi=None):
+    def mass_3d_lens(r, theta_E, gamma, q=None, phi=None):
         """Computes the spherical power-law mass enclosed (with SPP routine).
 
         :param r: radius within the mass is computed
@@ -479,10 +469,11 @@ class EPLQPhi(LensProfileBase):
         :param phi: position angle (not used)
         :return: mass enclosed a 3D radius r.
         """
-        return self._EPL.mass_3d_lens(r, theta_E, gamma)
+        return EPLQPhi._EPL.mass_3d_lens(r, theta_E, gamma)
 
+    @staticmethod
     @jit
-    def density_lens(self, r, theta_E, gamma, q=None, phi=None):
+    def density_lens(r, theta_E, gamma, q=None, phi=None):
         """Computes the density at 3d radius r given lens model parameterization. The
         integral in the LOS projection of this quantity results in the convergence
         quantity.
@@ -494,8 +485,7 @@ class EPLQPhi(LensProfileBase):
         :param phi: position angle (not used)
         :return: mass enclosed a 3D radius r
         """
-        return self._EPL.density_lens(r, theta_E, gamma)
+        return EPLQPhi._EPL.density_lens(r, theta_E, gamma)
 
 
 tree_util.register_pytree_node(EPL, EPL._tree_flatten, EPL._tree_unflatten)
-tree_util.register_pytree_node(EPLQPhi, EPLQPhi._tree_flatten, EPLQPhi._tree_unflatten)
