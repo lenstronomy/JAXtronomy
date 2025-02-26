@@ -49,7 +49,7 @@ class Gaussian(LensProfileBase):
         c = 1.0 / (2 * sigma_x * sigma_y)
         num_int = Gaussian._num_integral(r, c)
         amp_density = Gaussian._amp2d_to_3d(amp, sigma_x, sigma_y)
-        amp2d = amp_density / (np.sqrt(2. * np.pi) * jnp.sqrt(sigma_x * sigma_y))
+        amp2d = amp_density / (np.sqrt(2.0 * np.pi) * jnp.sqrt(sigma_x * sigma_y))
         amp2d *= 2 * 1.0 / (2 * c)
         return num_int * amp2d
 
@@ -57,8 +57,10 @@ class Gaussian(LensProfileBase):
     @jit
     def _num_integral(r, c):
         """Numerical integral of (1-e^{-c*x^2})/x dx from 0 to r calculated using
-        Weddle's rule on 100 subintervals. If r is an array of size n, then there are n
-        integrals which are computed in parallel.
+        Weddle's rule on 100 subintervals.
+
+        If r is an array of size n, then there are n integrals which are computed in
+        parallel.
         :param r: radius
         :param c: 1/2sigma^2
         :return: Array with the same shape as r containing the result for each integral
@@ -71,8 +73,10 @@ class Gaussian(LensProfileBase):
         coeffs = np.array([1, 5, 1, 6, 1, 5, 1], dtype=float) / 20
 
         def weddles_rule(i, sum):
-            x = (jnp.ones((7, len(r))) * subinterval_widths).T * (jnp.linspace(0., 1., 7) + i)
-            f_x = (1. - jnp.exp(-c * x**2))/x
+            x = (jnp.ones((7, len(r))) * subinterval_widths).T * (
+                jnp.linspace(0.0, 1.0, 7) + i
+            )
+            f_x = (1.0 - jnp.exp(-c * x**2)) / x
             f_x = jnp.where(x == 0, 0, f_x)
             sum += subinterval_widths * jnp.sum(f_x * coeffs, axis=1)
             return sum
@@ -205,11 +209,11 @@ class Gaussian(LensProfileBase):
         :param sigma_x: standard deviation of Gaussian in x direction
         :param sigma_y: standard deviation of Gaussian in y direction
         """
-        c = 1.0 / (2. * sigma_x * sigma_y)
+        c = 1.0 / (2.0 * sigma_x * sigma_y)
         A = Gaussian._amp2d_to_3d(amp, sigma_x, sigma_y) * (
-            np.sqrt(2. / np.pi) * jnp.sqrt(sigma_x * sigma_y)
+            np.sqrt(2.0 / np.pi) * jnp.sqrt(sigma_x * sigma_y)
         )
-        return 1.0 / R**2 * (-1. + (1. + 2. * c * R**2) * jnp.exp(-c * R**2)) * A
+        return 1.0 / R**2 * (-1.0 + (1.0 + 2.0 * c * R**2) * jnp.exp(-c * R**2)) * A
 
     @staticmethod
     @jit
@@ -230,7 +234,9 @@ class Gaussian(LensProfileBase):
             / (2 * c)
             * (
                 -R * jnp.exp(-c * R**2)
-                + jax.scipy.special.erf(jnp.sqrt(c) * R) * np.sqrt(np.pi / 4.) * jnp.sqrt(1./c)
+                + jax.scipy.special.erf(jnp.sqrt(c) * R)
+                * np.sqrt(np.pi / 4.0)
+                * jnp.sqrt(1.0 / c)
             )
         )
         return result * A * 4 * np.pi

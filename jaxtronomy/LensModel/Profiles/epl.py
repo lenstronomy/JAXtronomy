@@ -437,7 +437,9 @@ class EPLQPhi(LensProfileBase):
         :return: alpha_x, alpha_y
         """
         e1, e2 = param_util.phi_q2_ellipticity(phi, q)
-        return EPLQPhi._EPL.derivatives(x, y, theta_E, gamma, e1, e2, center_x, center_y)
+        return EPLQPhi._EPL.derivatives(
+            x, y, theta_E, gamma, e1, e2, center_x, center_y
+        )
 
     @staticmethod
     @jit
