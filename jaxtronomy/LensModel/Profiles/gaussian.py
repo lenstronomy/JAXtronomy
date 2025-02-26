@@ -74,7 +74,7 @@ class Gaussian(LensProfileBase):
             x = (jnp.ones((7, len(r))) * subinterval_widths).T * (jnp.linspace(0., 1., 7) + i)
             f_x = (1. - jnp.exp(-c * x**2))/x
             f_x = jnp.where(x == 0, 0, f_x)
-            sum += subinterval_widths * jnp.dot(f_x, coeffs)
+            sum += subinterval_widths * jnp.sum(f_x * coeffs, axis=1)
             return sum
 
         sum = jnp.zeros_like(r, dtype=float)
