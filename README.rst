@@ -113,7 +113,7 @@ The table below shows how much faster jaxtronomy is compared to lenstronomy for 
 
 **LightModel surface brightness**
 
-The table below shows the approximate ratios of jaxtronomy runtimes to lenstronomy runtimes in percentages for different source profiles and different grid sizes.
+The table below shows how much faster jaxtronomy is compared to lenstronomy for different source profiles and different grid sizes.
 
 .. list-table::
    :header-rows: 1
