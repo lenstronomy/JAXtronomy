@@ -62,7 +62,7 @@ The table below shows the approximate ratios of jaxtronomy runtimes to lenstrono
    * - EPL
      - 8%
      - 8%
-   * - EPL vs EPL_NUMBA
+   * - EPL (jax) vs EPL_NUMBA
      - 79%
      - 73%
    * - EPL_Q_PHI
