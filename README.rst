@@ -55,64 +55,64 @@ The table below shows the approximate ratios of jaxtronomy runtimes to lenstrono
      - 180x180 grid
    * - CONVERGENCE
      - 64%
-     - 58%
+     - 15%
    * - CSE
      - 24%
-     - 18%
+     - 17%
    * - EPL
      - 8%
-     - 8%
+     - 6%
    * - EPL (jax) vs EPL_NUMBA
      - 79%
-     - 73%
+     - 60%
    * - EPL_Q_PHI
      - 322%
-     - 321%
+     - 252%
    * - GAUSSIAN
      - 47%
-     - 46%
+     - 27%
    * - GAUSSIAN_POTENTIAL
      - 53%
-     - 49%
+     - 33%
    * - HERNQUIST
      - 49%
-     - 68%
+     - 57%
    * - HERNQUIST_ELLIPSE_CSE
      - 24%
-     - 25%
+     - 20%
    * - LOS
      - 42%
-     - 38%
+     - 14%
    * - LOS_MINIMAL
      - 39%
-     - 39%
+     - 14%
    * - NFW
      - 49%
-     - 47%
+     - 30%
    * - NFW_ELLIPSE_CSE
      - 19%
-     - 21%
+     - 16%
    * - NIE
      - 77%
-     - 81%
+     - 55%
    * - PJAFFE
      - 42%
-     - 42%
+     - 40%
    * - PJAFFE_ELLIPSE_POTENTIAL
      - 32%
      - 32%
    * - SHEAR
      - 54%
-     - 49%
+     - 22%
    * - SIE
      - 83%
-     - 84%
+     - 55%
    * - SIS
      - 30%
-     - 25%
+     - 23%
    * - SPP
      - 69%
-     - 65%
+     - 43%
 
 **LightModel surface brightness**
 
@@ -126,34 +126,34 @@ The table below shows the approximate ratios of jaxtronomy runtimes to lenstrono
      - 180x180 grid
    * - CORE_SERSIC
      - 24%
-     - 20%
+     - 7%
    * - GAUSSIAN
      - 28%
-     - 30%
+     - 10%
    * - GAUSSIAN_ELLIPSE
      - 43%
-     - 44%
+     - 13%
    * - MULTI_GAUSSIAN (5 components)
      - 17%
-     - 15%
+     - 5%
    * - MULTI_GAUSSIAN_ELLIPSE (5 components)
      - 13%
-     - 17%
+     - 6%
    * - SERSIC
      - 27%
-     - 26%
+     - 10%
    * - SERSIC_ELLIPSE
      - 27%
-     - 25%
+     - 10%
    * - SERSIC_ELLIPSE_Q_PHI
      - 31%
-     - 26%
+     - 10%
    * - SHAPELETS (n_max = 6)
      - 11%
-     - 12%
+     - 25%
    * - SHAPELETS (n_max = 10)
      - 5%
-     - 5%
+     - 20%
 
 Related software packages
 -------------------------
