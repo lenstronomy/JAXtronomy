@@ -20,10 +20,6 @@ class Gaussian(LensProfileBase):
     """This class contains functions to evaluate a Gaussian convergence and calculates
     its derivative and hessian matrix."""
 
-    # NOTE: Since there is no scipy.integrate.quad function in JAX,
-    #       the _num_integral function is implemented using Boole's rule,
-    #       resulting in numerical differences from lenstronomy.
-
     param_names = ["amp", "sigma", "center_x", "center_y"]
     lower_limit_default = {"amp": 0, "sigma": 0, "center_x": -100, "center_y": -100}
     upper_limit_default = {"amp": 100, "sigma": 100, "center_x": 100, "center_y": 100}
@@ -59,10 +55,11 @@ class Gaussian(LensProfileBase):
         """Numerical integral of (1-e^{-c*x^2})/x dx from 0 to r calculated using
         Weddle's rule on 100 subintervals.
 
-        If r is an array of size n, then there are n integrals which are computed in
-        parallel.
-        :param r: radius
-        :param c: 1/2sigma^2
+        If r is an array of size n, then there are n integrals which are computed vectorially.
+        This differs from lenstronomy's implementation, where r can only be a scalar.
+
+        :param r: array-like, radius
+        :param c: float, 1/2sigma^2
         :return: Array with the same shape as r containing the result for each integral
         """
         r = jnp.array(r)
@@ -73,11 +70,16 @@ class Gaussian(LensProfileBase):
         coeffs = np.array([1, 5, 1, 6, 1, 5, 1], dtype=float) / 20
 
         def weddles_rule(i, sum):
+            """Computes the integral of f_x over the i-th subinterval using Weddle's rule.
+            See https://mathworld.wolfram.com/WeddlesRule.html for details.
+            """
             x = (jnp.ones((7, len(r))) * subinterval_widths).T * (
                 jnp.linspace(0.0, 1.0, 7) + i
             )
+            # This function has a removable discontinuity at x = 0
             f_x = (1.0 - jnp.exp(-c * x**2)) / x
             f_x = jnp.where(x == 0, 0, f_x)
+            
             sum += subinterval_widths * jnp.sum(f_x * coeffs, axis=1)
             return sum
 
