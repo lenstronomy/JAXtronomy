@@ -1,6 +1,6 @@
 __author__ = "sibirrer"
 
-from jax import numpy as jnp, grad
+from jax import numpy as jnp, grad, jit
 import pytest
 import numpy as np
 import numpy.testing as npt
@@ -14,6 +14,11 @@ from lenstronomy.Data.psf import PSF
 from jaxtronomy.Sampling.likelihood import LikelihoodModule
 from lenstronomy.Sampling.likelihood import LikelihoodModule as LikelihoodModule_ref
 
+from jaxtronomy.LensModel.profile_list_base import _JAXXED_MODELS as JAXXED_DEFLECTOR_PROFILES
+from jaxtronomy.LightModel.light_model_base import _JAXXED_MODELS as JAXXED_SOURCE_PROFILES
+from jaxtronomy.LensModel.lens_model import LensModel
+from jaxtronomy.LightModel.light_model import LightModel
+from jaxtronomy.Sampling.likelihood import ImageLikelihood
 
 class TestLikelihoodModule(object):
     """Test the fitting sequences."""
@@ -313,6 +318,58 @@ class TestLikelihoodModule(object):
         assert Likelihood.logL(args) == -1e18
         assert Likelihood.logL(args) == Likelihood_ref.logL(args)
 
+    def test_lensmodel_autodifferentiation(self):
+        for deflector_profile in JAXXED_DEFLECTOR_PROFILES:
+            print(deflector_profile)
+            lensModel = LensModel([deflector_profile])
+            kwargs_model = {
+                "lens_model_list": [deflector_profile],
+                "lens_light_model_list": [],
+                "source_light_model_list": [],
+            }
+            likelihood = ImageLikelihood(
+                kwargs_model=kwargs_model,
+                **self.kwargs_data_joint,
+            )
+
+            kwargs_lens = lensModel.lens_model.func_list[0].lower_limit_default
+            for key,val in kwargs_lens.items():
+                kwargs_lens[key] = float(val)
+            print(kwargs_lens)
+
+            # don't care about the return value, just check that this runs
+            test_autodiff = jit(grad(_logL, argnums=1), static_argnums=0)(likelihood, [kwargs_lens], None)
+
+    def test_lightmodel_autodifferentiation(self):
+        for source_profile in JAXXED_SOURCE_PROFILES:
+            # TODO: fix autodifferentiation with shapelets
+            if source_profile == "SHAPELETS":
+                pass
+            print(source_profile)
+            lightModel = LightModel([source_profile])
+            kwargs_model = {
+                "lens_model_list": [],
+                "lens_light_model_list": [],
+                "source_light_model_list": [source_profile],
+            }
+            likelihood = ImageLikelihood(
+                kwargs_model=kwargs_model,
+                **self.kwargs_data_joint,
+            )
+
+            kwargs_source = lightModel.func_list[0].lower_limit_default
+            for key,val in kwargs_source.items():
+                if source_profile in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE", "SHAPELETS"] and key in ["amp", "sigma"]:
+                    kwargs_source[key] = [float(val)]
+                else:
+                    kwargs_source[key] = float(val)
+            print(kwargs_source)
+
+            # don't care about the return value, just check that this runs
+            test_autodiff = jit(grad(_logL, argnums=2), static_argnums=0)(likelihood, None, [kwargs_source])
+
+def _logL(imagelikelihood, kwargs_lens, kwargs_source):
+    return imagelikelihood.logL(kwargs_lens, kwargs_source)[0]
 
 if __name__ == "__main__":
     pytest.main()

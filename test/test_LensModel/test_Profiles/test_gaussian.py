@@ -15,11 +15,6 @@ from jaxtronomy.LensModel.Profiles.gaussian_potential import GaussianPotential
 
 jax.config.update("jax_enable_x64", True)
 
-# NOTE: Since there is no scipy.integrate.quad function in JAX,
-#       the _num_integral function is implemented using trapezoidal
-#       integration, resulting in numerical differences from lenstronomy.
-#       It is accurate up to 4 decimal places.
-
 
 class TestGaussian(object):
     def setup_method(self):
@@ -202,7 +197,7 @@ class TestGaussian(object):
         result_ref = np.array(result_ref)
 
         result = self.profile._num_integral(r, c)
-        npt.assert_array_almost_equal(result_ref, result, decimal=4)
+        npt.assert_array_almost_equal(result_ref, result, decimal=8)
 
 
 class TestGaussianPotential(object):
