@@ -1,5 +1,5 @@
 import numpy as np
-import jax.numpy as jnp
+from jax import jit, numpy as jnp
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
 __all__ = ["PseudoJaffe"]
@@ -58,12 +58,13 @@ class PseudoJaffe(LensProfileBase):
         "center_y": 100,
     }
 
-    def __init__(self):
-        """"""
-        LensProfileBase.__init__(self)
-        self._s = 0.0001
+    # Define this as class variable instead of instance variable to avoid recompiling
+    # upon creating multiple instances of PseudoJaffe
+    _s = 0.0001
 
-    def density(self, r, rho0, Ra, Rs):
+    @staticmethod
+    @jit
+    def density(r, rho0, Ra, Rs):
         """Computes the density.
 
         :param r: radial distance from the center (in 3D)
@@ -72,11 +73,13 @@ class PseudoJaffe(LensProfileBase):
         :param Rs: transition radius from logarithmic slope -2 to -4
         :return: density at r
         """
-        Ra, Rs = self._sort_ra_rs(Ra, Rs)
+        Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
         rho = rho0 / ((1 + (r / Ra) ** 2) * (1 + (r / Rs) ** 2))
         return rho
 
-    def density_2d(self, x, y, rho0, Ra, Rs, center_x=0, center_y=0):
+    @staticmethod
+    @jit
+    def density_2d(x, y, rho0, Ra, Rs, center_x=0, center_y=0):
         """Projected density.
 
         :param x: projected coordinate on the sky
@@ -88,11 +91,11 @@ class PseudoJaffe(LensProfileBase):
         :param center_y: center of profile
         :return: projected density
         """
-        Ra, Rs = self._sort_ra_rs(Ra, Rs)
+        Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
         x_ = x - center_x
         y_ = y - center_y
         r = jnp.sqrt(x_**2 + y_**2)
-        sigma0 = self.rho2sigma(rho0, Ra, Rs)
+        sigma0 = PseudoJaffe.rho2sigma(rho0, Ra, Rs)
         sigma = (
             sigma0
             * Ra
@@ -102,7 +105,9 @@ class PseudoJaffe(LensProfileBase):
         )
         return sigma
 
-    def mass_3d(self, r, rho0, Ra, Rs):
+    @staticmethod
+    @jit
+    def mass_3d(r, rho0, Ra, Rs):
         """Mass enclosed a 3d sphere or radius r.
 
         :param r: radial distance from the center (in 3D)
@@ -122,7 +127,9 @@ class PseudoJaffe(LensProfileBase):
         )
         return m_3d
 
-    def mass_3d_lens(self, r, sigma0, Ra, Rs):
+    @staticmethod
+    @jit
+    def mass_3d_lens(r, sigma0, Ra, Rs):
         """Mass enclosed a 3d sphere or radius r given a lens parameterization with
         angular units.
 
@@ -132,10 +139,12 @@ class PseudoJaffe(LensProfileBase):
         :param Rs: transition radius from logarithmic slope -2 to -4
         :return: M(<r) in angular units (modulo critical mass density)
         """
-        rho0 = self.sigma2rho(sigma0, Ra, Rs)
-        return self.mass_3d(r, rho0, Ra, Rs)
+        rho0 = PseudoJaffe.sigma2rho(sigma0, Ra, Rs)
+        return PseudoJaffe.mass_3d(r, rho0, Ra, Rs)
 
-    def mass_2d(self, r, rho0, Ra, Rs):
+    @staticmethod
+    @jit
+    def mass_2d(r, rho0, Ra, Rs):
         """Mass enclosed projected 2d sphere of radius r.
 
         :param r: radial distance from the center in projection
@@ -144,8 +153,8 @@ class PseudoJaffe(LensProfileBase):
         :param Rs: transition radius from logarithmic slope -2 to -4
         :return: Sigma(<r)
         """
-        Ra, Rs = self._sort_ra_rs(Ra, Rs)
-        sigma0 = self.rho2sigma(rho0, Ra, Rs)
+        Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
+        sigma0 = PseudoJaffe.rho2sigma(rho0, Ra, Rs)
         m_2d = (
             2
             * np.pi
@@ -157,7 +166,9 @@ class PseudoJaffe(LensProfileBase):
         )
         return m_2d
 
-    def mass_tot(self, rho0, Ra, Rs):
+    @staticmethod
+    @jit
+    def mass_tot(rho0, Ra, Rs):
         """Total mass within the profile.
 
         :param rho0: density normalization (see class documentation above)
@@ -165,12 +176,14 @@ class PseudoJaffe(LensProfileBase):
         :param Rs: transition radius from logarithmic slope -2 to -4
         :return: total mass
         """
-        Ra, Rs = self._sort_ra_rs(Ra, Rs)
-        sigma0 = self.rho2sigma(rho0, Ra, Rs)
+        Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
+        sigma0 = PseudoJaffe.rho2sigma(rho0, Ra, Rs)
         m_tot = 2 * np.pi * sigma0 * Ra * Rs
         return m_tot
 
-    def grav_pot(self, r, rho0, Ra, Rs):
+    @staticmethod
+    @jit
+    def grav_pot(r, rho0, Ra, Rs):
         """Gravitational potential (modulo 4 pi G and rho0 in appropriate units)
 
         :param r: radial distance from the center (in 3D)
@@ -179,7 +192,7 @@ class PseudoJaffe(LensProfileBase):
         :param Rs: transition radius from logarithmic slope -2 to -4
         :return: gravitational potential (modulo 4 pi G and rho0 in appropriate units)
         """
-        Ra, Rs = self._sort_ra_rs(Ra, Rs)
+        Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
         pot = (
             4
             * np.pi
@@ -195,7 +208,9 @@ class PseudoJaffe(LensProfileBase):
         )
         return pot
 
-    def function(self, x, y, sigma0, Ra, Rs, center_x=0, center_y=0):
+    @staticmethod
+    @jit
+    def function(x, y, sigma0, Ra, Rs, center_x=0, center_y=0):
         """Lensing potential.
 
         :param x: projected coordinate on the sky
@@ -208,7 +223,7 @@ class PseudoJaffe(LensProfileBase):
         :param center_y: center of profile
         :return: lensing potential
         """
-        Ra, Rs = self._sort_ra_rs(Ra, Rs)
+        Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
         x_ = x - center_x
         y_ = y - center_y
         r = jnp.sqrt(x_**2 + y_**2)
@@ -227,7 +242,9 @@ class PseudoJaffe(LensProfileBase):
         )
         return f_
 
-    def derivatives(self, x, y, sigma0, Ra, Rs, center_x=0, center_y=0):
+    @staticmethod
+    @jit
+    def derivatives(x, y, sigma0, Ra, Rs, center_x=0, center_y=0):
         """Deflection angles.
 
         :param x: projected coordinate on the sky
@@ -240,21 +257,19 @@ class PseudoJaffe(LensProfileBase):
         :param center_y: center of profile
         :return: f_x, f_y
         """
-        Ra, Rs = self._sort_ra_rs(Ra, Rs)
+        Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
         x_ = x - center_x
         y_ = y - center_y
         r = jnp.sqrt(x_**2 + y_**2)
-        # if isinstance(r, int) or isinstance(r, float):
-        #     r = max(self._s, r)
-        # else:
-        #     r[r < self._s] = self._s
-        r = jnp.where(r < self._s, self._s, r)
-        alpha_r = 2 * sigma0 * Ra * Rs / (Rs - Ra) * self._f_A20(r / Ra, r / Rs)
+        r = jnp.where(r < PseudoJaffe._s, PseudoJaffe._s, r)
+        alpha_r = 2 * sigma0 * Ra * Rs / (Rs - Ra) * PseudoJaffe._f_A20(r / Ra, r / Rs)
         f_x = alpha_r * x_ / r
         f_y = alpha_r * y_ / r
         return f_x, f_y
 
-    def hessian(self, x, y, sigma0, Ra, Rs, center_x=0, center_y=0):
+    @staticmethod
+    @jit
+    def hessian(x, y, sigma0, Ra, Rs, center_x=0, center_y=0):
         """Hessian of lensing potential.
 
         :param x: projected coordinate on the sky
@@ -267,15 +282,11 @@ class PseudoJaffe(LensProfileBase):
         :param center_y: center of profile
         :return: f_xx, f_xy, f_yx, f_yy
         """
-        Ra, Rs = self._sort_ra_rs(Ra, Rs)
+        Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
         x_ = x - center_x
         y_ = y - center_y
         r = jnp.sqrt(x_**2 + y_**2)
-        # if isinstance(r, int) or isinstance(r, float):
-        #     r = max(self._s, r)
-        # else:
-        #     r[r < self._s] = self._s
-        r = jnp.where(r < self._s, self._s, r)
+        r = jnp.where(r < PseudoJaffe._s, PseudoJaffe._s, r)
         gamma = (
             sigma0
             * Ra
@@ -307,7 +318,9 @@ class PseudoJaffe(LensProfileBase):
         f_xy = gamma2
         return f_xx, f_xy, f_xy, f_yy
 
-    def _f_A20(self, r_a, r_s):
+    @staticmethod
+    @jit
+    def _f_A20(r_a, r_s):
         """Equation A20 in Eliasdottir (2007)
 
         :param r_a: r/Ra
@@ -316,7 +329,9 @@ class PseudoJaffe(LensProfileBase):
         """
         return r_a / (1 + jnp.sqrt(1 + r_a**2)) - r_s / (1 + jnp.sqrt(1 + r_s**2))
 
-    def rho2sigma(self, rho0, Ra, Rs):
+    @staticmethod
+    @jit
+    def rho2sigma(rho0, Ra, Rs):
         """Converts 3d density into 2d projected density parameter, Equation A4 in
         Eliasdottir (2007)
 
@@ -328,7 +343,9 @@ class PseudoJaffe(LensProfileBase):
         """
         return np.pi * rho0 * Ra * Rs / (Rs + Ra)
 
-    def sigma2rho(self, sigma0, Ra, Rs):
+    @staticmethod
+    @jit
+    def sigma2rho(sigma0, Ra, Rs):
         """Inverse of rho2sigma()
 
         :param sigma0: projected density normalization
@@ -340,6 +357,7 @@ class PseudoJaffe(LensProfileBase):
         return (Rs + Ra) / Ra / Rs / np.pi * sigma0
 
     @staticmethod
+    @jit
     def _sort_ra_rs(Ra, Rs):
         """Sorts Ra and Rs to make sure Rs > Ra.
 
@@ -350,7 +368,6 @@ class PseudoJaffe(LensProfileBase):
         # makes sure these parameters do not go below some small values
         Ra = jnp.where(Ra < 1e-4, 1e-4, Ra)
         Rs = jnp.where(Rs < 1e-4, 1e-4, Rs)
-        # NOTE: the following swap of values *may* cause issues with JAX autodiff
-        Ra = jnp.where(Rs < Ra, Rs, Ra)
-        Rs = jnp.where(Rs < Ra, Ra, Rs)
+        # Autodifferentiation works with swaps
+        Ra, Rs = jnp.where(Rs < Ra, Rs, Ra), jnp.where(Rs < Ra, Ra, Rs)
         return Ra, Rs

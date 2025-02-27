@@ -38,7 +38,113 @@ The goal of this library is to reimplement lenstronomy functionalities in pure J
 - Code should be pip installable on any machine, no compilation required.
 - Any notable differences between the JAX and reference implementations will be clearly documented.
 
+Performance comparison between jaxtronomy and lenstronomy
+---------------------------------------------------------
 
+We compare the runtimes between jaxtronomy and lenstronomy by timing 10,000 function executions. These tests were done on one CPU. We expect the performance boosts to be even higher on GPU. A notebook for runtime comparisons is provided.
+
+**LensModel ray-shooting**
+
+The table below shows how much faster jaxtronomy is compared to lenstronomy for different deflector profiles and different grid sizes.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Deflector Profile
+     - 60x60 grid
+     - 180x180 grid
+   * - CONVERGENCE
+     - 1.5x
+     - 6.9x
+   * - CSE
+     - 5.7x
+     - 10.1x
+   * - EPL (jax) vs EPL_NUMBA
+     - 1.3x
+     - 2.2x
+   * - EPL_Q_PHI
+     - 0.3x
+     - 0.4x
+   * - GAUSSIAN
+     - 2.1x
+     - 3.3x
+   * - GAUSSIAN_POTENTIAL
+     - 1.9x
+     - 3.1x
+   * - HERNQUIST
+     - 1.6x
+     - 2.7x
+   * - HERNQUIST_ELLIPSE_CSE
+     - 4.7x
+     - 5.9x
+   * - LOS
+     - 2.9x
+     - 7.6x
+   * - LOS_MINIMAL
+     - 2.8x
+     - 8.1x
+   * - NFW
+     - 2.0x
+     - 4.0x
+   * - NFW_ELLIPSE_CSE
+     - 5.4x
+     - 7.0x
+   * - NIE
+     - 1.4x
+     - 1.9x
+   * - PJAFFE
+     - 2.4x
+     - 2.4x
+   * - PJAFFE_ELLIPSE_POTENTIAL
+     - 3.1x
+     - 3.1x
+   * - SHEAR
+     - 2.1x
+     - 5.3x
+   * - SIE
+     - 1.2x
+     - 1.9x
+   * - SIS
+     - 3.7x
+     - 4.3x
+   * - SPP
+     - 1.4x
+     - 2.3x
+
+**LightModel surface brightness**
+
+The table below shows how much faster jaxtronomy is compared to lenstronomy for different source profiles and different grid sizes.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Source Profile
+     - 60x60 grid
+     - 180x180 grid
+   * - CORE_SERSIC
+     - 4.4x
+     - 14.8x
+   * - GAUSSIAN
+     - 3.8x
+     - 9.9x
+   * - GAUSSIAN_ELLIPSE
+     - 2.7x
+     - 7.8x
+   * - MULTI_GAUSSIAN (5 components)
+     - 8.0x
+     - 18.2x
+   * - MULTI_GAUSSIAN_ELLIPSE (5 components)
+     - 8.2x
+     - 18.1x
+   * - SERSIC
+     - 3.4x
+     - 10.0x
+   * - SERSIC_ELLIPSE
+     - 3.5x
+     - 9.7x
+   * - SERSIC_ELLIPSE_Q_PHI
+     - 4.0x
+     - 9.6x
 
 Related software packages
 -------------------------

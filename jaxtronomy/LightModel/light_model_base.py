@@ -13,6 +13,7 @@ sersic_major_axis_conf = convention_conf.get("sersic_major_axis", False)
 __all__ = ["LightModelBase"]
 
 _JAXXED_MODELS = [
+    "CORE_SERSIC",
     "GAUSSIAN",
     "GAUSSIAN_ELLIPSE",
     "MULTI_GAUSSIAN",
@@ -21,7 +22,6 @@ _JAXXED_MODELS = [
     "SERSIC_ELLIPSE",
     "SERSIC_ELLIPSE_Q_PHI",
     "SHAPELETS",
-    "CORE_SERSIC",
 ]
 
 _MODELS_SUPPORTED = [
