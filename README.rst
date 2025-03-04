@@ -147,6 +147,7 @@ The table below shows how much faster jaxtronomy is compared to lenstronomy for 
      - 9.6x
 
 **Image Convolution**
+
 There is no gaussian convolution function in the JAX library. Thus, in jaxtronomy we construct a gaussian pixel kernel, pad the image, and perform an fft convolution which mimics scipy.ndimage.gaussian_filter with mode="nearest".
 When the kernel radius is less than 10, jaxtronomy takes about 1.1x to 1.2x longer than lenstronomy to perform a gaussian convolution, and when the kernel size is larger, it takes jaxtronomy 2x as long or more.
 Further details can be found in the performance comparison notebook.
