@@ -114,6 +114,10 @@ The table below shows how much faster jaxtronomy is compared to lenstronomy for 
      - 1.4x
      - 2.3x
 
+Note that some profiles' runtime are dependent on function arguments. For example, the EPL profile involves performing a hyp2f1 calculation using a power series expansion.
+In lenstronomy, the number of terms used depends on how quickly the series converges, whereas in jaxtronomy, the power series always involves a fixed number of terms, which is required for autodifferentiation.
+In the table, the EPL comparison shows the case where lenstronomy requires the maximum number of terms, and the EPL_Q_PHI comparison shows the case where lenstronomy requires the fewest.
+
 **LightModel surface brightness**
 
 The table below shows how much faster jaxtronomy is compared to lenstronomy for different source profiles and different grid sizes.
