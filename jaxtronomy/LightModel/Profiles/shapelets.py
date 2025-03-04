@@ -162,8 +162,8 @@ class Shapelets(object):
         """Calculates the phi_n(x) and phi_n(y) for a given x-array and y-array for the
         full order in the polynomials.
 
-        :param x: x-coordinates (jax.numpy array)
-        :param y: y-coordinates (jax.numpy array)
+        :param x: float or 1d array of x-coordinates
+        :param y: float or 1d array of y-coordinates
         :param beta: shapelet scale
         :param n_order: order of shapelets
         :param center_x: shapelet center
@@ -215,7 +215,7 @@ class Shapelets(object):
                 y_ < cut_threshold, 1, 0
             )
         else:
-            cut_x, cut_y = jnp.ones_like(x_), jnp.ones_like(y_)
+            cut_x, cut_y = np.ones_like(x_), np.ones_like(y_)
 
         phi_x = ((H_x * cut_x * exp_x).T * prefactor).T
         phi_y = ((H_y * cut_y * exp_y).T * prefactor).T
@@ -227,25 +227,31 @@ class ShapeletSet(object):
     n_max, such that n1 + n2 <= n_max."""
 
     param_names = ["amp", "n_max", "beta", "center_x", "center_y"]
-    lower_limit_default = {"beta": 0.01, "center_x": -100, "center_y": -100}
-    upper_limit_default = {"beta": 100, "center_x": 100, "center_y": 100}
+    lower_limit_default = {"amp": 0, "n_max": 1, "beta": 0.01, "center_x": -100, "center_y": -100}
+    upper_limit_default = {"amp": 100, "n_max": 20, "beta": 100, "center_x": 100, "center_y": 100}
 
     def __init__(self):
         self.shapelets = Shapelets(precalc=True)
 
-    @partial(jit, static_argnums=(0, 4))
+    @partial(jit, static_argnums=(0,))
     def function(self, x, y, amp, n_max, beta, center_x=0, center_y=0):
-        """
+        """NOTE: The number of loops is determined based off of len(amp) instead of n_max
+        for autodifferentiation to work. As long as len(amp) equals (n_max + 1) * (n_max + 2) / 2,
+        this function will work correctly and identically to lenstronomy. However if there is
+        any user error, the behaviour of this function will differ from lenstronomy.
+        For performance reasons, we do not include any runtime checks of len(amp) and n_max.
 
-        :param x: x-coordinates
-        :param y: y-coordinates
+        :param x: float or 1d array of x-coordinates
+        :param y: float or 1d array of y-coordinates
         :param amp: 1d array of amplitudes in pre-defined order of shapelet basis functions
             amp[0] corresponds to (n1, n2) = (0, 0), amp[1] corresponds to (n1, n2) = (1, 0)
             amp[2] corresponds to (n1, n2) = (0, 1), amp[3] corresponds to (n1, n2) = (2, 0)
             amp[4] corresponds to (n1, n2) = (1, 1), amp[5] corresponds to (n1, n2) = (0, 2)
             amp[6] corresponds to (n1, n2) = (3, 0), etc
+            len(amp) should be equal to (n_max + 1) * (n_max + 2) / 2
         :param beta: shapelet scale
-        :param n_max: maximum polynomial order in Hermite polynomial
+        :param n_max: int, maximum order in Hermite polynomial. Although this argument is unused here,
+            inonsistencies with len(amp) can lead to incorrect behaviour in e.g. Lightparam and Param classes.
         :param center_x: shapelet center
         :param center_y: shapelet center
         :return: surface brightness of combined shapelet set
@@ -253,18 +259,20 @@ class ShapeletSet(object):
         x_shape = x.shape
         x = jnp.atleast_1d(x)
         f_ = jnp.zeros_like(x)
+        amp = jnp.array(amp)
 
-        num_param = int((n_max + 1) * (n_max + 2) / 2)
+        n_order = int((-3 + np.sqrt(9 + 8*(len(amp)-1)))/2)
+        phi_x, phi_y = self.shapelets.pre_calc(x, y, beta, n_order, center_x, center_y)
+
         n1 = 0
         n2 = 0
-        phi_x, phi_y = self.shapelets.pre_calc(x, y, beta, n_max, center_x, center_y)
 
         def body_fun(i, val):
             f_, n1, n2 = val
-            f_ += amp[i] * phi_x.at[n1].get() * phi_y.at[n2].get()
+            f_ += amp.at[i].get() * phi_x.at[n1].get() * phi_y.at[n2].get()
             n1, n2 = jnp.where(n1 == 0, n2 + 1, n1 - 1), jnp.where(n1 == 0, 0, n2 + 1)
             return f_, n1, n2
 
-        f_ = lax.fori_loop(0, num_param, body_fun, (f_, n1, n2))[0]
+        f_ = lax.fori_loop(0, len(amp), body_fun, (f_, n1, n2))[0]
         f_ = f_.reshape(x_shape)
         return jnp.nan_to_num(f_)
