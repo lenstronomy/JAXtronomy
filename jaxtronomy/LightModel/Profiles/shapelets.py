@@ -227,8 +227,20 @@ class ShapeletSet(object):
     n_max, such that n1 + n2 <= n_max."""
 
     param_names = ["amp", "n_max", "beta", "center_x", "center_y"]
-    lower_limit_default = {"amp": 0, "n_max": 1, "beta": 0.01, "center_x": -100, "center_y": -100}
-    upper_limit_default = {"amp": 100, "n_max": 20, "beta": 100, "center_x": 100, "center_y": 100}
+    lower_limit_default = {
+        "amp": 0,
+        "n_max": 1,
+        "beta": 0.01,
+        "center_x": -100,
+        "center_y": -100,
+    }
+    upper_limit_default = {
+        "amp": 100,
+        "n_max": 20,
+        "beta": 100,
+        "center_x": 100,
+        "center_y": 100,
+    }
 
     def __init__(self):
         self.shapelets = Shapelets(precalc=True)
@@ -261,7 +273,7 @@ class ShapeletSet(object):
         f_ = jnp.zeros_like(x)
         amp = jnp.array(amp)
 
-        n_order = int((-3 + np.sqrt(9 + 8*(len(amp)-1)))/2)
+        n_order = int((-3 + np.sqrt(9 + 8 * (len(amp) - 1))) / 2)
         phi_x, phi_y = self.shapelets.pre_calc(x, y, beta, n_order, center_x, center_y)
 
         n1 = 0
