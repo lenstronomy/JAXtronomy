@@ -349,9 +349,6 @@ class TestLikelihoodModule(object):
 
     def test_lightmodel_autodifferentiation(self):
         for source_profile in JAXXED_SOURCE_PROFILES:
-            # TODO: fix autodifferentiation with shapelets
-            if source_profile == "SHAPELETS":
-                continue
             print(source_profile)
             lightModel = LightModel([source_profile])
             kwargs_model = {
