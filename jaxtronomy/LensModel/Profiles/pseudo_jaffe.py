@@ -262,7 +262,13 @@ class PseudoJaffe(LensProfileBase):
         y_ = y - center_y
         r = jnp.sqrt(x_**2 + y_**2)
         r = jnp.where(r < PseudoJaffe._s, PseudoJaffe._s, r)
-        alpha_r = 2 * sigma0 * Ra * Rs / (Rs - Ra) * PseudoJaffe._f_A20(r / Ra, r / Rs)
+
+        # There is a 0/0 here if Ra = Rs which can be avoided by taking the limit as Ra -> Rs
+        factor1 = PseudoJaffe._f_A20(r / Ra, r / Rs) / (Rs - Ra)
+        factor2 = r/(Rs + jnp.sqrt(Rs**2 + r**2))**2 * (1 + Rs/jnp.sqrt(Rs**2 + r**2))
+        factor = jnp.where(Ra == Rs, factor2, factor1)
+
+        alpha_r = 2 * sigma0 * Ra * Rs * factor
         f_x = alpha_r * x_ / r
         f_y = alpha_r * y_ / r
         return f_x, f_y
