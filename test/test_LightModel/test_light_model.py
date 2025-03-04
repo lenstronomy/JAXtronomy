@@ -51,9 +51,7 @@ class TestLightModel(object):
             # 'CORE_SERSIC'
         ]
 
-        self.lightModel = LightModel(
-            light_model_list=self.light_model_list
-        )
+        self.lightModel = LightModel(light_model_list=self.light_model_list)
         self.lightModel_ref = LightModel_ref(
             light_model_list=self.light_model_list,
         )
