@@ -57,11 +57,14 @@ The table below shows how much faster jaxtronomy is compared to lenstronomy for 
      - 1.5x
      - 6.9x
    * - CSE
+     - 5.0x
      - 5.7x
-     - 10.1x
+   * - EPL
+     - 12.0x
+     - 16.5x
    * - EPL (jax) vs EPL_NUMBA
      - 1.3x
-     - 2.2x
+     - 2.0x
    * - EPL_Q_PHI
      - 0.3x
      - 0.4x
@@ -76,13 +79,13 @@ The table below shows how much faster jaxtronomy is compared to lenstronomy for 
      - 2.7x
    * - HERNQUIST_ELLIPSE_CSE
      - 4.7x
-     - 5.9x
+     - 5.4x
    * - LOS
      - 2.9x
-     - 7.6x
+     - 7.1x
    * - LOS_MINIMAL
      - 2.8x
-     - 8.1x
+     - 7.3x
    * - NFW
      - 2.0x
      - 4.0x
@@ -93,14 +96,14 @@ The table below shows how much faster jaxtronomy is compared to lenstronomy for 
      - 1.4x
      - 1.9x
    * - PJAFFE
-     - 2.4x
-     - 2.4x
+     - 1.7x
+     - 1.7x
    * - PJAFFE_ELLIPSE_POTENTIAL
      - 3.1x
      - 3.1x
    * - SHEAR
      - 2.1x
-     - 5.3x
+     - 5.0x
    * - SIE
      - 1.2x
      - 1.9x
@@ -123,33 +126,41 @@ The table below shows how much faster jaxtronomy is compared to lenstronomy for 
      - 180x180 grid
    * - CORE_SERSIC
      - 4.4x
-     - 14.8x
+     - 15x
    * - GAUSSIAN
-     - 3.8x
-     - 9.9x
+     - 3.0x
+     - 10x
    * - GAUSSIAN_ELLIPSE
      - 2.7x
-     - 7.8x
+     - 15x
    * - MULTI_GAUSSIAN (5 components)
      - 8.0x
-     - 18.2x
+     - 18x
    * - MULTI_GAUSSIAN_ELLIPSE (5 components)
-     - 8.2x
-     - 18.1x
+     - 8.0x
+     - 20x
    * - SERSIC
      - 3.4x
-     - 10.0x
+     - 10x
    * - SERSIC_ELLIPSE
      - 3.5x
-     - 9.7x
+     - 10x
    * - SERSIC_ELLIPSE_Q_PHI
      - 4.0x
-     - 9.6x
+     - 10x
+   * - SHAPELETS (n_max=6)
+     - 8.7x
+     - 3.6x
+   * - SHAPELETS (n_max=10)
+     - 10.0x
+     - 4.0x
 
 **Image Convolution**
 
 There is no gaussian convolution function in the JAX library. Thus, in jaxtronomy we construct a gaussian pixel kernel, pad the image, and perform an fft convolution which mimics scipy.ndimage.gaussian_filter with mode="nearest".
-When the kernel radius is less than 10, jaxtronomy takes about 1.1x to 1.2x longer than lenstronomy to perform a gaussian convolution, and when the kernel size is larger, it takes jaxtronomy 2x as long or more.
+
+When the kernel radius is less than 10, jaxtronomy takes about 1.1x to 1.3x longer than lenstronomy to perform a gaussian convolution, and when the kernel size is larger, it takes jaxtronomy 2x as long or more.
+For pixel kernel fft convolution, performance varies significantly with kernel size and grid size.
 Further details can be found in the performance comparison notebook.
 
 Related software packages
