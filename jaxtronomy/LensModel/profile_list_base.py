@@ -254,6 +254,8 @@ def lens_class(
         If None, then the profile is initialized using default settings
     :return: class instance of the lens model type
     """
+    if profile_kwargs is None:
+        profile_kwargs = {}
 
     if lens_type not in _JAXXED_MODELS and lens_type in _SUPPORTED_MODELS:
         raise ValueError(
@@ -261,9 +263,6 @@ def lens_class(
                 lens_type
             )
         )
-    if profile_kwargs is None:
-        profile_kwargs = {}
-
     # if lens_type == "ARC_PERT":
     #     from lenstronomy.LensModel.Profiles.arc_perturbations import (
     #         ArcPerturbations,
