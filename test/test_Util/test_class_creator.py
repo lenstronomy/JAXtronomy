@@ -11,7 +11,13 @@ import unittest
 class TestClassCreator(object):
     def setup_method(self):
         self.kwargs_model = {
-            "lens_model_list": ["SIS", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE"],
+            "lens_model_list": [
+                "SIS",
+                "NFW_ELLIPSE_CSE",
+                "NFW_ELLIPSE_CSE",
+                "NFW_ELLIPSE_CSE",
+                "NFW_ELLIPSE_CSE",
+            ],
             "lens_profile_kwargs_list": [
                 None,
                 {"high_accuracy": True},
@@ -94,7 +100,13 @@ class TestClassCreator(object):
             point_source_class,
             extinction_class,
         ) = class_creator.create_class_instances(**self.kwargs_model)
-        assert lens_model_class.lens_model_list == ["SIS", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE"]
+        assert lens_model_class.lens_model_list == [
+            "SIS",
+            "NFW_ELLIPSE_CSE",
+            "NFW_ELLIPSE_CSE",
+            "NFW_ELLIPSE_CSE",
+            "NFW_ELLIPSE_CSE",
+        ]
         assert lens_model_class.lens_model.func_list[1].high_accuracy == True
         assert (
             lens_model_class.lens_model.func_list[1]
