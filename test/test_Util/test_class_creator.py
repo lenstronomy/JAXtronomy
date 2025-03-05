@@ -96,8 +96,6 @@ class TestClassCreator(object):
         assert lens_model_class.lens_model_list == [
             "SIS",
             "NFW",
-            "GNFW",
-            "GNFW",
             "NFW",
             "NFW",
         ]
