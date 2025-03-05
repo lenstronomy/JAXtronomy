@@ -181,9 +181,10 @@ class ProfileListBase(object):
         imported_classes = []
         imported_profile_kwargs = []
         for i, lens_type in enumerate(lens_model_list):
-            if lens_type in ["NFW_MC", "NFW_MC_ELLIPSE_POTENTIAL"]:
-                profile_kwargs_list[i]["z_lens"] = lens_redshift_list[i]
-                profile_kwargs_list[i]["z_source"] = z_source_convention
+            # TODO: Uncomment these next 3 lines of code when the profiles are implemented
+            # if lens_type in ["NFW_MC", "NFW_MC_ELLIPSE_POTENTIAL"]:
+            #     profile_kwargs_list[i]["z_lens"] = lens_redshift_list[i]
+            #     profile_kwargs_list[i]["z_source"] = z_source_convention
 
             # Creates another instance for dynamic profiles
             if lens_type in DYNAMIC_PROFILES:
