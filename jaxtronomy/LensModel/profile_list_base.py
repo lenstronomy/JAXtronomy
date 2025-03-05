@@ -248,8 +248,8 @@ def lens_class(
     """Generate class instance of single lens.
 
     :param lens_type: string, lens model type
-    :param profile_kwargs: dict, keyword arguments used to initialize profile classes. If
-        None, then the profile is initialized using default settings
+    :param profile_kwargs: dict, keyword arguments used to initialize profile classes.
+        If None, then the profile is initialized using default settings
     :return: class instance of the lens model type
     """
 
