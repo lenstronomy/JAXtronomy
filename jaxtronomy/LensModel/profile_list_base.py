@@ -175,6 +175,8 @@ class ProfileListBase(object):
     ):
         if lens_redshift_list is None:
             lens_redshift_list = [None] * len(lens_model_list)
+        if profile_kwargs_list is None:
+            profile_kwargs_list = [{} for _ in range(len(lens_model_list))]
         func_list = []
         imported_classes = []
         imported_profile_kwargs = []
