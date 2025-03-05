@@ -51,11 +51,9 @@ class TestLightModel(object):
             # 'CORE_SERSIC'
         ]
 
-        self.lightModel = LightModel(
-            light_model_list=self.light_model_list, sersic_major_axis=False
-        )
+        self.lightModel = LightModel(light_model_list=self.light_model_list)
         self.lightModel_ref = LightModel_ref(
-            light_model_list=self.light_model_list, sersic_major_axis=False
+            light_model_list=self.light_model_list,
         )
         test_sersic_ellipse_qphi = LightModel(["SERSIC_ELLIPSE_Q_PHI"])
 

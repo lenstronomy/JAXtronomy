@@ -8,9 +8,10 @@ __all__ = ["SersicUtil"]
 
 
 class SersicUtil(object):
-    _s = 0.00001
 
-    def __init__(self, smoothing=_s, sersic_major_axis=False):
+    _s = 0.0001
+
+    def __init__(self, smoothing=0.0001, sersic_major_axis=False):
         """
 
         :param smoothing: smoothing scale of the innermost part of the profile (for numerical reasons)
@@ -245,7 +246,7 @@ class SersicUtil(object):
         :param R: radius
         :return: smoothed and stabilized radius
         """
-        return jnp.maximum(self._smoothing, R)
+        return jnp.maximum(self._s, R)
 
     @jit
     def _r_sersic(

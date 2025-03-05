@@ -99,6 +99,7 @@ class ShearGammaPsi(LensProfileBase):
         super(ShearGammaPsi, self).__init__()
 
     @staticmethod
+    @jit
     def function(x, y, gamma_ext, psi_ext, ra_0=0, dec_0=0):
         """
 
