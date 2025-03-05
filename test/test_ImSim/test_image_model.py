@@ -1,6 +1,6 @@
 __author__ = "sibirrer"
 
-from jax import grad
+from jax import grad, config
 import numpy.testing as npt
 import numpy as np
 import pytest
@@ -18,6 +18,8 @@ from jaxtronomy.Data.imaging_data import ImageData
 from jaxtronomy.LensModel.lens_model import LensModel
 from jaxtronomy.LightModel.light_model import LightModel
 from jaxtronomy.ImSim.image_model import ImageModel
+
+config.update("jax_enable_x64", True)
 
 
 class TestImageModel(object):
