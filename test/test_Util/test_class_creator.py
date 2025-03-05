@@ -11,12 +11,13 @@ import unittest
 class TestClassCreator(object):
     def setup_method(self):
         self.kwargs_model = {
-            "lens_model_list": ["SIS", "NFW", "NFW", "NFW"],
+            "lens_model_list": ["SIS", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE"],
             "lens_profile_kwargs_list": [
                 None,
-                {"interpol": True},
-                {"interpol": True},
+                {"high_accuracy": True},
+                {"high_accuracy": True},
                 None,
+                {"high_accuracy": False},
             ],
             "source_light_model_list": ["SERSIC", "SERSIC"],
             "source_light_profile_kwargs_list": [
@@ -26,7 +27,7 @@ class TestClassCreator(object):
             "lens_light_model_list": ["SERSIC", "SERSIC"],
             "lens_light_profile_kwargs_list": [{"sersic_major_axis": True}, None],
             "point_source_model_list": ["LENSED_POSITION"],
-            "index_lens_model_list": [[0, 1, 2, 3]],
+            "index_lens_model_list": [[0, 1, 2, 3, 4]],
             "index_source_light_model_list": [[0, 1]],
             "index_lens_light_model_list": [[0, 1]],
             "index_point_source_model_list": [[0]],
@@ -35,7 +36,7 @@ class TestClassCreator(object):
             # "source_redshift_list": [1, 1],
             "fixed_magnification_list": [True],
             "additional_images_list": [False],
-            # "lens_redshift_list": [0.5] * 4,
+            # "lens_redshift_list": [0.5] * 5,
             "point_source_frame_list": [[0]],
         }
         self.kwargs_model_2 = {
@@ -93,23 +94,19 @@ class TestClassCreator(object):
             point_source_class,
             extinction_class,
         ) = class_creator.create_class_instances(**self.kwargs_model)
-        assert lens_model_class.lens_model_list == [
-            "SIS",
-            "NFW",
-            "NFW",
-            "NFW",
-        ]
-        assert lens_model_class.lens_model.func_list[1]._interpol == True
+        assert lens_model_class.lens_model_list == ["SIS", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE", "NFW_ELLIPSE_CSE"]
+        assert lens_model_class.lens_model.func_list[1].high_accuracy == True
         assert (
             lens_model_class.lens_model.func_list[1]
             == lens_model_class.lens_model.func_list[2]
         )
 
-        assert lens_model_class.lens_model.func_list[3]._interpol == False
+        assert lens_model_class.lens_model.func_list[3].high_accuracy == False
         assert (
             lens_model_class.lens_model.func_list[1]
             != lens_model_class.lens_model.func_list[3]
         )
+        assert lens_model_class.lens_model.func_list[4].high_accuracy == False
 
         assert source_model_class.func_list[0]._sersic_major_axis == False
         assert source_model_class.func_list[1]._sersic_major_axis == True
