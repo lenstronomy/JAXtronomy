@@ -9,8 +9,6 @@ __all__ = ["SersicUtil"]
 
 class SersicUtil(object):
 
-    _s = 0.0001
-
     def __init__(self, smoothing=0.0001, sersic_major_axis=False):
         """
 
@@ -124,7 +122,7 @@ class SersicUtil(object):
         x_ = x - center_x
         y_ = y - center_y
         r = jnp.sqrt(x_**2 + y_**2)
-        r = jnp.where(r < self._s, self._s, r)
+        r = jnp.where(r < self._smoothing, self._smoothing, r)
         x_reduced = (r / r_eff) ** (1.0 / n_sersic)
         return x_reduced
 
@@ -246,7 +244,7 @@ class SersicUtil(object):
         :param R: radius
         :return: smoothed and stabilized radius
         """
-        return jnp.maximum(self._s, R)
+        return jnp.maximum(self._smoothing, R)
 
     @jit
     def _r_sersic(

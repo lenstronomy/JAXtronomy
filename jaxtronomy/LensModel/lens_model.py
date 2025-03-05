@@ -26,14 +26,12 @@ class LensModel(object):
         lens_redshift_list=None,
         cosmo=None,
         multi_plane=False,
-        numerical_alpha_class=None,
         observed_convention_index=None,
         z_source_convention=None,
         cosmo_interp=False,
         z_interp_stop=None,
         num_z_interp=100,
-        kwargs_interp=None,
-        kwargs_synthesis=None,
+        profile_kwargs_list=None,
         decouple_multi_plane=False,
         kwargs_multiplane_model=None,
         distance_ratio_sampling=False,
@@ -42,36 +40,39 @@ class LensModel(object):
 
         :param lens_model_list: list of strings with lens model names
         :param z_lens: redshift of the deflector (only considered when operating in single plane mode).
-         Is only needed for specific functions that require a cosmology.
+            Is only needed for specific functions that require a cosmology.
         :param z_source: redshift of the source: Needed in multi_plane option only,
-         not required for the core functionalities in the single plane mode.
+            not required for the core functionalities in the single plane mode.
         :param lens_redshift_list: list of deflector redshift (corresponding to the lens model list),
-         only applicable in multi_plane mode.
+            only applicable in multi_plane mode.
         :param cosmo: instance of the astropy cosmology class. If not specified, uses the default cosmology.
         :param multi_plane: bool, if True, uses multi-plane mode. Default is False.
-        :param numerical_alpha_class: an instance of a custom class for use in TabulatedDeflections() lens model
-         (see documentation in Profiles/numerical_deflections)
-        :param kwargs_interp: interpolation keyword arguments specifying the numerics.
-         See description in the Interpolate() class. Only applicable for 'INTERPOL' and 'INTERPOL_SCALED' models.
         :param observed_convention_index: a list of indices, corresponding to the lens_model_list element with same
-         index, where the 'center_x' and 'center_y' kwargs correspond to observed (lensed) positions, not physical
-         positions. The code will compute the physical locations when performing computations
+            index, where the 'center_x' and 'center_y' kwargs correspond to observed (lensed) positions, not physical
+            positions. The code will compute the physical locations when performing computations
         :param z_source_convention: float, redshift of a source to define the reduced deflection angles of the lens
-         models. If None, 'z_source' is used.
+            models. If None, 'z_source' is used.
         :param cosmo_interp: boolean (only employed in multi-plane mode), interpolates astropy.cosmology distances for
-         faster calls when accessing several lensing planes
+            faster calls when accessing several lensing planes
         :param z_interp_stop: (only in multi-plane with cosmo_interp=True); maximum redshift for distance interpolation
-         This number should be higher or equal the maximum of the source redshift and/or the z_source_convention
+            This number should be higher or equal the maximum of the source redshift and/or the z_source_convention
         :param num_z_interp: (only in multi-plane with cosmo_interp=True); number of redshift bins for interpolating
-         distances
+            distances
+        :param profile_kwargs_list: list of dicts, keyword arguments used to initialize profile classes
+            in the same order of the lens_model_list. If any of the profile_kwargs are None, then that
+            profile will be initialized using default settings.
         :param distance_ratio_sampling: bool, if True, will use sampled
-         distance ratios to update T_ij value in multi-lens plane computation.
+            distance ratios to update T_ij value in multi-lens plane computation.
         """
         self.lens_model_list = lens_model_list
         self.z_lens = z_lens
         self.z_source = z_source
         self._z_source_convention = z_source_convention
         self.redshift_list = lens_redshift_list
+
+        if profile_kwargs_list is None:
+            profile_kwargs_list = [{} for _ in range(len(lens_model_list))]
+        self.profile_kwargs_list = profile_kwargs_list
 
         if cosmo is None:
             from astropy.cosmology import default_cosmology
@@ -116,14 +117,11 @@ class LensModel(object):
                 #    lens_model_list,
                 #    lens_redshift_list,
                 #    cosmo=cosmo,
-                #    numerical_alpha_class=numerical_alpha_class,
                 #    observed_convention_index=observed_convention_index,
                 #    z_source_convention=z_source_convention,
                 #    cosmo_interp=cosmo_interp,
                 #    z_interp_stop=z_interp_stop,
                 #    num_z_interp=num_z_interp,
-                #    kwargs_interp=kwargs_interp,
-                #    kwargs_synthesis=kwargs_synthesis,
                 #    **kwargs_multiplane_model
                 # )
             else:
@@ -135,15 +133,13 @@ class LensModel(object):
                 #    lens_model_list,
                 #    lens_redshift_list,
                 #    cosmo=cosmo,
-                #    numerical_alpha_class=numerical_alpha_class,
                 #    observed_convention_index=observed_convention_index,
                 #    z_source_convention=z_source_convention,
                 #    cosmo_interp=cosmo_interp,
                 #    z_interp_stop=z_interp_stop,
                 #    num_z_interp=num_z_interp,
-                #    kwargs_interp=kwargs_interp,
-                #    kwargs_synthesis=kwargs_synthesis,
                 #    distance_ratio_sampling=distance_ratio_sampling,
+                #    profile_kwargs_list=profile_kwargs_list,
                 # )
 
         else:
@@ -151,20 +147,16 @@ class LensModel(object):
                 self.lens_model = SinglePlaneLOS(
                     lens_model_list,
                     index_los=index_los,
-                    numerical_alpha_class=numerical_alpha_class,
                     lens_redshift_list=lens_redshift_list,
                     z_source_convention=z_source_convention,
-                    kwargs_interp=kwargs_interp,
-                    kwargs_synthesis=kwargs_synthesis,
+                    profile_kwargs_list=profile_kwargs_list,
                 )
             else:
                 self.lens_model = SinglePlane(
                     lens_model_list,
-                    numerical_alpha_class=numerical_alpha_class,
                     lens_redshift_list=lens_redshift_list,
                     z_source_convention=z_source_convention,
-                    kwargs_interp=kwargs_interp,
-                    kwargs_synthesis=kwargs_synthesis,
+                    profile_kwargs_list=profile_kwargs_list,
                 )
 
         # if z_lens is not None and z_source is not None:
