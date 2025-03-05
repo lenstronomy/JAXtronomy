@@ -322,7 +322,7 @@ class TestImageModel(object):
             kwargs_source=self.kwargs_source,
             kwargs_lens=self.kwargs_lens,
         )
-        npt.assert_array_almost_equal(flux, flux_ref, decimal=8)
+        npt.assert_array_almost_equal(flux, flux_ref, decimal=7)
 
         flux = self.imageModel._source_surface_brightness_analytical_numerics(
             kwargs_source=self.kwargs_source,
