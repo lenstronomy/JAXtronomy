@@ -20,10 +20,10 @@ class TestClassCreator(object):
             ],
             "lens_profile_kwargs_list": [
                 None,
-                {"high_accuracy": True},
-                {"high_accuracy": True},
-                None,
                 {"high_accuracy": False},
+                {"high_accuracy": False},
+                None,
+                {"high_accuracy": True},
             ],
             "source_light_model_list": ["SERSIC", "SERSIC"],
             "source_light_profile_kwargs_list": [
@@ -107,18 +107,17 @@ class TestClassCreator(object):
             "NFW_ELLIPSE_CSE",
             "NFW_ELLIPSE_CSE",
         ]
-        assert lens_model_class.lens_model.func_list[1].high_accuracy == True
+        assert lens_model_class.lens_model.func_list[1].high_accuracy == False
         assert (
             lens_model_class.lens_model.func_list[1]
             == lens_model_class.lens_model.func_list[2]
         )
-
-        assert lens_model_class.lens_model.func_list[3].high_accuracy == False
+        assert lens_model_class.lens_model.func_list[3].high_accuracy == True
         assert (
             lens_model_class.lens_model.func_list[1]
             != lens_model_class.lens_model.func_list[3]
         )
-        assert lens_model_class.lens_model.func_list[4].high_accuracy == False
+        assert lens_model_class.lens_model.func_list[4].high_accuracy == True
 
         assert source_model_class.func_list[0]._sersic_major_axis == False
         assert source_model_class.func_list[1]._sersic_major_axis == True
