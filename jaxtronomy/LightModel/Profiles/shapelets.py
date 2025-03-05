@@ -215,7 +215,7 @@ class Shapelets(object):
                 y_ < cut_threshold, 1, 0
             )
         else:
-            cut_x, cut_y = np.ones_like(x_), np.ones_like(y_)
+            cut_x, cut_y = jnp.ones_like(x_), jnp.ones_like(y_)
 
         phi_x = ((H_x * cut_x * exp_x).T * prefactor).T
         phi_y = ((H_y * cut_y * exp_y).T * prefactor).T
