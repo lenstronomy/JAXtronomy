@@ -3,6 +3,7 @@ from lenstronomy.PointSource.Types.unlensed import Unlensed as Unlensed_ref
 import pytest
 import numpy.testing as npt
 
+
 # NOTE: Even though this is a simple class, we still test against lenstronomy to ensure that the API remains the same
 class TestUnlensed(object):
     def setup_method(self):

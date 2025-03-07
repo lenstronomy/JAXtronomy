@@ -87,13 +87,9 @@ class PointSource(object):
             if model == "UNLENSED":
                 from jaxtronomy.PointSource.Types.unlensed import Unlensed
 
-                self._point_source_list.append(
-                    Unlensed()
-                )
+                self._point_source_list.append(Unlensed())
             elif model == "LENSED_POSITION":
-                from jaxtronomy.PointSource.Types.lensed_position import (
-                    LensedPositions
-                )
+                from jaxtronomy.PointSource.Types.lensed_position import LensedPositions
 
                 self._point_source_list.append(
                     LensedPositions(
@@ -137,7 +133,9 @@ class PointSource(object):
             have not been set
         :return: updated self instances
         """
-        raise ValueError("Updating class instance attributes not supported in jaxtronomy")
+        raise ValueError(
+            "Updating class instance attributes not supported in jaxtronomy"
+        )
         # if (
         #     min_distance is not None
         #     and "min_distance" not in self._kwargs_lens_eqn_solver
@@ -165,9 +163,11 @@ class PointSource(object):
         :param lens_model_class: instance of LensModel class
         :return: update instance of lens model class
         """
-        raise ValueError("Updating class instance attributes not supported in jaxtronomy")
-        #self._lens_model = lens_model_class
-        #for model in self._point_source_list:
+        raise ValueError(
+            "Updating class instance attributes not supported in jaxtronomy"
+        )
+        # self._lens_model = lens_model_class
+        # for model in self._point_source_list:
         #    model.update_lens_model(lens_model_class=lens_model_class)
 
     def k_list(self, k):
@@ -214,8 +214,7 @@ class PointSource(object):
 
         :param kwargs_ps: point source parameter keyword argument list
         :param kwargs_lens: lens model keyword argument list
-        :param k: None or int; only returns a subset of the model
-            predictions
+        :param k: None or int; only returns a subset of the model predictions
         :param original_position: boolean (only applies to 'LENSED_POSITION' models),
             returns the image positions in the model parameters and does not re-compute
             images (which might be differently ordered) in case of the lens equation
@@ -238,11 +237,11 @@ class PointSource(object):
                     additional_images=additional_images,
                 )
                 ## this takes action when new images are computed not necessarily in order
-                #if (
+                # if (
                 #    original_position is True
                 #    and additional_images is True
                 #    and self.point_source_type_list[i] == "LENSED_POSITION"
-                #):
+                # ):
                 #    x_o, y_o = kwargs["ra_image"], kwargs["dec_image"]
                 #    x_image, y_image = _sort_position_by_original(
                 #        x_o, y_o, x_image, y_image
@@ -254,13 +253,12 @@ class PointSource(object):
 
     @partial(jit, static_argnums=(0, 3, 4))
     def point_source_list(self, kwargs_ps, kwargs_lens, k=None, with_amp=True):
-        """Returns the image coordinates and image amplitudes of all point sources in a single
-        array.
+        """Returns the image coordinates and image amplitudes of all point sources in a
+        single array.
 
         :param kwargs_ps: point source keyword argument list
         :param kwargs_lens: lens model keyword argument list
-        :param k: None or int; selects a subset of the point source
-            models in the return
+        :param k: None or int; selects a subset of the point source models in the return
         :param with_amp: bool, if False, ignores the amplitude parameters in the return
             and instead provides ones for each point source image
         :return: ra_array, dec_array, amp_array
@@ -279,15 +277,14 @@ class PointSource(object):
                 dec_array.append(dec_list[i][j])
                 amp_array.append(amp_list[i][j])
         return jnp.array(ra_array), jnp.array(dec_array), jnp.array(amp_array)
-    
+
     @partial(jit, static_argnums=(0, 3))
     def image_amplitude(self, kwargs_ps, kwargs_lens, k=None):
         """Returns the image amplitudes.
 
         :param kwargs_ps: point source keyword argument list
         :param kwargs_lens: lens model keyword argument list
-        :param k: None or int, selects a subset of the point source
-            models in the return
+        :param k: None or int, selects a subset of the point source models in the return
         :return: list of image amplitudes per model component
         """
         amp_list = []
@@ -301,7 +298,7 @@ class PointSource(object):
                     )
                 )
         return amp_list
-    
+
     @partial(jit, static_argnums=(0))
     def source_amplitude(self, kwargs_ps, kwargs_lens):
         """Intrinsic (unlensed) point source amplitudes.
@@ -344,7 +341,9 @@ class PointSource(object):
                 dist = jnp.sqrt(
                     (x_source - x_source[0]) ** 2 + (y_source - y_source[0]) ** 2
                 )
-                within_tolerance = jnp.where(jnp.max(dist) > tolerance, False, within_tolerance)
+                within_tolerance = jnp.where(
+                    jnp.max(dist) > tolerance, False, within_tolerance
+                )
         return within_tolerance
 
     # This function should be called outside of a JIT'd environment
@@ -371,7 +370,7 @@ class PointSource(object):
         return kwargs_list
 
 
-#def _sort_position_by_original(x_o, y_o, x_solved, y_solved):
+# def _sort_position_by_original(x_o, y_o, x_solved, y_solved):
 #    """Sorting new image positions such that the old order is best preserved.
 #
 #    :param x_o: numpy array; original image positions

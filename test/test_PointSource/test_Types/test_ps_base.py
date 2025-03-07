@@ -8,7 +8,9 @@ from jaxtronomy.PointSource.Types.base_ps import PSBase
 from jaxtronomy.PointSource.Types.base_ps import _expand_to_array
 from jaxtronomy.PointSource.Types.base_ps import _shrink_array
 
-from lenstronomy.PointSource.Types.base_ps import _expand_to_array as _expand_to_array_ref
+from lenstronomy.PointSource.Types.base_ps import (
+    _expand_to_array as _expand_to_array_ref,
+)
 from lenstronomy.PointSource.Types.base_ps import _shrink_array as _shrink_array_ref
 
 
@@ -19,11 +21,7 @@ class TestPSBase(object):
             fixed_magnification=False,
             additional_images=False,
         )
-        self.kwargs_ps = {
-            "image_amp": 1,
-            "ra_image": 0.1,
-            "dec_image": 0.1
-        }
+        self.kwargs_ps = {"image_amp": 1, "ra_image": 0.1, "dec_image": 0.1}
 
     def test_init(self):
         assert self.ps._fixed_magnification == False
@@ -41,16 +39,15 @@ class TestPSBase(object):
         ps = PSBase(
             fixed_magnification=True,
             index_lens_model_list=index_lens_model_list,
-            point_source_frame_list=point_source_frame_list
+            point_source_frame_list=point_source_frame_list,
         )
         assert ps._lens_model is None
         assert ps._solver is None
         assert ps._fixed_magnification == True
-        assert ps.k_list == [(0,1), (2,3), (2,3), (0,1)]
+        assert ps.k_list == [(0, 1), (2, 3), (2, 3), (0, 1)]
 
         npt.assert_raises(ValueError, PSBase, additional_images=True)
         npt.assert_raises(ValueError, PSBase, redshift=3)
-
 
     def test_image_position(self):
         npt.assert_raises(ValueError, self.ps.image_position, self.kwargs_ps)

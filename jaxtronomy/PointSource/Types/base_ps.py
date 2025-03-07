@@ -58,7 +58,7 @@ class PSBase(object):
         if additional_images:
             raise ValueError("additional images not supported in jaxtronomy")
         self.additional_images = additional_images
-        #if fixed_magnification is True and additional_images is True:
+        # if fixed_magnification is True and additional_images is True:
         #    Warning(
         #        "The combination of fixed_magnification=True and additional_image=True is not optimal for the "
         #        "current computation. If you see this warning, please approach the developers."
@@ -115,12 +115,16 @@ class PSBase(object):
         :param lens_model_class: LensModel() class instance
         :return: internal `LensModel` class updated
         """
-        raise ValueError("Updating class instance attributes not supported in jaxtronomy")
+        raise ValueError(
+            "Updating class instance attributes not supported in jaxtronomy"
+        )
+
     #    self._lens_model = lens_model_class
     #    if lens_model_class is None:
     #        self._solver = None
     #    else:
     #        self._solver = LensEquationSolver(lens_model_class)
+
 
 @partial(jit, static_argnums=1)
 def _expand_to_array(array, num):
@@ -142,6 +146,7 @@ def _expand_to_array(array, num):
         return out
     else:
         return array
+
 
 @partial(jit, static_argnums=1)
 def _shrink_array(array, num):
