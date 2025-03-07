@@ -151,6 +151,9 @@ class TestLensedPosition(object):
         npt.assert_allclose(amp, amp_ref, rtol=1e-10, atol=1e-10)
         assert amp.ndim == 1
 
+        x_pos = [0.1238, -0.23478]
+        y_pos = [0.98324, 0.123]
+
         amp = self.ps_fixed_mag.image_amplitude(
             self.kwargs_fixed_mag,
             kwargs_lens=self.kwargs_lens,
