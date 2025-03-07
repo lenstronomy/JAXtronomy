@@ -138,7 +138,7 @@ class LensedPositions(PSBase):
                     )
             point_amp = jnp.array(kwargs_ps["source_amp"], dtype=float) * jnp.abs(mag)
         else:
-            point_amp = kwargs_ps["point_amp"]
+            point_amp = jnp.array(kwargs_ps["point_amp"])
             if x_pos is not None:
                 point_amp = _expand_to_array(point_amp, len(x_pos))
         return point_amp

@@ -48,7 +48,7 @@ class TestPointSource(object):
         kwargs_ps3 = {
             "ra_image": [0.4321, 0.233, 0.345],
             "dec_image": [-0.123, 0.243, 0.389],
-            "source_amp": [1.5, 0.23, 16.1234],
+            "source_amp": 1.5,
         }
         self.kwargs_ps = [kwargs_ps1, kwargs_ps2, kwargs_ps3]
 
@@ -120,6 +120,7 @@ class TestPointSource(object):
         for i in range(len(amp_list)):
             print(f"testing point_source_type_list {i}")
             npt.assert_allclose(amp_list[i], amp_list_ref[i], atol=1e-8, rtol=1e-8)
+            assert amp_list[i].ndim == 1
 
     def test_source_amplitude(self):
         amp_list = self.ps.source_amplitude(self.kwargs_ps, self.kwargs_lens)

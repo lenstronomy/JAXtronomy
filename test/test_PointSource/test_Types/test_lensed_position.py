@@ -108,6 +108,7 @@ class TestLensedPosition(object):
             kwargs_lens_eqn_solver=None,
         )
         npt.assert_allclose(amp, amp_ref, rtol=1e-10, atol=1e-10)
+        assert amp.ndim == 1
 
         amp = self.ps_fixed_mag.image_amplitude(
             self.kwargs_fixed_mag,
@@ -126,6 +127,7 @@ class TestLensedPosition(object):
             kwargs_lens_eqn_solver=None,
         )
         npt.assert_allclose(amp, amp_ref, rtol=1e-10, atol=1e-10)
+        assert amp.ndim == 1
 
     def test_source_amplitude(self):
         amp = self.ps.source_amplitude(self.kwargs, kwargs_lens=self.kwargs_lens)
@@ -133,6 +135,7 @@ class TestLensedPosition(object):
             self.kwargs, kwargs_lens=self.kwargs_lens
         )
         npt.assert_allclose(amp, amp_ref, rtol=1e-10, atol=1e-10)
+        assert amp.ndim == 0
 
         amp = self.ps_fixed_mag.source_amplitude(
             self.kwargs_fixed_mag, kwargs_lens=None
@@ -141,6 +144,7 @@ class TestLensedPosition(object):
             self.kwargs_fixed_mag, kwargs_lens=None
         )
         npt.assert_allclose(amp, amp_ref, rtol=1e-10, atol=1e-10)
+        assert amp.ndim == 0
 
 
 if __name__ == "__main__":

@@ -48,13 +48,15 @@ class PointSource(object):
         :param kwargs_lens_eqn_solver: keyword arguments specifying the numerical settings for the lens equation solver
             see LensEquationSolver() class for details, such as:
             min_distance=0.01, search_window=5, precision_limit=10**(-10), num_iter_max=100
-        :param index_lens_model_list: list (length of different patches/bands) of integer lists, e.g., [[0, 1], [2, 3]];
-            evaluating a subset of the lens models per individual bands. If this keyword is set, the image positions need
-            to have a specified band/frame assigned to it
-        :param point_source_frame_list: list of lists mirroring the structure of the image positions.
-            Integers correspond to the i'th list entry of index_lens_model_list indicating in which frame/band the image is
-            appearing, e.g., four images and four cutouts, you can do [[0], [1], [2], [3]] when the frames
-            (ordered as the list) are in the same order as the point sources (indices)
+        :param index_lens_model_list: list (length of different patches/bands) of integer lists, evaluating a subset of
+            the lens models per individual bands. e.g., [[0], [2, 3], [1]] assigns the 0th lens model to the 0th band,
+            the 2nd and 3rd lens models to the 1st band, and the 1st lens model to the 2nd band.
+            If this keyword is set, the image positions need to have a specified band/frame assigned to it
+        :param point_source_frame_list: list of list of ints, assigns each model in point_source_type_list a frame list.
+            Only relevent for LENSED_POSITION. e.g. if point_source_type_list = ["UNLENSED", "LENSED_POSITION", "LENSED_POSITION"]
+            with point_source_frame_list = [None, [0, 1, 2], [1, 2, 0, 1]], then the first LENSED_POSITION will have a frame list of
+            [0, 1, 2] and the second LENSED_POSITION will have a frame list of [1, 2, 0, 1]. See docstring for point_source_frame_list
+            in PSBase for further details.
         :param redshift_list: None or list of redshifts (only required for multiple source redshifts)
         """
         if len(point_source_type_list) > 0:
