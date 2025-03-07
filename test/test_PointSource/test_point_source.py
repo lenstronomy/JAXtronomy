@@ -114,6 +114,16 @@ class TestPointSource(object):
         npt.assert_allclose(dec_array, dec_array_ref, atol=1e-8, rtol=1e-8)
         npt.assert_allclose(amp_array, amp_array_ref, atol=1e-8, rtol=1e-8)
 
+        ra_array, dec_array, amp_array = self.ps.point_source_list(
+            self.kwargs_ps, self.kwargs_lens, with_amp=False
+        )
+        ra_array_ref, dec_array_ref, amp_array_ref = self.ps_ref.point_source_list(
+            self.kwargs_ps, self.kwargs_lens, with_amp=False
+        )
+        npt.assert_allclose(ra_array, ra_array_ref, atol=1e-8, rtol=1e-8)
+        npt.assert_allclose(dec_array, dec_array_ref, atol=1e-8, rtol=1e-8)
+        npt.assert_allclose(amp_array, amp_array_ref, atol=1e-8, rtol=1e-8)
+
     def test_image_amplitude(self):
         amp_list = self.ps.image_amplitude(self.kwargs_ps, self.kwargs_lens)
         amp_list_ref = self.ps_ref.image_amplitude(self.kwargs_ps, self.kwargs_lens)

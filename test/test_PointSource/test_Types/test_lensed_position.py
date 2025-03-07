@@ -110,6 +110,28 @@ class TestLensedPosition(object):
         npt.assert_allclose(amp, amp_ref, rtol=1e-10, atol=1e-10)
         assert amp.ndim == 1
 
+        x_pos = [0.1238, -0.23478, -1.478734, 1.382]
+        y_pos = [0.98324, 0.123, 0.352489, -1.38743]
+
+        amp = self.ps.image_amplitude(
+            self.kwargs,
+            kwargs_lens=None,
+            x_pos=x_pos,
+            y_pos=y_pos,
+            magnification_limit=None,
+            kwargs_lens_eqn_solver=None,
+        )
+        amp_ref = self.ps_ref.image_amplitude(
+            self.kwargs,
+            kwargs_lens=None,
+            x_pos=x_pos,
+            y_pos=y_pos,
+            magnification_limit=None,
+            kwargs_lens_eqn_solver=None,
+        )
+        npt.assert_allclose(amp, amp_ref, rtol=1e-10, atol=1e-10)
+        assert amp.ndim == 1
+
         amp = self.ps_fixed_mag.image_amplitude(
             self.kwargs_fixed_mag,
             kwargs_lens=self.kwargs_lens,
@@ -123,6 +145,25 @@ class TestLensedPosition(object):
             kwargs_lens=self.kwargs_lens,
             x_pos=None,
             y_pos=None,
+            magnification_limit=None,
+            kwargs_lens_eqn_solver=None,
+        )
+        npt.assert_allclose(amp, amp_ref, rtol=1e-10, atol=1e-10)
+        assert amp.ndim == 1
+
+        amp = self.ps_fixed_mag.image_amplitude(
+            self.kwargs_fixed_mag,
+            kwargs_lens=self.kwargs_lens,
+            x_pos=x_pos,
+            y_pos=y_pos,
+            magnification_limit=None,
+            kwargs_lens_eqn_solver=None,
+        )
+        amp_ref = self.ps_fixed_mag_ref.image_amplitude(
+            self.kwargs_fixed_mag,
+            kwargs_lens=self.kwargs_lens,
+            x_pos=x_pos,
+            y_pos=y_pos,
             magnification_limit=None,
             kwargs_lens_eqn_solver=None,
         )
