@@ -269,15 +269,16 @@ class PointSource(object):
         ra_list, dec_list = self.image_position(kwargs_ps, kwargs_lens, k=k)
         if with_amp is True:
             amp_list = self.image_amplitude(kwargs_ps, kwargs_lens, k=k)
-        else:
-            amp_list = jnp.ones_like(ra_list)
 
         ra_array, dec_array, amp_array = [], [], []
         for i in range(len(ra_list)):
             for j in range(len(ra_list[i])):
                 ra_array.append(ra_list[i][j])
                 dec_array.append(dec_list[i][j])
-                amp_array.append(amp_list[i][j])
+                if with_amp:
+                    amp_array.append(amp_list[i][j])
+                else:
+                    amp_array.append(1.)
         return jnp.array(ra_array), jnp.array(dec_array), jnp.array(amp_array)
 
     @partial(jit, static_argnums=(0, 3))
