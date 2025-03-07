@@ -278,7 +278,7 @@ class PointSource(object):
                 if with_amp:
                     amp_array.append(amp_list[i][j])
                 else:
-                    amp_array.append(1.)
+                    amp_array.append(1.0)
         return jnp.array(ra_array), jnp.array(dec_array), jnp.array(amp_array)
 
     @partial(jit, static_argnums=(0, 3))
