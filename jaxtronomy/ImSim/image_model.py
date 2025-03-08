@@ -71,7 +71,9 @@ class ImageModel(object):
             lens_model_class = LensModel(lens_model_list=[])
         self.LensModel = lens_model_class
         if point_source_class is None:
-            point_source_class = PointSource(point_source_type_list=[], lens_model=lens_model_class)
+            point_source_class = PointSource(
+                point_source_type_list=[], lens_model=lens_model_class
+            )
 
         # If user initiated point source class without the lens model class,
         # re-initiate the class with the lens models included
@@ -86,8 +88,8 @@ class ImageModel(object):
                 kwargs_lens_eqn_solver=point_source_class._kwargs_lens_eqn_solver,
                 index_lens_model_list=point_source_class._index_lens_model_list,
                 point_source_frame_list=point_source_class._point_source_frame_list,
-                redshift_list=point_source_class._redshift_list
-        )
+                redshift_list=point_source_class._redshift_list,
+            )
         self.PointSource = point_source_class
 
         x_center, y_center = self.Data.center
@@ -172,19 +174,22 @@ class ImageModel(object):
         """Computes the likelihood of the data given a model This is specified with the
         non-linear parameters and a linear inversion and prior marginalisation.
 
-        :param kwargs_lens: list of dicts, keyword arguments corresponding to the superposition
-            of different lens profiles in the same order of the lens_model_list
+        :param kwargs_lens: list of dicts, keyword arguments corresponding to the
+            superposition of different lens profiles in the same order of the
+            lens_model_list
         :param kwargs_source: list of dicts, keyword arguments corresponding to the
-            superposition of different source light profiles in the same order of light_model_list
-        :param kwargs_lens_light: list of dicts, keyword arguments corresponding to different
-            lens light surface brightness profiles in the same order of lens_light_model_list
-        :param kwargs_ps: list of dicts, keyword arguments for the points source models in the
-            same order of point_source_type_list
-        :param kwargs_extinction: list of dicts, keyword arguments corresponding to different
-            light profiles in the optical_depth_model
-        :param kwargs_special: optional dict including keys "delta_x_image" and "delta_y_image"
-            and array/list values indicating how much to shift each point source image
-            in units of arcseconds
+            superposition of different source light profiles in the same order of
+            light_model_list
+        :param kwargs_lens_light: list of dicts, keyword arguments corresponding to
+            different lens light surface brightness profiles in the same order of
+            lens_light_model_list
+        :param kwargs_ps: list of dicts, keyword arguments for the points source models
+            in the same order of point_source_type_list
+        :param kwargs_extinction: list of dicts, keyword arguments corresponding to
+            different light profiles in the optical_depth_model
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :param source_marg: bool, performs a marginalization over the linear parameters
         :param linear_prior: linear prior width in eigenvalues
         :param check_positive_flux: bool, if True, checks whether the linear inversion
@@ -229,14 +234,16 @@ class ImageModel(object):
         """Computes the source surface brightness distribution.
 
         :param kwargs_source: list of dicts, keyword arguments corresponding to the
-            superposition of different source light profiles in the same order of light_model_list
-        :param kwargs_lens: list of dicts, keyword arguments corresponding to the superposition
-            of different lens profiles in the same order of the lens_model_list
-        :param kwargs_extinction: list of dicts, keyword arguments corresponding to different
-            light profiles in the optical_depth_model
-        :param kwargs_special: optional dict including keys "delta_x_image" and "delta_y_image"
-            and array/list values indicating how much to shift each point source image
-            in units of arcseconds
+            superposition of different source light profiles in the same order of
+            light_model_list
+        :param kwargs_lens: list of dicts, keyword arguments corresponding to the
+            superposition of different lens profiles in the same order of the
+            lens_model_list
+        :param kwargs_extinction: list of dicts, keyword arguments corresponding to
+            different light profiles in the optical_depth_model
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :param unconvolved: if True: returns the unconvolved light distribution (prefect
             seeing)
         :param de_lensed: if True: returns the un-lensed source surface brightness
@@ -271,14 +278,16 @@ class ImageModel(object):
         """Computes the source surface brightness distribution.
 
         :param kwargs_source: list of dicts, keyword arguments corresponding to the
-            superposition of different source light profiles in the same order of light_model_list
-        :param kwargs_lens: list of dicts, keyword arguments corresponding to the superposition
-            of different lens profiles in the same order of the lens_model_list
-        :param kwargs_extinction: list of dicts, keyword arguments corresponding to different
-            light profiles in the optical_depth_model
-        :param kwargs_special: optional dict including keys "delta_x_image" and "delta_y_image"
-            and array/list values indicating how much to shift each point source image
-            in units of arcseconds
+            superposition of different source light profiles in the same order of
+            light_model_list
+        :param kwargs_lens: list of dicts, keyword arguments corresponding to the
+            superposition of different lens profiles in the same order of the
+            lens_model_list
+        :param kwargs_extinction: list of dicts, keyword arguments corresponding to
+            different light profiles in the optical_depth_model
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :param unconvolved: if True: returns the unconvolved light distribution (prefect
             seeing)
         :param de_lensed: if True: returns the un-lensed source surface brightness
@@ -313,14 +322,16 @@ class ImageModel(object):
         """Computes the source surface brightness distribution.
 
         :param kwargs_source: list of dicts, keyword arguments corresponding to the
-            superposition of different source light profiles in the same order of light_model_list
-        :param kwargs_lens: list of dicts, keyword arguments corresponding to the superposition
-            of different lens profiles in the same order of the lens_model_list
-        :param kwargs_extinction: list of dicts, keyword arguments corresponding to different
-            light profiles in the optical_depth_model
-        :param kwargs_special: optional dict including keys "delta_x_image" and "delta_y_image"
-            and array/list values indicating how much to shift each point source image
-            in units of arcseconds
+            superposition of different source light profiles in the same order of
+            light_model_list
+        :param kwargs_lens: list of dicts, keyword arguments corresponding to the
+            superposition of different lens profiles in the same order of the
+            lens_model_list
+        :param kwargs_extinction: list of dicts, keyword arguments corresponding to
+            different light profiles in the optical_depth_model
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :param de_lensed: if True: returns the un-lensed source surface brightness
             profile, otherwise the lensed.
         :param k: integer, if set, will only return the model of the specific index
@@ -382,24 +393,26 @@ class ImageModel(object):
 
     @partial(jit, static_argnums=(0, 4, 5))
     def point_source(
-       self,
-       kwargs_ps,
-       kwargs_lens=None,
-       kwargs_special=None,
-       unconvolved=False,
-       k=None,
+        self,
+        kwargs_ps,
+        kwargs_lens=None,
+        kwargs_special=None,
+        unconvolved=False,
+        k=None,
     ):
         """Computes the point source positions and paints PSF convolutions on them.
 
         :param kwargs_ps: list of dicts, keyword arguments for each point source model
             in the same order of the point_source_type_list
-        :param kwargs_lens: list of dicts, keyword arguments for the full set of lens models
-            in the same order of the lens_model_list
-        :param kwargs_special: optional dict including keys "delta_x_image" and "delta_y_image"
-            and array/list values indicating how much to shift each point source image
-            in units of arcseconds
-        :param unconvolved: bool, includes point source images if False, excludes ps if True
-        :param k: optional int, include only the k-th point source model. If None, includes all
+        :param kwargs_lens: list of dicts, keyword arguments for the full set of lens
+            models in the same order of the lens_model_list
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
+        :param unconvolved: bool, includes point source images if False, excludes ps if
+            True
+        :param k: optional int, include only the k-th point source model. If None,
+            includes all
         :return: rendered point source images
         """
         point_source_image = jnp.zeros((self.Data.num_pixel_axes))
@@ -432,19 +445,22 @@ class ImageModel(object):
     ):
         """Make an image with a realisation of linear parameter values "param".
 
-        :param kwargs_lens: list of dicts, keyword arguments corresponding to the superposition
-            of different lens profiles in the same order of the lens_model_list
+        :param kwargs_lens: list of dicts, keyword arguments corresponding to the
+            superposition of different lens profiles in the same order of the
+            lens_model_list
         :param kwargs_source: list of dicts, keyword arguments corresponding to the
-            superposition of different source light profiles in the same order of light_model_list
-        :param kwargs_lens_light: list of dicts, keyword arguments corresponding to different
-            lens light surface brightness profiles in the same order of lens_light_model_list
-        :param kwargs_ps: list of dicts, keyword arguments for the points source models in the
-            same order of point_source_type_list
-        :param kwargs_extinction: list of dicts, keyword arguments corresponding to different
-            light profiles in the optical_depth_model
-        :param kwargs_special: optional dict including keys "delta_x_image" and "delta_y_image"
-            and array/list values indicating how much to shift each point source image
-            in units of arcseconds
+            superposition of different source light profiles in the same order of
+            light_model_list
+        :param kwargs_lens_light: list of dicts, keyword arguments corresponding to
+            different lens light surface brightness profiles in the same order of
+            lens_light_model_list
+        :param kwargs_ps: list of dicts, keyword arguments for the points source models
+            in the same order of point_source_type_list
+        :param kwargs_extinction: list of dicts, keyword arguments corresponding to
+            different light profiles in the optical_depth_model
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :param unconvolved: if True: returns the unconvolved light distribution (prefect
             seeing)
         :param source_add: if True, compute source, otherwise without
@@ -468,11 +484,11 @@ class ImageModel(object):
             )
         if point_source_add is True:
             model += ImageModel.point_source(
-               self,
-               kwargs_ps,
-               kwargs_lens,
-               kwargs_special=kwargs_special,
-               unconvolved=unconvolved,
+                self,
+                kwargs_ps,
+                kwargs_lens,
+                kwargs_special=kwargs_special,
+                unconvolved=unconvolved,
             )
         return model
 
@@ -563,13 +579,14 @@ class ImageModel(object):
         """Returns the 1d array of the error estimate corresponding to the data
         response.
 
-        :param kwargs_lens: list of dicts, keyword arguments corresponding to the superposition
-            of different lens profiles in the same order of the lens_model_list
-        :param kwargs_ps: list of dicts, keyword arguments for the points source models in the
-            same order of point_source_type_list
-        :param kwargs_special: optional dict including keys "delta_x_image" and "delta_y_image"
-            and array/list values indicating how much to shift each point source image
-            in units of arcseconds
+        :param kwargs_lens: list of dicts, keyword arguments corresponding to the
+            superposition of different lens profiles in the same order of the
+            lens_model_list
+        :param kwargs_ps: list of dicts, keyword arguments for the points source models
+            in the same order of point_source_type_list
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :return: 1d numpy array of response, 2d array of additional errors (e.g. point
             source uncertainties)
         """
@@ -584,13 +601,14 @@ class ImageModel(object):
         resulted from inherent model uncertainties. This term is currently the psf error
         map.
 
-        :param kwargs_lens: list of dicts, keyword arguments corresponding to the superposition
-            of different lens profiles in the same order of the lens_model_list
-        :param kwargs_ps: list of dicts, keyword arguments for the points source models in the
-            same order of point_source_type_list
-        :param kwargs_special: optional dict including keys "delta_x_image" and "delta_y_image"
-            and array/list values indicating how much to shift each point source image
-            in units of arcseconds
+        :param kwargs_lens: list of dicts, keyword arguments corresponding to the
+            superposition of different lens profiles in the same order of the
+            lens_model_list
+        :param kwargs_ps: list of dicts, keyword arguments for the points source models
+            in the same order of point_source_type_list
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :return: 2d array corresponding to the pixels in terms of variance in noise
         """
         return self._error_map_psf(kwargs_lens, kwargs_ps, kwargs_special)
@@ -600,62 +618,63 @@ class ImageModel(object):
         """Map of image with error terms (sigma**2) expected from inaccuracies in the
         PSF modeling.
 
-        :param kwargs_lens: list of dicts, keyword arguments corresponding to the superposition
-            of different lens profiles in the same order of the lens_model_list
-        :param kwargs_ps: list of dicts, keyword arguments for the points source models in the
-            same order of point_source_type_list
-        :param kwargs_special: optional dict including keys "delta_x_image" and "delta_y_image"
-            and array/list values indicating how much to shift each point source image
-            in units of arcseconds
+        :param kwargs_lens: list of dicts, keyword arguments corresponding to the
+            superposition of different lens profiles in the same order of the
+            lens_model_list
+        :param kwargs_ps: list of dicts, keyword arguments for the points source models
+            in the same order of point_source_type_list
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :return: 2d array of size of the image
         """
         error_map = jnp.zeros(self.Data.num_pixel_axes)
         if self._psf_error_map is True:
-           for k, bool_ in enumerate(self._psf_error_map_bool_list):
-               if bool_ is True:
-                   ra_pos, dec_pos, _ = self.PointSource.point_source_list(
-                       kwargs_ps, kwargs_lens=kwargs_lens, k=k, with_amp=False
-                   )
-                   if len(ra_pos) > 0:
-                       ra_pos, dec_pos = self._displace_astrometry(
-                           ra_pos, dec_pos, kwargs_special=kwargs_special
-                       )
-                       error_map += self.ImageNumerics.psf_variance_map(
-                           ra_pos,
-                           dec_pos,
-                           None,
-                           self.Data.data,
-                           fix_psf_error_map=False,
-                       )
+            for k, bool_ in enumerate(self._psf_error_map_bool_list):
+                if bool_ is True:
+                    ra_pos, dec_pos, _ = self.PointSource.point_source_list(
+                        kwargs_ps, kwargs_lens=kwargs_lens, k=k, with_amp=False
+                    )
+                    if len(ra_pos) > 0:
+                        ra_pos, dec_pos = self._displace_astrometry(
+                            ra_pos, dec_pos, kwargs_special=kwargs_special
+                        )
+                        error_map += self.ImageNumerics.psf_variance_map(
+                            ra_pos,
+                            dec_pos,
+                            None,
+                            self.Data.data,
+                            fix_psf_error_map=False,
+                        )
         return error_map
 
     @staticmethod
     @jit
     def _displace_astrometry(x_pos, y_pos, kwargs_special=None):
-       """Displaces point sources by shifts specified in kwargs_special.
+        """Displaces point sources by shifts specified in kwargs_special.
 
-       :param x_pos: list of point source positions according to point source model
-           list
-       :param y_pos: list of point source positions according to point source model
-           list
-        :param kwargs_special: optional dict including keys "delta_x_image" and "delta_y_image"
-            and array/list values indicating how much to shift each point source image
-            in units of arcseconds
-       :return: shifted image positions in same format as input
-       """
-       if kwargs_special is not None:
-           if "delta_x_image" in kwargs_special:
-               delta_x, delta_y = (
-                   kwargs_special["delta_x_image"],
-                   kwargs_special["delta_y_image"],
-               )
-               delta_x_new = jnp.zeros(len(x_pos))
-               delta_x_new = delta_x_new.at[0 : len(delta_x)].set(delta_x)
-               delta_y_new = jnp.zeros(len(y_pos))
-               delta_y_new = delta_y_new.at[0 : len(delta_y)].set(delta_y)
-               x_pos = x_pos + delta_x_new
-               y_pos = y_pos + delta_y_new
-       return x_pos, y_pos
+        :param x_pos: list of point source positions according to point source model
+            list
+        :param y_pos: list of point source positions according to point source model
+            list
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
+        :return: shifted image positions in same format as input
+        """
+        if kwargs_special is not None:
+            if "delta_x_image" in kwargs_special:
+                delta_x, delta_y = (
+                    kwargs_special["delta_x_image"],
+                    kwargs_special["delta_y_image"],
+                )
+                delta_x_new = jnp.zeros(len(x_pos))
+                delta_x_new = delta_x_new.at[0 : len(delta_x)].set(delta_x)
+                delta_y_new = jnp.zeros(len(y_pos))
+                delta_y_new = delta_y_new.at[0 : len(delta_y)].set(delta_y)
+                x_pos = x_pos + delta_x_new
+                y_pos = y_pos + delta_y_new
+        return x_pos, y_pos
 
     def update_psf(self, psf_class):
         """Update the psf class.
