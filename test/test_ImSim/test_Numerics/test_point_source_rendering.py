@@ -33,6 +33,7 @@ class TestPointSourceRendering(object):
             "kernel_point_source": kernel,
             "psf_type": "PIXEL",
             "psf_variance_map": np.ones_like(kernel) * kernel**2,
+            "supersampling_factor": 3,
         }
         psf_class = PSF(**kwargs_psf)
 
@@ -90,6 +91,36 @@ class TestPointSourceRendering(object):
             ra_pos, dec_pos, amp=1, data=data, fix_psf_variance_map=False
         )
         npt.assert_allclose(image, image_ref, atol=1e-8, rtol=1e-8)
+
+# Same tests as above but with supersampling = 3
+class TestPointSourceRenderingSuperSampling(TestPointSourceRendering):
+    def setup_method(self):
+        Mpix2coord = np.array([[1, 0], [0, 1]])
+        kwargs_grid = {
+            "ra_at_xy_0": 0,
+            "dec_at_xy_0": 0,
+            "transform_pix2angle": Mpix2coord,
+            "nx": 10,
+            "ny": 10,
+        }
+        pixel_grid = PixelGrid(**kwargs_grid)
+        kernel = np.zeros((7, 7))
+        kernel[1:6, 1:6] = 2
+        kernel[4:4] = 7
+        kwargs_psf = {
+            "kernel_point_source": kernel,
+            "psf_type": "PIXEL",
+            "psf_variance_map": np.ones_like(kernel) * kernel**2,
+            "supersampling_factor": 3,
+        }
+        psf_class = PSF(**kwargs_psf)
+
+        self._ps_rendering = PointSourceRendering(
+            pixel_grid, supersampling_factor=None, psf=psf_class
+        )
+        self._ps_rendering_ref = PointSourceRendering_ref(
+            pixel_grid, supersampling_factor=None, psf=psf_class
+        )
 
 
 class TestRaise(unittest.TestCase):

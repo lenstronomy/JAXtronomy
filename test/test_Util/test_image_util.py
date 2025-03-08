@@ -102,6 +102,12 @@ def test_shift():
     result_ref = shift_ref(input=input_array, shift=shift, order=1)
     npt.assert_allclose(result, result_ref, atol=1e-15, rtol=1e-15)
 
+    input_array = np.linspace(-15, 15, 150 * 150, dtype=float).reshape((150, 150))
+    shift = 0.423
+    result = image_util.shift(input=input_array, shift=shift)
+    result_ref = shift_ref(input=input_array, shift=shift, order=1)
+    npt.assert_allclose(result, result_ref, atol=1e-15, rtol=1e-15)
+
     _3d_array = np.ones((3, 3, 3))
     npt.assert_raises(ValueError, image_util.shift, _3d_array, 0.23)
 
