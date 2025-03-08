@@ -13,11 +13,13 @@ from lenstronomy.Data.imaging_data import ImageData as ImageData_ref
 from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
 from lenstronomy.LightModel.light_model import LightModel as LightModel_ref
 from lenstronomy.ImSim.image_model import ImageModel as ImageModel_ref
+from lenstronomy.PointSource.point_source import PointSource as PointSource_ref
 
 from jaxtronomy.Data.imaging_data import ImageData
 from jaxtronomy.LensModel.lens_model import LensModel
 from jaxtronomy.LightModel.light_model import LightModel
 from jaxtronomy.ImSim.image_model import ImageModel
+from jaxtronomy.PointSource.point_source import PointSource
 
 config.update("jax_enable_x64", True)
 
@@ -108,6 +110,40 @@ class TestImageModel(object):
         source_model_class = LightModel(light_model_list=source_model_list)
         source_model_class_ref = LightModel_ref(light_model_list=source_model_list)
 
+        point_source_type_list = ["UNLENSED", "LENSED_POSITION", "LENSED_POSITION"]
+        fixed_magnification_list = [None, True, False]
+        kwargs_unlensed = {
+            "ra_image": [5.342],
+            "dec_image": [2.8743],
+            "point_amp": [18.23]
+        }
+        kwargs_lensed_fixed_mag = {
+            "ra_image": [1.342],
+            "dec_image": [3.8743],
+            "source_amp": [13.23]
+        }
+        kwargs_lensed = {
+            "ra_image": [3.342, -2.23498],
+            "dec_image": [-0.8743, 4.2384],
+            "point_amp": [19.23, 18.543]
+        }
+        self.kwargs_ps = [kwargs_unlensed, kwargs_lensed_fixed_mag, kwargs_lensed]
+        point_source_class = PointSource(
+            lens_model=None,
+            point_source_type_list=point_source_type_list,
+            fixed_magnification_list=fixed_magnification_list,
+        )
+        point_source_class_ref = PointSource_ref(
+            lens_model=None,
+            point_source_type_list=point_source_type_list,
+            fixed_magnification_list=fixed_magnification_list,
+        )
+
+        self.kwargs_special = {
+            "delta_x_image": [0.334],
+            "delta_y_image": [-1.3287],
+        }
+
         kwargs_numerics = {
             "supersampling_factor": 3,
             "supersampling_convolution": True,
@@ -119,7 +155,7 @@ class TestImageModel(object):
         likelihood_mask[25][::3] -= likelihood_mask[25][::3]
         self.likelihood_mask = likelihood_mask
 
-        # Create 2 class instances with likelihood mask
+        # Create 2 class instances with likelihood mask and w/o point source
         self.imageModel = ImageModel(
             self.data_class,
             self.psf_class_gaussian,
@@ -139,13 +175,14 @@ class TestImageModel(object):
             likelihood_mask=likelihood_mask,
         )
 
-        # Create 2 class instances without likelihood mask
+        # Create 2 class instances without likelihood mask and with point source
         self.imageModel_nomask = ImageModel(
             self.data_class,
             self.psf_class_gaussian,
             lens_model_class,
             source_model_class,
             lens_light_model_class,
+            point_source_class=point_source_class,
             kwargs_numerics=kwargs_numerics,
         )
         self.imageModel_nomask_ref = ImageModel_ref(
@@ -154,6 +191,7 @@ class TestImageModel(object):
             lens_model_class_ref,
             source_model_class_ref,
             lens_light_model_class_ref,
+            point_source_class=point_source_class_ref,
             kwargs_numerics=kwargs_numerics,
         )
 
@@ -192,16 +230,6 @@ class TestImageModel(object):
             ValueError, ImageModel, self.data_class, self.psf_class_gaussian
         )
 
-        # psf error map not supported
-        kernel = self.psf_class_gaussian.kernel_point_source
-        kwargs_psf = {
-            "psf_type": "PIXEL",
-            "kernel_point_source": kernel,
-            "psf_variance_map": np.ones_like(kernel) * 0.001 * kernel**2,
-        }
-        psf_class = PSF(**kwargs_psf)
-        npt.assert_raises(ValueError, ImageModel, self.data_class, psf_class)
-
     def test_likelihood_data_given_model(self):
         logL = self.imageModel.likelihood_data_given_model(
             self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
@@ -220,18 +248,18 @@ class TestImageModel(object):
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
         logL = self.imageModel_nomask.likelihood_data_given_model(
-            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
         )
         logL_ref = self.imageModel_nomask_ref.likelihood_data_given_model(
-            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
         logL = self.imageModel_nomask.likelihood_data_given_model(
-            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps, kwargs_special=self.kwargs_special
         )
         logL_ref = self.imageModel_nomask_ref.likelihood_data_given_model(
-            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps, kwargs_special=self.kwargs_special
         )
         npt.assert_array_almost_equal(logL, logL_ref, decimal=8)
 
@@ -245,7 +273,7 @@ class TestImageModel(object):
         # differentiates with respect to the 0th argument by default
         grad_log_func = grad(self.imageModel_nomask.likelihood_data_given_model)
         grad_log = grad_log_func(
-            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
         )
         assert len(grad_log[0]) == len(self.kwargs_lens2[0])
         assert len(grad_log[1]) == len(self.kwargs_lens2[1])
@@ -264,7 +292,7 @@ class TestImageModel(object):
             self.imageModel_nomask.likelihood_data_given_model, argnums=1
         )
         grad_log = grad_log_func(
-            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
         )
         assert len(grad_log[0]) == len(self.kwargs_source[0])
 
@@ -273,9 +301,18 @@ class TestImageModel(object):
             self.imageModel_nomask.likelihood_data_given_model, argnums=2
         )
         grad_log = grad_log_func(
-            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
         )
         assert len(grad_log[0]) == len(self.kwargs_lens_light[0])
+
+        # differentiates with respect to kwargs_ps
+        grad_log_func = grad(
+            self.imageModel_nomask.likelihood_data_given_model, argnums=3
+        )
+        grad_log = grad_log_func(
+            self.kwargs_lens2, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        assert len(grad_log[2]) == len(self.kwargs_ps[2])
 
     def test_source_surface_brightness(self):
         flux = self.imageModel.source_surface_brightness(
@@ -353,6 +390,48 @@ class TestImageModel(object):
         )
         npt.assert_array_almost_equal(flux, flux_ref, decimal=8)
 
+    def test_point_source(self):
+        flux = self.imageModel_nomask.point_source(
+            self.kwargs_ps,
+            self.kwargs_lens,
+            self.kwargs_special,
+        )
+        flux_ref = self.imageModel_nomask_ref.point_source(
+            self.kwargs_ps,
+            self.kwargs_lens,
+            self.kwargs_special,
+        )
+        npt.assert_allclose(flux, flux_ref, atol=1e-8, rtol=1e-8)
+
+        flux = self.imageModel_nomask.point_source(
+            self.kwargs_ps,
+            self.kwargs_lens,
+            self.kwargs_special,
+            k=2
+        )
+        flux_ref = self.imageModel_nomask_ref.point_source(
+            self.kwargs_ps,
+            self.kwargs_lens,
+            self.kwargs_special,
+            k=2
+        )
+        npt.assert_allclose(flux, flux_ref, atol=1e-8, rtol=1e-8)
+
+        flux = self.imageModel_nomask.point_source(
+            self.kwargs_ps,
+            self.kwargs_lens,
+            self.kwargs_special,
+            unconvolved=True
+        )
+        flux_ref = self.imageModel_nomask_ref.point_source(
+            self.kwargs_ps,
+            self.kwargs_lens,
+            self.kwargs_special,
+            unconvolved=True
+        )
+        npt.assert_allclose(flux, flux_ref, atol=1e-8, rtol=1e-8)
+
+
     def test_image(self):
         image = self.imageModel.image(
             kwargs_lens=self.kwargs_lens,
@@ -382,11 +461,13 @@ class TestImageModel(object):
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
+            kwargs_ps=self.kwargs_ps,
         )
         image_ref = self.imageModel_nomask_ref.image(
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
+            kwargs_ps=self.kwargs_ps,
         )
         npt.assert_array_almost_equal(image, image_ref, decimal=8)
 
@@ -394,11 +475,29 @@ class TestImageModel(object):
             kwargs_lens=self.kwargs_lens2,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
+            kwargs_ps=self.kwargs_ps,
+            kwargs_special=self.kwargs_special,
         )
         image_ref = self.imageModel_nomask_ref.image(
             kwargs_lens=self.kwargs_lens2,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
+            kwargs_ps=self.kwargs_ps,
+            kwargs_special=self.kwargs_special,
+        )
+        npt.assert_array_almost_equal(image, image_ref, decimal=8)
+
+        image = self.imageModel_nomask.image(
+            kwargs_lens=self.kwargs_lens,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
+            unconvolved=True,
+        )
+        image_ref = self.imageModel_nomask_ref.image(
+            kwargs_lens=self.kwargs_lens,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
+            unconvolved=True,
         )
         npt.assert_array_almost_equal(image, image_ref, decimal=8)
 
@@ -413,18 +512,18 @@ class TestImageModel(object):
 
     def test_error(self):
         # error response
-        cd_response, model_error = self.imageModel.error_response(
-            self.kwargs_lens, [], []
+        cd_response, model_error = self.imageModel_nomask.error_response(
+            self.kwargs_lens, self.kwargs_ps, self.kwargs_special
         )
-        cd_response_ref, model_error_ref = self.imageModel_ref.error_response(
-            self.kwargs_lens, [], []
+        cd_response_ref, model_error_ref = self.imageModel_nomask_ref.error_response(
+            self.kwargs_lens, self.kwargs_ps, self.kwargs_special
         )
         npt.assert_array_almost_equal(cd_response, cd_response_ref, decimal=8)
         npt.assert_array_almost_equal(model_error, model_error_ref, decimal=8)
 
         # error map psf
-        error = self.imageModel._error_map_psf(self.kwargs_lens, [], [])
-        error_ref = self.imageModel_ref._error_map_psf(self.kwargs_lens, [], [])
+        error = self.imageModel_nomask._error_map_psf(self.kwargs_lens, self.kwargs_ps, self.kwargs_special)
+        error_ref = self.imageModel_nomask_ref._error_map_psf(self.kwargs_lens, self.kwargs_ps, self.kwargs_special)
         npt.assert_array_almost_equal(error, error_ref, decimal=8)
 
     def test_reduced_residuals(self):
@@ -481,16 +580,6 @@ class TestImageModel(object):
             ValueError, self.imageModel.update_psf, self.psf_class_gaussian
         )
         npt.assert_raises(ValueError, self.imageModel.update_data, self.data_class)
-
-        # point source not supported
-        npt.assert_raises(
-            ValueError,
-            self.imageModel.image,
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light,
-            point_source_add=True,
-        )
 
         # extinction not supported
         npt.assert_raises(
