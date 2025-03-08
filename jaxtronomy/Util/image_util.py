@@ -55,13 +55,18 @@ def add_layer2image_int(grid2d, x_pos, y_pos, kernel):
     # Adds in the kernel one pixel at a time
     def body_fun(i, grid2d):
         row_index = i + y_int - kernel_y_radius
+
         def body_fun2(j, grid2d):
             col_index = j + x_int - kernel_x_radius
             kernel_value = kernel.at[i, j].get()
 
             # Set the kernel equal to zero in places where it would go outside the grid
-            kernel_value = jnp.where(row_index < 0, 0, jnp.where(row_index >= image_rows, 0, kernel_value))
-            kernel_value = jnp.where(col_index < 0, 0, jnp.where(col_index >= image_cols, 0, kernel_value))
+            kernel_value = jnp.where(
+                row_index < 0, 0, jnp.where(row_index >= image_rows, 0, kernel_value)
+            )
+            kernel_value = jnp.where(
+                col_index < 0, 0, jnp.where(col_index >= image_cols, 0, kernel_value)
+            )
 
             # Add kernel to grid
             value = kernel_value + grid2d.at[row_index, col_index].get()
