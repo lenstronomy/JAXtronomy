@@ -1,4 +1,6 @@
-from lenstronomy.ImSim.Numerics.point_source_rendering import PointSourceRendering as PointSourceRendering_ref
+from lenstronomy.ImSim.Numerics.point_source_rendering import (
+    PointSourceRendering as PointSourceRendering_ref,
+)
 from lenstronomy.Data.pixel_grid import PixelGrid
 from lenstronomy.Data.psf import PSF
 
@@ -11,6 +13,7 @@ import pytest
 import unittest
 
 config.update("jax_enable_x64", True)
+
 
 class TestPointSourceRendering(object):
     def setup_method(self):
