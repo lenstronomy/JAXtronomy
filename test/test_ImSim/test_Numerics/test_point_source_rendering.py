@@ -92,6 +92,7 @@ class TestPointSourceRendering(object):
         )
         npt.assert_allclose(image, image_ref, atol=1e-8, rtol=1e-8)
 
+
 # Same tests as above but with supersampling = 3
 class TestPointSourceRenderingSuperSampling(TestPointSourceRendering):
     def setup_method(self):
