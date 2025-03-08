@@ -2,8 +2,8 @@ from jaxtronomy.Data.imaging_data import ImageData
 from jaxtronomy.LensModel.lens_model import LensModel
 from jaxtronomy.LightModel.light_model import LightModel
 from jaxtronomy.ImSim.image_model import ImageModel
+from jaxtronomy.PointSource.point_source import PointSource
 
-from lenstronomy.PointSource.point_source import PointSource
 from lenstronomy.ImSim.differential_extinction import DifferentialExtinction
 from lenstronomy.Data.psf import PSF
 
@@ -13,7 +13,7 @@ from lenstronomy.Util.package_util import exporter
 
 # This file is the same as lenstronomy but with import statements changed
 # Functions here do not need to be JIT compiled
-# TODO: Implement TracerModel, PointSource, and Extinction in jaxtronomy
+# TODO: Implement TracerModel and Extinction in jaxtronomy
 
 export, __all__ = exporter()
 
