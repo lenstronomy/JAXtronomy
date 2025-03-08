@@ -88,12 +88,11 @@ def add_layer2image_int(grid2d, x_pos, y_pos, kernel):
 
         padded_image = lax.fori_loop(0, k_cols, body_fun2, padded_image)
         return padded_image
+
     result = lax.fori_loop(0, k_rows, body_fun, padded_image)
-    
+
     # Unpads the image
-    return result[
-        kernel_y_radius:-kernel_y_radius, kernel_x_radius:-kernel_x_radius
-    ]
+    return result[kernel_y_radius:-kernel_y_radius, kernel_x_radius:-kernel_x_radius]
 
 
 @partial(jit, static_argnums=1)
