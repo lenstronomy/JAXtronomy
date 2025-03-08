@@ -88,9 +88,10 @@ def add_layer2image_int(grid2d, x_pos, y_pos, kernel):
 
         padded_image = lax.fori_loop(0, k_cols, body_fun2, padded_image)
         return padded_image
-
+    result = lax.fori_loop(0, k_rows, body_fun, padded_image)
+    
     # Unpads the image
-    return lax.fori_loop(0, k_rows, body_fun, padded_image)[
+    return result[
         kernel_y_radius:-kernel_y_radius, kernel_x_radius:-kernel_x_radius
     ]
 
@@ -130,8 +131,8 @@ def shift(input, shift):
     :param input: 2 dimensional array to be shifted
     :param shift: float, amount to shift the rows and columns by. Can also be a
         tuple or list of floats, i.e. shift = [shift_row, shift_col]
-    :param shift_row: float between -1 and 1, amount to shift the rows by
-    :param shift_col: float between -1 and 1, amount to shift the columns by
+    :param shift_row: float between -1 and 1, amount to shift the rows up or down by
+    :param shift_col: float between -1 and 1, amount to shift the columns left or right by
     """
     old_array = jnp.array(input)
     if old_array.ndim != 2:
