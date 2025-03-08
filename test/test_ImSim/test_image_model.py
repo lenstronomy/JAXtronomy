@@ -47,7 +47,7 @@ class TestImageModel(object):
         kwargs_psf = {
             "psf_type": "PIXEL",
             "kernel_point_source": kernel,
-            "psf_variance_map": np.ones_like(kernel) * kernel**2
+            "psf_variance_map": np.ones_like(kernel) * kernel**2,
         }
         self.psf_class_gaussian = PSF(**kwargs_psf)
 
