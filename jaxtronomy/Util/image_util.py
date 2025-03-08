@@ -36,8 +36,7 @@ def add_layer2image_int(grid2d, x_pos, y_pos, kernel):
     of pixel. Since JAX requires that array sizes are known at compile time, and the
     amount of overlapping area between the kernel and image is only known at runtime
     when x_pos and y_pos are given, the implementation here differs significantly from
-    lenstronomy. With large kernel sizes (21+), this JAX implementation is significantly
-    slower. For small kernel sizes (< 9), the runtime is about the same.
+    lenstronomy and is about 5x slower (even more so with larger kernel sizes).
 
     :param grid2d: 2d pixel grid (i.e. image)
     :param x_pos: x-position center (pixel coordinate) of the layer to be added
@@ -53,46 +52,26 @@ def add_layer2image_int(grid2d, x_pos, y_pos, kernel):
     x_int = (jnp.round(x_pos)).astype(int)
     y_int = (jnp.round(y_pos)).astype(int)
 
-    # If x_int and y_int are so far out that there is no overlap between the kernel and image,
-    # set the kernel to zero
-    out_of_bounds = False
-    out_of_bounds = jnp.where(x_int < -kernel_x_radius, True, out_of_bounds)
-    out_of_bounds = jnp.where(y_int < -kernel_y_radius, True, out_of_bounds)
-    out_of_bounds = jnp.where(
-        x_int >= image_cols + kernel_x_radius, True, out_of_bounds
-    )
-    out_of_bounds = jnp.where(
-        y_int >= image_rows + kernel_y_radius, True, out_of_bounds
-    )
-    kernel = jnp.where(out_of_bounds, 0, kernel)
+    # Adds in the kernel one pixel at a time
+    def body_fun(i, grid2d):
+        row_index = i + y_int - kernel_y_radius
+        def body_fun2(j, grid2d):
+            col_index = j + x_int - kernel_x_radius
+            kernel_value = kernel.at[i, j].get()
 
-    # Padding the image is required so that if x_int or y_int are just outside the image, then
-    # we can add in the kernel, then unpad the image so that we are left with the partial kernel
-    padded_image = jnp.pad(
-        grid2d,
-        pad_width=(
-            (kernel_y_radius, kernel_y_radius),
-            (kernel_x_radius, kernel_x_radius),
-        ),
-        mode="constant",
-    )
+            # Set the kernel equal to zero in places where it would go outside the grid
+            kernel_value = jnp.where(row_index < 0, 0, jnp.where(row_index >= image_rows, 0, kernel_value))
+            kernel_value = jnp.where(col_index < 0, 0, jnp.where(col_index >= image_cols, 0, kernel_value))
 
-    # Adds in the kernel
-    def body_fun(i, padded_image):
-        def body_fun2(j, padded_image):
-            row_index = i + y_int
-            col_index = j + x_int
-            value = kernel.at[i, j].get() + padded_image.at[row_index, col_index].get()
-            padded_image = padded_image.at[row_index, col_index].set(value)
-            return padded_image
+            # Add kernel to grid
+            value = kernel_value + grid2d.at[row_index, col_index].get()
+            grid2d = grid2d.at[row_index, col_index].set(value)
+            return grid2d
 
-        padded_image = lax.fori_loop(0, k_cols, body_fun2, padded_image)
-        return padded_image
+        grid2d = lax.fori_loop(0, k_cols, body_fun2, grid2d)
+        return grid2d
 
-    result = lax.fori_loop(0, k_rows, body_fun, padded_image)
-
-    # Unpads the image
-    return result[kernel_y_radius:-kernel_y_radius, kernel_x_radius:-kernel_x_radius]
+    return lax.fori_loop(0, k_rows, body_fun, grid2d)
 
 
 @partial(jit, static_argnums=1)
