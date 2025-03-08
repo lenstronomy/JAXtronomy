@@ -83,6 +83,23 @@ def image2array(image):
 
 
 @jit
+def map_coord2pix(ra, dec, x_0, y_0, M):
+    """This routines performs a linear transformation between two coordinate systems.
+    Mainly used to transform angular into pixel coordinates in an image.
+
+    :param ra: ra coordinates
+    :param dec: dec coordinates
+    :param x_0: pixel value in x-axis of ra,dec = 0,0
+    :param y_0: pixel value in y-axis of ra,dec = 0,0
+    :param M: 2x2 matrix to transform angular to pixel coordinates
+    :return: transformed coordinate systems of input ra and dec
+    """
+    M = jnp.array(M)
+    x, y = M.dot(jnp.array([ra, dec]))
+    return x + x_0, y + y_0
+
+
+@jit
 def rotate(xcoords, ycoords, angle):
     """Rotates x and y coordinates by an angle.
 

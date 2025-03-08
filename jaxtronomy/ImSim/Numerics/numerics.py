@@ -4,9 +4,9 @@ from jaxtronomy.ImSim.Numerics.convolution import (
     PixelKernelConvolution,
     GaussianConvolution,
 )
+from jaxtronomy.ImSim.Numerics.point_source_rendering import PointSourceRendering
 
 from lenstronomy.Util import util as util_lenstronomy
-from lenstronomy.ImSim.Numerics.point_source_rendering import PointSourceRendering
 from lenstronomy.Util import kernel_util
 from jax import jit
 import numpy as np
@@ -44,19 +44,19 @@ class Numerics(PointSourceRendering):
         :param compute_mode: options are: 'regular'. 'adaptive' is not supported in JAXtronomy
         :param supersampling_factor: int, factor of higher resolution sub-pixel sampling of surface brightness
         :param supersampling_convolution: bool, if True, performs (part of) the convolution on the super-sampled
-         grid/pixels
+            grid/pixels
         :param supersampling_kernel_size: int (odd number), size (in regular pixel units) of the super-sampled
-         convolution
+            convolution
         :param flux_evaluate_indexes: boolean 2d array of size of image before supersampling (or None, then initiated as gird of True's).
-         Pixels indicated with True will be used to perform the surface brightness computation (and possible lensing
-         ray-shooting). Pixels marked as False will be assigned a flux value of zero (or ignored in the adaptive
-         convolution)
+            Pixels indicated with True will be used to perform the surface brightness computation (and possible lensing
+            ray-shooting). Pixels marked as False will be assigned a flux value of zero (or ignored in the adaptive
+            convolution)
         :param supersampled_indexes: 2d boolean array (only used in mode='adaptive') of pixels to be supersampled (in
-         surface brightness and if supersampling_convolution=True also in convolution). All other pixels not set to =True
-         will not be super-sampled.
+            surface brightness and if supersampling_convolution=True also in convolution). All other pixels not set to =True
+            will not be super-sampled.
         :param compute_indexes: 2d boolean array (only used in compute_mode='adaptive'), marks pixel that the response after
-         convolution is computed (all others =0). This can be set to likelihood_mask in the Likelihood module for
-         consistency.
+            convolution is computed (all others =0). This can be set to likelihood_mask in the Likelihood module for
+            consistency.
         :param point_source_supersampling_factor: super-sampling resolution of the point source placing
         :param convolution_kernel_size: int, odd number, size of convolution kernel before supersampling. If None, takes size of point_source_kernel
             Only relevant for psf type PIXEL

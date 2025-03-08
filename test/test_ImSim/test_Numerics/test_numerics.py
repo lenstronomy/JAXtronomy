@@ -111,6 +111,7 @@ class TestNumerics(object):
             "psf_type": "GAUSSIAN",
             "fwhm": 0.5,
             "kernel_point_source_normalisation": True,
+            "pixel_size": 0.11,
         }
         self.psf_class_gaussian = PSF(**kwargs_psf_gaussian)
         kwargs_psf_none = {

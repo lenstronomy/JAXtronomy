@@ -3,7 +3,7 @@ import numpy as np
 from jax import jit, numpy as jnp
 
 from jaxtronomy.ImSim.Numerics.numerics import Numerics
-from lenstronomy.ImSim.Numerics.point_source_rendering import PointSourceRendering
+from jaxtronomy.ImSim.Numerics.point_source_rendering import PointSourceRendering
 from lenstronomy.Data.pixel_grid import PixelGrid
 
 # NOTE: This file is copy-pasted from lenstronomy, with import statements changed.
