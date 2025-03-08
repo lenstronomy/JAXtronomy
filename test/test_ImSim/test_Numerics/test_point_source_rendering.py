@@ -33,7 +33,6 @@ class TestPointSourceRendering(object):
             "kernel_point_source": kernel,
             "psf_type": "PIXEL",
             "psf_variance_map": np.ones_like(kernel) * kernel**2,
-            "supersampling_factor": 3,
         }
         psf_class = PSF(**kwargs_psf)
 
@@ -111,7 +110,7 @@ class TestPointSourceRenderingSuperSampling(TestPointSourceRendering):
             "kernel_point_source": kernel,
             "psf_type": "PIXEL",
             "psf_variance_map": np.ones_like(kernel) * kernel**2,
-            "supersampling_factor": 3,
+            "point_source_supersampling_factor": 3,
         }
         psf_class = PSF(**kwargs_psf)
 
