@@ -23,7 +23,7 @@ def estimate_amp(data, x_pos, y_pos, psf_kernel):
     conditions = jnp.where(y_int <= 2, False, conditions)
     conditions = jnp.where(y_int >= numPix_y - 2, False, conditions)
 
-    # This is the same as np.sum(data[y_int - 2: y_int + 3, x_int - 2, x_int + 3])
+    # This is the same as np.sum(data[y_int - 2: y_int + 3, x_int - 2: x_int + 3])
     # But we have to do it this way since numpy slicing doesn't work unless the
     # start and end indices are known at compile time
     def body_fun(i, sum):
