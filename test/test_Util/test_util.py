@@ -49,6 +49,24 @@ def test_image2array():
     x_array_ref = util_ref.image2array(x)
     npt.assert_array_almost_equal(x_array, x_array_ref, decimal=8)
 
+def test_map_coord2pix():
+    M = np.array([[1, 3], [-1, 2]])
+    x_0, y_0 = 3, 2
+    ra = np.array([0.3435, 0.29384, 1.32989])
+    dec = np.array([1.3482, 2.4823, 23.8345])
+
+    result = util.map_coord2pix(ra, dec, x_0, y_0, M)
+    result_ref = util_ref.map_coord2pix(ra, dec, x_0, y_0, M)
+    npt.assert_allclose(result, result_ref, atol=1e-8, rtol=1e-8)
+
+    M = np.array([[1.453, 2.432], [-0.2354, 1.2342]])
+    x_0, y_0 = 2, -2
+    ra = np.array([0.43435, 0.29384, 12.32989])
+    dec = np.array([1.482, 23.823, 2.8345])
+
+    result = util.map_coord2pix(ra, dec, x_0, y_0, M)
+    result_ref = util_ref.map_coord2pix(ra, dec, x_0, y_0, M)
+    npt.assert_allclose(result, result_ref, atol=1e-8, rtol=1e-8)
 
 def test_rotate():
     x = np.array([0, 1, 2, 10])
