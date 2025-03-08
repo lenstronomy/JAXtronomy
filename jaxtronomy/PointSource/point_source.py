@@ -203,7 +203,7 @@ class PointSource(object):
             y_source_list.append(y_source)
         return x_source_list, y_source_list
 
-    @partial(jit, static_argnums=(0, 5))
+    @partial(jit, static_argnums=(0, 3, 5))
     def image_position(
         self,
         kwargs_ps,
