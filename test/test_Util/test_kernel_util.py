@@ -7,8 +7,9 @@ import pytest
 
 config.update("jax_enable_x64", True)
 
+
 def test_estimate_amp():
-    data = np.linspace(1, 50, 50*50).reshape((50,50))
+    data = np.linspace(1, 50, 50 * 50).reshape((50, 50))
     x_pos = 3.45
     y_pos = 2.98
     psf_kernel = np.ones((5, 5))

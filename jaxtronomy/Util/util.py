@@ -81,6 +81,7 @@ def image2array(image):
     imgh = jnp.reshape(image, jnp.size(image))  # change the shape to be 1d
     return imgh
 
+
 @jit
 def map_coord2pix(ra, dec, x_0, y_0, M):
     """This routines performs a linear transformation between two coordinate systems.
@@ -96,6 +97,7 @@ def map_coord2pix(ra, dec, x_0, y_0, M):
     M = jnp.array(M)
     x, y = M.dot(jnp.array([ra, dec]))
     return x + x_0, y + y_0
+
 
 @jit
 def rotate(xcoords, ycoords, angle):

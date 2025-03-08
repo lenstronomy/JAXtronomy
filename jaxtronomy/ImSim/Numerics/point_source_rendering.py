@@ -25,10 +25,8 @@ class PointSourceRendering(object):
         self._psf = psf
 
         # PSF updates are not allowed in jaxtronomy so this can be put in the init
-        self._kernel_supersampled = (
-            self._psf.kernel_point_source_supersampled(
-                self._supersampling_factor, updata_cache=False
-            )
+        self._kernel_supersampled = self._psf.kernel_point_source_supersampled(
+            self._supersampling_factor, updata_cache=False
         )
 
     @partial(jit, static_argnums=0)
@@ -42,7 +40,11 @@ class PointSourceRendering(object):
         """
         subgrid = self._supersampling_factor
         x_pos, y_pos = util.map_coord2pix(
-            ra_pos, dec_pos, self._pixel_grid._x_at_radec_0, self._pixel_grid._y_at_radec_0, self._pixel_grid._Ma2pix
+            ra_pos,
+            dec_pos,
+            self._pixel_grid._x_at_radec_0,
+            self._pixel_grid._y_at_radec_0,
+            self._pixel_grid._Ma2pix,
         )
         # translate coordinates to higher resolution grid
         x_pos_subgrid = x_pos * subgrid + (subgrid - 1) / 2.0
@@ -81,7 +83,11 @@ class PointSourceRendering(object):
             inaccuracies in the PSF modeling
         """
         x_pos, y_pos = util.map_coord2pix(
-            ra_pos, dec_pos, self._pixel_grid._x_at_radec_0, self._pixel_grid._y_at_radec_0, self._pixel_grid._Ma2pix
+            ra_pos,
+            dec_pos,
+            self._pixel_grid._x_at_radec_0,
+            self._pixel_grid._y_at_radec_0,
+            self._pixel_grid._Ma2pix,
         )
         psf_kernel = self._psf.kernel_point_source
         psf_variance_map = self._psf.psf_variance_map

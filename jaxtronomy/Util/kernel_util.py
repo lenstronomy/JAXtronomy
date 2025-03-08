@@ -2,6 +2,7 @@
 
 from jax import jit, lax, numpy as jnp
 
+
 @jit
 def estimate_amp(data, x_pos, y_pos, psf_kernel):
     """Estimates the amplitude of a point source located at x_pos, y_pos.
@@ -27,20 +28,20 @@ def estimate_amp(data, x_pos, y_pos, psf_kernel):
     # start and end indices are known at compile time
     def body_fun(i, sum):
         row_index = y_int - 2 + i
+
         def body_fun2(j, sum):
             col_index = x_int - 2 + j
             sum += data.at[row_index, col_index].get()
             return sum
 
         return lax.fori_loop(0, 5, body_fun2, sum)
+
     sum = lax.fori_loop(0, 5, body_fun, 0)
     mean_image = jnp.maximum(sum, 0)
-    
+
     num = len(psf_kernel)
     center = int((num - 0.5) / 2)
-    mean_kernel = jnp.sum(
-        psf_kernel[center - 2 : center + 3, center - 2 : center + 3]
-    )
+    mean_kernel = jnp.sum(psf_kernel[center - 2 : center + 3, center - 2 : center + 3])
     amp_estimated = jnp.where(conditions, mean_image / mean_kernel, 0)
 
     return amp_estimated
