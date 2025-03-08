@@ -218,6 +218,7 @@ class TestClassCreator(object):
 
 class TestRaise(unittest.TestCase):
     def test_raise(self):
+        # incorrect multi band type
         with self.assertRaises(ValueError):
             class_creator.create_im_sim(
                 multi_band_list=None,
@@ -227,6 +228,7 @@ class TestRaise(unittest.TestCase):
                 image_likelihood_mask_list=None,
                 band_index=0,
             )
+        # multi-liinear not supported
         with self.assertRaises(ValueError):
             class_creator.create_im_sim(
                 multi_band_list=[[], []],
@@ -237,6 +239,7 @@ class TestRaise(unittest.TestCase):
                 image_likelihood_mask_list=None,
                 band_index=0,
             )
+        # source redshift list not supported
         kwargs_model = {
             "lens_model_list": ["SIS"],
             "source_light_model_list": ["SERSIC"],
@@ -258,6 +261,7 @@ class TestRaise(unittest.TestCase):
                 source_redshift_list=[1], **kwargs_model
             )
 
+        # Multi_plane not supported yet
         kwargs_model = {
             "lens_model_list": ["SIS", "SIS"],
             "lens_redshift_list": [0.3, 0.4],
@@ -265,6 +269,17 @@ class TestRaise(unittest.TestCase):
             "observed_convention_index": [0],
             "index_lens_model_list": [[0]],
             "z_source": 1,
+        }
+        with self.assertRaises(ValueError):
+            class_creator.create_class_instances(**kwargs_model)
+
+        # source_position point source not supported yet
+        kwargs_model = {
+            "lens_model_list": ["SIS", "SIS"],
+            "lens_redshift_list": [0.3, 0.4],
+            "observed_convention_index": [0],
+            "index_lens_model_list": [[0]],
+            "point_source_model_list": ["SOURCE_POSITION"],
             "point_source_frame_list": [[0]],
         }
         with self.assertRaises(ValueError):
