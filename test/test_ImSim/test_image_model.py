@@ -33,7 +33,6 @@ class TestImageModel(object):
         exp_time = 100  # exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
         numPix = 100  # cutout pixel size
         deltaPix = 0.05  # pixel size in arcsec (area per pixel = deltaPix**2)
-        fwhm = 0.5  # full width half max of PSF
         kwargs_data = sim_util.data_configure_simple(
             numPix, deltaPix, exp_time, sigma_bkg, inverse=True
         )
@@ -41,11 +40,14 @@ class TestImageModel(object):
         self.data_class_ref = ImageData_ref(**kwargs_data)
 
         # PSF specification
+        kernel = np.zeros((17, 17))
+        kernel[5:-5, 5:-5] = 1
+        kernel[7:-7, 7:-7] = 3
+        kernel[9, 9] = 7
         kwargs_psf = {
-            "psf_type": "GAUSSIAN",
-            "fwhm": fwhm,
-            "truncation": 5,
-            "pixel_size": deltaPix,
+            "psf_type": "PIXEL",
+            "kernel_point_source": kernel,
+            "psf_variance_map": np.ones_like(kernel) * kernel**2
         }
         self.psf_class_gaussian = PSF(**kwargs_psf)
 
