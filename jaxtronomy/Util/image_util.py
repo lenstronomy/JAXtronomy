@@ -36,7 +36,8 @@ def add_layer2image_int(grid2d, x_pos, y_pos, kernel):
     of pixel. Since JAX requires that array sizes are known at compile time, and the
     amount of overlapping area between the kernel and image is only known at runtime
     when x_pos and y_pos are given, the implementation here differs significantly from
-    lenstronomy and is about 15x slower.
+    lenstronomy. With large kernel sizes (21+), this JAX implementation is significantly
+    slower. For small kernel sizes (< 9), the runtime is about the same.
 
     :param grid2d: 2d pixel grid (i.e. image)
     :param x_pos: x-position center (pixel coordinate) of the layer to be added
