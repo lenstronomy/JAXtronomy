@@ -44,10 +44,10 @@ def add_layer2image_int(grid2d, x_pos, y_pos, kernel):
 
     n_row, n_col = jnp.shape(grid2d)
     k_rows, k_cols = jnp.shape(kernel)
-    
+
     if k_rows % 2 == 0 or k_cols % 2 == 0:
         raise ValueError("kernel dimensions must be odd")
-    
+
     x_int = (jnp.round(x_pos)).astype(int)
     y_int = (jnp.round(y_pos)).astype(int)
 
