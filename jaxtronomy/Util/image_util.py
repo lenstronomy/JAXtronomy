@@ -18,14 +18,12 @@ def add_layer2image(grid2d, x_pos, y_pos, kernel, order=1):
     :return: image with added layer, cut to original size
     """
     if order > 1:
-        raise ValueError(
-            f"interpolation order > 1 is not supported in jaxtronomy"
-        )
+        raise ValueError(f"interpolation order > 1 is not supported in jaxtronomy")
     k_rows, k_cols = jnp.shape(kernel)
 
     if k_rows % 2 == 0 or k_cols % 2 == 0:
         raise ValueError("kernel dimensions must be odd")
-    
+
     n_row, n_col = jnp.shape(grid2d)
 
     # Create a coordinate grid where the origin is placed at the point source
@@ -36,7 +34,10 @@ def add_layer2image(grid2d, x_pos, y_pos, kernel, order=1):
 
     # Maps kernel onto coordinate grid and add original image
     # Row indices are given by the y_grid and column indices are given by the x_grid
-    return scipy.ndimage.map_coordinates(kernel, coordinates=[y_grid, x_grid], order=order) + grid2d
+    return (
+        scipy.ndimage.map_coordinates(kernel, coordinates=[y_grid, x_grid], order=order)
+        + grid2d
+    )
 
 
 @jit
