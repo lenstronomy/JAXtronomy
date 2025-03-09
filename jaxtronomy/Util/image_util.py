@@ -51,10 +51,15 @@ def add_layer2image_int(grid2d, x_pos, y_pos, kernel):
     x_int = (jnp.round(x_pos)).astype(int)
     y_int = (jnp.round(y_pos)).astype(int)
 
-    xrange = jnp.arange(n_col) + k_cols // 2
-    yrange = jnp.arange(n_row) + k_rows // 2
-    xy_grid = jnp.meshgrid(xrange - x_int, yrange - y_int)
-    return grid2d + scipy.ndimage.map_coordinates(kernel.T, xy_grid, order=0)
+    # Create a coordinate grid where the origin is placed at the point source
+    # shifted left and up by the kernel radius
+    xrange = jnp.arange(n_col) + k_cols // 2 - x_int
+    yrange = jnp.arange(n_row) + k_rows // 2 - y_int
+    x_grid, y_grid = jnp.meshgrid(xrange, yrange)
+
+    # Maps kernel onto coordinate grid and add original image
+    # Row indices are given by the y_grid and column indices are given by the x_grid
+    return scipy.ndimage.map_coordinates(kernel, coordinates=[y_grid, x_grid], order=0) + grid2d
 
 
 @partial(jit, static_argnums=1)
