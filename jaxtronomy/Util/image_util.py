@@ -1,7 +1,7 @@
 __author__ = "sibirrer"
 
 from functools import partial
-from jax import jit, lax, numpy as jnp
+from jax import jit, lax, numpy as jnp, scipy
 import numpy as np
 
 
@@ -33,10 +33,7 @@ def add_layer2image(grid2d, x_pos, y_pos, kernel, order=1):
 @jit
 def add_layer2image_int(grid2d, x_pos, y_pos, kernel):
     """Adds a kernel on the grid2d image at position x_pos, y_pos at integer positions
-    of pixel. Since JAX requires that array sizes are known at compile time, and the
-    amount of overlapping area between the kernel and image is only known at runtime
-    when x_pos and y_pos are given, the implementation here differs significantly from
-    lenstronomy and is about 5x slower (even more so with larger kernel sizes).
+    of pixel.
 
     :param grid2d: 2d pixel grid (i.e. image)
     :param x_pos: x-position center (pixel coordinate) of the layer to be added
@@ -45,38 +42,19 @@ def add_layer2image_int(grid2d, x_pos, y_pos, kernel):
     :return: image with added layer
     """
 
+    n_row, n_col = jnp.shape(grid2d)
     k_rows, k_cols = jnp.shape(kernel)
-    image_rows, image_cols = jnp.shape(grid2d)
-    kernel_y_radius = int((k_rows - 1) / 2)
-    kernel_x_radius = int((k_cols - 1) / 2)
+    
+    if k_rows % 2 == 0 or k_cols % 2 == 0:
+        raise ValueError("kernel dimensions must be odd")
+    
     x_int = (jnp.round(x_pos)).astype(int)
     y_int = (jnp.round(y_pos)).astype(int)
 
-    # Adds in the kernel one pixel at a time
-    def body_fun(i, grid2d):
-        row_index = i + y_int - kernel_y_radius
-
-        def body_fun2(j, grid2d):
-            col_index = j + x_int - kernel_x_radius
-            kernel_value = kernel.at[i, j].get()
-
-            # Set the kernel equal to zero in places where it would go outside the grid
-            kernel_value = jnp.where(
-                row_index < 0, 0, jnp.where(row_index >= image_rows, 0, kernel_value)
-            )
-            kernel_value = jnp.where(
-                col_index < 0, 0, jnp.where(col_index >= image_cols, 0, kernel_value)
-            )
-
-            # Add kernel to grid
-            value = kernel_value + grid2d.at[row_index, col_index].get()
-            grid2d = grid2d.at[row_index, col_index].set(value)
-            return grid2d
-
-        grid2d = lax.fori_loop(0, k_cols, body_fun2, grid2d)
-        return grid2d
-
-    return lax.fori_loop(0, k_rows, body_fun, grid2d)
+    xrange = jnp.arange(n_col) + k_cols // 2
+    yrange = jnp.arange(n_row) + k_rows // 2
+    xy_grid = jnp.meshgrid(xrange - x_int, yrange - y_int)
+    return grid2d + scipy.ndimage.map_coordinates(kernel.T, xy_grid, order=0)
 
 
 @partial(jit, static_argnums=1)

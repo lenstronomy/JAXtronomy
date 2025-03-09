@@ -64,6 +64,11 @@ def test_add_layer2image_int():
     result_ref = image_util_ref.add_layer2image_int(test, x_pos, y_pos, kernel)
     np.testing.assert_array_equal(result, result_ref)
 
+    kernel = np.ones((10, 11))
+    npt.assert_raises(
+        ValueError, image_util.add_layer2image, test, x_pos, y_pos, kernel, order=2
+    )
+
 
 def test_re_size():
     grid = np.ones((200, 100))
