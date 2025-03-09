@@ -75,9 +75,7 @@ def test_add_layer2image_int():
     np.testing.assert_array_equal(result, result_ref)
 
     kernel = np.ones((10, 11))
-    npt.assert_raises(
-        ValueError, image_util.add_layer2image, test, x_pos, y_pos, kernel, order=1
-    )
+    npt.assert_raises(ValueError, image_util.add_layer2image, test, x_pos, y_pos, kernel)
 
 
 def test_re_size():
