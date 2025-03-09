@@ -36,7 +36,7 @@ def add_layer2image(grid2d, x_pos, y_pos, kernel, order=1):
 
     # Maps kernel onto coordinate grid and add original image
     # Row indices are given by the y_grid and column indices are given by the x_grid
-    return scipy.ndimage.map_coordinates(kernel, coordinates=[y_grid, x_grid], order=1) + grid2d
+    return scipy.ndimage.map_coordinates(kernel, coordinates=[y_grid, x_grid], order=order) + grid2d
 
 
 @jit
