@@ -76,7 +76,7 @@ def test_add_layer2image_int():
 
     kernel = np.ones((10, 11))
     npt.assert_raises(
-        ValueError, image_util.add_layer2image, test, x_pos, y_pos, kernel
+        ValueError, image_util.add_layer2image_int, test, x_pos, y_pos, kernel
     )
 
 
