@@ -13,7 +13,7 @@ config.update("jax_enable_x64", True)
 
 
 def test_add_layer2image():
-    kernel = np.ones((45, 45))
+    kernel = np.ones((45, 47))
     kernel[44] = 2
     test = np.ones((256, 256))
     x_pos = 27.3287
@@ -23,7 +23,7 @@ def test_add_layer2image():
     result_ref = image_util_ref.add_layer2image_int(test, x_pos, y_pos, kernel)
     np.testing.assert_array_equal(result, result_ref)
 
-    kernel = np.ones((31, 31))
+    kernel = np.ones((31, 33))
     kernel[13] = 2
     kernel[27] = 5
     kernel[:, 12] = 7
@@ -35,8 +35,19 @@ def test_add_layer2image():
     result_ref = image_util_ref.add_layer2image_int(test, x_pos, y_pos, kernel)
     np.testing.assert_array_equal(result, result_ref)
 
+    x_pos = 25.89543
+    y_pos = 25.2783
+
+    result = image_util.add_layer2image_int(test, x_pos, y_pos, kernel)
+    result_ref = image_util_ref.add_layer2image_int(test, x_pos, y_pos, kernel)
+    np.testing.assert_array_equal(result, result_ref)
+
     npt.assert_raises(
         ValueError, image_util.add_layer2image, test, x_pos, y_pos, kernel, order=2
+    )
+    kernel = np.ones((10, 11))
+    npt.assert_raises(
+        ValueError, image_util.add_layer2image, test, x_pos, y_pos, kernel, order=1
     )
 
 
@@ -66,7 +77,7 @@ def test_add_layer2image_int():
 
     kernel = np.ones((10, 11))
     npt.assert_raises(
-        ValueError, image_util.add_layer2image, test, x_pos, y_pos, kernel, order=2
+        ValueError, image_util.add_layer2image, test, x_pos, y_pos, kernel, order=1
     )
 
 

@@ -17,17 +17,26 @@ def add_layer2image(grid2d, x_pos, y_pos, kernel, order=1):
     :param order: interpolation order for sub-pixel shift of the kernel to be added
     :return: image with added layer, cut to original size
     """
-    if order != 1:
+    if order > 1:
         raise ValueError(
-            f"spline interpolation order {order} is not supported in jaxtronomy"
+            f"interpolation order > 1 is not supported in jaxtronomy"
         )
+    k_rows, k_cols = jnp.shape(kernel)
 
-    x_int = (jnp.round(x_pos)).astype(int)
-    y_int = (jnp.round(y_pos)).astype(int)
-    shift_x = x_int - x_pos
-    shift_y = y_int - y_pos
-    kernel_shifted = shift(kernel, shift=[-shift_y, -shift_x])
-    return add_layer2image_int(grid2d, x_int, y_int, kernel_shifted)
+    if k_rows % 2 == 0 or k_cols % 2 == 0:
+        raise ValueError("kernel dimensions must be odd")
+    
+    n_row, n_col = jnp.shape(grid2d)
+
+    # Create a coordinate grid where the origin is placed at the point source
+    # shifted left and up by the kernel radius
+    xrange = jnp.arange(n_col) + k_cols // 2 - x_pos
+    yrange = jnp.arange(n_row) + k_rows // 2 - y_pos
+    x_grid, y_grid = jnp.meshgrid(xrange, yrange)
+
+    # Maps kernel onto coordinate grid and add original image
+    # Row indices are given by the y_grid and column indices are given by the x_grid
+    return scipy.ndimage.map_coordinates(kernel, coordinates=[y_grid, x_grid], order=1) + grid2d
 
 
 @jit
