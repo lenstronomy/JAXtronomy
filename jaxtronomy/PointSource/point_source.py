@@ -362,9 +362,10 @@ class PointSource(object):
         argument list currently only used in SimAPI to transform magnitudes to
         amplitudes in the lenstronomy conventions.
 
-        :param amp_list: list of model amplitudes for each point source model. This list should
-            include all of the point source models even if flux_from_point_source is False for any of them.
-            In that case, the amplitudes will not be changed for those models.
+        :param amp_list: list of model amplitudes for each point source model. This list
+            should include all of the point source models even if flux_from_point_source
+            is False for any of them. In that case, the amplitudes will not be changed
+            for those models.
         :param kwargs_ps: list of point source keywords
         :return: overwrites kwargs_ps with new amplitudes
         """

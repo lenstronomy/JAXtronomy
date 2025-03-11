@@ -282,7 +282,7 @@ def create_class_instances(
         kwargs_lens_eqn_solver=kwargs_lens_eqn_solver,
         point_source_frame_list=point_source_frame_list_i,
         index_lens_model_list=index_lens_model_list,
-        redshift_list=point_source_redshift_list_i
+        redshift_list=point_source_redshift_list_i,
     )
     if tau0_index_list is None:
         tau0_index = 0

@@ -247,6 +247,7 @@ class TestPointSourcewithFrames(TestPointSource):
 
         self.kwargs_lens = [kwargs_epl, kwargs_sis]
 
+
 # Same tests as before but this time with set flux_from_point_source_list
 # Different setup method but inherits all the tests from above
 class TestPointSourcewithFluxList(TestPointSource):
@@ -259,7 +260,7 @@ class TestPointSourcewithFluxList(TestPointSource):
             point_source_type_list=point_source_type_list,
             lens_model=lensmodel,
             fixed_magnification_list=[False, False, True],
-            flux_from_point_source_list=[False, True, True]
+            flux_from_point_source_list=[False, True, True],
         )
 
         lensmodel_ref = LensModel_ref(lens_model_list=lens_model_list)
@@ -267,7 +268,7 @@ class TestPointSourcewithFluxList(TestPointSource):
             point_source_type_list=point_source_type_list,
             lens_model=lensmodel_ref,
             fixed_magnification_list=[False, False, True],
-            flux_from_point_source_list=[False, True, True]
+            flux_from_point_source_list=[False, True, True],
         )
 
         kwargs_ps1 = {
@@ -310,7 +311,9 @@ class TestPointSourcewithFluxList(TestPointSource):
         assert kwargs_new == kwargs_new_ref
 
         # The amplitudes are not updated for models where flux_from_point_source is False
-        npt.assert_array_equal(self.kwargs_ps[0]["point_amp"], kwargs_new[0]["point_amp"])
+        npt.assert_array_equal(
+            self.kwargs_ps[0]["point_amp"], kwargs_new[0]["point_amp"]
+        )
 
         # These amplitudes are updated
         npt.assert_array_equal(amp_list[1], kwargs_new[1]["point_amp"])
