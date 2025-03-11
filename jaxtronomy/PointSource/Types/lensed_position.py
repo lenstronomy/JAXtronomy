@@ -77,7 +77,7 @@ class LensedPositions(PSBase):
             )
         else:
             x_source, y_source = jnp.zeros_like(ra_image), jnp.zeros_like(ra_image)
-            for i in range(len(ra_image)):
+            for i in range(ra_image.size):
                 x, y = self._lens_model.ray_shooting(
                     ra_image[i], dec_image[i], kwargs_lens, k=self.k_list[i]
                 )
@@ -115,9 +115,9 @@ class LensedPositions(PSBase):
         # self._lens_model.change_source_redshift(self._redshift)
         if self._fixed_magnification:
             if x_pos is not None and y_pos is not None:
-                ra_image, dec_image = jnp.array(x_pos, dtype=float), jnp.array(
-                    y_pos, dtype=float
-                )
+                x_pos = jnp.array(x_pos, dtype=float)
+                y_pos = jnp.array(y_pos, dtype=float)
+                ra_image, dec_image = x_pos, y_pos
             else:
                 ra_image, dec_image = self.image_position(
                     kwargs_ps,
@@ -130,7 +130,7 @@ class LensedPositions(PSBase):
                 mag = self._lens_model.magnification(ra_image, dec_image, kwargs_lens)
             else:
                 mag = jnp.zeros_like(ra_image)
-                for i in range(len(ra_image)):
+                for i in range(ra_image.size):
                     mag = mag.at[i].set(
                         self._lens_model.magnification(
                             ra_image[i], dec_image[i], kwargs_lens, k=self.k_list[i]
@@ -138,9 +138,10 @@ class LensedPositions(PSBase):
                     )
             point_amp = jnp.array(kwargs_ps["source_amp"], dtype=float) * jnp.abs(mag)
         else:
-            point_amp = jnp.array(kwargs_ps["point_amp"])
+            point_amp = jnp.array(kwargs_ps["point_amp"], dtype=float)
             if x_pos is not None:
-                point_amp = _expand_to_array(point_amp, len(x_pos))
+                x_pos = jnp.array(x_pos, dtype=float)
+                point_amp = _expand_to_array(point_amp, x_pos.size)
         return point_amp
 
     @partial(jit, static_argnums=(0))
@@ -165,7 +166,7 @@ class LensedPositions(PSBase):
                 mag = self._lens_model.magnification(ra_image, dec_image, kwargs_lens)
             else:
                 mag = jnp.zeros_like(ra_image)
-                for i in range(len(ra_image)):
+                for i in range(ra_image.size):
                     mag = mag.at[i].set(
                         self._lens_model.magnification(
                             ra_image[i], dec_image[i], kwargs_lens, k=self.k_list[i]

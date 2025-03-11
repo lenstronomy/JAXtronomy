@@ -142,9 +142,9 @@ def _expand_to_array(array, num):
     array = jnp.array(array, dtype=float)
     if jnp.isscalar(array):
         return jnp.ones(num) * array
-    elif len(array) < num:
+    elif array.size < num:
         out = jnp.zeros(num)
-        out = out.at[0 : len(array)].set(array)
+        out = out.at[0 : array.size].set(array)
         return out
     else:
         return array
@@ -167,7 +167,7 @@ def _shrink_array(array, num):
     elif array.size < num:
         raise ValueError(
             "the length of the array (%s) needs to be larger or equal than the designated length %s "
-            % (len(array), num)
+            % (array.size, num)
         )
     else:
         return array.at[0:num].get()

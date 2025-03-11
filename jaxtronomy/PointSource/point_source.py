@@ -59,11 +59,11 @@ class PointSource(object):
             in PSBase for further details.
         :param redshift_list: None or list of redshifts (only required for multiple source redshifts)
         """
-        if len(point_source_type_list) > 0:
+        if "LENSED_POSITION" in point_source_type_list:
             if index_lens_model_list is not None and point_source_frame_list is None:
                 raise ValueError(
-                    "with specified index_lens_model_list a specified point_source_frame_list argument is "
-                    "required"
+                    "with specified index_lens_model_list, a specified point_source_frame_list argument is "
+                    "required for LENSED_POSITION"
                 )
             if index_lens_model_list is None:
                 point_source_frame_list = [None] * len(point_source_type_list)
@@ -270,9 +270,12 @@ class PointSource(object):
         if with_amp is True:
             amp_list = self.image_amplitude(kwargs_ps, kwargs_lens, k=k)
 
+        # In lenstronomy, we get rid of images with 0 amplitude so that they are not rendered
+        # However we cannot do that here since the amplitudes are not known at compile time,
+        # and therefore the final array size would not be known at compile time.
         ra_array, dec_array, amp_array = [], [], []
         for i in range(len(ra_list)):
-            for j in range(len(ra_list[i])):
+            for j in range(ra_list[i].size):
                 ra_array.append(ra_list[i][j])
                 dec_array.append(dec_list[i][j])
                 if with_amp:
@@ -292,14 +295,17 @@ class PointSource(object):
         """
         amp_list = []
         for i, model in enumerate(self._point_source_list):
-            if (k is None or k == i) and self._flux_from_point_source_list[i]:
-                amp_list.append(
-                    model.image_amplitude(
-                        kwargs_ps=kwargs_ps[i],
-                        kwargs_lens=kwargs_lens,
-                        kwargs_lens_eqn_solver=self._kwargs_lens_eqn_solver,
-                    )
+            if k is None or k == i:
+                image_amp = model.image_amplitude(
+                    kwargs_ps=kwargs_ps[i],
+                    kwargs_lens=kwargs_lens,
+                    kwargs_lens_eqn_solver=self._kwargs_lens_eqn_solver,
                 )
+                if self._flux_from_point_source_list[i]:
+                    amp_list.append(image_amp)
+                else:
+                    amp_list.append(jnp.zeros_like(image_amp))
+
         return amp_list
 
     @partial(jit, static_argnums=(0))
@@ -312,12 +318,13 @@ class PointSource(object):
         """
         amp_list = []
         for i, model in enumerate(self._point_source_list):
+            source_amp = model.source_amplitude(
+                kwargs_ps=kwargs_ps[i], kwargs_lens=kwargs_lens
+            )
             if self._flux_from_point_source_list[i]:
-                amp_list.append(
-                    model.source_amplitude(
-                        kwargs_ps=kwargs_ps[i], kwargs_lens=kwargs_lens
-                    )
-                )
+                amp_list.append(source_amp)
+            else:
+                amp_list.append(jnp.zeros_like(source_amp))
         return amp_list
 
     @partial(jit, static_argnums=(0,))
@@ -355,7 +362,9 @@ class PointSource(object):
         argument list currently only used in SimAPI to transform magnitudes to
         amplitudes in the lenstronomy conventions.
 
-        :param amp_list: list of model amplitudes for each point source model
+        :param amp_list: list of model amplitudes for each point source model. This list should
+            include all of the point source models even if flux_from_point_source is False for any of them.
+            In that case, the amplitudes will not be changed for those models.
         :param kwargs_ps: list of point source keywords
         :return: overwrites kwargs_ps with new amplitudes
         """
