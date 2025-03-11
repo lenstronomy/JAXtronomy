@@ -35,7 +35,7 @@ class Numerics(PointSourceRendering):
         point_source_supersampling_factor=1,
         convolution_kernel_size=None,
         convolution_type="fft",
-        truncation=4,
+        truncation_conv=None,
     ):
         """
 
@@ -61,6 +61,9 @@ class Numerics(PointSourceRendering):
         :param convolution_kernel_size: int, odd number, size of convolution kernel before supersampling. If None, takes size of point_source_kernel
             Only relevant for psf type PIXEL
         :param convolution_type: string, 'fft', 'grid', 'fft_static' mode of 2d convolution
+        :param truncation_conv: Truncation used for the construction of the convolution kernels (only relevant for Gaussian convolution). By default,
+            the truncation from the psf class will be used. Can be overwritten so that different PSFs are used for
+            convolution and point source rendering.
         """
         if compute_mode != "regular":
             if compute_mode == "adaptive":
@@ -125,12 +128,14 @@ class Numerics(PointSourceRendering):
             fwhm = psf.fwhm  # FWHM  in units of angle
             # sigma cannot be a traced value; must be concrete
             sigma = util_lenstronomy.fwhm2sigma(fwhm)
+            if truncation_conv is None:
+                truncation_conv = psf.truncation
             self._conv = GaussianConvolution(
                 sigma,
                 pixel_scale,
                 supersampling_factor,
                 supersampling_convolution,
-                truncation=truncation,
+                truncation=truncation_conv,
             )
         elif self._psf_type == "NONE":
             self._conv = None
