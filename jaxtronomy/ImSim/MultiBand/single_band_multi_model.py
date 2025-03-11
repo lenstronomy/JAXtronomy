@@ -115,18 +115,26 @@ class SingleBandMultiModel(ImageModel):
         unconvolved=False,
         source_add=True,
         lens_light_add=True,
-        point_source_add=False,
+        point_source_add=True,
     ):
         """Make an image with a realisation of linear parameter values "param".
 
-        :param kwargs_lens: list of keyword arguments corresponding to the superposition
-            of different lens profiles
-        :param kwargs_source: list of keyword arguments corresponding to the
-            superposition of different source light profiles
-        :param kwargs_lens_light: list of keyword arguments corresponding to different
-            lens light surface brightness profiles
-        :param kwargs_ps: keyword arguments corresponding to "other" parameters, such as
-            external shear and point source image positions
+        :param kwargs_lens: list of dicts, keyword arguments corresponding to the
+            superposition of different lens profiles in the same order of the
+            lens_model_list
+        :param kwargs_source: list of dicts, keyword arguments corresponding to the
+            superposition of different source light profiles in the same order of
+            light_model_list
+        :param kwargs_lens_light: list of dicts, keyword arguments corresponding to
+            different lens light surface brightness profiles in the same order of
+            lens_light_model_list
+        :param kwargs_ps: list of dicts, keyword arguments for the points source models
+            in the same order of point_source_type_list
+        :param kwargs_extinction: list of dicts, keyword arguments corresponding to
+            different light profiles in the optical_depth_model
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :param unconvolved: if True: returns the unconvolved light distribution (prefect
             seeing)
         :param source_add: if True, compute source, otherwise without
@@ -171,11 +179,17 @@ class SingleBandMultiModel(ImageModel):
     ):
         """Computes the source surface brightness distribution.
 
-        :param kwargs_source: list of keyword arguments corresponding to the
-            superposition of different source light profiles
-        :param kwargs_lens: list of keyword arguments corresponding to the superposition
-            of different lens profiles
-        :param kwargs_extinction: list of keyword arguments of extinction model
+        :param kwargs_source: list of dicts, keyword arguments corresponding to the
+            superposition of different source light profiles in the same order of
+            light_model_list
+        :param kwargs_lens: list of dicts, keyword arguments corresponding to the
+            superposition of different lens profiles in the same order of the
+            lens_model_list
+        :param kwargs_extinction: list of dicts, keyword arguments corresponding to
+            different light profiles in the optical_depth_model
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :param unconvolved: if True: returns the unconvolved light distribution (prefect
             seeing)
         :param de_lensed: if True: returns the un-lensed source surface brightness
@@ -223,37 +237,44 @@ class SingleBandMultiModel(ImageModel):
             self, kwargs_lens_light_i, unconvolved=unconvolved, k=k
         )
 
-    # def point_source(
-    #    self,
-    #    kwargs_ps,
-    #    kwargs_lens=None,
-    #    kwargs_special=None,
-    #    unconvolved=False,
-    #    k=None,
-    # ):
-    #    """Computes the point source positions and paints PSF convolutions on them.
+    def point_source(
+        self,
+        kwargs_ps,
+        kwargs_lens=None,
+        kwargs_special=None,
+        unconvolved=False,
+        k=None,
+    ):
+        """Computes the point source positions and paints PSF convolutions on them.
 
-    #    :param kwargs_ps:
-    #    :param kwargs_lens:
-    #    :param kwargs_special:
-    #    :param unconvolved:
-    #    :param k:
-    #    :return:
-    #    """
-    #    kwargs_lens_i, _, _, kwargs_ps_i, _ = self.select_kwargs(
-    #        kwargs_lens=kwargs_lens,
-    #        kwargs_source=None,
-    #        kwargs_lens_light=None,
-    #        kwargs_ps=kwargs_ps,
-    #        kwargs_extinction=None,
-    #    )
-    #    return self._point_source(
-    #        kwargs_ps=kwargs_ps_i,
-    #        kwargs_lens=kwargs_lens_i,
-    #        kwargs_special=kwargs_special,
-    #        unconvolved=unconvolved,
-    #        k=k,
-    #    )
+        :param kwargs_ps: list of dicts, keyword arguments for each point source model
+            in the same order of the point_source_type_list
+        :param kwargs_lens: list of dicts, keyword arguments for the full set of lens
+            models in the same order of the lens_model_list
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
+        :param unconvolved: bool, includes point source images if False, excludes ps if
+            True
+        :param k: optional int, include only the k-th point source model. If None,
+            includes all
+        :return: rendered point source images
+        """
+        kwargs_lens_i, _, _, kwargs_ps_i, _ = self.select_kwargs(
+            kwargs_lens=kwargs_lens,
+            kwargs_source=None,
+            kwargs_lens_light=None,
+            kwargs_ps=kwargs_ps,
+            kwargs_extinction=None,
+        )
+        return ImageModel.point_source(
+            self,
+            kwargs_ps=kwargs_ps_i,
+            kwargs_lens=kwargs_lens_i,
+            kwargs_special=kwargs_special,
+            unconvolved=unconvolved,
+            k=k,
+        )
 
     @partial(jit, static_argnums=(0, 7, 8, 9, 10))
     def likelihood_data_given_model(
@@ -280,6 +301,11 @@ class SingleBandMultiModel(ImageModel):
             lens light surface brightness profiles
         :param kwargs_ps: keyword arguments corresponding to "other" parameters, such as
             external shear and point source image positions
+        :param kwargs_extinction: list of dicts, keyword arguments corresponding to
+            different light profiles in the optical_depth_model
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :param check_positive_flux: bool, should be false. True not supported in
             jaxtronomy
         :return: log likelihood (natural logarithm) (sum of the log likelihoods of the
@@ -313,6 +339,13 @@ class SingleBandMultiModel(ImageModel):
         """Returns the 1d array of the error estimate corresponding to the data
         response.
 
+        :param kwargs_lens: list of keyword arguments corresponding to the superposition
+            of different lens profiles
+        :param kwargs_ps: keyword arguments corresponding to "other" parameters, such as
+            external shear and point source image positions
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :return: 1d numpy array of response, 2d array of additional errors (e.g. point
             source uncertainties)
         """
@@ -366,6 +399,11 @@ class SingleBandMultiModel(ImageModel):
             lens light surface brightness profiles
         :param kwargs_ps: keyword arguments corresponding to "other" parameters, such as
             external shear and point source image positions
+        :param kwargs_extinction: list of dicts, keyword arguments corresponding to
+            different light profiles in the optical_depth_model
+        :param kwargs_special: optional dict including keys "delta_x_image" and
+            "delta_y_image" and array/list values indicating how much to shift each
+            point source image in units of arcseconds
         :return: Select subset of kwargs lists
         """
         if self._index_lens_model is None or kwargs_lens is None:
@@ -380,11 +418,11 @@ class SingleBandMultiModel(ImageModel):
             kwargs_lens_light_i = kwargs_lens_light
         else:
             kwargs_lens_light_i = [kwargs_lens_light[k] for k in self._index_lens_light]
-        # TODO: Implement point source and extinction
-        # if self._index_point_source is None or kwargs_ps is None:
-        #    kwargs_ps_i = kwargs_ps
-        # else:
-        #    kwargs_ps_i = [kwargs_ps[k] for k in self._index_point_source]
+        if self._index_point_source is None or kwargs_ps is None:
+            kwargs_ps_i = kwargs_ps
+        else:
+            kwargs_ps_i = [kwargs_ps[k] for k in self._index_point_source]
+        # TODO: Implement extinction
         # if self._index_optical_depth is None or kwargs_extinction is None:
         #    kwargs_extinction_i = kwargs_extinction
         # else:
@@ -395,6 +433,6 @@ class SingleBandMultiModel(ImageModel):
             kwargs_lens_i,
             kwargs_source_i,
             kwargs_lens_light_i,
-            None,  # kwargs_ps_i,
+            kwargs_ps_i,
             None,  # kwargs_extinction_i,
         )
