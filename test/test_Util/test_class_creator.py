@@ -65,7 +65,7 @@ class TestClassCreator(object):
             "index_source_light_model_list": [[0], [0]],
             "index_lens_light_model_list": [[0], [0]],
             "index_point_source_model_list": [[0, 1], [1, 2]],
-            #"point_source_redshift_list": [0.5, 1, 1.5],
+            # "point_source_redshift_list": [0.5, 1, 1.5],
             "band_index": 1,
         }
         self.kwargs_model_4 = {
@@ -154,7 +154,7 @@ class TestClassCreator(object):
         assert point_source_class.point_source_type_list[1] == "LENSED_POSITION"
 
         # TODO: implement multiple redshifts for point sources
-        #assert point_source_class._redshift_list == [1, 1.5]
+        # assert point_source_class._redshift_list == [1, 1.5]
 
         # TODO: implement multiplane
         # (
