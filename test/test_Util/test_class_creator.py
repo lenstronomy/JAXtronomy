@@ -43,7 +43,6 @@ class TestClassCreator(object):
             "fixed_magnification_list": [True],
             "additional_images_list": [False],
             # "lens_redshift_list": [0.5] * 5,
-            "point_source_frame_list": [[0]],
         }
         self.kwargs_model_2 = {
             "lens_model_list": ["SIS"],
@@ -51,19 +50,23 @@ class TestClassCreator(object):
             "lens_light_model_list": ["SERSIC"],
             "point_source_model_list": ["LENSED_POSITION"],
         }
+        # Band 0: SIS + SHEAR, SERSIC, SERSIC, LENSED_POSITION 1 + UNLENSED
+        # Band 1: EPL + SHEAR, SERSIC, SERSIC, UNLENSED + LENSED_POSITION 2
         self.kwargs_model_3 = {
-            "lens_model_list": ["SIS"],
+            "lens_model_list": ["SIS", "EPL", "SHEAR"],
             "source_light_model_list": ["SERSIC"],
             "lens_light_model_list": ["SERSIC"],
-            "point_source_model_list": ["LENSED_POSITION"],
-            "index_lens_model_list": [[0]],
-            "index_source_light_model_list": [[0]],
-            "index_lens_light_model_list": [[0]],
-            "index_point_source_model_list": [[0]],
-            "point_source_frame_list": [[0]],
-            "optical_depth_model_list": ["UNIFORM"],
-            "index_optical_depth_model_list": [[0]],
-            "tau0_index_list": [0],
+            "point_source_model_list": [
+                "LENSED_POSITION",
+                "UNLENSED",
+                "LENSED_POSITION",
+            ],
+            "index_lens_model_list": [[0, 2], [1, 2]],
+            "index_source_light_model_list": [[0], [0]],
+            "index_lens_light_model_list": [[0], [0]],
+            "index_point_source_model_list": [[0, 1], [1, 2]],
+            #"point_source_redshift_list": [0.5, 1, 1.5],
+            "band_index": 1,
         }
         self.kwargs_model_4 = {
             "lens_model_list": ["SIS", "SIS"],
@@ -141,7 +144,17 @@ class TestClassCreator(object):
             point_source_class,
             extinction_class,
         ) = class_creator.create_class_instances(**self.kwargs_model_3)
-        assert lens_model_class.lens_model_list[0] == "SIS"
+
+        # Since band index = 1, we should only have the EPL and SHEAR lens models
+        assert lens_model_class.lens_model_list == ["EPL", "SHEAR"]
+        assert point_source_class._lens_model.lens_model_list == ["EPL", "SHEAR"]
+
+        # Since band index = 1, we should only have the UNLENSED and second LENSED_POSITION point source models
+        assert point_source_class.point_source_type_list[0] == "UNLENSED"
+        assert point_source_class.point_source_type_list[1] == "LENSED_POSITION"
+
+        # TODO: implement multiple redshifts for point sources
+        #assert point_source_class._redshift_list == [1, 1.5]
 
         # TODO: implement multiplane
         # (
@@ -280,10 +293,18 @@ class TestRaise(unittest.TestCase):
             "observed_convention_index": [0],
             "index_lens_model_list": [[0]],
             "point_source_model_list": ["SOURCE_POSITION"],
-            "point_source_frame_list": [[0]],
         }
         with self.assertRaises(ValueError):
             class_creator.create_class_instances(**kwargs_model)
+
+        # point source frame list warning
+        with self.assertWarns(UserWarning):
+            class_creator.create_class_instances(
+                point_source_model_list=["UNLENSED", "LENSED_POSITION"],
+                index_point_source_model_list=[[0], [1]],
+                point_source_frame_list=[None, [1, 0]],
+                band_index=1,
+            )
 
 
 if __name__ == "__main__":

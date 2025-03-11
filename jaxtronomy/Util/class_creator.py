@@ -11,6 +11,8 @@ from lenstronomy.Data.psf import PSF
 
 from lenstronomy.Util.package_util import exporter
 
+import warnings
+
 # This file is the same as lenstronomy but with import statements changed
 # Functions here do not need to be JIT compiled
 # TODO: Implement TracerModel and Extinction in jaxtronomy
@@ -177,16 +179,9 @@ def create_class_instances(
         kwargs_multiplane_model=kwargs_multiplane_model,
     )
 
-    # Only create a second LensModel class if the user wants a separate class
-    # or if index_lens_model_list is specified, since we need a class with all lens models
-    if (
-        kwargs_multiplane_model_point_source is not None
-        or index_lens_model_list is not None
-    ):
-        if kwargs_multiplane_model_point_source is None:
-            kwargs_multiplane_model_point_source = kwargs_multiplane_model
+    if kwargs_multiplane_model_point_source is not None:
         lens_model_class_point_source = LensModel(
-            lens_model_list=lens_model_list,
+            lens_model_list=lens_model_list_i,
             z_lens=z_lens,
             z_source=z_source,
             z_source_convention=z_source_convention,
@@ -264,6 +259,9 @@ def create_class_instances(
                 for k in index_point_source_model_list[band_index]
             ]
         if point_source_frame_list is not None:
+            warnings.warn(
+                "point_source_frame_list is unused in class_creator.create_class_instances()"
+            )
             point_source_frame_list_i = [
                 point_source_frame_list[k]
                 for k in index_point_source_model_list[band_index]
@@ -273,6 +271,9 @@ def create_class_instances(
                 point_source_redshift_list[k]
                 for k in index_point_source_model_list[band_index]
             ]
+
+    # This PointSource class will only have access to a downselected list of lens models
+    # so point_source_frame_list is not supported
     point_source_class = PointSource(
         point_source_type_list=point_source_model_list_i,
         lens_model=lens_model_class_point_source,
@@ -280,8 +281,8 @@ def create_class_instances(
         additional_images_list=additional_images_list_i,
         magnification_limit=point_source_magnification_limit,
         kwargs_lens_eqn_solver=kwargs_lens_eqn_solver,
-        point_source_frame_list=point_source_frame_list_i,
-        index_lens_model_list=index_lens_model_list,
+        point_source_frame_list=None,
+        index_lens_model_list=None,
         redshift_list=point_source_redshift_list_i,
     )
     if tau0_index_list is None:
