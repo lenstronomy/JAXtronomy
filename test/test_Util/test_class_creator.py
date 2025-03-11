@@ -81,6 +81,7 @@ class TestClassCreator(object):
             "tau0_index_list": [0],
             "point_source_frame_list": [[0]],
         }
+        # TODO: Implement extinction, right now we currently use lenstronomy extinction
         self.kwargs_model_5 = {
             "lens_model_list": ["SIS", "SIS"],
             # "lens_redshift_list": [0.3, 0.4],
@@ -88,6 +89,9 @@ class TestClassCreator(object):
             # "z_source": 1,
             "kwargs_multiplane_model_point_source": {},
             # "decouple_multi_plane": False,
+            "optical_depth_model_list": ["UNIFORM"],
+            "index_optical_depth_model_list": [[0]],
+            "tau0_index_list": [0],
         }
 
         self.kwargs_psf = {"psf_type": "NONE"}
