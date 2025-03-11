@@ -161,14 +161,14 @@ class TestSingleBandMultiModel(object):
             [kwargs_data2, kwargs_psf2, kwargs_numerics2],
         ]
         self.multi_band_list = multi_band_list
-        
+
         # Band 0: SIE + SHEAR, SERSIC, SERSIC_ELLIPSE, UNLENSED + LENSED_POSITION 1
         # Band 1: EPL + SHEAR, SERSIC, SERSIC_ELLIPSE, UNLENSED + LENSED_POSITION 2
         kwargs_model = {
-            "lens_model_list": lens_model_list, # ["SIE", "EPL", "SHEAR"]
-            "source_light_model_list": source_model_list, # ["SERSIC_ELLIPSE"]
-            "lens_light_model_list": lens_light_model_list, # ["SERSIC"]
-            "point_source_model_list": point_source_type_list, # ["UNLENSED", "LENSED_POSITION", "LENSED_POSITION"]
+            "lens_model_list": lens_model_list,  # ["SIE", "EPL", "SHEAR"]
+            "source_light_model_list": source_model_list,  # ["SERSIC_ELLIPSE"]
+            "lens_light_model_list": lens_light_model_list,  # ["SERSIC"]
+            "point_source_model_list": point_source_type_list,  # ["UNLENSED", "LENSED_POSITION", "LENSED_POSITION"]
             "fixed_magnification_list": fixed_magnification_list,
             "index_lens_model_list": [[0, 2], [1, 2]],
             "index_source_light_model_list": [[0], [0]],
@@ -393,14 +393,18 @@ class TestSingleBandMultiModel(object):
         npt.assert_array_almost_equal(likelihood1, likelihood1_ref, decimal=8)
 
     def test_error_response(self):
-        c_d, error0 = self.singleband0.error_response(self.kwargs_lens, self.kwargs_ps, self.kwargs_special)
+        c_d, error0 = self.singleband0.error_response(
+            self.kwargs_lens, self.kwargs_ps, self.kwargs_special
+        )
         c_d_ref, error0_ref = self.singleband0_ref.error_response(
             self.kwargs_lens, self.kwargs_ps, self.kwargs_special
         )
         npt.assert_array_almost_equal(c_d, c_d_ref, decimal=8)
         npt.assert_array_almost_equal(error0, error0_ref, decimal=8)
 
-        c_d, error1 = self.singleband1.error_response(self.kwargs_lens, self.kwargs_ps, self.kwargs_special)
+        c_d, error1 = self.singleband1.error_response(
+            self.kwargs_lens, self.kwargs_ps, self.kwargs_special
+        )
         c_d_ref, error1_ref = self.singleband1_ref.error_response(
             self.kwargs_lens, self.kwargs_ps, self.kwargs_special
         )

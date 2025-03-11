@@ -238,14 +238,14 @@ class SingleBandMultiModel(ImageModel):
         )
 
     def point_source(
-       self,
-       kwargs_ps,
-       kwargs_lens=None,
-       kwargs_special=None,
-       unconvolved=False,
-       k=None,
+        self,
+        kwargs_ps,
+        kwargs_lens=None,
+        kwargs_special=None,
+        unconvolved=False,
+        k=None,
     ):
-       """Computes the point source positions and paints PSF convolutions on them.
+        """Computes the point source positions and paints PSF convolutions on them.
 
         :param kwargs_ps: list of dicts, keyword arguments for each point source model
             in the same order of the point_source_type_list
@@ -259,22 +259,22 @@ class SingleBandMultiModel(ImageModel):
         :param k: optional int, include only the k-th point source model. If None,
             includes all
         :return: rendered point source images
-       """
-       kwargs_lens_i, _, _, kwargs_ps_i, _ = self.select_kwargs(
-           kwargs_lens=kwargs_lens,
-           kwargs_source=None,
-           kwargs_lens_light=None,
-           kwargs_ps=kwargs_ps,
-           kwargs_extinction=None,
-       )
-       return ImageModel.point_source(
-           self,
-           kwargs_ps=kwargs_ps_i,
-           kwargs_lens=kwargs_lens_i,
-           kwargs_special=kwargs_special,
-           unconvolved=unconvolved,
-           k=k,
-       )
+        """
+        kwargs_lens_i, _, _, kwargs_ps_i, _ = self.select_kwargs(
+            kwargs_lens=kwargs_lens,
+            kwargs_source=None,
+            kwargs_lens_light=None,
+            kwargs_ps=kwargs_ps,
+            kwargs_extinction=None,
+        )
+        return ImageModel.point_source(
+            self,
+            kwargs_ps=kwargs_ps_i,
+            kwargs_lens=kwargs_lens_i,
+            kwargs_special=kwargs_special,
+            unconvolved=unconvolved,
+            k=k,
+        )
 
     @partial(jit, static_argnums=(0, 7, 8, 9, 10))
     def likelihood_data_given_model(
@@ -419,9 +419,9 @@ class SingleBandMultiModel(ImageModel):
         else:
             kwargs_lens_light_i = [kwargs_lens_light[k] for k in self._index_lens_light]
         if self._index_point_source is None or kwargs_ps is None:
-           kwargs_ps_i = kwargs_ps
+            kwargs_ps_i = kwargs_ps
         else:
-           kwargs_ps_i = [kwargs_ps[k] for k in self._index_point_source]
+            kwargs_ps_i = [kwargs_ps[k] for k in self._index_point_source]
         # TODO: Implement extinction
         # if self._index_optical_depth is None or kwargs_extinction is None:
         #    kwargs_extinction_i = kwargs_extinction
