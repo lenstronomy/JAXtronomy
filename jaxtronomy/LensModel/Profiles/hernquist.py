@@ -85,8 +85,8 @@ class Hernquist(LensProfileBase):
         :param center_y: y-center of the profile
         :return: projected density
         """
-        x_ = x - center_x
-        y_ = y - center_y
+        x_ = jnp.array(x - center_x, dtype=float)
+        y_ = jnp.array(y - center_y, dtype=float)
         r = jnp.sqrt(x_**2 + y_**2)
         X = r / Rs
         sigma0 = Hernquist.rho2sigma(rho0, Rs)
@@ -178,8 +178,8 @@ class Hernquist(LensProfileBase):
         :param center_y: y-center of the profile (units of angle)
         :return: lensing potential at (x,y)
         """
-        x_ = x - center_x
-        y_ = y - center_y
+        x_ = jnp.array(x - center_x, dtype=float)
+        y_ = jnp.array(y - center_y, dtype=float)
         r = jnp.sqrt(x_**2 + y_**2)
         r = jnp.where(r < Hernquist._s, Hernquist._s, r)
         X = r / Rs
@@ -200,8 +200,8 @@ class Hernquist(LensProfileBase):
         :param center_y: y-center of the profile (units of angle)
         :return: derivative of function (deflection angles in x- and y-direction)
         """
-        x_ = x - center_x
-        y_ = y - center_y
+        x_ = jnp.array(x - center_x, dtype=float)
+        y_ = jnp.array(y - center_y, dtype=float)
         r = jnp.sqrt(x_**2 + y_**2)
         r = jnp.maximum(r, Hernquist._s)
         X = r / Rs
