@@ -40,6 +40,7 @@ class TestClassCreator(object):
             "band_index": 0,
             "source_deflection_scaling_list": [1, 1],
             # "source_redshift_list": [1, 1],
+            "point_source_redshift_list": [None],
             "fixed_magnification_list": [True],
             "additional_images_list": [False],
             # "lens_redshift_list": [0.5] * 5,
