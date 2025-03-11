@@ -178,7 +178,7 @@ class TestPointSource(object):
 
     def test_raises(self):
         npt.assert_raises(
-            ValueError, PointSource, ["UNLENSED"], index_lens_model_list=[[0]]
+            ValueError, PointSource, ["LENSED_POSITION"], index_lens_model_list=[[0]]
         )
         npt.assert_raises(ValueError, PointSource, [], save_cache=True)
         npt.assert_raises(ValueError, PointSource, ["SOURCE_POSITION"])
