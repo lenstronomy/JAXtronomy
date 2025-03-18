@@ -1,6 +1,8 @@
 __author__ = "sibirrer"
 
 from jaxtronomy.Sampling.Likelihoods.image_likelihood import ImageLikelihood
+from jaxtronomy.Sampling.Likelihoods.position_likelihood import PositionLikelihood
+
 from lenstronomy.Sampling.Likelihoods.prior_likelihood import PriorLikelihood
 
 # TODO: Implement other Likelihood classes intro jaxtronomy
@@ -39,7 +41,7 @@ class LikelihoodModule(object):
         source_position_likelihood=False,
         image_position_uncertainty=0.004,
         check_positive_flux=False,
-        source_position_tolerance=0.001,
+        source_position_tolerance=None,
         source_position_sigma=0.001,
         force_no_add_image=False,
         source_marg=False,
@@ -126,16 +128,11 @@ class LikelihoodModule(object):
         if (
             time_delay_likelihood
             or tracer_likelihood
-            or image_position_likelihood
-            or source_position_likelihood
             or flux_ratio_likelihood
             or kinematic_2d_likelihood
-            or astrometric_likelihood
         ):
             raise ValueError(
-                "Only image_likelihood is currently supported in JAXtronomy.\n"
-                "tracer, image_position, source_position, flux_ratio, kinematic_2d, and astrometric \n"
-                "likelihoods are not currently supported and should be set to False."
+                "tracer, flux_ratio, and kinematic_2d likelihoods are not currently supported and should be set to False."
             )
         # TODO unpack also tracer model from kwargs_data
         (
@@ -286,6 +283,9 @@ class LikelihoodModule(object):
             self.image_likelihood = ImageLikelihood(
                 kwargs_model=kwargs_model, **kwargs_imaging
             )
+        self._position_likelihood = PositionLikelihood(
+            point_source_class, **kwargs_position
+        )
 
     def __call__(self, a):
         return self.logL(a)
@@ -360,6 +360,10 @@ class LikelihoodModule(object):
             if verbose is True:
                 jax.debug.print("image logL = {}", logL_image)
 
+        logL += self._position_likelihood.logL(
+            kwargs_lens, kwargs_ps, kwargs_special, verbose=verbose
+        )
+
         logL = jnp.nan_to_num(logL, nan=1e-18)
         return logL
 
@@ -406,6 +410,7 @@ class LikelihoodModule(object):
         num_data = 0
         if self._image_likelihood is True:
             num_data += self.image_likelihood.num_data
+        num_data += self._position_likelihood.num_data
         return num_data
 
     @property
