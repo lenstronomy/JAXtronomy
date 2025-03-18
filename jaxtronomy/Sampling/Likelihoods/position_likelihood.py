@@ -294,7 +294,7 @@ class PositionLikelihood(object):
                 k_list = self._pointSource.k_list(k)
                 for i in range(len(x_image)):
                     if k_list is not None:
-                        k_lens = k_list[i]
+                        k_lens = tuple(k_list[i])
                     else:
                         k_lens = None
                     x_source_i, y_source_i = self._lensModel.ray_shooting(
