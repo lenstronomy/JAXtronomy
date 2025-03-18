@@ -34,10 +34,7 @@ class TestPositionLikelihood(object):
                 "center_x": 0,
                 "center_y": 0,
             },
-            {
-                "gamma1": 0.1,
-                "gamma2": 0.2
-            }
+            {"gamma1": 0.1, "gamma2": 0.2},
         ]
         self.kwargs_lens_eqn_solver = {"min_distance": 0.1, "search_window": 10}
         x_pos, y_pos = solver.image_position_from_source(
@@ -63,13 +60,13 @@ class TestPositionLikelihood(object):
             point_source_type_list=["LENSED_POSITION"],
             lens_model=lensModel,
             index_lens_model_list=[[0], [1]],
-            point_source_frame_list=[[0]*len(x_pos)]
+            point_source_frame_list=[[0] * len(x_pos)],
         )
         point_source_class_ref2 = PointSource_ref(
             point_source_type_list=["LENSED_POSITION"],
             lens_model=lensModel_ref,
             index_lens_model_list=[[0], [1]],
-            point_source_frame_list=[[0]*len(x_pos)]
+            point_source_frame_list=[[0] * len(x_pos)],
         )
 
         self.likelihood = PositionLikelihood(
@@ -192,7 +189,9 @@ class TestPositionLikelihood(object):
         )
         npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=1e-8)
 
-        logL = self.likelihood.astrometric_likelihood([{"not_ra_image": 0.01}], kwargs_special, sigma=0.01)
+        logL = self.likelihood.astrometric_likelihood(
+            [{"not_ra_image": 0.01}], kwargs_special, sigma=0.01
+        )
         logL_ref = self.likelihood_ref.astrometric_likelihood(
             [{"not_ra_image": 0.1}], kwargs_special, sigma=0.01
         )
