@@ -1,7 +1,8 @@
 from functools import partial
 from jax import config, debug, jit, lax, numpy as jnp
 import warnings
-#from lenstronomy.Util.cosmo_util import get_astropy_cosmology
+
+# from lenstronomy.Util.cosmo_util import get_astropy_cosmology
 
 config.update("jax_enable_x64", True)
 
@@ -69,13 +70,16 @@ class PositionLikelihood(object):
         #     raise ValueError(
         #         "max_num_images needs to be provided when restrict_number_images is True!"
         #     )
-        
+
         self._astrometric_likelihood = astrometric_likelihood
 
         self._source_position_likelihood = source_position_likelihood
         self._source_position_sigma = source_position_sigma
         self._bound_source_position_tolerance = source_position_tolerance
-        if source_position_tolerance is not None and source_position_likelihood is False:
+        if (
+            source_position_tolerance is not None
+            and source_position_likelihood is False
+        ):
             warnings.warn(
                 "source_position_tolerance has been set but source_position_likelihood is False. \n"
                 "In order to use the source_position_tolerance, set source_position_likelihood to True"
@@ -202,9 +206,9 @@ class PositionLikelihood(object):
         if "ra_image" not in kwargs_ps[0]:
             return 0
         if "delta_x_image" in kwargs_special:
-            delta_x, delta_y = jnp.array(kwargs_special["delta_x_image"], dtype=float), jnp.array(
-                kwargs_special["delta_y_image"], dtype=float
-            )
+            delta_x, delta_y = jnp.array(
+                kwargs_special["delta_x_image"], dtype=float
+            ), jnp.array(kwargs_special["delta_y_image"], dtype=float)
             dist = (delta_x**2 + delta_y**2) / sigma**2 / 2
             logL = -jnp.sum(dist)
             logL = jnp.nan_to_num(logL, nan=-(10**15))
@@ -276,7 +280,7 @@ class PositionLikelihood(object):
             return 0
         logL = 0
         source_x, source_y = self._pointSource.source_position(kwargs_ps, kwargs_lens)
-        #redshift_list = self._pointSource._redshift_list
+        # redshift_list = self._pointSource._redshift_list
 
         for k in range(len(kwargs_ps)):
             if (
@@ -285,7 +289,7 @@ class PositionLikelihood(object):
             ):
                 x_image = kwargs_ps[k]["ra_image"]
                 y_image = kwargs_ps[k]["dec_image"]
-                #self._lensModel.change_source_redshift(redshift_list[k])
+                # self._lensModel.change_source_redshift(redshift_list[k])
                 # calculating the individual source positions from the image positions
                 k_list = self._pointSource.k_list(k)
                 for i in range(len(x_image)):
@@ -303,25 +307,39 @@ class PositionLikelihood(object):
                     Sigma_theta = jnp.array([[1, 0], [0, 1]], dtype=float) * sigma**2
                     Sigma_beta = image2source_covariance(A, Sigma_theta)
                     delta = jnp.array(
-                        [source_x[k] - x_source_i, source_y[k] - y_source_i], dtype=float
+                        [source_x[k] - x_source_i, source_y[k] - y_source_i],
+                        dtype=float,
                     )
                     if hard_bound_rms is not None:
-                        bound_hit = jnp.where(delta[0] ** 2 + delta[1] ** 2 > hard_bound_rms**2, True, False)
+                        bound_hit = jnp.where(
+                            delta[0] ** 2 + delta[1] ** 2 > hard_bound_rms**2,
+                            True,
+                            False,
+                        )
                         logL = jnp.where(bound_hit, logL - 10**3, logL)
                         if verbose is True:
+
                             def true_fun():
                                 debug.print(
                                     "Source positions of image {i} of model {k} do not match to the same source position to the required "
                                     "precision. Achieved: {delta}, Required: {hard_bound_rms}.",
-                                    i=i, k=k, delta=delta, hard_bound_rms=hard_bound_rms
+                                    i=i,
+                                    k=k,
+                                    delta=delta,
+                                    hard_bound_rms=hard_bound_rms,
                                 )
+
                             def false_fun():
                                 pass
 
                             lax.cond(bound_hit, true_fun, false_fun)
                     Sigma_inv = jnp.linalg.inv(Sigma_beta)
                     not_invertible = jnp.any(jnp.isinf(Sigma_inv))
-                    logL = jnp.where(not_invertible, -(10**15), logL - delta.T.dot(Sigma_inv.dot(delta))/2)
+                    logL = jnp.where(
+                        not_invertible,
+                        -(10**15),
+                        logL - delta.T.dot(Sigma_inv.dot(delta)) / 2,
+                    )
         return logL
 
     @property

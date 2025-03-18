@@ -9,7 +9,9 @@ from jaxtronomy.PointSource.point_source import PointSource
 from jaxtronomy.LensModel.lens_model import LensModel
 from jaxtronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver
 
-from lenstronomy.Sampling.Likelihoods.position_likelihood import PositionLikelihood as PositionLikelihood_ref
+from lenstronomy.Sampling.Likelihoods.position_likelihood import (
+    PositionLikelihood as PositionLikelihood_ref,
+)
 from lenstronomy.PointSource.point_source import PointSource as PointSource_ref
 from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
 
@@ -24,7 +26,14 @@ class TestPositionLikelihood(object):
 
         solver = LensEquationSolver(lensModel=lensModel)
         self._kwargs_lens = [
-            {"theta_E": 1, "gamma": 1.6, "e1": 0.1, "e2": -0.03, "center_x": 0, "center_y": 0}
+            {
+                "theta_E": 1,
+                "gamma": 1.6,
+                "e1": 0.1,
+                "e2": -0.03,
+                "center_x": 0,
+                "center_y": 0,
+            }
         ]
         self.kwargs_lens_eqn_solver = {"min_distance": 0.1, "search_window": 10}
         x_pos, y_pos = solver.image_position_from_source(
@@ -93,7 +102,6 @@ class TestPositionLikelihood(object):
             force_no_add_image=True,
         )
 
-
     def test_image_position_likelihood(self):
         kwargs_ps = [{"ra_image": self._x_pos, "dec_image": self._y_pos}]
         logL = self.likelihood.image_position_likelihood(
@@ -146,9 +154,7 @@ class TestPositionLikelihood(object):
         npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=1e-8)
 
         logL = self.likelihood.astrometric_likelihood(kwargs_ps, {}, sigma=0.01)
-        logL_ref = self.likelihood_ref.astrometric_likelihood(
-            kwargs_ps, {}, sigma=0.01
-        )
+        logL_ref = self.likelihood_ref.astrometric_likelihood(kwargs_ps, {}, sigma=0.01)
         npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=1e-8)
 
     def test_source_position_likelihood(self):
@@ -186,7 +192,12 @@ class TestPositionLikelihood(object):
         )
         npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=1e-8)
 
-        kwargs_ps = [{"ra_image": self._x_pos + np.array([0.01, -0.32, 0, 0, -0.11]), "dec_image": self._y_pos}]
+        kwargs_ps = [
+            {
+                "ra_image": self._x_pos + np.array([0.01, -0.32, 0, 0, -0.11]),
+                "dec_image": self._y_pos,
+            }
+        ]
         logL = self.likelihood.source_position_likelihood(
             self._kwargs_lens, kwargs_ps, sigma=0.01
         )
@@ -196,7 +207,12 @@ class TestPositionLikelihood(object):
         npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=1e-8)
 
     def test_logL(self):
-        kwargs_ps = [{"ra_image": self._x_pos, "dec_image": self._y_pos + np.array([0.01, -0.32, 0.11, 0, 0])}]
+        kwargs_ps = [
+            {
+                "ra_image": self._x_pos,
+                "dec_image": self._y_pos + np.array([0.01, -0.32, 0.11, 0, 0]),
+            }
+        ]
         kwargs_special = {
             "delta_x_image": [0, 0, 0, 0.1],
             "delta_y_image": [0, 0, 0, 0.1],

@@ -287,7 +287,6 @@ class LikelihoodModule(object):
             point_source_class, **kwargs_position
         )
 
-
     def __call__(self, a):
         return self.logL(a)
 
