@@ -21,8 +21,8 @@ config.update("jax_enable_x64", True)
 class TestPositionLikelihood(object):
     def setup_method(self):
         # compute image positions
-        lensModel = LensModel(lens_model_list=["EPL"])
-        lensModel_ref = LensModel_ref(lens_model_list=["EPL"])
+        lensModel = LensModel(lens_model_list=["EPL", "SHEAR"])
+        lensModel_ref = LensModel_ref(lens_model_list=["EPL", "SHEAR"])
 
         solver = LensEquationSolver(lensModel=lensModel)
         self._kwargs_lens = [
@@ -33,6 +33,10 @@ class TestPositionLikelihood(object):
                 "e2": -0.03,
                 "center_x": 0,
                 "center_y": 0,
+            },
+            {
+                "gamma1": 0.1,
+                "gamma2": 0.2
             }
         ]
         self.kwargs_lens_eqn_solver = {"min_distance": 0.1, "search_window": 10}
@@ -54,6 +58,20 @@ class TestPositionLikelihood(object):
         )
         self.ps_class = point_source_class
 
+        # Has only the EPL lens model
+        point_source_class2 = PointSource(
+            point_source_type_list=["LENSED_POSITION"],
+            lens_model=lensModel,
+            index_lens_model_list=[[0], [1]],
+            point_source_frame_list=[[0]*len(x_pos)]
+        )
+        point_source_class_ref2 = PointSource_ref(
+            point_source_type_list=["LENSED_POSITION"],
+            lens_model=lensModel_ref,
+            index_lens_model_list=[[0], [1]],
+            point_source_frame_list=[[0]*len(x_pos)]
+        )
+
         self.likelihood = PositionLikelihood(
             point_source_class,
             image_position_uncertainty=0.005,
@@ -69,6 +87,33 @@ class TestPositionLikelihood(object):
         )
         self.likelihood_ref = PositionLikelihood_ref(
             point_source_class_ref,
+            image_position_uncertainty=0.005,
+            astrometric_likelihood=True,
+            image_position_likelihood=True,
+            ra_image_list=[x_pos],
+            dec_image_list=[y_pos],
+            source_position_likelihood=True,
+            source_position_tolerance=0.001,
+            force_no_add_image=False,
+            restrict_image_number=False,
+            max_num_images=None,
+        )
+
+        self.likelihood2 = PositionLikelihood(
+            point_source_class2,
+            image_position_uncertainty=0.005,
+            astrometric_likelihood=True,
+            image_position_likelihood=True,
+            ra_image_list=[x_pos],
+            dec_image_list=[y_pos],
+            source_position_likelihood=True,
+            source_position_tolerance=0.001,
+            force_no_add_image=False,
+            restrict_image_number=False,
+            max_num_images=None,
+        )
+        self.likelihood2_ref = PositionLikelihood_ref(
+            point_source_class_ref2,
             image_position_uncertainty=0.005,
             astrometric_likelihood=True,
             image_position_likelihood=True,
@@ -147,6 +192,12 @@ class TestPositionLikelihood(object):
         )
         npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=1e-8)
 
+        logL = self.likelihood.astrometric_likelihood([{"not_ra_image": 0.01}], kwargs_special, sigma=0.01)
+        logL_ref = self.likelihood_ref.astrometric_likelihood(
+            [{"not_ra_image": 0.1}], kwargs_special, sigma=0.01
+        )
+        npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=1e-8)
+
         logL = self.likelihood.astrometric_likelihood([], kwargs_special, sigma=0.01)
         logL_ref = self.likelihood_ref.astrometric_likelihood(
             [], kwargs_special, sigma=0.01
@@ -203,6 +254,38 @@ class TestPositionLikelihood(object):
         )
         logL_ref = self.likelihood_ref.source_position_likelihood(
             self._kwargs_lens, kwargs_ps, sigma=0.01
+        )
+        npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=1e-8)
+
+        logL = self.likelihood.source_position_likelihood(
+            self._kwargs_lens,
+            [],
+            hard_bound_rms=0.001,
+            sigma=0.0001,
+            verbose=False,
+        )
+        logL_ref = self.likelihood_ref.source_position_likelihood(
+            self._kwargs_lens,
+            [],
+            hard_bound_rms=0.001,
+            sigma=0.0001,
+            verbose=False,
+        )
+        npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=1e-8)
+
+        logL = self.likelihood2.source_position_likelihood(
+            self._kwargs_lens,
+            kwargs_ps,
+            hard_bound_rms=0.001,
+            sigma=0.0001,
+            verbose=False,
+        )
+        logL_ref = self.likelihood2_ref.source_position_likelihood(
+            self._kwargs_lens,
+            kwargs_ps,
+            hard_bound_rms=0.001,
+            sigma=0.0001,
+            verbose=False,
         )
         npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=1e-8)
 
