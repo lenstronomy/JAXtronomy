@@ -26,6 +26,7 @@ from jaxtronomy.Sampling.likelihood import ImageLikelihood
 
 config.update("jax_enable_x64", True)
 
+
 class TestLikelihoodModule(object):
     """Test the fitting sequences."""
 
@@ -43,7 +44,7 @@ class TestLikelihoodModule(object):
             "lens_model_list": ["EPL"],
             "lens_light_model_list": ["SERSIC"],
             "source_light_model_list": ["SERSIC"],
-            "point_source_model_list": ["LENSED_POSITION"]
+            "point_source_model_list": ["LENSED_POSITION"],
         }
 
         # PSF specification
@@ -86,7 +87,7 @@ class TestLikelihoodModule(object):
             {
                 "ra_image": [0.3, 0.5],
                 "dec_image": [-0.5, 0.3],
-                "point_amp": [22., 30.]
+                "point_amp": [22.0, 30.0],
             }
         ]
         self.kwargs_special = {
@@ -120,7 +121,7 @@ class TestLikelihoodModule(object):
             self.kwargs_lens,
             self.kwargs_source,
             self.kwargs_lens_light,
-            self.kwargs_ps
+            self.kwargs_ps,
         )
 
         data_class.update_data(image_sim)
@@ -163,7 +164,9 @@ class TestLikelihoodModule(object):
             "dec_image_list": [[0.4, 0.4]],
         }
 
-        self.param_class = Param(self.kwargs_model, linear_solver=False, num_point_source_list=[2])
+        self.param_class = Param(
+            self.kwargs_model, linear_solver=False, num_point_source_list=[2]
+        )
         self.imageModel = ImageModel(
             data_class,
             psf_class,
@@ -329,8 +332,8 @@ class TestLikelihoodModule(object):
         assert Likelihood.logL(args) == Likelihood_ref.logL(args)
 
     def test_lensmodel_autodifferentiation(self):
-        del(self.kwargs_data_joint["ra_image_list"])
-        del(self.kwargs_data_joint["dec_image_list"])
+        del self.kwargs_data_joint["ra_image_list"]
+        del self.kwargs_data_joint["dec_image_list"]
         for deflector_profile in JAXXED_DEFLECTOR_PROFILES:
             print(deflector_profile)
             lensModel = LensModel([deflector_profile])
@@ -355,8 +358,8 @@ class TestLikelihoodModule(object):
             )
 
     def test_lightmodel_autodifferentiation(self):
-        del(self.kwargs_data_joint["ra_image_list"])
-        del(self.kwargs_data_joint["dec_image_list"])
+        del self.kwargs_data_joint["ra_image_list"]
+        del self.kwargs_data_joint["dec_image_list"]
         for source_profile in JAXXED_SOURCE_PROFILES:
             print(source_profile)
             lightModel = LightModel([source_profile])
