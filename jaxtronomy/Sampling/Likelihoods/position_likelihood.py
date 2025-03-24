@@ -278,6 +278,20 @@ class PositionLikelihood(object):
         """
         if len(kwargs_ps) < 1:
             return 0
+        if verbose:
+            def true_fun(i, k, delta, hard_bound_rms):
+                debug.print(
+                    "Source positions of image {i} of model {k} do not match to the same source position to the required "
+                    "precision. Achieved: {delta}, Required: {hard_bound_rms}.",
+                    i=i,
+                    k=k,
+                    delta=delta,
+                    hard_bound_rms=hard_bound_rms,
+                )
+
+            def false_fun(i, k, delta, hard_bound_rms):
+                pass
+
         logL = 0
         source_x, source_y = self._pointSource.source_position(kwargs_ps, kwargs_lens)
         # redshift_list = self._pointSource._redshift_list
@@ -318,27 +332,14 @@ class PositionLikelihood(object):
                         )
                         logL = jnp.where(bound_hit, logL - 10**3, logL)
                         if verbose is True:
-
-                            def true_fun():
-                                debug.print(
-                                    "Source positions of image {i} of model {k} do not match to the same source position to the required "
-                                    "precision. Achieved: {delta}, Required: {hard_bound_rms}.",
-                                    i=i,
-                                    k=k,
-                                    delta=delta,
-                                    hard_bound_rms=hard_bound_rms,
-                                )
-
-                            def false_fun():
-                                pass
-
-                            lax.cond(bound_hit, true_fun, false_fun)
-                    Sigma_inv = jnp.linalg.inv(Sigma_beta)
-                    not_invertible = jnp.any(jnp.isinf(Sigma_inv))
+                            lax.cond(bound_hit, true_fun, false_fun, i, k, delta, hard_bound_rms)
+                    a, b, c, d = Sigma_beta[0][0], Sigma_beta[0][1], Sigma_beta[1][0], Sigma_beta[1][1]
+                    det = a * d - b * c
+                    Sigma_inv = jnp.array([[d, -b], [-c, a]])
                     logL = jnp.where(
-                        not_invertible,
+                        det == 0,
                         -(10**15),
-                        logL - delta.T.dot(Sigma_inv.dot(delta)) / 2,
+                        logL - delta.T.dot(Sigma_inv.dot(delta)) / (2 * det),
                     )
         return logL
 
