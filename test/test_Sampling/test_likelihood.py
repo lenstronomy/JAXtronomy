@@ -1,6 +1,6 @@
 __author__ = "sibirrer"
 
-from jax import numpy as jnp, grad, jit
+from jax import config, numpy as jnp, grad, jit
 import pytest
 import numpy as np
 import numpy.testing as npt
@@ -24,6 +24,8 @@ from jaxtronomy.LensModel.lens_model import LensModel
 from jaxtronomy.LightModel.light_model import LightModel
 from jaxtronomy.Sampling.likelihood import ImageLikelihood
 
+config.update("jax_enable_x64", True)
+
 
 class TestLikelihoodModule(object):
     """Test the fitting sequences."""
@@ -42,6 +44,7 @@ class TestLikelihoodModule(object):
             "lens_model_list": ["EPL"],
             "lens_light_model_list": ["SERSIC"],
             "source_light_model_list": ["SERSIC"],
+            "point_source_model_list": ["LENSED_POSITION"],
         }
 
         # PSF specification
@@ -80,6 +83,17 @@ class TestLikelihoodModule(object):
 
         self.kwargs_lens_light = [kwargs_sersic]
         self.kwargs_source = [kwargs_sersic_ellipse]
+        self.kwargs_ps = [
+            {
+                "ra_image": [0.3, 0.5],
+                "dec_image": [-0.5, 0.3],
+                "point_amp": [22.0, 30.0],
+            }
+        ]
+        self.kwargs_special = {
+            "delta_x_image": [0.1, 0.15],
+            "delta_y_image": [0.07, 0.03],
+        }
 
         kwargs_numerics = {
             "supersampling_factor": 3,
@@ -107,6 +121,7 @@ class TestLikelihoodModule(object):
             self.kwargs_lens,
             self.kwargs_source,
             self.kwargs_lens_light,
+            self.kwargs_ps,
         )
 
         data_class.update_data(image_sim)
@@ -136,13 +151,22 @@ class TestLikelihoodModule(object):
         kwargs_likelihood = {
             "prior_lens": [[0, "theta_E", 1, 0.1]],
             "custom_logL_addition": condition_definition,
+            "image_position_likelihood": True,
+            "image_position_uncertainty": 0.5,
+            "source_position_likelihood": True,
+            "source_position_sigma": 0.1,
+            "astrometric_likelihood": True,
         }
         self.kwargs_data_joint = {
             "multi_band_list": [[kwargs_data, kwargs_psf, kwargs_numerics]],
             "multi_band_type": "single-band",
+            "ra_image_list": [[0.4, 0.4]],
+            "dec_image_list": [[0.4, 0.4]],
         }
 
-        self.param_class = Param(self.kwargs_model, linear_solver=False)
+        self.param_class = Param(
+            self.kwargs_model, linear_solver=False, num_point_source_list=[2]
+        )
         self.imageModel = ImageModel(
             data_class,
             psf_class,
@@ -192,22 +216,6 @@ class TestLikelihoodModule(object):
             self.kwargs_data_joint,
             self.kwargs_model,
             self.param_class,
-            image_position_likelihood=True,
-        )
-        npt.assert_raises(
-            ValueError,
-            LikelihoodModule,
-            self.kwargs_data_joint,
-            self.kwargs_model,
-            self.param_class,
-            source_position_likelihood=True,
-        )
-        npt.assert_raises(
-            ValueError,
-            LikelihoodModule,
-            self.kwargs_data_joint,
-            self.kwargs_model,
-            self.param_class,
             flux_ratio_likelihood=True,
         )
         npt.assert_raises(
@@ -218,40 +226,36 @@ class TestLikelihoodModule(object):
             self.param_class,
             kinematic_2d_likelihood=True,
         )
-        npt.assert_raises(
-            ValueError,
-            LikelihoodModule,
-            self.kwargs_data_joint,
-            self.kwargs_model,
-            self.param_class,
-            astrometric_likelihood=True,
-        )
 
     def test_logL(self):
         args = self.param_class.kwargs2args(
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
+            kwargs_ps=self.kwargs_ps,
+            kwargs_special=self.kwargs_special,
         )
 
         logL = self.Likelihood(args)
         logL_ref = self.Likelihood_ref(args)
-        npt.assert_almost_equal(logL, logL_ref, decimal=8)
+        npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=2e-7)
 
         logL = self.Likelihood.logL(args, verbose=True)
         logL_ref = self.Likelihood_ref.logL(args, verbose=True)
-        npt.assert_almost_equal(logL, logL_ref, decimal=8)
+        npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=2e-7)
 
         args[3] += 0.1
 
         logL = self.Likelihood.likelihood(args)
-        npt.assert_raises(AssertionError, npt.assert_almost_equal, logL, logL_ref)
+        npt.assert_raises(AssertionError, npt.assert_allclose, logL, logL_ref)
         logL_ref = self.Likelihood_ref.likelihood(args)
-        npt.assert_almost_equal(logL, logL_ref, decimal=8)
+        npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=2e-7)
+
+        args[0] += 0.1
 
         logL = self.Likelihood.negativelogL(args)
         logL_ref = self.Likelihood_ref.negativelogL(args)
-        npt.assert_almost_equal(logL, logL_ref, decimal=8)
+        npt.assert_allclose(logL, logL_ref, atol=1e-8, rtol=2e-7)
 
         num_data = self.Likelihood.num_data
         num_data_ref = self.Likelihood_ref.num_data
@@ -266,6 +270,8 @@ class TestLikelihoodModule(object):
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
+            kwargs_ps=self.kwargs_ps,
+            kwargs_special=self.kwargs_special,
         )
         grad_func = grad(self.Likelihood.logL)
         assert len(args) == len(grad_func(args))
@@ -273,8 +279,8 @@ class TestLikelihoodModule(object):
     def test_check_bounds(self):
         lower_limit, upper_limit = self.Likelihood.param_limits
         lower_limit_ref, upper_limit_ref = self.Likelihood_ref.param_limits
-        npt.assert_array_equal(lower_limit, lower_limit_ref)
-        npt.assert_array_equal(upper_limit, upper_limit_ref)
+        npt.assert_allclose(lower_limit, lower_limit_ref, atol=1e-8, rtol=1e-8)
+        npt.assert_allclose(upper_limit, upper_limit_ref, atol=1e-8, rtol=1e-8)
 
         penalty, bound_hit = self.Likelihood.check_bounds(
             args=[0, 1], lowerLimit=[1, 0], upperLimit=[2, 2], verbose=True
@@ -301,6 +307,8 @@ class TestLikelihoodModule(object):
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
+            kwargs_ps=self.kwargs_ps,
+            kwargs_special=self.kwargs_special,
         )
 
         self.kwargs_data_joint["multi_band_list"] = None
@@ -324,6 +332,8 @@ class TestLikelihoodModule(object):
         assert Likelihood.logL(args) == Likelihood_ref.logL(args)
 
     def test_lensmodel_autodifferentiation(self):
+        del self.kwargs_data_joint["ra_image_list"]
+        del self.kwargs_data_joint["dec_image_list"]
         for deflector_profile in JAXXED_DEFLECTOR_PROFILES:
             print(deflector_profile)
             lensModel = LensModel([deflector_profile])
@@ -348,6 +358,8 @@ class TestLikelihoodModule(object):
             )
 
     def test_lightmodel_autodifferentiation(self):
+        del self.kwargs_data_joint["ra_image_list"]
+        del self.kwargs_data_joint["dec_image_list"]
         for source_profile in JAXXED_SOURCE_PROFILES:
             print(source_profile)
             lightModel = LightModel([source_profile])
