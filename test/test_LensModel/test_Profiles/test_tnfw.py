@@ -355,6 +355,31 @@ class TestTNFW(object):
         _h = TNFW._h(x, tau)
         npt.assert_allclose(_h, _h_ref, atol=1e-12, rtol=1e-12)
 
+    def test_alpha2rho(self):
+        alpha_Rs = 1.5
+        Rs = 1.9
+        rho_ref = self.tnfw_ref.alpha2rho0(alpha_Rs, Rs)
+        rho = TNFW.alpha2rho0(alpha_Rs, Rs)
+        npt.assert_allclose(rho, rho_ref, atol=1e-12, rtol=1e-12)
+
+        alpha_Rs = 0.3
+        Rs = 0.1
+        rho_ref = self.tnfw_ref.alpha2rho0(alpha_Rs, Rs)
+        rho = TNFW.alpha2rho0(alpha_Rs, Rs)
+        npt.assert_allclose(rho, rho_ref, atol=1e-12, rtol=1e-12)
+
+    def test_rho2alpha(self):
+        rho0 = 1.5
+        Rs = 1.9
+        alpha_ref = self.tnfw_ref.alpha2rho0(rho0, Rs)
+        alpha = TNFW.alpha2rho0(rho0, Rs)
+        npt.assert_allclose(alpha, alpha_ref, atol=1e-12, rtol=1e-12)
+
+        rho0 = 0.3
+        Rs = 0.1
+        alpha_ref = self.tnfw_ref.alpha2rho0(rho0, Rs)
+        alpha = TNFW.alpha2rho0(rho0, Rs)
+        npt.assert_allclose(alpha, alpha_ref, atol=1e-12, rtol=1e-12)
 
 if __name__ == "__main__":
     pytest.main()
