@@ -377,8 +377,8 @@ class TestTNFW(object):
 
         rho0 = 0.3
         Rs = 0.1
-        alpha_ref = self.tnfw_ref.alpha2rho0(rho0, Rs)
-        alpha = TNFW.alpha2rho0(rho0, Rs)
+        alpha_ref = self.tnfw_ref.rho02alpha(rho0, Rs)
+        alpha = TNFW.rho02alpha(rho0, Rs)
         npt.assert_allclose(alpha, alpha_ref, atol=1e-12, rtol=1e-12)
 
 
