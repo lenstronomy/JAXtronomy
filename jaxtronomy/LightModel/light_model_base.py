@@ -358,10 +358,11 @@ class LightModelBase(object):
         """
         name_list = []
         for i, func in enumerate(self.func_list):
-            if hasattr(func, "param_names_latex"):
-                name_list.append(func.param_names_latex)
-            else:
-                name_list.append(func.param_names)
+            # TODO: Currently there are no profiles in jaxtronomy with LaTeX param names
+            # if hasattr(func, "param_names_latex"):
+            #     #name_list.append(func.param_names_latex)
+            # else:
+            name_list.append(func.param_names)
         return name_list
 
     def check_parameters(self, kwargs_list):
