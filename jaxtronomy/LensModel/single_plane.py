@@ -92,7 +92,7 @@ class SinglePlane(ProfileListBase):
             lens model classes
         :param k: only evaluate the k-th lens model
         :type k: None, int, or tuple of ints
-        :return: deflectionangles in units of arcsec
+        :return: deflection angles in units of arcsec
         """
         x = jnp.array(x, dtype=float)
         y = jnp.array(y, dtype=float)

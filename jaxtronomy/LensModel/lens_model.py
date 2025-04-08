@@ -162,6 +162,24 @@ class LensModel(object):
         # if z_lens is not None and z_source is not None:
         #    self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
 
+    def info(self):
+        """Shows what models are being initialized and what parameters are being
+        requested for. Should be used outside of JIT.
+
+        :return: None
+        """
+        self.lens_model.model_info()
+
+    def check_parameters(self, kwargs_list):
+        """Checks whether parameter list is consistent with the parameters required by
+        the model. Should be used outside of JIT.
+
+        :param kwargs_list: keyword argument list as parameterised models
+        :return: None or raise ValueError with error message of what parameter is not
+            supported.
+        """
+        self.lens_model.check_parameters(kwargs_list)
+
     @partial(jit, static_argnums=(0, 4))
     def ray_shooting(self, x, y, kwargs, k=None):
         """Maps image to source position (inverse deflection)

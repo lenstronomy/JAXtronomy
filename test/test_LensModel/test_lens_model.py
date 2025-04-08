@@ -58,6 +58,22 @@ class TestLensModel(object):
         lens_model_list = ["SIS", "LOS"]
         lensModel = LensModel(lens_model_list)
 
+        lensModel.info()
+
+    def test_check_parameters(self):
+        lens_model = LensModel(lens_model_list=["SIS"])
+        # check_parameters
+        kwargs_list = [{"theta_E": 1.0, "center_x": 0, "center_y": 0}]
+        lens_model.check_parameters(kwargs_list)
+        kwargs_list_add = [
+            {"theta_E": 1.0, "center_x": 0, "center_y": 0, "not_a_parameter": 1}
+        ]
+        kwargs_list_remove = [{"center_x": 0, "center_y": 0}]
+        kwargs_list_too_long = [{"theta_E": 1.0, "center_x": 0, "center_y": 0}, {}]
+        npt.assert_raises(ValueError, lens_model.check_parameters, kwargs_list_add)
+        npt.assert_raises(ValueError, lens_model.check_parameters, kwargs_list_remove)
+        npt.assert_raises(ValueError, lens_model.check_parameters, kwargs_list_too_long)
+
     def test_kappa(self):
         lensModel = LensModel(lens_model_list=["CONVERGENCE"])
         lensModel_ref = LensModel_ref(lens_model_list=["CONVERGENCE"])

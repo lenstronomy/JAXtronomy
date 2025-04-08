@@ -60,6 +60,24 @@ class TestLightModel(object):
     def test_import_profiles(self):
         lightModel = LightModel(light_model_list=_JAXXED_MODELS)
 
+    def test_check_parameters(self):
+        lightModel = LightModel(light_model_list=["GAUSSIAN"])
+        kwargs_list = [{"amp": 0, "sigma": 1, "center_x": 0, "center_y": 0}]
+
+        lightModel.check_parameters(kwargs_list)
+        kwargs_list_add = [
+            {"amp": 0, "sigma": 1, "center_x": 0, "center_y": 0, "bad": 1}
+        ]
+        kwargs_list_remove = [{"amp": 0, "center_x": 0, "center_y": 0}]
+        kwargs_list_too_long = [
+            {"amp": 0, "sigma": 1, "center_x": 0, "center_y": 0},
+            {},
+        ]
+
+        npt.assert_raises(ValueError, lightModel.check_parameters, kwargs_list_add)
+        npt.assert_raises(ValueError, lightModel.check_parameters, kwargs_list_remove)
+        npt.assert_raises(ValueError, lightModel.check_parameters, kwargs_list_too_long)
+
     def test_surface_brightness(self):
         x = 1.0
         y = 1.3
