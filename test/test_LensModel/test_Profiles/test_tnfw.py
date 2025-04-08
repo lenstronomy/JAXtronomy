@@ -381,5 +381,6 @@ class TestTNFW(object):
         alpha = TNFW.alpha2rho0(rho0, Rs)
         npt.assert_allclose(alpha, alpha_ref, atol=1e-12, rtol=1e-12)
 
+
 if __name__ == "__main__":
     pytest.main()
