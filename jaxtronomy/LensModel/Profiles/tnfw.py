@@ -43,7 +43,6 @@ class TNFW(LensProfileBase):
     }
 
     _s = 0.001
-    
 
     @staticmethod
     @jit
@@ -160,7 +159,7 @@ class TNFW(LensProfileBase):
         tau = r_trunc / Rs
         Fx = TNFW._F(x, tau)
         return 2 * rho0 * Rs * Fx
-    
+
     @staticmethod
     @jit
     def mass_2d(R, Rs, rho0, r_trunc):
@@ -279,7 +278,7 @@ class TNFW(LensProfileBase):
         Fx = TNFW._F(x, tau)
         a = 2 * rho0 * Rs * (2 * gx / x**2 - Fx)
         return a * (ax_y**2 - ax_x**2) / R**2, -a * 2 * (ax_x * ax_y) / R**2
-    
+
     @staticmethod
     @jit
     def _L(x, tau):
@@ -302,8 +301,12 @@ class TNFW(LensProfileBase):
         """
 
         x = jnp.maximum(x, TNFW._s)
-        result = jnp.where(x < 1, (1 - x**2) ** -0.5 * jnp.arctanh((1 - x**2) ** 0.5), x)
-        result = jnp.where(x > 1, (x**2 - 1) ** -0.5 * jnp.arctan((x**2 - 1) ** 0.5), result)
+        result = jnp.where(
+            x < 1, (1 - x**2) ** -0.5 * jnp.arctanh((1 - x**2) ** 0.5), x
+        )
+        result = jnp.where(
+            x > 1, (x**2 - 1) ** -0.5 * jnp.arctan((x**2 - 1) ** 0.5), result
+        )
         return result
 
     @staticmethod

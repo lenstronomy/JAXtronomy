@@ -337,7 +337,7 @@ class LightModelBase(object):
                 # 'GAUSSIAN', 'GAUSSIAN_ELLIPSE', 'POWER_LAW', 'NIE', 'CHAMELEON', 'DOUBLE_CHAMELEON' ,
                 # 'TRIPLE_CHAMELEON', 'UNIFORM'
         return norm_flux_list
-    
+
     @property
     def param_name_list(self):
         """Returns the list of all parameter names. Should be used outside of JIT.
@@ -351,8 +351,8 @@ class LightModelBase(object):
 
     @property
     def param_name_list_latex(self):
-        """Returns the list of all parameter names in LateX style.
-        Should be used outside of JIT.
+        """Returns the list of all parameter names in LateX style. Should be used
+        outside of JIT.
 
         :return: list of lists of strings (for each light model separately)
         """

@@ -1,6 +1,7 @@
 __author__ = "sibirrer"
 
 import jax
+
 jax.config.update("jax_enable_x64", True)
 
 import numpy as np
@@ -43,7 +44,6 @@ class TestTNFW(object):
         values = TNFW.function(x, y, Rs, alpha_Rs, r_trunc)
         npt.assert_allclose(values_ref, values, atol=1e-12, rtol=1e-12)
 
-
     def test_derivatives(self):
         x = np.array([0])
         y = np.array([0])
@@ -79,7 +79,9 @@ class TestTNFW(object):
         Rs = 1.4
         alpha_Rs = 3.5
         r_trunc = 3.2
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.tnfw_ref.hessian(x, y, Rs, alpha_Rs, r_trunc)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.tnfw_ref.hessian(
+            x, y, Rs, alpha_Rs, r_trunc
+        )
         f_xx, f_xy, f_yx, f_yy = TNFW.hessian(x, y, Rs, alpha_Rs, r_trunc)
         npt.assert_allclose(f_xx_ref, f_xx, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_xy_ref, f_xy, atol=1e-12, rtol=1e-12)
@@ -91,7 +93,9 @@ class TestTNFW(object):
         Rs = 2.4
         alpha_Rs = 1.5
         r_trunc = 1.2
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.tnfw_ref.hessian(x, y, Rs, alpha_Rs, r_trunc)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.tnfw_ref.hessian(
+            x, y, Rs, alpha_Rs, r_trunc
+        )
         f_xx, f_xy, f_yx, f_yy = TNFW.hessian(x, y, Rs, alpha_Rs, r_trunc)
         npt.assert_allclose(f_xx_ref, f_xx, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_xy_ref, f_xy, atol=1e-12, rtol=1e-12)
@@ -101,7 +105,9 @@ class TestTNFW(object):
         Rs = 4
         alpha_Rs = 0.5
         r_trunc = 8
-        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.tnfw_ref.hessian(x, y, Rs, alpha_Rs, r_trunc)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.tnfw_ref.hessian(
+            x, y, Rs, alpha_Rs, r_trunc
+        )
         f_xx, f_xy, f_yx, f_yy = TNFW.hessian(x, y, Rs, alpha_Rs, r_trunc)
         npt.assert_allclose(f_xx_ref, f_xx, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_xy_ref, f_xy, atol=1e-12, rtol=1e-12)
@@ -348,7 +354,6 @@ class TestTNFW(object):
         _h_ref = self.tnfw_ref._h(x, tau)
         _h = TNFW._h(x, tau)
         npt.assert_allclose(_h, _h_ref, atol=1e-12, rtol=1e-12)
-
 
 
 if __name__ == "__main__":
