@@ -52,7 +52,7 @@ We compare the runtimes between JAXtronomy and lenstronomy by timing 10,000 func
 The table below shows how much faster JAXtronomy is compared to lenstronomy for different deflector profiles and different grid sizes.
 
 .. list-table::
-   :header-rows: 1
+  :header-rows: 1
 
   * - Deflector Profile
     - 60x60 grid (cpu)
