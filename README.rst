@@ -45,148 +45,171 @@ The goal of this library is to reimplement lenstronomy functionalities in pure J
 Performance comparison between JAXtronomy and lenstronomy
 ---------------------------------------------------------
 
-We compare the runtimes between JAXtronomy and lenstronomy by timing 10,000 function executions. These tests were done on one CPU. We expect the performance boosts to be even higher on GPU. A notebook for runtime comparisons is provided.
+We compare the runtimes between JAXtronomy and lenstronomy by timing 10,000 function executions.
+While lenstronomy is always run using CPU, JAXtronomy can be run using either CPU or GPU.
 
 **LensModel ray-shooting**
 
 The table below shows how much faster JAXtronomy is compared to lenstronomy for different deflector profiles and different grid sizes.
+These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz and an NVIDIA A100 GPU.
 
 .. list-table::
   :header-rows: 1
 
   * - Deflector Profile
-    - 60x60 grid (cpu)
-    - 180x180 grid (cpu)
-    - 180x180 grid (gpu)
+    - 60x60 grid (JAX w/ cpu)
+    - 180x180 grid (JAX w/ cpu)
+    - 180x180 grid (JAX w/ gpu)
   * - CONVERGENCE
     - 0.4x
-    - 0.8x
-    - 0.1x
+    - 1.3x
+    - 0.4x
   * - CSE
-    - 1.3x
-    - 3.2x
+    - 1.6x
+    - 2.9x
+    - 2.3x
+  * - EPL (e1 = e2 = 0.0)
+    - 0.1x
     - 0.2x
-  * - EPL
-    - 8.9x
-    - 14.0
-    - 7.3x
-  * - EPL (jax) vs EPL_NUMBA
-    - 1.0x
-    - 1.7x
-    - 1.3x
-  * - EPL_Q_PHI
+    - 1.6x
+  * - EPL (e1 = e2 = 0.5)
+    - 6.7x
+    - 10.8x
+    - 76.6x
+  * - EPL (jax) vs EPL_NUMBA (e1 = e2 = 0.0)
     - 0.2x
     - 0.3x
-    - 0.2x
+    - 2.7x
+  * - EPL (jax) vs EPL_NUMBA (e1 = e2 = 0.5)
+    - 0.8x
+    - 1.5x
+    - 11.3x
   * - GAUSSIAN
     - 1.0x
-    - 1.9x
-    - 0.2x
+    - 1.8x
+    - 3.0x
   * - GAUSSIAN_POTENTIAL
     - 0.9x
-    - 1.8x
-    - 0.1x
+    - 1.7x
+    - 2.4x
   * - HERNQUIST
-    - 1.7x
-    - 4.3x
-    - 0.4x
+    - 1.9x
+    - 3.6x
+    - 6.4x
   * - HERNQUIST_ELLIPSE_CSE
-    - 5.0x
-    - 4.3x
-    - 5.2x
+    - 3.8x
+    - 5.9x
+    - 40.3x
   * - NFW
-    - 1.7x
-    - 3.2x
-    - 0.3x
+    - 1.6x
+    - 3.3x
+    - 5.0x
   * - NFW_ELLIPSE_CSE
-    - 5.4x
-    - 5.2x
+    - 4.1x
     - 5.7x
+    - 36.5x
   * - NIE
-    - 0.8x
-    - 1.6x
-    - 0.2x
+    - 0.5x
+    - 0.5x
+    - 2.0x
   * - PJAFFE
-    - 0.9x
-    - 0.8x
-    - 0.2x
-  * - PJAFFE_ELLIPSE_POTENTIAL
-    - 1.4x
-    - 1.6x
-    - 0.2x
-  * - SHEAR
-    - 0.9x
-    - 1.6x
-    - 0.1x
-  * - SIE
-    - 0.9x
+    - 1.0x
     - 1.2x
-    - 0.3x
+    - 3.0x
+  * - PJAFFE_ELLIPSE_POTENTIAL
+    - 1.5x
+    - 1.6x
+    - 3.1x
+  * - SHEAR
+    - 0.7x
+    - 2.2x
+    - 1.0x
+  * - SIE
+    - 0.5x
+    - 0.5x
+    - 2.0x
   * - SIS
-    - 1.7x
-    - 1.7x
-    - 0.1x
+    - 1.4x
+    - 3.0x
+    - 2.0x
   * - SPP
-    - 0.8x
-    - 1.7x
-    - 0.2x
+    - 0.5x
+    - 1.0x
+    - 2.9x
   * - TNFW
-    - 2.5x
-    - 3.9x
-    - 0.6x
+    - 2.4x
+    - 5.4x
+    - 8.3x
 
-Note that some profiles' runtime are dependent on function arguments. For example, the EPL profile involves performing a hyp2f1 calculation using a power series expansion.
+Note that some profiles' runtime may be dependent on function arguments. For example, the EPL profile involves performing a hyp2f1 calculation using a power series expansion.
 In lenstronomy, the number of terms used depends on how quickly the series converges, whereas in JAXtronomy, the power series always involves a fixed number of terms, which is required for autodifferentiation.
-In the table, the EPL comparison shows the case where lenstronomy requires the maximum number of terms, and the EPL_Q_PHI comparison shows the case where lenstronomy requires the fewest.
+
+A performance comparison notebook is available for more detailed analysis.
 
 **LightModel surface brightness**
 
 The table below shows how much faster JAXtronomy is compared to lenstronomy for different source profiles and different grid sizes.
+These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz and an NVIDIA A100 GPU.
 
 .. list-table::
    :header-rows: 1
 
    * - Source Profile
-     - 60x60 grid
-     - 180x180 grid
+     - 60x60 grid (JAX w/ cpu)
+     - 180x180 grid (JAX w/ cpu)
+     - 180x180 grid (JAX w/ gpu)
    * - CORE_SERSIC
+     - 2.1x
+     - 10.2x
      - 4.4x
-     - 15x
    * - GAUSSIAN
-     - 3.0x
-     - 10x
-   * - GAUSSIAN_ELLIPSE
-     - 2.7x
-     - 15x
-   * - MULTI_GAUSSIAN (5 components)
-     - 8.0x
-     - 18x
-   * - MULTI_GAUSSIAN_ELLIPSE (5 components)
-     - 8.0x
-     - 20x
-   * - SERSIC
+     - 1.6x
      - 3.4x
-     - 10x
+     - 1.6x
+   * - GAUSSIAN_ELLIPSE
+     - 1.5x
+     - 6.9x
+     - 2.1x
+   * - MULTI_GAUSSIAN (5 components)
+     - 3.7x
+     - 16.2x
+     - 7.8x
+   * - MULTI_GAUSSIAN_ELLIPSE (5 components)
+     - 4.4x
+     - 18.3x
+     - 7.2x
+   * - SERSIC
+     - 2.3x
+     - 9.3x
+     - 4.2x
    * - SERSIC_ELLIPSE
-     - 3.5x
-     - 10x
+     - 2.1x
+     - 8.5x
+     - 3.2x
    * - SERSIC_ELLIPSE_Q_PHI
-     - 4.0x
-     - 10x
+     - 1.7x
+     - 8.6x
+     - 3.4x
    * - SHAPELETS (n_max=6)
-     - 8.7x
-     - 3.6x
+     - 8.0x
+     - 5.2x
+     - 17.6x
    * - SHAPELETS (n_max=10)
-     - 10.0x
-     - 4.0x
+     - 8.9x
+     - 6.1x
+     - 22.4x
 
-**Image Convolution**
+**FFT Pixel Kernel Convolution**
 
-There is no gaussian convolution function in the JAX library. Thus, in JAXtronomy we construct a gaussian pixel kernel, pad the image, and perform an fft convolution which mimics scipy.ndimage.gaussian_filter with mode="nearest".
+Convolution runtimes vary significantly, depending on both grid size and kernel size. A short summary is as follows, using
+an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz and an NVIDIA A100 GPU.
 
-When the kernel radius is less than 10, JAXtronomy takes about 1.1x to 1.3x longer than lenstronomy to perform a gaussian convolution, and when the kernel size is larger, it takes JAXtronomy 2x as long or more.
-For pixel kernel fft convolution, performance varies significantly with kernel size and grid size.
-Further details can be found in the performance comparison notebook.
+- For a 60x60 grid, and kernel sizes ranging from 3 to 45, jaxtronomy on CPU is about 1.1x to 2.9x faster than lenstronomy, with no obvious correlation to kernel size.
+- For a 60x60 grid, and kernel sizes ranging from 3 to 45, jaxtronomy on GPU is about 1.5x to 3.5x faster than lenstronomy, with JAX performing better with higher kernel sizes.
+- For a 180x180 grid, and kernel sizes ranging from 9 to 135, jaxtronomy on CPU is about 0.7x to 2.5x as fast as lenstronomy, with no obvious correlation to kernel size.
+- For a 180x180 grid, and kernel sizes ranging from 9 t0 135, jaxtronomy on GPU is about 10x to 20x as fast as lenstronomy, with JAX performing better with higher kernel sizes.
+
+A performance comparison notebook is available for more detailed analysis.
 
 Related software packages
 -------------------------
