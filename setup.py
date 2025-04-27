@@ -11,17 +11,17 @@ tests_require = ["pytest"]
 
 setup(
     name="jaxtronomy",
-    version="0.0.1rc1",
+    version="0.0.9",
     url="https://github.com/lenstronomy/JAXtronomy",
-    author="lenstronomy developers",
+    author="jaxtronomy developers",
     description="lenstronomy, but in JAX",
     packages=find_packages(),
     license="BSD-3",
     install_requires=requires,
     tests_require=tests_require,
-    keywords="lenstronomy",
+    keywords="jaxtronomy",
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
         "Natural Language :: English",
         "Operating System :: OS Independent",
