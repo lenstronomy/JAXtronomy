@@ -202,7 +202,7 @@ class HernquistEllipseCSE(LensProfileBase):
         :return: normalization (m)
         """
         rs_ = Rs / jnp.sqrt(q)
-        const = sigma0 / 2 * rs_**3
+        const = sigma0 * rs_**2
         return const
 
     @staticmethod
