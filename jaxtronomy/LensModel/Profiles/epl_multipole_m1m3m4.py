@@ -1,6 +1,7 @@
 __author__ = "dangilman"
 
 from jax import config, jit, numpy as jnp
+
 config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
@@ -207,9 +208,15 @@ class EPL_MULTIPOLE_M1M3M4_ELL(LensProfileBase):
             )
         )
         f_epl = EPL_MULTIPOLE_M1M3M4_ELL.epl.function(x, y, **kwargs_epl)
-        f_multipole = EPL_MULTIPOLE_M1M3M4_ELL.multipole.function(x, y, **kwargs_multipole3)
-        f_multipole += EPL_MULTIPOLE_M1M3M4_ELL.multipole.function(x, y, **kwargs_multipole4)
-        f_multipole += EPL_MULTIPOLE_M1M3M4_ELL.multipole.function(x, y, **kwargs_multipole1)
+        f_multipole = EPL_MULTIPOLE_M1M3M4_ELL.multipole.function(
+            x, y, **kwargs_multipole3
+        )
+        f_multipole += EPL_MULTIPOLE_M1M3M4_ELL.multipole.function(
+            x, y, **kwargs_multipole4
+        )
+        f_multipole += EPL_MULTIPOLE_M1M3M4_ELL.multipole.function(
+            x, y, **kwargs_multipole1
+        )
         return f_epl + f_multipole
 
     @staticmethod
@@ -366,7 +373,9 @@ class EPL_MULTIPOLE_M1M3M4_ELL(LensProfileBase):
                 center_y=center_y,
             )
         )
-        f_xx_epl, f_xy_epl, f_yx_epl, f_yy_epl = EPL_MULTIPOLE_M1M3M4_ELL.epl.hessian(x, y, **kwargs_epl)
+        f_xx_epl, f_xy_epl, f_yx_epl, f_yy_epl = EPL_MULTIPOLE_M1M3M4_ELL.epl.hessian(
+            x, y, **kwargs_epl
+        )
         (
             f_xx_multipole3,
             f_xy_multipole3,
@@ -604,8 +613,12 @@ class EPL_MULTIPOLE_M1M3M4(LensProfileBase):
         )
         f_epl = EPL_MULTIPOLE_M1M3M4.epl.function(x, y, **kwargs_epl)
         f_multipole = EPL_MULTIPOLE_M1M3M4.multipole.function(x, y, **kwargs_multipole3)
-        f_multipole += EPL_MULTIPOLE_M1M3M4.multipole.function(x, y, **kwargs_multipole4)
-        f_multipole += EPL_MULTIPOLE_M1M3M4.multipole.function(x, y, **kwargs_multipole1)
+        f_multipole += EPL_MULTIPOLE_M1M3M4.multipole.function(
+            x, y, **kwargs_multipole4
+        )
+        f_multipole += EPL_MULTIPOLE_M1M3M4.multipole.function(
+            x, y, **kwargs_multipole1
+        )
         return f_epl + f_multipole
 
     @staticmethod
@@ -757,7 +770,9 @@ class EPL_MULTIPOLE_M1M3M4(LensProfileBase):
                 center_y=center_y,
             )
         )
-        f_xx_epl, f_xy_epl, f_yx_epl, f_yy_epl = EPL_MULTIPOLE_M1M3M4.epl.hessian(x, y, **kwargs_epl)
+        f_xx_epl, f_xy_epl, f_yx_epl, f_yy_epl = EPL_MULTIPOLE_M1M3M4.epl.hessian(
+            x, y, **kwargs_epl
+        )
         (
             f_xx_multipole3,
             f_xy_multipole3,

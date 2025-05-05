@@ -1,4 +1,5 @@
 from jax import config
+
 config.update("jax_enable_x64", True)
 
 import numpy.testing as npt
@@ -81,7 +82,6 @@ class TestEPL_MULTIPOLE_M1M3M4(object):
         result = self.epl_m1m3m4.hessian(**self.kwargs2_m1m3m4)
         result_ref = self.epl_m1m3m4_ref.hessian(**self.kwargs2_m1m3m4)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
-
 
 
 class TestEPL_MULTIPOLE_M1M3M4_ELL(object):

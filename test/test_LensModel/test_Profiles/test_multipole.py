@@ -1,4 +1,5 @@
 from jax import config
+
 config.update("jax_enable_x64", True)
 
 from jaxtronomy.LensModel.Profiles.multipole import (
@@ -20,7 +21,7 @@ from jaxtronomy.LensModel.Profiles.multipole import (
     _F_m4_1,
     _F_m4_1_derivative,
     _F_m4_2,
-    _F_m4_2_derivative
+    _F_m4_2_derivative,
 )
 from lenstronomy.LensModel.Profiles.multipole import (
     Multipole as Multipole_ref,
@@ -41,7 +42,7 @@ from lenstronomy.LensModel.Profiles.multipole import (
     _F_m4_1 as _F_m4_1_ref,
     _F_m4_1_derivative as _F_m4_1_derivative_ref,
     _F_m4_2 as _F_m4_2_ref,
-    _F_m4_2_derivative as _F_m4_2_derivative_ref
+    _F_m4_2_derivative as _F_m4_2_derivative_ref,
 )
 
 import numpy as np
@@ -56,18 +57,31 @@ class TestMultipole(object):
         self.multipole_ref = Multipole_ref()
         self.multipole = Multipole()
 
-
     def test_function(self):
         x = np.linspace(-5, 5, 100)
         y = np.linspace(-6, 6, 100)
 
-        kwargs = {"m": 1, "a_m": 1.4, "phi_m": 1.3, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 1,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.function(x, y, **kwargs)
         result_ref = self.multipole_ref.function(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 2, "a_m": 1.1, "phi_m": 1.5, "center_x": 0.1, "center_y": -0.3, "r_E": 1.1}
+        kwargs = {
+            "m": 2,
+            "a_m": 1.1,
+            "phi_m": 1.5,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.1,
+        }
 
         result = self.multipole.function(x, y, **kwargs)
         result_ref = self.multipole_ref.function(x, y, **kwargs)
@@ -78,13 +92,27 @@ class TestMultipole(object):
         x = np.linspace(-5, 5, 100)
         y = np.linspace(-6, 6, 100)
 
-        kwargs = {"m": 1, "a_m": 1.4, "phi_m": 1.3, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 1,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.derivatives(x, y, **kwargs)
         result_ref = self.multipole_ref.derivatives(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 2, "a_m": 1.1, "phi_m": 1.5, "center_x": 0.1, "center_y": -0.3, "r_E": 1.1}
+        kwargs = {
+            "m": 2,
+            "a_m": 1.1,
+            "phi_m": 1.5,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.1,
+        }
 
         result = self.multipole.derivatives(x, y, **kwargs)
         result_ref = self.multipole_ref.derivatives(x, y, **kwargs)
@@ -95,17 +123,32 @@ class TestMultipole(object):
         x = np.linspace(-5, 5, 100)
         y = np.linspace(-6, 6, 100)
 
-        kwargs = {"m": 1, "a_m": 1.4, "phi_m": 1.3, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 1,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.hessian(x, y, **kwargs)
         result_ref = self.multipole_ref.hessian(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 2, "a_m": 1.1, "phi_m": 1.5, "center_x": 0.1, "center_y": -0.3, "r_E": 1.1}
+        kwargs = {
+            "m": 2,
+            "a_m": 1.1,
+            "phi_m": 1.5,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.1,
+        }
 
         result = self.multipole.hessian(x, y, **kwargs)
         result_ref = self.multipole_ref.hessian(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
+
 
 class TestEllipticalMultipole(object):
 
@@ -118,31 +161,71 @@ class TestEllipticalMultipole(object):
         x = np.linspace(-5, 5, 100)
         y = np.linspace(-6, 6, 100)
 
-        kwargs = {"m": 1, "a_m": 1.4, "phi_m": 1.3, "q": 0.4, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 1,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.4,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.function(x, y, **kwargs)
         result_ref = self.multipole_ref.function(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 3, "a_m": 1.4, "phi_m": 1.3, "q": 0.4, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 3,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.4,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.function(x, y, **kwargs)
         result_ref = self.multipole_ref.function(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 4, "a_m": 1.4, "phi_m": 1.3, "q": 0.4, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 4,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.4,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.function(x, y, **kwargs)
         result_ref = self.multipole_ref.function(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 6, "a_m": 1.4, "phi_m": 1.3, "q": 0.9999999999999999999999, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 6,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.9999999999999999999999,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.function(x, y, **kwargs)
         result_ref = self.multipole_ref.function(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 7, "a_m": 1.4, "phi_m": 1.3, "q": 0.3, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 7,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.3,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
         result = self.multipole.function(x, y, **kwargs)
         npt.assert_array_equal(result, np.ones_like(x) * 1e18)
 
@@ -151,31 +234,71 @@ class TestEllipticalMultipole(object):
         x = np.linspace(-5, 5, 100)
         y = np.linspace(-6, 6, 100)
 
-        kwargs = {"m": 1, "a_m": 1.4, "phi_m": 1.3, "q": 0.4, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 1,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.4,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.derivatives(x, y, **kwargs)
         result_ref = self.multipole_ref.derivatives(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 3, "a_m": 1.4, "phi_m": 1.3, "q": 0.4, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 3,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.4,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.derivatives(x, y, **kwargs)
         result_ref = self.multipole_ref.derivatives(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 4, "a_m": 1.4, "phi_m": 1.3, "q": 0.4, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 4,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.4,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.derivatives(x, y, **kwargs)
         result_ref = self.multipole_ref.derivatives(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 6, "a_m": 1.4, "phi_m": 1.3, "q": 0.9999999999999999999999, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 6,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.9999999999999999999999,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.derivatives(x, y, **kwargs)
         result_ref = self.multipole_ref.derivatives(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 7, "a_m": 1.4, "phi_m": 1.3, "q": 0.3, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 7,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.3,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
         result = self.multipole.derivatives(x, y, **kwargs)
         npt.assert_array_equal(result, (np.ones_like(x) * 1e18,) * 2)
 
@@ -184,33 +307,74 @@ class TestEllipticalMultipole(object):
         x = np.linspace(-5, 5, 100)
         y = np.linspace(-6, 6, 100)
 
-        kwargs = {"m": 1, "a_m": 1.4, "phi_m": 1.3, "q": 0.4, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 1,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.4,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.hessian(x, y, **kwargs)
         result_ref = self.multipole_ref.hessian(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 3, "a_m": 1.4, "phi_m": 1.3, "q": 0.4, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 3,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.4,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.hessian(x, y, **kwargs)
         result_ref = self.multipole_ref.hessian(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 4, "a_m": 1.4, "phi_m": 1.3, "q": 0.4, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 4,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.4,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.hessian(x, y, **kwargs)
         result_ref = self.multipole_ref.hessian(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 6, "a_m": 1.4, "phi_m": 1.3, "q": 0.9999999999999999999999, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 6,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.9999999999999999999999,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
 
         result = self.multipole.hessian(x, y, **kwargs)
         result_ref = self.multipole_ref.hessian(x, y, **kwargs)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        kwargs = {"m": 7, "a_m": 1.4, "phi_m": 1.3, "q": 0.3, "center_x": 0.1, "center_y": -0.3, "r_E": 1.3}
+        kwargs = {
+            "m": 7,
+            "a_m": 1.4,
+            "phi_m": 1.3,
+            "q": 0.3,
+            "center_x": 0.1,
+            "center_y": -0.3,
+            "r_E": 1.3,
+        }
         result = self.multipole.hessian(x, y, **kwargs)
         npt.assert_array_equal(result, (np.ones_like(x) * 1e18,) * 4)
+
 
 class TestMiscFunctions(object):
 
@@ -312,7 +476,6 @@ class TestMiscFunctions(object):
         result = _F_m4_2_derivative(self.phi, self.q)
         result_ref = _F_m4_2_derivative_ref(self.phi, self.q)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
-
 
 
 if __name__ == "__main__":
