@@ -7,6 +7,10 @@ _JAXXED_MODELS = [
     "CONVERGENCE",
     "CSE",
     "EPL",
+    "EPL_MULTIPOLE_M1M3M4",
+    "EPL_MULTIPOLE_M1M3M4_ELL",
+    "EPL_MULTIPOLE_M3M4_ELL",
+    "EPL_MULTIPOLE_M3M4",
     "EPL_Q_PHI",
     "GAUSSIAN",
     "GAUSSIAN_POTENTIAL",
@@ -14,6 +18,8 @@ _JAXXED_MODELS = [
     "HERNQUIST_ELLIPSE_CSE",
     "LOS",
     "LOS_MINIMAL",
+    "MULTIPOLE",
+    "MULTIPOLE_ELL",
     "NFW",
     "NFW_ELLIPSE_CSE",
     "NIE",
@@ -53,6 +59,9 @@ _SUPPORTED_MODELS = [
     "DOUBLE_CHAMELEON",
     "EPL",
     "EPL_BOXYDISKY",
+    "EPL_MULTIPOLE_M1M3M4",
+    "EPL_MULTIPOLE_M1M3M4_ELL",
+    "EPL_MULTIPOLE_M3M4_ELL",
     "EPL_MULTIPOLE_M3M4",
     "EPL_NUMBA",
     "EPL_Q_PHI",
@@ -74,6 +83,7 @@ _SUPPORTED_MODELS = [
     "LOS",
     "LOS_MINIMAL",
     "MULTIPOLE",
+    "MULTIPOLE_ELL",
     "MULTI_GAUSSIAN",
     "MULTI_GAUSSIAN_ELLIPSE_POTENTIAL",
     "NFW",
@@ -430,10 +440,30 @@ def lens_class(
     #     from lenstronomy.LensModel.Profiles.epl_boxydisky import EPL_BOXYDISKY
 
     #     return EPL_BOXYDISKY(**profile_kwargs)
-    # elif lens_type == "EPL_MULTIPOLE_M3M4":
-    #     from lenstronomy.LensModel.Profiles.epl_multipole_m3m4 import EPL_MULTIPOLE_M3M4
+    elif lens_type == "EPL_MULTIPOLE_M1M3M4":
+        from jaxtronomy.LensModel.Profiles.epl_multipole_m1m3m4 import (
+            EPL_MULTIPOLE_M1M3M4,
+        )
 
-    #     return EPL_MULTIPOLE_M3M4(**profile_kwargs)
+        return EPL_MULTIPOLE_M1M3M4(**profile_kwargs)
+    elif lens_type == "EPL_MULTIPOLE_M1M3M4_ELL":
+        from jaxtronomy.LensModel.Profiles.epl_multipole_m1m3m4 import (
+            EPL_MULTIPOLE_M1M3M4_ELL,
+        )
+
+        return EPL_MULTIPOLE_M1M3M4_ELL(**profile_kwargs)
+    elif lens_type == "EPL_MULTIPOLE_M3M4_ELL":
+        from jaxtronomy.LensModel.Profiles.epl_multipole_m3m4 import (
+            EPL_MULTIPOLE_M3M4_ELL,
+        )
+
+        return EPL_MULTIPOLE_M3M4_ELL(**profile_kwargs)
+    elif lens_type == "EPL_MULTIPOLE_M3M4":
+        from jaxtronomy.LensModel.Profiles.epl_multipole_m3m4 import (
+            EPL_MULTIPOLE_M3M4,
+        )
+
+        return EPL_MULTIPOLE_M3M4(**profile_kwargs)
     # elif lens_type == "EPL_NUMBA":
     #     from lenstronomy.LensModel.Profiles.epl_numba import EPL_numba
 
@@ -518,10 +548,14 @@ def lens_class(
         )
 
         return LOSMinimal(**profile_kwargs)
-    # elif lens_type == "MULTIPOLE":
-    #     from lenstronomy.LensModel.Profiles.multipole import Multipole
+    elif lens_type == "MULTIPOLE":
+        from jaxtronomy.LensModel.Profiles.multipole import Multipole
 
-    #     return Multipole(**profile_kwargs)
+        return Multipole(**profile_kwargs)
+    elif lens_type == "MULTIPOLE_ELL":
+        from jaxtronomy.LensModel.Profiles.multipole import EllipticalMultipole
+
+        return EllipticalMultipole(**profile_kwargs)
     # elif lens_type == "MULTI_GAUSSIAN":
     #     from lenstronomy.LensModel.Profiles.multi_gaussian import (
     #         MultiGaussian,

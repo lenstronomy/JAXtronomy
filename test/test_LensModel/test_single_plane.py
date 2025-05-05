@@ -2,6 +2,8 @@ __author__ = "sibirrer"
 
 import numpy.testing as npt
 import pytest
+
+import jaxtronomy
 from jaxtronomy.LensModel.single_plane import SinglePlane
 from lenstronomy.LensModel.single_plane import SinglePlane as SinglePlane_ref
 from jaxtronomy.LensModel.Profiles.sis import SIS
@@ -253,6 +255,8 @@ class TestSinglePlane(object):
         # this tests the giant elif statement in profile_list_base
 
         lensModel = SinglePlane(lens_model_list=_JAXXED_MODELS)
+        for profile in lensModel.func_list:
+            assert jaxtronomy.__name__ in profile.__module__
 
 
 class TestRaise(unittest.TestCase):
