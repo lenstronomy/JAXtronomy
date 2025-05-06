@@ -383,7 +383,7 @@ class EPLMajorAxis(LensProfileBase):
         Z = q * x + y * 1j
         R = jnp.abs(Z)
         R = jnp.maximum(R, 0.000000001)
-        f = (1.0 - q)/ (1.0 + q)
+        f = (1.0 - q) / (1.0 + q)
 
         # If f = 0, hyp2f1 just evaluates to 1
         def f_equals_0(Z, f, t):
