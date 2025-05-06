@@ -3,6 +3,7 @@ from scipy.special import hyp2f1 as hyp2f1_ref
 import numpy.testing as npt
 
 from jax import config, numpy as jnp
+
 config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 
 from jaxtronomy.Util.hyp2f1_util import (
@@ -86,6 +87,7 @@ def test_hyp2f1_continuation():
     result = hyp2f1_continuation(a, b, c, z)
     result_ref = hyp2f1_ref(a, b, c, z)
     npt.assert_allclose(result, result_ref, atol=1e-8, rtol=1e-8)
+
 
 def test_hyp2f1_lopez_temme():
     a, b, c = 0.3, 0.7, 2.2
