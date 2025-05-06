@@ -5,12 +5,6 @@ import jax.numpy as jnp
 from jax import jit, lax
 from jax.scipy.special import gamma
 
-# TODO: The analytic continuation formula used in hyp2f1_continuation only works
-#       whenever b - a is not an integer. Additionally, hyp2f1_near_one only works
-#       whenever c - b - a is not an integer. Other implementations are required
-#       for these situations.
-
-
 @partial(jit, static_argnums=4)
 def hyp2f1_series(a, b, c, z, nmax=50):
     """This computation is based off of the standard series expansion of hyp2f1.
@@ -69,7 +63,6 @@ def hyp2f1_continuation(a, b, c, z, nmax=50):
     # sum_1 corresponds to the summation on the top line of equation 4.21
     # sum_2 corresponds to the summation on the bottom line of equation 4.21
     # Gamma function prefactors are multiplied at the end
-    # Allows for the input z to be an array of values
     sum_1 = 1.0 * jnp.ones_like(z)
     sum_2 = 1.0 * jnp.ones_like(z)
 
@@ -153,8 +146,8 @@ def hyp2f1_lopez_temme_8(a, b, c, z, nmax=75):
     # This is the n=1 prefactor
     sum_prefactor = a * (z / (z - 2.))
 
-    # The values of hyp2f1 inside the sum are computed iteratively used one of Gauss's
-    # contiguous relations
+    # The values of hyp2f1 inside the sum are computed iteratively using one of Gauss's
+    # contiguous relations, see Eq 15.5.11 https://dlmf.nist.gov/15.5#E11
     prev_prev_F = 1.
     prev_F = 1. - 2. * b / c
 
