@@ -78,7 +78,7 @@ def hyp2f1_continuation(a, b, c, z, nmax=50):
     z = jnp.where(jnp.imag(z) == 0.0, jnp.where(jnp.real(z) >= 1, z + 0.0000001j, z), z)
 
     # This is the (z - 0.5) ** (-n) term in the series; we start with n = 1
-    z_factor = 1. / (z - 0.5)
+    z_factor = 1.0 / (z - 0.5)
 
     def body_fun(n, val):
         z_factor, prev_prev_da, prev_prev_db, prev_da, prev_db, sum_1, sum_2 = val
@@ -124,7 +124,10 @@ def hyp2f1_continuation(a, b, c, z, nmax=50):
         return [z_factor, prev_prev_da, prev_prev_db, prev_da, prev_db, sum_1, sum_2]
 
     result = lax.fori_loop(
-        1, nmax, body_fun, [z_factor, prev_prev_da, prev_prev_db, prev_da, prev_db, sum_1, sum_2]
+        1,
+        nmax,
+        body_fun,
+        [z_factor, prev_prev_da, prev_prev_db, prev_da, prev_db, sum_1, sum_2],
     )
 
     # includes the gamma function prefactors in equation 4 to compute the final result
@@ -134,6 +137,7 @@ def hyp2f1_continuation(a, b, c, z, nmax=50):
     )
     return final_result
 
+
 @partial(jit, static_argnums=4)
 def hyp2f1_lopez_temme_8(a, b, c, z, nmax=75):
     """
@@ -142,7 +146,7 @@ def hyp2f1_lopez_temme_8(a, b, c, z, nmax=75):
     https://link.springer.com/content/pdf/10.1007/s10444-012-9283-y.pdf"
 
     This series expansion converges whenever Re(z) < 1, and does not have any
-    restrictions on a, b, or c. The downside is that this series converges 
+    restrictions on a, b, or c. The downside is that this series converges
     slowly for |z| -> infty, so nmax needs to be higher for an accurate result.
     This series expansion coverges a bit faster than the standard series expansion
     when z is in the unit disk.
@@ -151,12 +155,12 @@ def hyp2f1_lopez_temme_8(a, b, c, z, nmax=75):
 
     # This prefactor includes the Pochhammer symbol, n factorial and (z/(z-2))**n in the sum.
     # This is the n=1 prefactor
-    sum_prefactor = a * (z / (z - 2.))
+    sum_prefactor = a * (z / (z - 2.0))
 
     # The values of hyp2f1 inside the sum are computed iteratively used one of Gauss's
     # contiguous relations
-    prev_prev_F = 1.
-    prev_F = 1. - 2. * b / c
+    prev_prev_F = 1.0
+    prev_F = 1.0 - 2.0 * b / c
 
     # The loop starts at n = 2
     init_sum = 1 + sum_prefactor * prev_F
@@ -164,8 +168,8 @@ def hyp2f1_lopez_temme_8(a, b, c, z, nmax=75):
     def body_fun(n, val):
         sum_prefactor, prev_prev_F, prev_F, sum = val
 
-        sum_prefactor *= (a + n - 1.)/n * (z / (z-2.))
-        new_F = ((n - 1.) * prev_prev_F - (2. * b - c) * prev_F) / (c + n - 1.)
+        sum_prefactor *= (a + n - 1.0) / n * (z / (z - 2.0))
+        new_F = ((n - 1.0) * prev_prev_F - (2.0 * b - c) * prev_F) / (c + n - 1.0)
         sum += sum_prefactor * new_F
 
         prev_prev_F = prev_F
@@ -173,7 +177,9 @@ def hyp2f1_lopez_temme_8(a, b, c, z, nmax=75):
 
         return sum_prefactor, prev_prev_F, prev_F, sum
 
-    return (1. - z/2.)**(-a) * lax.fori_loop(2, nmax, body_fun, (sum_prefactor, prev_prev_F, prev_F, init_sum))[3]
+    return (1.0 - z / 2.0) ** (-a) * lax.fori_loop(
+        2, nmax, body_fun, (sum_prefactor, prev_prev_F, prev_F, init_sum)
+    )[3]
 
 
 # TODO: Implement a version that can handle c - b - a = integer
@@ -182,7 +188,8 @@ def hyp2f1_lopez_temme_8(a, b, c, z, nmax=75):
 @partial(jit, static_argnums=4)
 def hyp2f1_near_one(a, b, c, z, nmax=50):
     """This implementation is based off of equation 15.3.6 in Abramowitz and Stegun.
-    This transformation formula allows for a calculation of hyp2f1 for points near
+    This transformation formula allows for a calculation of hyp2f1 for points near.
+
     z = 1 (where other iterative computation schemes converge slowly) by
     transforming z to 1 - z.
 

@@ -2,6 +2,7 @@ __author__ = "ntessore"
 
 from functools import partial
 from jax import config, custom_jvp, jvp, jit, lax, numpy as jnp, tree_util
+
 config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 
 from jaxtronomy.Util.hyp2f1_util import hyp2f1_lopez_temme_8 as hyp2f1
@@ -305,44 +306,43 @@ class EPLMajorAxis(LensProfileBase):
     @staticmethod
     @jit
     def _hyp2f1_evaluate(t, z):
-        """
-        The series expansion for hyp2f1 converges faster when |z| is closer
-        to the origin. This function decides how many terms to use.
-        By adjusting the number of terms, the performance for ray-shooting
-        is significantly improved.
+        """The series expansion for hyp2f1 converges faster when |z| is closer to the
+        origin.
+
+        This function decides how many terms to use. By adjusting the number of terms,
+        the performance for ray-shooting is significantly improved.
         """
 
         f = jnp.max(jnp.abs(z))
 
-        case = jnp.where(f < 0.92, 5, 6) # nmax=200, if f > 0.92 then nmax=500
-        case = jnp.where(f < 0.86, 4, case) # nmax=100
-        case = jnp.where(f < 0.73, 3, case) # nmax=50
-        case = jnp.where(f < 0.6, 2, case) # nmax=35
-        case = jnp.where(f < 0.4, 1, case) # nmax=20
-        case = jnp.where(f < 0.12, 0, case) # nmax=10
+        case = jnp.where(f < 0.92, 5, 6)  # nmax=200, if f > 0.92 then nmax=500
+        case = jnp.where(f < 0.86, 4, case)  # nmax=100
+        case = jnp.where(f < 0.73, 3, case)  # nmax=50
+        case = jnp.where(f < 0.6, 2, case)  # nmax=35
+        case = jnp.where(f < 0.4, 1, case)  # nmax=20
+        case = jnp.where(f < 0.12, 0, case)  # nmax=10
 
-        return lax.switch(case, EPLMajorAxis.hyp2f1_func_list, 1, t/2, 2-t/2, z)
-    
+        return lax.switch(case, EPLMajorAxis.hyp2f1_func_list, 1, t / 2, 2 - t / 2, z)
+
     @staticmethod
     @jit
     def _hyp2f1_for_autodiff(t, z):
+        """This function is the same as above but always uses nmax=100.
+
+        When performing autodifferentiation, it is faster to autodifferentiate through
+        this function rather than the above function, since autodifferentiating through
+        lax.switch is very slow.
         """
-        This function is the same as above but always uses nmax=100.
-        When performing autodifferentiation, it is faster to autodifferentiate
-        through this function rather than the above function, since autodifferentiating
-        through lax.switch is very slow.
-        """
-        B = t/2
+        B = t / 2
         C = 2 - B
         return EPLMajorAxis.hyp2f1_slow(1, B, C, z)
-    
+
     @jit
     @_hyp2f1_evaluate.defjvp
     def _hyp2f1_jvp(primals, tangents):
-        """
-        This function defines the derivative of _hyp2f1_evaluate, so that when autodifferentiation is used,
-        it will instead autodifferentiate through _hyp2f1_for_autodiff, resulting in performance boost.
-        """
+        """This function defines the derivative of _hyp2f1_evaluate, so that when
+        autodifferentiation is used, it will instead autodifferentiate through
+        _hyp2f1_for_autodiff, resulting in performance boost."""
         return jvp(EPLMajorAxis._hyp2f1_for_autodiff, primals, tangents)
 
     @staticmethod
@@ -394,7 +394,7 @@ class EPLMajorAxis(LensProfileBase):
         alpha_imag = jnp.nan_to_num(alpha.imag, posinf=10**10, neginf=-(10**10))
 
         return alpha_real, alpha_imag
-    
+
     @staticmethod
     @jit
     def hessian(x, y, b, t, q):
@@ -435,6 +435,7 @@ class EPLMajorAxis(LensProfileBase):
         f_xy = gamma_2
 
         return f_xx, f_xy, f_xy, f_yy
+
 
 class EPLQPhi(LensProfileBase):
     """Class to model a EPL sampling over q and phi instead of e1 and e2."""
