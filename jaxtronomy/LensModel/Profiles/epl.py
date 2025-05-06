@@ -314,6 +314,8 @@ class EPLMajorAxis(LensProfileBase):
         """
 
         f = jnp.max(jnp.abs(z))
+        B = t / 2.0
+        C = 2.0 - B
 
         case = jnp.where(f < 0.92, 5, 6)  # nmax=200, if f > 0.92 then nmax=500
         case = jnp.where(f < 0.86, 4, case)  # nmax=100
@@ -322,7 +324,7 @@ class EPLMajorAxis(LensProfileBase):
         case = jnp.where(f < 0.4, 1, case)  # nmax=20
         case = jnp.where(f < 0.12, 0, case)  # nmax=10
 
-        return lax.switch(case, EPLMajorAxis.hyp2f1_func_list, 1, t / 2, 2 - t / 2, z)
+        return lax.switch(case, EPLMajorAxis.hyp2f1_func_list, 1, B, C, z)
 
     @staticmethod
     @jit
@@ -333,8 +335,8 @@ class EPLMajorAxis(LensProfileBase):
         this function rather than the above function, since autodifferentiating through
         lax.switch is very slow.
         """
-        B = t / 2
-        C = 2 - B
+        B = t / 2.0
+        C = 2.0 - B
         return EPLMajorAxis.hyp2f1_slow(1, B, C, z)
 
     @jit
