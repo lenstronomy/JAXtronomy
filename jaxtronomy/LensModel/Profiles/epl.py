@@ -300,6 +300,7 @@ class EPLMajorAxis(LensProfileBase):
         hyp2f1_slow,
         hyp2f1_slower,
         hyp2f1_slowest,
+        lambda a,b,c,z: jnp.ones_like(z)
     ]
 
     @custom_jvp
@@ -323,6 +324,7 @@ class EPLMajorAxis(LensProfileBase):
         case = jnp.where(f < 0.6, 2, case)  # nmax=35
         case = jnp.where(f < 0.4, 1, case)  # nmax=20
         case = jnp.where(f < 0.12, 0, case)  # nmax=10
+        case = jnp.where(f == 0, 7, case) # simply returns 1
 
         return lax.switch(case, EPLMajorAxis.hyp2f1_func_list, 1, B, C, z)
 
@@ -385,15 +387,8 @@ class EPLMajorAxis(LensProfileBase):
         R = jnp.maximum(R, 0.000000001)
         f = (1.0 - q) / (1.0 + q)
 
-        # If f = 0, hyp2f1 just evaluates to 1
-        def f_equals_0(Z, f, t):
-            return jnp.ones_like(Z)
-
-        def f_not_0(Z, f, t):
-            return EPLMajorAxis._hyp2f1_evaluate(t, -f * Z / jnp.conj(Z))
-
         # angular dependency with extra factor of R, eq. (23)
-        R_omega = Z * lax.cond(f == 0, f_equals_0, f_not_0, Z, f, t)
+        R_omega = Z * EPLMajorAxis._hyp2f1_evaluate(t, -f * Z / jnp.conj(Z))
 
         # deflection, eq. (22)
         alpha = 2 / (1 + q) * (b / R) ** t * R_omega
