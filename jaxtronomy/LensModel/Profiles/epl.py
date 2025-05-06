@@ -300,7 +300,7 @@ class EPLMajorAxis(LensProfileBase):
         hyp2f1_slow,
         hyp2f1_slower,
         hyp2f1_slowest,
-        lambda a,b,c,z: jnp.ones_like(z)
+        lambda a, b, c, z: jnp.ones_like(z),
     ]
 
     @custom_jvp
@@ -324,7 +324,7 @@ class EPLMajorAxis(LensProfileBase):
         case = jnp.where(f < 0.6, 2, case)  # nmax=35
         case = jnp.where(f < 0.4, 1, case)  # nmax=20
         case = jnp.where(f < 0.12, 0, case)  # nmax=10
-        case = jnp.where(f == 0, 7, case) # simply returns 1
+        case = jnp.where(f == 0, 7, case)  # simply returns 1
 
         return lax.switch(case, EPLMajorAxis.hyp2f1_func_list, 1, B, C, z)
 
