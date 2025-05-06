@@ -271,7 +271,12 @@ class TestSingleBandMultiModel(object):
             kwargs_special=self.kwargs_special,
         )
         npt.assert_raises(
-            AssertionError, npt.assert_allclose, image1, image1_ref, atol=1e-10, rtol=1e-10
+            AssertionError,
+            npt.assert_allclose,
+            image1,
+            image1_ref,
+            atol=1e-10,
+            rtol=1e-10,
         )
         image1_ref = self.singleband1_ref.image(
             kwargs_lens=self.kwargs_lens2,

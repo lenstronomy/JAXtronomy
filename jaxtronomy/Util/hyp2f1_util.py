@@ -5,6 +5,7 @@ import jax.numpy as jnp
 from jax import jit, lax
 from jax.scipy.special import gamma
 
+
 @partial(jit, static_argnums=4)
 def hyp2f1_series(a, b, c, z, nmax=50):
     """This computation is based off of the standard series expansion of hyp2f1.
