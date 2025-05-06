@@ -383,10 +383,17 @@ class EPLMajorAxis(LensProfileBase):
         Z = q * x + y * 1j
         R = jnp.abs(Z)
         R = jnp.maximum(R, 0.000000001)
-        f = (1.0 - q) / (1.0 + q)
+        f = (1.0 - q)/ (1.0 + q)
+
+        # If f = 0, hyp2f1 just evaluates to 1
+        def f_equals_0(Z, f, t):
+            return jnp.ones_like(Z)
+
+        def f_not_0(Z, f, t):
+            return EPLMajorAxis._hyp2f1_evaluate(t, -f * Z / jnp.conj(Z))
 
         # angular dependency with extra factor of R, eq. (23)
-        R_omega = Z * EPLMajorAxis._hyp2f1_evaluate(t, -f * Z / jnp.conj(Z))
+        R_omega = Z * lax.cond(f == 0, f_equals_0, f_not_0, Z, f, t)
 
         # deflection, eq. (22)
         alpha = 2 / (1 + q) * (b / R) ** t * R_omega
