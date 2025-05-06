@@ -242,7 +242,7 @@ class TestSingleBandMultiModel(object):
             kwargs_ps=self.kwargs_ps,
             kwargs_special=self.kwargs_special,
         )
-        npt.assert_array_almost_equal(image0, image0_ref, decimal=8)
+        npt.assert_allclose(image0, image0_ref, atol=1e-10, rtol=1e-10)
         assert image0.shape == (self.numPix, self.numPix)
 
         image1 = self.singleband1.image(
@@ -259,7 +259,7 @@ class TestSingleBandMultiModel(object):
             kwargs_ps=self.kwargs_ps,
             kwargs_special=self.kwargs_special,
         )
-        npt.assert_array_almost_equal(image1, image1_ref, decimal=8)
+        npt.assert_allclose(image1, image1_ref, atol=1e-10, rtol=1e-10)
         assert image1.shape == (self.numPix2, self.numPix2)
 
         # Use kwargs_lens2 and make sure we get a different result
@@ -271,7 +271,12 @@ class TestSingleBandMultiModel(object):
             kwargs_special=self.kwargs_special,
         )
         npt.assert_raises(
-            AssertionError, npt.assert_array_almost_equal, image1, image1_ref, decimal=8
+            AssertionError,
+            npt.assert_allclose,
+            image1,
+            image1_ref,
+            atol=1e-10,
+            rtol=1e-10,
         )
         image1_ref = self.singleband1_ref.image(
             kwargs_lens=self.kwargs_lens2,
@@ -280,7 +285,7 @@ class TestSingleBandMultiModel(object):
             kwargs_ps=self.kwargs_ps,
             kwargs_special=self.kwargs_special,
         )
-        npt.assert_array_almost_equal(image1, image1_ref, decimal=8)
+        npt.assert_allclose(image1, image1_ref, atol=1e-10, rtol=1e-10)
 
     def test_source_surface_brightness(self):
         flux0 = self.singleband0.source_surface_brightness(
@@ -291,7 +296,7 @@ class TestSingleBandMultiModel(object):
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
         )
-        npt.assert_array_almost_equal(flux0, flux0_ref, decimal=8)
+        npt.assert_allclose(flux0, flux0_ref, atol=1e-10, rtol=1e-10)
 
         flux1 = self.singleband1.source_surface_brightness(
             kwargs_lens=self.kwargs_lens,
@@ -301,7 +306,7 @@ class TestSingleBandMultiModel(object):
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
         )
-        npt.assert_array_almost_equal(flux1, flux1_ref, decimal=8)
+        npt.assert_allclose(flux1, flux1_ref, atol=1e-10, rtol=1e-10)
 
     def test_lens_surface_brightness(self):
         flux0 = self.singleband0.lens_surface_brightness(
@@ -310,7 +315,7 @@ class TestSingleBandMultiModel(object):
         flux0_ref = self.singleband0_ref.lens_surface_brightness(
             kwargs_lens_light=self.kwargs_lens_light,
         )
-        npt.assert_array_almost_equal(flux0, flux0_ref, decimal=8)
+        npt.assert_allclose(flux0, flux0_ref, atol=1e-10, rtol=1e-10)
 
         flux1 = self.singleband1.lens_surface_brightness(
             kwargs_lens_light=self.kwargs_lens_light,
@@ -318,7 +323,7 @@ class TestSingleBandMultiModel(object):
         flux1_ref = self.singleband1_ref.lens_surface_brightness(
             kwargs_lens_light=self.kwargs_lens_light,
         )
-        npt.assert_array_almost_equal(flux1, flux1_ref, decimal=8)
+        npt.assert_allclose(flux1, flux1_ref, atol=1e-10, rtol=1e-10)
 
     def test_point_source(self):
         flux = self.singleband0.point_source(
@@ -373,7 +378,7 @@ class TestSingleBandMultiModel(object):
             kwargs_special=self.kwargs_special,
             linear_solver=False,
         )
-        npt.assert_array_almost_equal(likelihood0, likelihood0_ref, decimal=8)
+        npt.assert_allclose(likelihood0, likelihood0_ref, atol=1e-10, rtol=1e-10)
 
         likelihood1, _ = self.singleband1.likelihood_data_given_model(
             kwargs_lens=self.kwargs_lens,
@@ -390,7 +395,7 @@ class TestSingleBandMultiModel(object):
             kwargs_special=self.kwargs_special,
             linear_solver=False,
         )
-        npt.assert_array_almost_equal(likelihood1, likelihood1_ref, decimal=8)
+        npt.assert_allclose(likelihood1, likelihood1_ref, atol=1e-10, rtol=1e-10)
 
     def test_error_response(self):
         c_d, error0 = self.singleband0.error_response(
@@ -399,8 +404,8 @@ class TestSingleBandMultiModel(object):
         c_d_ref, error0_ref = self.singleband0_ref.error_response(
             self.kwargs_lens, self.kwargs_ps, self.kwargs_special
         )
-        npt.assert_array_almost_equal(c_d, c_d_ref, decimal=8)
-        npt.assert_array_almost_equal(error0, error0_ref, decimal=8)
+        npt.assert_allclose(c_d, c_d_ref, atol=1e-10, rtol=1e-10)
+        npt.assert_allclose(error0, error0_ref, atol=1e-10, rtol=1e-10)
 
         c_d, error1 = self.singleband1.error_response(
             self.kwargs_lens, self.kwargs_ps, self.kwargs_special
@@ -408,8 +413,8 @@ class TestSingleBandMultiModel(object):
         c_d_ref, error1_ref = self.singleband1_ref.error_response(
             self.kwargs_lens, self.kwargs_ps, self.kwargs_special
         )
-        npt.assert_array_almost_equal(c_d, c_d_ref, decimal=8)
-        npt.assert_array_almost_equal(error1, error1_ref, decimal=8)
+        npt.assert_allclose(c_d, c_d_ref, atol=1e-10, rtol=1e-10)
+        npt.assert_allclose(error1, error1_ref, atol=1e-10, rtol=1e-10)
 
     def test_select_kwargs(self):
         (

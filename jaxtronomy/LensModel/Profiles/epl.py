@@ -1,20 +1,16 @@
-# Copy pasted from lenstronomy's epl profile but with all instances of numpy
-# replaced by jnp, and scipy.special.hyp2f1 replaced with a jaxified version
-
-
 __author__ = "ntessore"
 
-import jax
-from jax import jit, tree_util
-import jax.numpy as jnp
+from functools import partial
+from jax import config, custom_jvp, jvp, jit, lax, numpy as jnp, tree_util
 
-from jaxtronomy.Util.hyp2f1_util import hyp2f1_series as hyp2f1
+config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
+
+from jaxtronomy.Util.hyp2f1_util import hyp2f1_lopez_temme_8 as hyp2f1
 import jaxtronomy.Util.util as util
 import jaxtronomy.Util.param_util as param_util
 from jaxtronomy.LensModel.Profiles.spp import SPP
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
-jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 
 __all__ = ["EPL", "EPLMajorAxis", "EPLQPhi"]
 
@@ -287,8 +283,71 @@ class EPLMajorAxis(LensProfileBase):
 
     param_names = ["b", "t", "q", "center_x", "center_y"]
 
-    def __init__(self):
-        super(EPLMajorAxis, self).__init__()
+    # Defining multiple hyp2f1 functions like this is required since nmax must be static
+    # for autodifferentiation to be used
+    hyp2f1_fastest = partial(hyp2f1, nmax=10)
+    hyp2f1_faster = partial(hyp2f1, nmax=20)
+    hyp2f1_fast = partial(hyp2f1, nmax=35)
+    hyp2f1_norm = partial(hyp2f1, nmax=50)
+    hyp2f1_slow = partial(hyp2f1, nmax=100)
+    hyp2f1_slower = partial(hyp2f1, nmax=200)
+    hyp2f1_slowest = partial(hyp2f1, nmax=500)
+    hyp2f1_func_list = [
+        hyp2f1_fastest,
+        hyp2f1_faster,
+        hyp2f1_fast,
+        hyp2f1_norm,
+        hyp2f1_slow,
+        hyp2f1_slower,
+        hyp2f1_slowest,
+        lambda a, b, c, z: jnp.ones_like(z),
+    ]
+
+    @custom_jvp
+    @staticmethod
+    @jit
+    def _hyp2f1_evaluate(t, z):
+        """The series expansion for hyp2f1 converges faster when |z| is closer to the
+        origin.
+
+        This function decides how many terms to use. By adjusting the number of terms,
+        the performance for ray-shooting is significantly improved.
+        """
+
+        f = jnp.max(jnp.abs(z))
+        B = t / 2.0
+        C = 2.0 - B
+
+        case = jnp.where(f < 0.92, 5, 6)  # nmax=200, if f > 0.92 then nmax=500
+        case = jnp.where(f < 0.86, 4, case)  # nmax=100
+        case = jnp.where(f < 0.73, 3, case)  # nmax=50
+        case = jnp.where(f < 0.6, 2, case)  # nmax=35
+        case = jnp.where(f < 0.4, 1, case)  # nmax=20
+        case = jnp.where(f < 0.12, 0, case)  # nmax=10
+        case = jnp.where(f == 0, 7, case)  # simply returns 1
+
+        return lax.switch(case, EPLMajorAxis.hyp2f1_func_list, 1, B, C, z)
+
+    @staticmethod
+    @jit
+    def _hyp2f1_for_autodiff(t, z):
+        """This function is the same as above but always uses nmax=100.
+
+        When performing autodifferentiation, it is faster to autodifferentiate through
+        this function rather than the above function, since autodifferentiating through
+        lax.switch is very slow.
+        """
+        B = t / 2.0
+        C = 2.0 - B
+        return EPLMajorAxis.hyp2f1_slow(1, B, C, z)
+
+    @jit
+    @_hyp2f1_evaluate.defjvp
+    def _hyp2f1_jvp(primals, tangents):
+        """This function defines the derivative of _hyp2f1_evaluate, so that when
+        autodifferentiation is used, it will instead autodifferentiate through
+        _hyp2f1_for_autodiff, resulting in performance boost."""
+        return jvp(EPLMajorAxis._hyp2f1_for_autodiff, primals, tangents)
 
     @staticmethod
     @jit
@@ -329,7 +388,7 @@ class EPLMajorAxis(LensProfileBase):
         f = (1.0 - q) / (1.0 + q)
 
         # angular dependency with extra factor of R, eq. (23)
-        R_omega = Z * hyp2f1(1, t / 2, 2 - t / 2, -f * Z / jnp.conj(Z))
+        R_omega = Z * EPLMajorAxis._hyp2f1_evaluate(t, -f * Z / jnp.conj(Z))
 
         # deflection, eq. (22)
         alpha = 2 / (1 + q) * (b / R) ** t * R_omega
@@ -352,6 +411,8 @@ class EPLMajorAxis(LensProfileBase):
         :param q: axis ratio
         :return: f_xx, f_yy, f_xy
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         R = jnp.hypot(q * x, y)
         R = jnp.maximum(R, 0.00000001)
         r = jnp.hypot(x, y)
