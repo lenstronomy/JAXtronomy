@@ -518,7 +518,6 @@ class ImageLinearFit(ImageModel):
     #         kwargs_lens_light[0]["center_y"] = 0
     #     return kwargs_source, kwargs_lens_light
 
-    # TODO: Is this function called inside or outside of JIT?
     @partial(jit, static_argnums=(0,))
     def error_map_source(self, kwargs_source, x_grid, y_grid, cov_param):
         """Variance of the linear source reconstruction in the source plane coordinates,

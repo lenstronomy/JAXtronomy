@@ -294,7 +294,7 @@ class ShapeletSet(object):
 
 
 class ShapeletSetStatic(object):
-    """Same as ShapeletSet, but nmax is declared at initialization.
+    """Same as ShapeletSet, but n_max is declared at initialization.
 
     This is required to use the linear solver.
     NOTE: To use a new value of n_max, a new instance of the class needs to be created. Changing self.n_max
