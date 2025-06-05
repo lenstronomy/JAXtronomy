@@ -2,12 +2,14 @@ __author__ = "sibirrer"
 
 from functools import partial
 from jax import config, jit, numpy as jnp
+
 config.update("jax_enable_x64", True)
 
 import numpy as np
 import sys
 
 EPSILON = sys.float_info.epsilon
+
 
 @partial(jit, static_argnums=3)
 def get_param_WLS(A, C_D_inv, d, inv_bool=True):
@@ -47,8 +49,9 @@ def marginalisation_const(M_inv):
     """
 
     sign, log_det = jnp.linalg.slogdet(M_inv)
-    result = jnp.where(sign == 0, -10**15, sign * log_det / 2)
+    result = jnp.where(sign == 0, -(10**15), sign * log_det / 2)
     return result
+
 
 @jit
 def marginalization_new(M_inv, d_prior=None):
@@ -67,8 +70,13 @@ def marginalization_new(M_inv, d_prior=None):
     v_abs = jnp.where(v_abs > d_prior**2, d_prior**2, v_abs)
     log_det = jnp.sum(jnp.log(v_abs)) * jnp.prod(sign_v)
     m = len(v)
-    result = jnp.where(jnp.isnan(log_det), -10**15, log_det / 2 + m / 2.0 * jnp.log(jnp.pi / 2.0) - m * jnp.log(d_prior))
+    result = jnp.where(
+        jnp.isnan(log_det),
+        -(10**15),
+        log_det / 2 + m / 2.0 * jnp.log(jnp.pi / 2.0) - m * jnp.log(d_prior),
+    )
     return result
+
 
 @jit
 def _stable_inv(m):
@@ -78,10 +86,11 @@ def _stable_inv(m):
     :return: inverse of M (or zeros if non-invertible)
     """
     m_inv = jnp.linalg.inv(m)
-    
+
     # NOTE: Is this even needed? We already check jnp.linalg.cond < 5/EPSILON
     m_inv = jnp.nan_to_num(m_inv, nan=0, posinf=0, neginf=0)
     return m_inv
+
 
 @jit
 def _solve_stable(m, r):

@@ -12,6 +12,7 @@ import unittest
 
 class TestLightModel(object):
     """Tests the source model routines.
+
     Functions related to linear solver are tested in test_linear_basis.py instead.
     """
 

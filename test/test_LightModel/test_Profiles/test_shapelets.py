@@ -6,7 +6,11 @@ import jax
 
 jax.config.update("jax_enable_x64", True)
 
-from jaxtronomy.LightModel.Profiles.shapelets import Shapelets, ShapeletSet, ShapeletSetStatic
+from jaxtronomy.LightModel.Profiles.shapelets import (
+    Shapelets,
+    ShapeletSet,
+    ShapeletSetStatic,
+)
 from lenstronomy.LightModel.Profiles.shapelets import (
     Shapelets as Shapelets_ref,
     ShapeletSet as ShapeletSet_ref,
@@ -233,7 +237,9 @@ class TestShapeletSet(object):
         n_max = 4
         num_param = int((n_max + 1) * (n_max + 2) / 2)
         amp = np.linspace(1.0, 100.0, num_param)
-        result = self.shapeletset_static4.function_split(x, y, amp, beta, center_x, center_y)
+        result = self.shapeletset_static4.function_split(
+            x, y, amp, beta, center_x, center_y
+        )
         result_ref = self.shapeletset_ref.function_split(
             x, y, amp, n_max, beta, center_x, center_y
         )
@@ -242,7 +248,9 @@ class TestShapeletSet(object):
         n_max = 12
         num_param = int((n_max + 1) * (n_max + 2) / 2)
         amp = np.linspace(1.0, 100.0, num_param)
-        result = self.shapeletset_static12.function_split(y, x, amp, beta, center_x, center_y)
+        result = self.shapeletset_static12.function_split(
+            y, x, amp, beta, center_x, center_y
+        )
         result_ref = self.shapeletset_ref.function_split(
             y, x, amp, n_max, beta, center_x, center_y
         )

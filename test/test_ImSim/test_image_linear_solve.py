@@ -1,6 +1,7 @@
 __author__ = "sibirrer"
 
 import jax
+
 jax.config.update("jax_enable_x64", True)
 
 import numpy as np
@@ -9,7 +10,8 @@ import numpy.testing as npt
 from jaxtronomy.ImSim.image_linear_solve import ImageLinearFit
 from jaxtronomy.LensModel.lens_model import LensModel
 from jaxtronomy.LightModel.light_model import LightModel
-#from jaxtronomy.PointSource.point_source import PointSource
+
+# from jaxtronomy.PointSource.point_source import PointSource
 from jaxtronomy.Data.imaging_data import ImageData
 
 from lenstronomy.ImSim.image_linear_solve import ImageLinearFit as ImageLinearFit_ref
@@ -85,7 +87,9 @@ class TestImageLinearFit(object):
         lens_light_model_list = ["SERSIC"]
         self.kwargs_lens_light = [kwargs_sersic]
         lens_light_model_class = LightModel(light_model_list=lens_light_model_list)
-        lens_light_model_class_ref = LightModel_ref(light_model_list=lens_light_model_list)
+        lens_light_model_class_ref = LightModel_ref(
+            light_model_list=lens_light_model_list
+        )
 
         source_model_list = ["SERSIC_ELLIPSE", "SERSIC_ELLIPSE"]
         self.kwargs_source = [kwargs_sersic_ellipse1, kwargs_sersic_ellipse2]
@@ -109,7 +113,7 @@ class TestImageLinearFit(object):
             lens_model_class,
             source_model_class,
             lens_light_model_class,
-            #point_source_class,
+            # point_source_class,
             kwargs_numerics=kwargs_numerics,
         )
         self.imageLinearFit_ref = ImageLinearFit_ref(
@@ -118,7 +122,7 @@ class TestImageLinearFit(object):
             lens_model_class_ref,
             source_model_class_ref,
             lens_light_model_class_ref,
-            #point_source_class_ref,
+            # point_source_class_ref,
             kwargs_numerics=kwargs_numerics,
         )
         image_sim = sim_util.simulate_simple(
@@ -133,12 +137,28 @@ class TestImageLinearFit(object):
 
     def test_init(self):
         source_model_class = LightModel(["SHAPELETS"])
-        lens_light_model_class = LightModel(["SERSIC", "SHAPELETS"], profile_kwargs_list=[{}, {"n_max": 3}])
-        npt.assert_raises(ValueError, ImageLinearFit, data_class=None, source_model_class=source_model_class, lens_light_model_class=lens_light_model_class)
+        lens_light_model_class = LightModel(
+            ["SERSIC", "SHAPELETS"], profile_kwargs_list=[{}, {"n_max": 3}]
+        )
+        npt.assert_raises(
+            ValueError,
+            ImageLinearFit,
+            data_class=None,
+            source_model_class=source_model_class,
+            lens_light_model_class=lens_light_model_class,
+        )
 
-        source_model_class = LightModel(["SHAPELETS"], profile_kwargs_list=[{"n_max": 3}])
+        source_model_class = LightModel(
+            ["SHAPELETS"], profile_kwargs_list=[{"n_max": 3}]
+        )
         lens_light_model_class = LightModel(["SERSIC", "SHAPELETS"])
-        npt.assert_raises(ValueError, ImageLinearFit, data_class=None, source_model_class=source_model_class, lens_light_model_class=lens_light_model_class)
+        npt.assert_raises(
+            ValueError,
+            ImageLinearFit,
+            data_class=None,
+            source_model_class=source_model_class,
+            lens_light_model_class=lens_light_model_class,
+        )
 
     def test_likelihood_data_given_model(self):
         logL, param = self.imageLinearFit.likelihood_data_given_model(
@@ -183,12 +203,14 @@ class TestImageLinearFit(object):
             self.kwargs_ps,
             inv_bool=False,
         )
-        model_ref, error_map_ref, cov_param_ref, param_ref = self.imageLinearFit_ref.image_linear_solve(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light,
-            self.kwargs_ps,
-            inv_bool=False,
+        model_ref, error_map_ref, cov_param_ref, param_ref = (
+            self.imageLinearFit_ref.image_linear_solve(
+                self.kwargs_lens,
+                self.kwargs_source,
+                self.kwargs_lens_light,
+                self.kwargs_ps,
+                inv_bool=False,
+            )
         )
         npt.assert_allclose(model, model_ref, atol=1e-11, rtol=1e-11)
         npt.assert_allclose(error_map, error_map_ref, atol=1e-11, rtol=1e-11)
@@ -206,18 +228,20 @@ class TestImageLinearFit(object):
             self.kwargs_ps,
             inv_bool=True,
         )
-        model_ref, error_map_ref, cov_param_ref, param_ref = self.imageLinearFit_ref.image_linear_solve(
-            self.kwargs_lens,
-            self.kwargs_source,
-            self.kwargs_lens_light,
-            self.kwargs_ps,
-            inv_bool=True,
+        model_ref, error_map_ref, cov_param_ref, param_ref = (
+            self.imageLinearFit_ref.image_linear_solve(
+                self.kwargs_lens,
+                self.kwargs_source,
+                self.kwargs_lens_light,
+                self.kwargs_ps,
+                inv_bool=True,
+            )
         )
         npt.assert_allclose(model, model_ref, atol=1e-11, rtol=1e-11)
         npt.assert_allclose(error_map, error_map_ref, atol=1e-11, rtol=1e-11)
         npt.assert_allclose(cov_param, cov_param_ref, atol=1e-10, rtol=1e-10)
         npt.assert_allclose(param, param_ref, atol=2e-9, rtol=2e-9)
-        
+
         chi2_reduced = self.imageLinearFit.reduced_chi2(model, error_map)
         chi2_reduced_ref = self.imageLinearFit_ref.reduced_chi2(model, error_map)
         npt.assert_allclose(chi2_reduced, chi2_reduced_ref, atol=1e-11, rtol=1e-11)
@@ -280,7 +304,7 @@ class TestImageLinearFit(object):
         npt.assert_allclose(C_D_response, C_D_response_ref, atol=1e-11, rtol=1e-11)
         npt.assert_allclose(model_error, model_error_ref, atol=1e-10, rtol=1e-10)
 
-    #def test_point_source_linear_response_set(self):
+    # def test_point_source_linear_response_set(self):
     #    kwargs_special = {"delta_x_image": [0.1, 0.1], "delta_y_image": [-0.1, -0.1]}
     #    (
     #        ra_pos,

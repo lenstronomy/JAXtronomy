@@ -1,6 +1,7 @@
 __author__ = "sibirrer"
 
 from jax import config
+
 config.update("jax_enable_x64", True)
 import numpy as np
 import numpy.testing as npt
@@ -19,15 +20,17 @@ class TestDeLens(object):
         C_D_inv = np.array([1, 1, 1])
         d = np.array([1, 2, 3])
         result, cov_error, image = de_lens.get_param_WLS(A, C_D_inv, d, inv_bool=True)
-        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(A, C_D_inv, d, inv_bool=True)
+        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(
+            A, C_D_inv, d, inv_bool=True
+        )
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(cov_error, cov_error_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(image, image_ref, atol=1e-12, rtol=1e-12)
 
-        result, cov_error, image = de_lens.get_param_WLS(
+        result, cov_error, image = de_lens.get_param_WLS(A, C_D_inv, d, inv_bool=False)
+        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(
             A, C_D_inv, d, inv_bool=False
         )
-        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(A, C_D_inv, d, inv_bool=False)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(image, image_ref, atol=1e-12, rtol=1e-12)
         assert cov_error is None
@@ -38,7 +41,9 @@ class TestDeLens(object):
         C_D_inv = np.array([0, 0, 0])
         d = np.array([1, 2, 3])
         result, cov_error, image = de_lens.get_param_WLS(A, C_D_inv, d, inv_bool=True)
-        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(A, C_D_inv, d, inv_bool=True)
+        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(
+            A, C_D_inv, d, inv_bool=True
+        )
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(cov_error, cov_error_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(image, image_ref, atol=1e-12, rtol=1e-12)
@@ -46,7 +51,9 @@ class TestDeLens(object):
         A = np.array([[1, 2, 1], [1, 2, 1]]).T
         d = np.array([1, 2, 3])
         result, cov_error, image = de_lens.get_param_WLS(A, C_D_inv, d, inv_bool=False)
-        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(A, C_D_inv, d, inv_bool=False)
+        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(
+            A, C_D_inv, d, inv_bool=False
+        )
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(image, image_ref, atol=1e-12, rtol=1e-12)
         assert cov_error is None
@@ -56,12 +63,16 @@ class TestDeLens(object):
         A = np.array([[1.0, 2.0, 1.0 + 10 ** (-8.9)], [1.0, 2.0, 1.0]]).T
         d = np.array([1, 2, 3])
         result, cov_error, image = de_lens.get_param_WLS(A, C_D_inv, d, inv_bool=False)
-        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(A, C_D_inv, d, inv_bool=False)
+        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(
+            A, C_D_inv, d, inv_bool=False
+        )
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(image, image_ref, atol=1e-12, rtol=1e-12)
 
         result, cov_error, image = de_lens.get_param_WLS(A, C_D_inv, d, inv_bool=True)
-        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(A, C_D_inv, d, inv_bool=True)
+        result_ref, cov_error_ref, image_ref = de_lens_ref.get_param_WLS(
+            A, C_D_inv, d, inv_bool=True
+        )
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(cov_error, cov_error_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(image, image_ref, atol=1e-12, rtol=1e-12)
@@ -70,7 +81,9 @@ class TestDeLens(object):
         A = np.array([[1, 2, 3], [3, 2, 1]]).T
         C_D_inv = np.array([1, 1, 1])
         d = np.array([1, 2, 3])
-        result, cov_error, image = de_lens_ref.get_param_WLS(A, C_D_inv, d, inv_bool=True)
+        result, cov_error, image = de_lens_ref.get_param_WLS(
+            A, C_D_inv, d, inv_bool=True
+        )
         logL_marg = de_lens.marginalisation_const(cov_error)
         logL_marg_ref = de_lens_ref.marginalisation_const(cov_error)
         npt.assert_allclose(logL_marg, logL_marg_ref, atol=1e-12, rtol=1e-12)

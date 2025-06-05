@@ -54,15 +54,19 @@ class ImageLinearFit(ImageModel):
             index = source_model_class.profile_type_list.index("SHAPELETS")
             shapelet = source_model_class.func_list[index]
             if not hasattr(shapelet, "num_param"):
-                raise ValueError("SHAPELETS n_max must be set at initialization. Use profile_kwargs_list when initializing LightModel.\n" \
-                "If using kwargs_model, see documentation of source_light_profile_kwargs_list in class_creator.create_class_instances()")
+                raise ValueError(
+                    "SHAPELETS n_max must be set at initialization. Use profile_kwargs_list when initializing LightModel.\n"
+                    "If using kwargs_model, see documentation of source_light_profile_kwargs_list in class_creator.create_class_instances()"
+                )
         if "SHAPELETS" in lens_light_model_class.profile_type_list:
             index = lens_light_model_class.profile_type_list.index("SHAPELETS")
             shapelet = lens_light_model_class.func_list[index]
             if not hasattr(shapelet, "num_param"):
-                raise ValueError("SHAPELETS n_max must be set at initialization. Use profile_kwargs_list when initializing LightModel.\n" \
-                "If using kwargs_model, see documentation of lens_light_profile_kwargs_list in class_creator.create_class_instances()")
-            
+                raise ValueError(
+                    "SHAPELETS n_max must be set at initialization. Use profile_kwargs_list when initializing LightModel.\n"
+                    "If using kwargs_model, see documentation of lens_light_profile_kwargs_list in class_creator.create_class_instances()"
+                )
+
         super(ImageLinearFit, self).__init__(
             data_class,
             psf_class=psf_class,
@@ -79,10 +83,12 @@ class ImageLinearFit(ImageModel):
 
         # prepare to use fft convolution for the natwt linear solver
         if self.Data.likelihood_method() == "interferometry_natwt":
-            raise ValueError("interferometry_natwt linear solver not supported in jaxtronomy yet")
-            #self._convolution = PixelKernelConvolution(
+            raise ValueError(
+                "interferometry_natwt linear solver not supported in jaxtronomy yet"
+            )
+            # self._convolution = PixelKernelConvolution(
             #    kernel=self.PSF.kernel_point_source
-            #)
+            # )
 
     @partial(jit, static_argnums=(0, 7))
     def image_linear_solve(
@@ -149,7 +155,7 @@ class ImageLinearFit(ImageModel):
                 self, param, kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps
             )
         # TODO: Implement this
-        #elif self.Data.likelihood_method() == "interferometry_natwt":
+        # elif self.Data.likelihood_method() == "interferometry_natwt":
         #    (
         #        model,
         #        model_error,
@@ -169,7 +175,7 @@ class ImageLinearFit(ImageModel):
             )
         return model, model_error, cov_param, param
 
-    #def image_pixelbased_solve(
+    # def image_pixelbased_solve(
     #    self,
     #    kwargs_lens=None,
     #    kwargs_source=None,
@@ -178,7 +184,7 @@ class ImageLinearFit(ImageModel):
     #    kwargs_extinction=None,
     #    kwargs_special=None,
     #    init_lens_light_model=None,
-    #):
+    # ):
     #    """Computes the image (lens and source surface brightness with a given lens
     #    model) using the pixel-based solver.
 
@@ -326,7 +332,7 @@ class ImageLinearFit(ImageModel):
             )
             logL = jnp.where(bool_, logL, logL - 10**8)
         return logL
-    
+
     @partial(jit, static_argnums=(0,))
     def num_param_linear(
         self, kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps
@@ -344,7 +350,7 @@ class ImageLinearFit(ImageModel):
         if self._pixelbased_bool is False:
             num += self.SourceModel.num_param_linear(kwargs_source)
             num += self.LensLightModel.num_param_linear(kwargs_lens_light)
-        #num += self.PointSource.num_basis(kwargs_ps, kwargs_lens)
+        # num += self.PointSource.num_basis(kwargs_ps, kwargs_lens)
         return num
 
     @partial(jit, static_argnums=(0, 7))
@@ -383,22 +389,22 @@ class ImageLinearFit(ImageModel):
         )
         n_source = len(source_light_response)
 
-        #extinction = self._extinction.extinction(
+        # extinction = self._extinction.extinction(
         #    x_grid,
         #    y_grid,
         #    kwargs_extinction=kwargs_extinction,
         #    kwargs_special=kwargs_special,
-        #)
+        # )
 
         lens_light_response, _ = self.LensLightModel.functions_split(
             x_grid, y_grid, kwargs_lens_light
         )
         n_lens_light = len(lens_light_response)
 
-        #ra_pos, dec_pos, amp, n_points = self.point_source_linear_response_set(
+        # ra_pos, dec_pos, amp, n_points = self.point_source_linear_response_set(
         #    kwargs_ps, kwargs_lens, kwargs_special, with_amp=False
-        #)
-        num_param = n_lens_light + n_source #n_points + n_lens_light + n_source
+        # )
+        num_param = n_lens_light + n_source  # n_points + n_lens_light + n_source
 
         num_response = self.num_data_evaluate
         A = jnp.zeros((num_param, num_response))
@@ -410,9 +416,9 @@ class ImageLinearFit(ImageModel):
             # NOTE: Primary beam not supported in jaxtronomy
             # multiply with primary beam before convolution
             # if self._pb is not None:
-                #image *= self._pb_1d
+            # image *= self._pb_1d
 
-            #image *= extinction
+            # image *= extinction
             image = self.ImageNumerics.re_size_convolve(image, unconvolved=unconvolved)
             A = A.at[n].set(jnp.nan_to_num(self.image2array_masked(image)))
             n += 1
@@ -422,14 +428,14 @@ class ImageLinearFit(ImageModel):
 
             # NOTE: Primary beam not supported in jaxtronomy
             # multiply with primary beam before convolution
-            #if self._pb is not None:
+            # if self._pb is not None:
             #    image *= self._pb_1d
 
             image = self.ImageNumerics.re_size_convolve(image, unconvolved=unconvolved)
             A = A.at[n].set(jnp.nan_to_num(self.image2array_masked(image)))
             n += 1
         # response of point sources
-        #for i in range(0, n_points):
+        # for i in range(0, n_points):
         #    # NOTE: Primary beam not supported in jaxtronomy
         #    # raise warnings when primary beam is attempted to be applied for point sources
         #    # if self._pb is not None:
@@ -463,7 +469,7 @@ class ImageLinearFit(ImageModel):
         kwargs_lens_light, i = self.LensLightModel.update_linear(
             param, i, kwargs_list=kwargs_lens_light
         )
-        #kwargs_ps, i = self.PointSource.update_linear(param, i, kwargs_ps, kwargs_lens)
+        # kwargs_ps, i = self.PointSource.update_linear(param, i, kwargs_ps, kwargs_lens)
         return kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps
 
     @partial(jit, static_argnums=0)
@@ -479,7 +485,7 @@ class ImageLinearFit(ImageModel):
         param = []
         param += self.SourceModel.linear_param_from_kwargs(kwargs_source)
         param += self.LensLightModel.linear_param_from_kwargs(kwargs_lens_light)
-        #param += self.PointSource.linear_param_from_kwargs(kwargs_ps)
+        # param += self.PointSource.linear_param_from_kwargs(kwargs_ps)
         return param
 
     # NOTE: pixelbased profiles not supported in jaxtronomy
@@ -542,9 +548,9 @@ class ImageLinearFit(ImageModel):
                 )
         return error_map
 
-    #def point_source_linear_response_set(
+    # def point_source_linear_response_set(
     #    self, kwargs_ps, kwargs_lens, kwargs_special, with_amp=True
-    #):
+    # ):
     #    """
 
     #    :param kwargs_ps: point source keyword argument list
@@ -586,26 +592,23 @@ class ImageLinearFit(ImageModel):
         :return: boolean
         """
         pos_bool = True
-        #pos_bool_ps = self.PointSource.check_positive_flux(kwargs_ps)
-        #if self._pixelbased_bool is True:
+        # pos_bool_ps = self.PointSource.check_positive_flux(kwargs_ps)
+        # if self._pixelbased_bool is True:
         #    # this constraint must be handled by the pixel-based solver
         #    pos_bool_source = True
         #    pos_bool_lens_light = True
-        #else:
-        pos_bool_source = self.SourceModel.check_positive_flux_profile(
-            kwargs_source
-        )
+        # else:
+        pos_bool_source = self.SourceModel.check_positive_flux_profile(kwargs_source)
         pos_bool_lens_light = self.LensLightModel.check_positive_flux_profile(
             kwargs_lens_light
         )
-        #pos_bool = jnp.where(pos_bool_ps, pos_bool, False)
+        # pos_bool = jnp.where(pos_bool_ps, pos_bool, False)
         pos_bool = jnp.where(pos_bool_source, pos_bool, False)
         pos_bool = jnp.where(pos_bool_lens_light, pos_bool, False)
         return pos_bool
 
-
     # linear solver for interferometric natwt method
-    #def _image_linear_solve_interferometry_natwt(
+    # def _image_linear_solve_interferometry_natwt(
     #    self,
     #    kwargs_lens=None,
     #    kwargs_source=None,
@@ -613,7 +616,7 @@ class ImageLinearFit(ImageModel):
     #    kwargs_ps=None,
     #    kwargs_extinction=None,
     #    kwargs_special=None,
-    #):
+    # ):
     #    """'interferometry_natwt' method does NOT support model_error, cov_param. The
     #    interferometry linear solver just does the linear solving to get the optimal
     #    linear amplitudes and apply the marginalized amplitudes to make the model
@@ -648,7 +651,7 @@ class ImageLinearFit(ImageModel):
     #    )
     #    return model, model_error, cov_param, param
 
-    #def _image_linear_solve_interferometry_natwt_solving(self, A, d):
+    # def _image_linear_solve_interferometry_natwt_solving(self, A, d):
     #    """Linearly solve the amplitude of each light profile response to the natural
     #    weighting interferometry images, based on (placeholder for Nan Zhang's paper).
 

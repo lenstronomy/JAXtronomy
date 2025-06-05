@@ -224,7 +224,10 @@ class Shapelets(object):
 
 class ShapeletSet(object):
     """Class to operate on entire shapelet set limited by a maximal polynomial order
-    n_max, such that n1 + n2 <= n_max. This class is not compatible with linear solver."""
+    n_max, such that n1 + n2 <= n_max.
+
+    This class is not compatible with linear solver.
+    """
 
     param_names = ["amp", "n_max", "beta", "center_x", "center_y"]
     lower_limit_default = {
@@ -290,9 +293,10 @@ class ShapeletSet(object):
         return jnp.nan_to_num(f_)
 
 
-
 class ShapeletSetStatic(object):
-    """Same as ShapeletSet, but nmax is declared at initialization. This is required to use the linear solver.
+    """Same as ShapeletSet, but nmax is declared at initialization.
+
+    This is required to use the linear solver.
     NOTE: To use a new value of n_max, a new instance of the class needs to be created. Changing self.n_max
     will not work.
     """
@@ -315,7 +319,9 @@ class ShapeletSetStatic(object):
 
     def __init__(self, n_max):
         if not isinstance(n_max, int):
-            raise ValueError("n_max must be initialized as an int for the ShapeletSetSatic profile")
+            raise ValueError(
+                "n_max must be initialized as an int for the ShapeletSetSatic profile"
+            )
         self.n_max = n_max
         self.num_param = int(((n_max + 1) * (n_max + 2) / 2))
         self.shapelets = Shapelets(precalc=True)
@@ -343,14 +349,18 @@ class ShapeletSetStatic(object):
         """
 
         if len(amp) != self.num_param:
-            raise ValueError(f"Length of amplitude array {len(amp)} not consistent with nmax {self.nmax} given at initialization. The length of amplitude array should be {self.num_param}")
-        
+            raise ValueError(
+                f"Length of amplitude array {len(amp)} not consistent with nmax {self.nmax} given at initialization. The length of amplitude array should be {self.num_param}"
+            )
+
         x_shape = x.shape
         x = jnp.atleast_1d(x)
         f_ = jnp.zeros_like(x)
         amp = jnp.array(amp)
 
-        phi_x, phi_y = self.shapelets.pre_calc(x, y, beta, self.n_max, center_x, center_y)
+        phi_x, phi_y = self.shapelets.pre_calc(
+            x, y, beta, self.n_max, center_x, center_y
+        )
 
         n1 = 0
         n2 = 0
@@ -363,7 +373,7 @@ class ShapeletSetStatic(object):
 
         f_ = lax.fori_loop(0, self.num_param, body_fun, (f_, n1, n2))[0]
         f_ = f_.reshape(x_shape)
-        return jnp.nan_to_num(f_)        
+        return jnp.nan_to_num(f_)
 
     @partial(jit, static_argnums=0)
     def function_split(self, x, y, amp, beta, center_x=0, center_y=0, *args, **kwargs):
@@ -383,10 +393,14 @@ class ShapeletSetStatic(object):
         """
 
         if len(amp) != self.num_param:
-            raise ValueError(f"Length of amplitude array {len(amp)} not consistent with nmax {self.nmax} given at initialization. The length of amplitude array should be {self.num_param}")
+            raise ValueError(
+                f"Length of amplitude array {len(amp)} not consistent with nmax {self.nmax} given at initialization. The length of amplitude array should be {self.num_param}"
+            )
         f_ = []
 
-        phi_x, phi_y = self.shapelets.pre_calc(x, y, beta, self.n_max, center_x, center_y)
+        phi_x, phi_y = self.shapelets.pre_calc(
+            x, y, beta, self.n_max, center_x, center_y
+        )
 
         n1 = 0
         n2 = 0

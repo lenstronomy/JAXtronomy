@@ -119,7 +119,9 @@ class LightModelBase(object):
 
             elif profile_type == "SHAPELETS":
                 if profile_kwargs.get("n_max", None) is not None:
-                    from jaxtronomy.LightModel.Profiles.shapelets import ShapeletSetStatic
+                    from jaxtronomy.LightModel.Profiles.shapelets import (
+                        ShapeletSetStatic,
+                    )
 
                     self.func_list.append(ShapeletSetStatic(**profile_kwargs))
                 else:
