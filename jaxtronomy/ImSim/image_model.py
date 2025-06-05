@@ -118,6 +118,7 @@ class ImageModel(object):
         self._extinction = extinction_class
         if kwargs_pixelbased is None:
             kwargs_pixelbased = {}
+            self._pixelbased_bool = False
         else:
             raise ValueError("pixelbased solver not supported in JAXtronomy")
         self.source_mapping = Image2SourceMapping(

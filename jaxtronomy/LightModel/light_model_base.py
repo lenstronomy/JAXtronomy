@@ -118,9 +118,14 @@ class LightModelBase(object):
                 self.func_list.append(CoreSersic(**profile_kwargs))
 
             elif profile_type == "SHAPELETS":
-                from jaxtronomy.LightModel.Profiles.shapelets import ShapeletSet
+                if profile_kwargs.get("n_max", None) is not None:
+                    from jaxtronomy.LightModel.Profiles.shapelets import ShapeletSetStatic
 
-                self.func_list.append(ShapeletSet(**profile_kwargs))
+                    self.func_list.append(ShapeletSetStatic(**profile_kwargs))
+                else:
+                    from jaxtronomy.LightModel.Profiles.shapelets import ShapeletSet
+
+                    self.func_list.append(ShapeletSet(**profile_kwargs))
             # elif profile_type == "SHAPELETS_ELLIPSE":
             #     from lenstronomy.LightModel.Profiles.shapelets_ellipse import (
             #         ShapeletSetEllipse,
