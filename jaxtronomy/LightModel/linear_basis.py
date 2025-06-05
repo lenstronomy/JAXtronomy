@@ -4,7 +4,7 @@ __author__ = "sibirrer"
 # used for the linear solver only
 
 from functools import partial
-from jax import jit, numpy as jnp
+from jax import jit, lax, numpy as jnp
 import numpy as np
 from jaxtronomy.LightModel.light_model_base import LightModelBase
 
@@ -158,7 +158,7 @@ class LinearBasis(LightModelBase):
                 raise ValueError("model type %s not valid!" % model)
         return n_list
 
-    @partial(jit, static_argnums=(0, 2), inline=True)
+    @partial(jit, static_argnums=(0,))
     def update_linear(self, param, i, kwargs_list):
         """
 
@@ -192,11 +192,11 @@ class LinearBasis(LightModelBase):
                 "LINEAR_ELLIPSE",
                 "LINE_PROFILE",
             ]:
-                kwargs_list[k]["amp"] = param[i]
+                kwargs_list[k]["amp"] = param.at[i].get()
                 i += 1
             elif model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
                 num_param = len(kwargs_list[k]["sigma"])
-                kwargs_list[k]["amp"] = param[i : i + num_param]
+                kwargs_list[k]["amp"] = lax.dynamic_slice(param, [i], (num_param,))
                 i += num_param
             elif model in [
                 "SHAPELETS",
@@ -205,13 +205,13 @@ class LinearBasis(LightModelBase):
                 "SHAPELETS_ELLIPSE",
             ]:
                 num_param = self.func_list[k].num_param
-                kwargs_list[k]["amp"] = param[i : i + num_param]
+                kwargs_list[k]["amp"] = lax.dynamic_slice(param, [i], (num_param,))
                 i += num_param
             # elif model in ["SLIT_STARLETS", "SLIT_STARLETS_GEN2"]:
             #     n_scales = kwargs_list[k]["n_scales"]
             #     n_pixels = kwargs_list[k]["n_pixels"]
             #     num_param = int(n_scales * n_pixels)
-            #     kwargs_list[k]["amp"] = param[i : i + num_param]
+            #     kwargs_list[k]["amp"] = lax.dynamic_slice(param, [i], (num_param,))
             #     i += num_param
             else:
                 raise ValueError("model type %s not valid!" % model)
