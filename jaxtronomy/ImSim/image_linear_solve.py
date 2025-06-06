@@ -140,7 +140,7 @@ class ImageLinearFit(ImageModel):
         #         kwargs_special,
         #     )
 
-        #if self.Data.likelihood_method() == "diagonal":
+        # if self.Data.likelihood_method() == "diagonal":
         A = ImageLinearFit.linear_response_matrix(
             self,
             kwargs_lens,
@@ -176,7 +176,7 @@ class ImageLinearFit(ImageModel):
         #        kwargs_extinction,
         #        kwargs_special,
         #    )
-        #else:
+        # else:
         #    raise ValueError(
         #        "likelihood_method %s not supported!" % self.Data.likelihood_method()
         #    )
