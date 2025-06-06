@@ -50,15 +50,18 @@ class TestLinearBasis(object):
         assert n == n_ref == 14
 
     def test_num_param_linear(self):
+        param_list = self.linear_basis.num_param_linear_list(self.kwargs_list)
+        param_list_ref = self.linear_basis_ref.num_param_linear_list(self.kwargs_list)
+        npt.assert_array_equal(param_list, param_list_ref)
+
         assert (
             self.linear_basis.num_param_linear(self.kwargs_list)
             == self.linear_basis_ref.num_param_linear(self.kwargs_list)
             == 14
         )
 
-    def test_num_param_linear_list(self):
-        param_list = self.linear_basis.num_param_linear(self.kwargs_list)
-        param_list_ref = self.linear_basis_ref.num_param_linear(self.kwargs_list)
+        param_list = self.linear_basis.num_param_linear(self.kwargs_list, list_return=True)
+        param_list_ref = self.linear_basis_ref.num_param_linear(self.kwargs_list, list_return=True)
         npt.assert_array_equal(param_list, param_list_ref)
 
     def test_update_linear(self):
