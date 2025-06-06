@@ -350,7 +350,7 @@ class ShapeletSetStatic(object):
 
         if len(amp) != self.num_param:
             raise ValueError(
-                f"Length of amplitude array {len(amp)} not consistent with nmax {self.nmax} given at initialization. The length of amplitude array should be {self.num_param}"
+                f"Length of amplitude array {len(amp)} not consistent with n_max {self.n_max} given at initialization. The length of amplitude array should be {self.num_param}"
             )
 
         x_shape = x.shape
@@ -394,7 +394,7 @@ class ShapeletSetStatic(object):
 
         if len(amp) != self.num_param:
             raise ValueError(
-                f"Length of amplitude array {len(amp)} not consistent with nmax {self.nmax} given at initialization. The length of amplitude array should be {self.num_param}"
+                f"Length of amplitude array {len(amp)} not consistent with n_max {self.n_max} given at initialization. The length of amplitude array should be {self.num_param}"
             )
         f_ = []
 

@@ -227,6 +227,10 @@ class TestShapeletSet(object):
         result = self.shapeletset_static12.function(y, x, amp, beta, center_x, center_y)
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
+        amp = np.linspace(1.0, 100.0, num_param+1)
+        npt.assert_raises(ValueError, self.shapeletset_static12.function, x, y, amp, beta, center_x, center_y)
+        npt.assert_raises(ValueError, self.shapeletset_static12.function_split, x, y, amp, beta, center_x, center_y)
+
     def test_function_split(self):
         x = np.array([1.3, 3.5, 6.7, 2.5, 13.54, 99])
         y = np.array([-0.6, 2.5, 6.1, -2.6, 13.54, 99])
