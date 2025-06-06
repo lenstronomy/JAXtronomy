@@ -21,7 +21,7 @@ class ImageLinearFit(ImageModel):
     def __init__(
         self,
         data_class,
-        psf_class=None,
+        psf_class,
         lens_model_class=None,
         source_model_class=None,
         lens_light_model_class=None,
@@ -50,7 +50,7 @@ class ImageLinearFit(ImageModel):
          (see SLITronomy documentation) being applied to the point sources.
         """
         # SHAPELETS nmax must be set at initialization for linear solver
-        if "SHAPELETS" in source_model_class.profile_type_list:
+        if source_model_class is not None and "SHAPELETS" in source_model_class.profile_type_list:
             index = source_model_class.profile_type_list.index("SHAPELETS")
             shapelet = source_model_class.func_list[index]
             if not hasattr(shapelet, "num_param"):
@@ -58,7 +58,7 @@ class ImageLinearFit(ImageModel):
                     "SHAPELETS n_max must be set at initialization. Use profile_kwargs_list when initializing LightModel.\n"
                     "If using kwargs_model, see documentation of source_light_profile_kwargs_list in class_creator.create_class_instances()"
                 )
-        if "SHAPELETS" in lens_light_model_class.profile_type_list:
+        if lens_light_model_class is not None and "SHAPELETS" in lens_light_model_class.profile_type_list:
             index = lens_light_model_class.profile_type_list.index("SHAPELETS")
             shapelet = lens_light_model_class.func_list[index]
             if not hasattr(shapelet, "num_param"):
@@ -401,9 +401,10 @@ class ImageLinearFit(ImageModel):
         )
         n_lens_light = len(lens_light_response)
 
-        # ra_pos, dec_pos, amp, n_points = self.point_source_linear_response_set(
+        # ra_pos, dec_pos, amp, _ = self.point_source_linear_response_set(
         #    kwargs_ps, kwargs_lens, kwargs_special, with_amp=False
         # )
+        # n_points = len(ra_pos)
         num_param = n_lens_light + n_source  # n_points + n_lens_light + n_source
 
         num_response = self.num_data_evaluate
@@ -527,7 +528,7 @@ class ImageLinearFit(ImageModel):
         :param kwargs_source: keyword arguments of source model
         :param x_grid: x-axis of positions to compute error map
         :param y_grid: y-axis of positions to compute error map
-        :param cov_param: covariance matrix of liner inversion parameters
+        :param cov_param: covariance matrix of linear inversion parameters
         :return: diagonal covariance errors at the positions (x_grid, y_grid)
         """
 

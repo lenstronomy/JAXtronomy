@@ -37,6 +37,7 @@ class TestImageLinearFit(object):
         kwargs_data = sim_util.data_configure_simple(
             numPix, deltaPix, exp_time, sigma_bkg, inverse=True
         )
+        self.kwargs_data = kwargs_data
         data_class = ImageData(**kwargs_data)
         data_class_ref = ImageData_ref(**kwargs_data)
 
@@ -138,27 +139,35 @@ class TestImageLinearFit(object):
     def test_init(self):
         source_model_class = LightModel(["SHAPELETS"])
         lens_light_model_class = LightModel(
-            ["SERSIC", "SHAPELETS"], profile_kwargs_list=[{}, {"n_max": 3}]
+            ["SERSIC", "SHAPELETS"]
+        )
+        kwargs_psf = {
+            "psf_type": "GAUSSIAN",
+            "fwhm": 0.5,
+            "truncation": 5,
+            "pixel_size": 0.05,
+        }
+        psf_class = PSF(**kwargs_psf)
+        data_class = ImageData(**self.kwargs_data)
+
+        npt.assert_raises(
+            ValueError,
+            ImageLinearFit,
+            data_class=data_class,
+            psf_class=psf_class,
+            source_model_class=source_model_class,
         )
         npt.assert_raises(
             ValueError,
             ImageLinearFit,
-            data_class=None,
-            source_model_class=source_model_class,
+            data_class=data_class,
+            psf_class=psf_class,
             lens_light_model_class=lens_light_model_class,
         )
 
-        source_model_class = LightModel(
-            ["SHAPELETS"], profile_kwargs_list=[{"n_max": 3}]
-        )
-        lens_light_model_class = LightModel(["SERSIC", "SHAPELETS"])
-        npt.assert_raises(
-            ValueError,
-            ImageLinearFit,
-            data_class=None,
-            source_model_class=source_model_class,
-            lens_light_model_class=lens_light_model_class,
-        )
+        data_class = ImageData(likelihood_method='interferometry_natwt', **self.kwargs_data)
+        npt.assert_raises(ValueError, ImageLinearFit, psf_class=psf_class, data_class=data_class)
+
 
     def test_likelihood_data_given_model(self):
         logL, param = self.imageLinearFit.likelihood_data_given_model(
@@ -167,6 +176,7 @@ class TestImageLinearFit(object):
             self.kwargs_lens_light,
             self.kwargs_ps,
             source_marg=False,
+            check_positive_flux=False,
         )
         logL_ref, param_ref = self.imageLinearFit.likelihood_data_given_model(
             self.kwargs_lens,
@@ -174,6 +184,26 @@ class TestImageLinearFit(object):
             self.kwargs_lens_light,
             self.kwargs_ps,
             source_marg=False,
+            check_positive_flux=False,
+        )
+        npt.assert_allclose(logL, logL_ref, atol=1e-12, rtol=1e-12)
+        npt.assert_allclose(param, param_ref, atol=1e-12, rtol=1e-12)
+
+        logL, param = self.imageLinearFit.likelihood_data_given_model(
+            self.kwargs_lens,
+            self.kwargs_source,
+            self.kwargs_lens_light,
+            self.kwargs_ps,
+            source_marg=False,
+            check_positive_flux=True,
+        )
+        logL_ref, param_ref = self.imageLinearFit.likelihood_data_given_model(
+            self.kwargs_lens,
+            self.kwargs_source,
+            self.kwargs_lens_light,
+            self.kwargs_ps,
+            source_marg=False,
+            check_positive_flux=True,
         )
         npt.assert_allclose(logL, logL_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(param, param_ref, atol=1e-12, rtol=1e-12)
@@ -184,6 +214,7 @@ class TestImageLinearFit(object):
             self.kwargs_lens_light,
             self.kwargs_ps,
             source_marg=True,
+            check_positive_flux=False,
         )
         logL_ref, param_ref = self.imageLinearFit.likelihood_data_given_model(
             self.kwargs_lens,
@@ -191,6 +222,7 @@ class TestImageLinearFit(object):
             self.kwargs_lens_light,
             self.kwargs_ps,
             source_marg=True,
+            check_positive_flux=False,
         )
         npt.assert_allclose(logL, logL_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(param, param_ref, atol=1e-12, rtol=1e-12)
@@ -221,6 +253,12 @@ class TestImageLinearFit(object):
         chi2_reduced_ref = self.imageLinearFit_ref.reduced_chi2(model, error_map)
         npt.assert_allclose(chi2_reduced, chi2_reduced_ref, atol=1e-11, rtol=1e-11)
 
+        x = np.tile(np.linspace(-1, 1, 50), 50)
+        y = np.repeat(np.linspace(-1, 1, 50), 50)
+        error_map = self.imageLinearFit.error_map_source(self.kwargs_source, x, y, cov_param)
+        error_map_ref = self.imageLinearFit_ref.error_map_source(self.kwargs_source, x, y, cov_param)
+        npt.assert_allclose(error_map, error_map_ref, atol=1e-11, rtol=1e-11)
+
         model, error_map, cov_param, param = self.imageLinearFit.image_linear_solve(
             self.kwargs_lens,
             self.kwargs_source,
@@ -245,6 +283,10 @@ class TestImageLinearFit(object):
         chi2_reduced = self.imageLinearFit.reduced_chi2(model, error_map)
         chi2_reduced_ref = self.imageLinearFit_ref.reduced_chi2(model, error_map)
         npt.assert_allclose(chi2_reduced, chi2_reduced_ref, atol=1e-11, rtol=1e-11)
+
+        error_map = self.imageLinearFit.error_map_source(self.kwargs_source, x, y, cov_param)
+        error_map_ref = self.imageLinearFit_ref.error_map_source(self.kwargs_source, x, y, cov_param)
+        npt.assert_allclose(error_map, error_map_ref, atol=1e-11, rtol=1e-11)
 
     def test_num_param_linear(self):
         num_param_linear = self.imageLinearFit.num_param_linear(
