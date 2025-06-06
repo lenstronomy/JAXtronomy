@@ -50,7 +50,10 @@ class ImageLinearFit(ImageModel):
          (see SLITronomy documentation) being applied to the point sources.
         """
         # SHAPELETS nmax must be set at initialization for linear solver
-        if source_model_class is not None and "SHAPELETS" in source_model_class.profile_type_list:
+        if (
+            source_model_class is not None
+            and "SHAPELETS" in source_model_class.profile_type_list
+        ):
             index = source_model_class.profile_type_list.index("SHAPELETS")
             shapelet = source_model_class.func_list[index]
             if not hasattr(shapelet, "num_param"):
@@ -58,7 +61,10 @@ class ImageLinearFit(ImageModel):
                     "SHAPELETS n_max must be set at initialization. Use profile_kwargs_list when initializing LightModel.\n"
                     "If using kwargs_model, see documentation of source_light_profile_kwargs_list in class_creator.create_class_instances()"
                 )
-        if lens_light_model_class is not None and "SHAPELETS" in lens_light_model_class.profile_type_list:
+        if (
+            lens_light_model_class is not None
+            and "SHAPELETS" in lens_light_model_class.profile_type_list
+        ):
             index = lens_light_model_class.profile_type_list.index("SHAPELETS")
             shapelet = lens_light_model_class.func_list[index]
             if not hasattr(shapelet, "num_param"):
