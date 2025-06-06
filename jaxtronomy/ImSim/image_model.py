@@ -27,7 +27,7 @@ class ImageModel(object):
     def __init__(
         self,
         data_class,
-        psf_class=None,
+        psf_class,
         lens_model_class=None,
         source_model_class=None,
         lens_light_model_class=None,
