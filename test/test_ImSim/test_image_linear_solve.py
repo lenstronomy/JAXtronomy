@@ -15,12 +15,13 @@ from jaxtronomy.LightModel.light_model import LightModel
 from jaxtronomy.Data.imaging_data import ImageData
 
 from lenstronomy.ImSim.image_linear_solve import ImageLinearFit as ImageLinearFit_ref
-import lenstronomy.Util.param_util as param_util
 from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
 from lenstronomy.LightModel.light_model import LightModel as LightModel_ref
 from lenstronomy.PointSource.point_source import PointSource as PointSource_ref
-import lenstronomy.Util.simulation_util as sim_util
 from lenstronomy.Data.imaging_data import ImageData as ImageData_ref
+
+import lenstronomy.Util.param_util as param_util
+import lenstronomy.Util.simulation_util as sim_util
 from lenstronomy.Data.psf import PSF
 
 

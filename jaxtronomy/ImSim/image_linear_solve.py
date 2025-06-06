@@ -90,7 +90,7 @@ class ImageLinearFit(ImageModel):
         # prepare to use fft convolution for the natwt linear solver
         if self.Data.likelihood_method() == "interferometry_natwt":
             raise ValueError(
-                "interferometry_natwt linear solver not supported in jaxtronomy yet"
+                "interferometry_natwt linear solver not supported in jaxtronomy yet. Only diagonal likelihood method is supported."
             )
             # self._convolution = PixelKernelConvolution(
             #    kernel=self.PSF.kernel_point_source
@@ -139,27 +139,28 @@ class ImageLinearFit(ImageModel):
         #         kwargs_extinction,
         #         kwargs_special,
         #     )
-        if self.Data.likelihood_method() == "diagonal":
-            A = ImageLinearFit.linear_response_matrix(
-                self,
-                kwargs_lens,
-                kwargs_source,
-                kwargs_lens_light,
-                kwargs_ps,
-                kwargs_extinction,
-                kwargs_special,
-            )
-            C_D_response, model_error = ImageModel.error_response(
-                self, kwargs_lens, kwargs_ps, kwargs_special=kwargs_special
-            )
-            d = self.data_response
-            param, cov_param, wls_model = de_lens.get_param_WLS(
-                A.T, 1 / C_D_response, d, inv_bool=inv_bool
-            )
-            model = self.array_masked2image(wls_model)
-            _, _, _, _ = ImageLinearFit.update_linear_kwargs(
-                self, param, kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps
-            )
+
+        #if self.Data.likelihood_method() == "diagonal":
+        A = ImageLinearFit.linear_response_matrix(
+            self,
+            kwargs_lens,
+            kwargs_source,
+            kwargs_lens_light,
+            kwargs_ps,
+            kwargs_extinction,
+            kwargs_special,
+        )
+        C_D_response, model_error = ImageModel.error_response(
+            self, kwargs_lens, kwargs_ps, kwargs_special=kwargs_special
+        )
+        d = self.data_response
+        param, cov_param, wls_model = de_lens.get_param_WLS(
+            A.T, 1 / C_D_response, d, inv_bool=inv_bool
+        )
+        model = self.array_masked2image(wls_model)
+        _, _, _, _ = ImageLinearFit.update_linear_kwargs(
+            self, param, kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps
+        )
         # TODO: Implement this
         # elif self.Data.likelihood_method() == "interferometry_natwt":
         #    (
@@ -175,10 +176,10 @@ class ImageLinearFit(ImageModel):
         #        kwargs_extinction,
         #        kwargs_special,
         #    )
-        else:
-            raise ValueError(
-                "likelihood_method %s not supported!" % self.Data.likelihood_method()
-            )
+        #else:
+        #    raise ValueError(
+        #        "likelihood_method %s not supported!" % self.Data.likelihood_method()
+        #    )
         return model, model_error, cov_param, param
 
     # def image_pixelbased_solve(
