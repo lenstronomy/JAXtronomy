@@ -138,9 +138,7 @@ class TestImageLinearFit(object):
 
     def test_init(self):
         source_model_class = LightModel(["SHAPELETS"])
-        lens_light_model_class = LightModel(
-            ["SERSIC", "SHAPELETS"]
-        )
+        lens_light_model_class = LightModel(["SERSIC", "SHAPELETS"])
         kwargs_psf = {
             "psf_type": "GAUSSIAN",
             "fwhm": 0.5,
@@ -165,9 +163,12 @@ class TestImageLinearFit(object):
             lens_light_model_class=lens_light_model_class,
         )
 
-        data_class = ImageData(likelihood_method='interferometry_natwt', **self.kwargs_data)
-        npt.assert_raises(ValueError, ImageLinearFit, psf_class=psf_class, data_class=data_class)
-
+        data_class = ImageData(
+            likelihood_method="interferometry_natwt", **self.kwargs_data
+        )
+        npt.assert_raises(
+            ValueError, ImageLinearFit, psf_class=psf_class, data_class=data_class
+        )
 
     def test_likelihood_data_given_model(self):
         logL, param = self.imageLinearFit.likelihood_data_given_model(
@@ -255,8 +256,12 @@ class TestImageLinearFit(object):
 
         x = np.tile(np.linspace(-1, 1, 50), 50)
         y = np.repeat(np.linspace(-1, 1, 50), 50)
-        error_map = self.imageLinearFit.error_map_source(self.kwargs_source, x, y, cov_param)
-        error_map_ref = self.imageLinearFit_ref.error_map_source(self.kwargs_source, x, y, cov_param)
+        error_map = self.imageLinearFit.error_map_source(
+            self.kwargs_source, x, y, cov_param
+        )
+        error_map_ref = self.imageLinearFit_ref.error_map_source(
+            self.kwargs_source, x, y, cov_param
+        )
         npt.assert_allclose(error_map, error_map_ref, atol=1e-11, rtol=1e-11)
 
         model, error_map, cov_param, param = self.imageLinearFit.image_linear_solve(
@@ -284,8 +289,12 @@ class TestImageLinearFit(object):
         chi2_reduced_ref = self.imageLinearFit_ref.reduced_chi2(model, error_map)
         npt.assert_allclose(chi2_reduced, chi2_reduced_ref, atol=1e-11, rtol=1e-11)
 
-        error_map = self.imageLinearFit.error_map_source(self.kwargs_source, x, y, cov_param)
-        error_map_ref = self.imageLinearFit_ref.error_map_source(self.kwargs_source, x, y, cov_param)
+        error_map = self.imageLinearFit.error_map_source(
+            self.kwargs_source, x, y, cov_param
+        )
+        error_map_ref = self.imageLinearFit_ref.error_map_source(
+            self.kwargs_source, x, y, cov_param
+        )
         npt.assert_allclose(error_map, error_map_ref, atol=1e-11, rtol=1e-11)
 
     def test_num_param_linear(self):
