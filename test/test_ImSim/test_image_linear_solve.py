@@ -99,14 +99,20 @@ class TestImageLinearFit(object):
 
         self.kwargs_ps = [
             {"ra_image": [0.01], "dec_image": [0.0], "source_amp": 1.2},
-            {"ra_image": [0.01, 1.1, -0.4], "dec_image": [0.0, -0.3, 0.2], "point_amp": [1.3, 2.3, 1.3]}
-        ] 
+            {
+                "ra_image": [0.01, 1.1, -0.4],
+                "dec_image": [0.0, -0.3, 0.2],
+                "point_amp": [1.3, 2.3, 1.3],
+            },
+        ]
 
         point_source_class = PointSource(
-            point_source_type_list=["LENSED_POSITION", "LENSED_POSITION"], fixed_magnification_list=[True, False]
+            point_source_type_list=["LENSED_POSITION", "LENSED_POSITION"],
+            fixed_magnification_list=[True, False],
         )
         point_source_class_ref = PointSource_ref(
-            point_source_type_list=["LENSED_POSITION", "LENSED_POSITION"], fixed_magnification_list=[True, False]
+            point_source_type_list=["LENSED_POSITION", "LENSED_POSITION"],
+            fixed_magnification_list=[True, False],
         )
         kwargs_numerics = {
             "supersampling_factor": 2,
@@ -350,7 +356,7 @@ class TestImageLinearFit(object):
         assert kwargs_source[1]["amp"] == 10
         assert kwargs_lens_light[0]["amp"] == 10
         assert kwargs_ps[0]["source_amp"] == 10
-        npt.assert_array_equal(kwargs_ps[1]["point_amp"], np.ones(3)*10)
+        npt.assert_array_equal(kwargs_ps[1]["point_amp"], np.ones(3) * 10)
 
     def test_error_response(self):
         C_D_response, model_error = self.imageLinearFit.error_response(
@@ -412,31 +418,47 @@ class TestImageLinearFit(object):
             npt.assert_allclose(ra_pos[i], ra_pos_ref[i], atol=1e-12, rtol=1e-12)
             npt.assert_allclose(dec_pos[i], dec_pos_ref[i], atol=1e-12, rtol=1e-12)
             npt.assert_allclose(amp[i], amp_ref[i], atol=1e-12, rtol=1e-12)
-        assert num_point == num_point_ref            
+        assert num_point == num_point_ref
 
     def test_check_positive_flux(self):
-        self.kwargs_source[1]['amp'] = -1.1
-        pos_bool = self.imageLinearFit.check_positive_flux(self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
-        pos_bool_ref = self.imageLinearFit_ref.check_positive_flux(self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
+        self.kwargs_source[1]["amp"] = -1.1
+        pos_bool = self.imageLinearFit.check_positive_flux(
+            self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        pos_bool_ref = self.imageLinearFit_ref.check_positive_flux(
+            self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
         assert pos_bool == pos_bool_ref
         assert pos_bool == False
 
-        self.kwargs_lens_light[0]['amp'] = -1.1
-        self.kwargs_source[1]['amp'] = 1.1
-        pos_bool = self.imageLinearFit.check_positive_flux(self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
-        pos_bool_ref = self.imageLinearFit_ref.check_positive_flux(self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
+        self.kwargs_lens_light[0]["amp"] = -1.1
+        self.kwargs_source[1]["amp"] = 1.1
+        pos_bool = self.imageLinearFit.check_positive_flux(
+            self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        pos_bool_ref = self.imageLinearFit_ref.check_positive_flux(
+            self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
         assert pos_bool == pos_bool_ref
         assert pos_bool == False
 
-        self.kwargs_ps[1]['point_amp'] = [1.1, 1.1, -1.1]
-        self.kwargs_lens_light[0]['amp'] = 1.1
-        pos_bool = self.imageLinearFit.check_positive_flux(self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
-        pos_bool_ref = self.imageLinearFit_ref.check_positive_flux(self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
+        self.kwargs_ps[1]["point_amp"] = [1.1, 1.1, -1.1]
+        self.kwargs_lens_light[0]["amp"] = 1.1
+        pos_bool = self.imageLinearFit.check_positive_flux(
+            self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        pos_bool_ref = self.imageLinearFit_ref.check_positive_flux(
+            self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
         assert pos_bool == pos_bool_ref
         assert pos_bool == False
 
-        self.kwargs_ps[1]['point_amp'] = [1.1, 1.1, 1.1]
-        pos_bool = self.imageLinearFit.check_positive_flux(self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
-        pos_bool_ref = self.imageLinearFit_ref.check_positive_flux(self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
+        self.kwargs_ps[1]["point_amp"] = [1.1, 1.1, 1.1]
+        pos_bool = self.imageLinearFit.check_positive_flux(
+            self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        pos_bool_ref = self.imageLinearFit_ref.check_positive_flux(
+            self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
         assert pos_bool == pos_bool_ref
         assert pos_bool == True

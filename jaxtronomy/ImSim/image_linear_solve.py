@@ -409,7 +409,7 @@ class ImageLinearFit(ImageModel):
         n_lens_light = len(lens_light_response)
 
         ra_pos, dec_pos, amp, _ = self.point_source_linear_response_set(
-           kwargs_ps, kwargs_lens, kwargs_special, with_amp=False
+            kwargs_ps, kwargs_lens, kwargs_special, with_amp=False
         )
         n_points = len(ra_pos)
         num_param = n_points + n_lens_light + n_source
@@ -442,18 +442,18 @@ class ImageLinearFit(ImageModel):
             image = self.ImageNumerics.re_size_convolve(image, unconvolved=unconvolved)
             A = A.at[n].set(jnp.nan_to_num(self.image2array_masked(image)))
             n += 1
-        #response of point sources
+        # response of point sources
         for i in range(0, n_points):
-           # NOTE: Primary beam not supported in jaxtronomy
-           # raise warnings when primary beam is attempted to be applied for point sources
-           # if self._pb is not None:
-           #     raise Warning("Antenna primary beam does not apply to point sources!")
+            # NOTE: Primary beam not supported in jaxtronomy
+            # raise warnings when primary beam is attempted to be applied for point sources
+            # if self._pb is not None:
+            #     raise Warning("Antenna primary beam does not apply to point sources!")
 
-           image = self.ImageNumerics.point_source_rendering(
-               ra_pos[i], dec_pos[i], amp[i]
-           )
-           A = A.at[n].set(jnp.nan_to_num(self.image2array_masked(image)))
-           n += 1
+            image = self.ImageNumerics.point_source_rendering(
+                ra_pos[i], dec_pos[i], amp[i]
+            )
+            A = A.at[n].set(jnp.nan_to_num(self.image2array_masked(image)))
+            n += 1
         return A * self._flux_scaling
 
     @partial(jit, static_argnums=(0,))
@@ -557,38 +557,42 @@ class ImageLinearFit(ImageModel):
 
     @partial(jit, static_argnums=(0, 4))
     def point_source_linear_response_set(
-       self, kwargs_ps, kwargs_lens, kwargs_special=None, with_amp=True
+        self, kwargs_ps, kwargs_lens, kwargs_special=None, with_amp=True
     ):
-       """
+        """
 
-       :param kwargs_ps: point source keyword argument list
-       :param kwargs_lens: lens model keyword argument list
-       :param kwargs_special: special keyword argument list, may include 'delta_x_image' and 'delta_y_image'
-       :param with_amp: bool, if True, relative magnification between multiply imaged point sources are held fixed.
-       :return: list of positions and amplitudes split in different basis components with applied astrometric corrections
-       """
+        :param kwargs_ps: point source keyword argument list
+        :param kwargs_lens: lens model keyword argument list
+        :param kwargs_special: special keyword argument list, may include 'delta_x_image' and 'delta_y_image'
+        :param with_amp: bool, if True, relative magnification between multiply imaged point sources are held fixed.
+        :return: list of positions and amplitudes split in different basis components with applied astrometric corrections
+        """
 
-       ra_pos, dec_pos, amp, _ = self.PointSource.linear_response_set(
-           kwargs_ps, kwargs_lens, with_amp=with_amp
-       )
-       n_points = len(ra_pos)
+        ra_pos, dec_pos, amp, _ = self.PointSource.linear_response_set(
+            kwargs_ps, kwargs_lens, with_amp=with_amp
+        )
+        n_points = len(ra_pos)
 
-       if kwargs_special is not None:
-           if "delta_x_image" in kwargs_special:
-               delta_x, delta_y = (
-                   kwargs_special["delta_x_image"],
-                   kwargs_special["delta_y_image"],
-               )
-               k = 0
-               n = len(delta_x)
-               for i in range(n_points):
-                   for j in range(len(ra_pos[i])):
-                       if k >= n:
-                           break
-                       ra_pos[i] = ra_pos[i].at[j].set(ra_pos[i].at[j].get() + delta_x[k])
-                       dec_pos[i] = dec_pos[i].at[j].set(dec_pos[i].at[j].get() + delta_y[k])
-                       k += 1
-       return ra_pos, dec_pos, amp, n_points
+        if kwargs_special is not None:
+            if "delta_x_image" in kwargs_special:
+                delta_x, delta_y = (
+                    kwargs_special["delta_x_image"],
+                    kwargs_special["delta_y_image"],
+                )
+                k = 0
+                n = len(delta_x)
+                for i in range(n_points):
+                    for j in range(len(ra_pos[i])):
+                        if k >= n:
+                            break
+                        ra_pos[i] = (
+                            ra_pos[i].at[j].set(ra_pos[i].at[j].get() + delta_x[k])
+                        )
+                        dec_pos[i] = (
+                            dec_pos[i].at[j].set(dec_pos[i].at[j].get() + delta_y[k])
+                        )
+                        k += 1
+        return ra_pos, dec_pos, amp, n_points
 
     @partial(jit, static_argnums=0)
     def check_positive_flux(self, kwargs_source, kwargs_lens_light, kwargs_ps):

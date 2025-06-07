@@ -403,7 +403,9 @@ class PointSource(object):
                     i += 1
                 else:
                     n_points = len(ra_pos_list[k])
-                    kwargs_ps[k]["point_amp"] = lax.dynamic_slice(param, [i], (n_points,))
+                    kwargs_ps[k]["point_amp"] = lax.dynamic_slice(
+                        param, [i], (n_points,)
+                    )
                     i += n_points
         return kwargs_ps, i
 
@@ -499,6 +501,7 @@ class PointSource(object):
                 amp = jnp.array(kwargs["source_amp"])
             pos_bool = jnp.where(jnp.any(amp < 0), False, pos_bool)
         return pos_bool
+
 
 # def _sort_position_by_original(x_o, y_o, x_solved, y_solved):
 #    """Sorting new image positions such that the old order is best preserved.

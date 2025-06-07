@@ -157,8 +157,12 @@ class TestPointSource(object):
             npt.assert_allclose(amp_list[i], amp_list_ref[i], atol=1e-8, rtol=1e-8)
 
     def test_linear_response_set(self):
-        ra_pos, dec_pos, amp, n = self.ps.linear_response_set(self.kwargs_ps, self.kwargs_lens, with_amp=True)
-        ra_pos_ref, dec_pos_ref, amp_ref, n_ref = self.ps_ref.linear_response_set(self.kwargs_ps, self.kwargs_lens, with_amp=True)
+        ra_pos, dec_pos, amp, n = self.ps.linear_response_set(
+            self.kwargs_ps, self.kwargs_lens, with_amp=True
+        )
+        ra_pos_ref, dec_pos_ref, amp_ref, n_ref = self.ps_ref.linear_response_set(
+            self.kwargs_ps, self.kwargs_lens, with_amp=True
+        )
         for i in range(len(ra_pos)):
             print(f"testing point_source_type_list {i}")
             npt.assert_allclose(ra_pos[i], ra_pos_ref[i], atol=1e-12, rtol=1e-12)
@@ -171,12 +175,14 @@ class TestPointSource(object):
         kwargs_ps1 = copy.deepcopy(self.kwargs_ps)
         kwargs_ps2 = copy.deepcopy(self.kwargs_ps)
         kwargs_ps1, i = self.ps.update_linear(param, 0, kwargs_ps1, self.kwargs_lens)
-        kwargs_ps2, i_ref = self.ps_ref.update_linear(param, 0, kwargs_ps2, self.kwargs_lens)
+        kwargs_ps2, i_ref = self.ps_ref.update_linear(
+            param, 0, kwargs_ps2, self.kwargs_lens
+        )
 
         assert i == i_ref
-        npt.assert_array_equal(kwargs_ps1[0]['point_amp'], kwargs_ps2[0]['point_amp'])
-        npt.assert_array_equal(kwargs_ps1[1]['point_amp'], kwargs_ps2[1]['point_amp'])
-        assert kwargs_ps1[2]['source_amp'] == kwargs_ps2[2]['source_amp']
+        npt.assert_array_equal(kwargs_ps1[0]["point_amp"], kwargs_ps2[0]["point_amp"])
+        npt.assert_array_equal(kwargs_ps1[1]["point_amp"], kwargs_ps2[1]["point_amp"])
+        assert kwargs_ps1[2]["source_amp"] == kwargs_ps2[2]["source_amp"]
 
     def test_linear_param_from_kwargs(self):
         param = self.ps.linear_param_from_kwargs(self.kwargs_ps)
@@ -215,14 +221,14 @@ class TestPointSource(object):
         assert pos_bool == pos_bool_ref
         assert pos_bool == True
 
-        self.kwargs_ps[2]['source_amp'] = -0.3
+        self.kwargs_ps[2]["source_amp"] = -0.3
         pos_bool = self.ps.check_positive_flux(self.kwargs_ps)
         pos_bool_ref = self.ps_ref.check_positive_flux(self.kwargs_ps)
         assert pos_bool == pos_bool_ref
         assert pos_bool == False
 
-        self.kwargs_ps[1]['point_amp'] = [0.3, 0.3, 0.3, -0.3]
-        self.kwargs_ps[2]['source_amp'] = 0.3
+        self.kwargs_ps[1]["point_amp"] = [0.3, 0.3, 0.3, -0.3]
+        self.kwargs_ps[2]["source_amp"] = 0.3
         pos_bool = self.ps.check_positive_flux(self.kwargs_ps)
         pos_bool_ref = self.ps_ref.check_positive_flux(self.kwargs_ps)
         assert pos_bool == pos_bool_ref
