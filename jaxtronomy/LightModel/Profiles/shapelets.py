@@ -224,7 +224,10 @@ class Shapelets(object):
 
 class ShapeletSet(object):
     """Class to operate on entire shapelet set limited by a maximal polynomial order
-    n_max, such that n1 + n2 <= n_max."""
+    n_max, such that n1 + n2 <= n_max.
+
+    This class is not compatible with linear solver.
+    """
 
     param_names = ["amp", "n_max", "beta", "center_x", "center_y"]
     lower_limit_default = {
@@ -288,3 +291,125 @@ class ShapeletSet(object):
         f_ = lax.fori_loop(0, len(amp), body_fun, (f_, n1, n2))[0]
         f_ = f_.reshape(x_shape)
         return jnp.nan_to_num(f_)
+
+
+class ShapeletSetStatic(object):
+    """Same as ShapeletSet, but n_max is declared at initialization.
+
+    This is required to use the linear solver.
+    NOTE: To use a new value of n_max, a new instance of the class needs to be created. Changing self.n_max
+    will not work.
+    """
+
+    param_names = ["amp", "n_max", "beta", "center_x", "center_y"]
+    lower_limit_default = {
+        "amp": 0,
+        "n_max": 1,
+        "beta": 0.01,
+        "center_x": -100,
+        "center_y": -100,
+    }
+    upper_limit_default = {
+        "amp": 100,
+        "n_max": 20,
+        "beta": 100,
+        "center_x": 100,
+        "center_y": 100,
+    }
+
+    def __init__(self, n_max):
+        if not isinstance(n_max, int):
+            raise ValueError(
+                "n_max must be initialized as an int for the ShapeletSetSatic profile"
+            )
+        self.n_max = n_max
+        self.num_param = int(((n_max + 1) * (n_max + 2) / 2))
+        self.shapelets = Shapelets(precalc=True)
+
+    @partial(jit, static_argnums=0)
+    def function(self, x, y, amp, beta, center_x=0, center_y=0, *args, **kwargs):
+        """NOTE: The number of loops is determined based off of len(amp) instead of n_max
+        for autodifferentiation to work. As long as len(amp) equals (n_max + 1) * (n_max + 2) / 2,
+        this function will work correctly and identically to lenstronomy. However if there is
+        any user error, the behaviour of this function will differ from lenstronomy.
+        For performance reasons, we do not include any runtime checks of len(amp) and n_max.
+
+        :param x: float or 1d array of x-coordinates
+        :param y: float or 1d array of y-coordinates
+        :param amp: 1d array of amplitudes in pre-defined order of shapelet basis functions
+            amp[0] corresponds to (n1, n2) = (0, 0), amp[1] corresponds to (n1, n2) = (1, 0)
+            amp[2] corresponds to (n1, n2) = (0, 1), amp[3] corresponds to (n1, n2) = (2, 0)
+            amp[4] corresponds to (n1, n2) = (1, 1), amp[5] corresponds to (n1, n2) = (0, 2)
+            amp[6] corresponds to (n1, n2) = (3, 0), etc
+            len(amp) should be equal to (n_max + 1) * (n_max + 2) / 2
+        :param beta: shapelet scale
+        :param center_x: shapelet center
+        :param center_y: shapelet center
+        :return: surface brightness of combined shapelet set
+        """
+
+        if len(amp) != self.num_param:
+            raise ValueError(
+                f"Length of amplitude array {len(amp)} not consistent with n_max {self.n_max} given at initialization. The length of amplitude array should be {self.num_param}"
+            )
+
+        x_shape = x.shape
+        x = jnp.atleast_1d(x)
+        f_ = jnp.zeros_like(x)
+        amp = jnp.array(amp)
+
+        phi_x, phi_y = self.shapelets.pre_calc(
+            x, y, beta, self.n_max, center_x, center_y
+        )
+
+        n1 = 0
+        n2 = 0
+
+        def body_fun(i, val):
+            f_, n1, n2 = val
+            f_ += amp.at[i].get() * phi_x.at[n1].get() * phi_y.at[n2].get()
+            n1, n2 = jnp.where(n1 == 0, n2 + 1, n1 - 1), jnp.where(n1 == 0, 0, n2 + 1)
+            return f_, n1, n2
+
+        f_ = lax.fori_loop(0, self.num_param, body_fun, (f_, n1, n2))[0]
+        f_ = f_.reshape(x_shape)
+        return jnp.nan_to_num(f_)
+
+    @partial(jit, static_argnums=0)
+    def function_split(self, x, y, amp, beta, center_x=0, center_y=0, *args, **kwargs):
+        """
+        :param x: float or 1d array of x-coordinates
+        :param y: float or 1d array of y-coordinates
+        :param amp: 1d array of amplitudes in pre-defined order of shapelet basis functions
+            amp[0] corresponds to (n1, n2) = (0, 0), amp[1] corresponds to (n1, n2) = (1, 0)
+            amp[2] corresponds to (n1, n2) = (0, 1), amp[3] corresponds to (n1, n2) = (2, 0)
+            amp[4] corresponds to (n1, n2) = (1, 1), amp[5] corresponds to (n1, n2) = (0, 2)
+            amp[6] corresponds to (n1, n2) = (3, 0), etc
+            len(amp) should be equal to (n_max + 1) * (n_max + 2) / 2
+        :param beta: shapelet scale
+        :param center_x: shapelet center
+        :param center_y: shapelet center
+        :return: list of surface brightnesses of each shapelet in the set
+        """
+
+        if len(amp) != self.num_param:
+            raise ValueError(
+                f"Length of amplitude array {len(amp)} not consistent with n_max {self.n_max} given at initialization. The length of amplitude array should be {self.num_param}"
+            )
+        f_ = []
+
+        phi_x, phi_y = self.shapelets.pre_calc(
+            x, y, beta, self.n_max, center_x, center_y
+        )
+
+        n1 = 0
+        n2 = 0
+
+        for i in range(len(amp)):
+            f_.append(jnp.nan_to_num(amp[i] * phi_x[n1] * phi_y[n2]))
+            if n1 == 0:
+                n1, n2 = n2 + 1, 0
+            else:
+                n1, n2 = n1 - 1, n2 + 1
+
+        return f_

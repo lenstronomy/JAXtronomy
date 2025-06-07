@@ -11,7 +11,10 @@ import unittest
 
 
 class TestLightModel(object):
-    """Tests the source model routines."""
+    """Tests the source model routines.
+
+    Functions related to linear solver are tested in test_linear_basis.py instead.
+    """
 
     def setup_method(self):
         self.light_model_list = [
@@ -92,14 +95,6 @@ class TestLightModel(object):
         output_ref = self.lightModel_ref.surface_brightness(x, y, self.kwargs)
         npt.assert_array_almost_equal(output, output_ref, decimal=6)
 
-    def test_functions_split(self):
-        output = self.lightModel.functions_split(x=1.0, y=1.0, kwargs_list=self.kwargs)
-        output_ref = self.lightModel_ref.functions_split(
-            x=1.0, y=1.0, kwargs_list=self.kwargs
-        )
-        npt.assert_array_almost_equal(output[0], output_ref[0], decimal=6)
-        assert output[1] == output_ref[1]
-
     def test_param_name_list(self):
         param_name_list = self.lightModel.param_name_list
         assert len(self.light_model_list) == len(param_name_list)
@@ -107,22 +102,6 @@ class TestLightModel(object):
     def test_param_name_list_latex(self):
         param_name_list = self.lightModel.param_name_list_latex
         assert len(self.light_model_list) == len(param_name_list)
-
-    def test_num_param_linear(self):
-        num = self.lightModel.num_param_linear(self.kwargs, list_return=False)
-        assert num == 3
-
-        num_list = self.lightModel.num_param_linear(self.kwargs, list_return=True)
-        assert num_list == [1, 1, 1]
-
-    def test_update_linear(self):
-        response, n = self.lightModel.functions_split(1, 1, self.kwargs)
-        param = np.ones(n) * 2
-        kwargs_out, i = self.lightModel.update_linear(
-            param, i=0, kwargs_list=self.kwargs
-        )
-        assert i == n
-        assert kwargs_out[0]["amp"] == 2
 
     def test_total_flux(self):
         light_model_list = ["SERSIC", "SERSIC_ELLIPSE", "MULTI_GAUSSIAN"]

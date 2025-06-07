@@ -27,7 +27,7 @@ class ImageModel(object):
     def __init__(
         self,
         data_class,
-        psf_class=None,
+        psf_class,
         lens_model_class=None,
         source_model_class=None,
         lens_light_model_class=None,
@@ -118,6 +118,7 @@ class ImageModel(object):
         self._extinction = extinction_class
         if kwargs_pixelbased is None:
             kwargs_pixelbased = {}
+            self._pixelbased_bool = False
         else:
             raise ValueError("pixelbased solver not supported in JAXtronomy")
         self.source_mapping = Image2SourceMapping(
