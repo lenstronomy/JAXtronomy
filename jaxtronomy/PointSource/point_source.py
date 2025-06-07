@@ -1,6 +1,6 @@
 import copy
 from functools import partial
-from jax import jit, numpy as jnp
+from jax import jit, lax, numpy as jnp
 import numpy as np
 
 
@@ -224,7 +224,7 @@ class PointSource(object):
         :param additional_images: if True, solves the lens equation for additional
             images
         :type additional_images: bool
-        :return: list of: list of image positions per point source model component
+        :return: list of arrays of image positions per point source model component
         """
         x_image_list = []
         y_image_list = []
@@ -284,6 +284,24 @@ class PointSource(object):
                     amp_array.append(1.0)
         return jnp.array(ra_array), jnp.array(dec_array), jnp.array(amp_array)
 
+    @partial(jit, static_argnums=0)
+    def num_basis(self, kwargs_ps, kwargs_lens):
+        """Number of basis functions for linear inversion.
+
+        :param kwargs_ps: point source keyword argument list
+        :param kwargs_lens: lens model keyword argument list
+        :return: int
+        """
+        n = 0
+        ra_pos_list, dec_pos_list = self.image_position(kwargs_ps, kwargs_lens)
+        for i, model in enumerate(self.point_source_type_list):
+            if self._flux_from_point_source_list[i]:
+                if self._fixed_magnification_list[i]:
+                    n += 1
+                else:
+                    n += len(ra_pos_list[i])
+        return n
+
     @partial(jit, static_argnums=(0, 3))
     def image_amplitude(self, kwargs_ps, kwargs_lens, k=None):
         """Returns the image amplitudes.
@@ -326,6 +344,89 @@ class PointSource(object):
             else:
                 amp_list.append(jnp.zeros_like(source_amp))
         return amp_list
+
+    @partial(jit, static_argnums=(0, 3))
+    def linear_response_set(self, kwargs_ps, kwargs_lens=None, with_amp=False):
+        """
+
+        :param kwargs_ps: point source keyword argument list
+        :param kwargs_lens: lens model keyword argument list
+        :param with_amp: bool, if True returns the image amplitude derived from kwargs_ps,
+            otherwise the magnification of the lens model
+        :return: ra_pos (list of arrays), dec_pos (list of arrays), amp (list of arrays), n (int)
+        """
+        ra_pos = []
+        dec_pos = []
+        amp = []
+        x_image_list, y_image_list = self.image_position(kwargs_ps, kwargs_lens)
+        for i, model in enumerate(self._point_source_list):
+            if self._flux_from_point_source_list[i]:
+                x_pos = jnp.asarray(x_image_list[i])
+                y_pos = jnp.asarray(y_image_list[i])
+                if self._fixed_magnification_list[i]:
+                    ra_pos.append(x_pos)
+                    dec_pos.append(y_pos)
+                    if with_amp:
+                        mag = self.image_amplitude(kwargs_ps, kwargs_lens, k=i)[0]
+                    else:
+                        mag = self._lens_model.magnification(x_pos, y_pos, kwargs_lens)
+                        mag = jnp.abs(mag)
+                    amp.append(jnp.asarray(mag))
+                else:
+                    if with_amp:
+                        mag = self.image_amplitude(kwargs_ps, kwargs_lens, k=i)[0]
+                    else:
+                        mag = jnp.ones_like(x_pos)
+                    for j in range(len(x_pos)):
+                        ra_pos.append(jnp.array([x_pos[j]]))
+                        dec_pos.append(jnp.array([y_pos[j]]))
+                        amp.append(jnp.array([mag[j]]))
+        n = len(ra_pos)
+        return ra_pos, dec_pos, amp, n
+
+    @partial(jit, static_argnums=(0))
+    def update_linear(self, param, i, kwargs_ps, kwargs_lens):
+        """
+
+        :param param: list of floats corresponding ot the parameters being sampled
+        :param i: index of the first parameter relevant for this class
+        :param kwargs_ps: point source keyword argument list
+        :param kwargs_lens: lens model keyword argument list
+        :return: kwargs_ps with updated linear parameters, index of the next parameter relevant for another class
+        """
+        param = jnp.asarray(param)
+        ra_pos_list, dec_pos_list = self.image_position(kwargs_ps, kwargs_lens)
+        for k, model in enumerate(self._point_source_list):
+            if self._flux_from_point_source_list[k]:
+                if self._fixed_magnification_list[k]:
+                    kwargs_ps[k]["source_amp"] = param.at[i].get()
+                    i += 1
+                else:
+                    n_points = len(ra_pos_list[k])
+                    kwargs_ps[k]["point_amp"] = lax.dynamic_slice(param, [i], (n_points,))
+                    i += n_points
+        return kwargs_ps, i
+
+    @partial(jit, static_argnums=0)
+    def linear_param_from_kwargs(self, kwargs_list):
+        """Inverse function of update_linear() returning the linear amplitude list for
+        the keyword argument list.
+
+        :param kwargs_list: model parameters including the linear amplitude parameters
+        :type kwargs_list: list of keyword arguments
+        :return: list of linear amplitude parameters
+        :rtype: list
+        """
+        param = []
+        for k, model in enumerate(self._point_source_list):
+            if self._flux_from_point_source_list[k]:
+                kwargs = kwargs_list[k]
+                if self._fixed_magnification_list[k]:
+                    param.append(kwargs["source_amp"])
+                else:
+                    for a in kwargs["point_amp"]:
+                        param.append(a)
+        return param
 
     @partial(jit, static_argnums=(0,))
     def check_image_positions(self, kwargs_ps, kwargs_lens, tolerance=0.001):
@@ -382,6 +483,22 @@ class PointSource(object):
                         kwargs_list[i]["point_amp"] = amp
         return kwargs_list
 
+    @staticmethod
+    @jit
+    def check_positive_flux(kwargs_ps):
+        """Check whether inferred linear parameters are positive.
+
+        :param kwargs_ps: point source keyword argument list
+        :return: bool, True, if all 'point_amp' parameters are positive semi-definite
+        """
+        pos_bool = True
+        for kwargs in kwargs_ps:
+            if "point_amp" in kwargs:
+                amp = jnp.array(kwargs["point_amp"])
+            elif "source_amp" in kwargs:
+                amp = jnp.array(kwargs["source_amp"])
+            pos_bool = jnp.where(jnp.any(amp < 0), False, pos_bool)
+        return pos_bool
 
 # def _sort_position_by_original(x_o, y_o, x_solved, y_solved):
 #    """Sorting new image positions such that the old order is best preserved.
