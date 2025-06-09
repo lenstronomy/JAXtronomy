@@ -1,4 +1,5 @@
 import pytest
+import copy
 import jax, jax.numpy as jnp
 import numpy as np
 import numpy.testing as npt
@@ -135,6 +136,11 @@ class TestPointSource(object):
         npt.assert_allclose(dec_array, dec_array_ref, atol=1e-8, rtol=1e-8)
         npt.assert_allclose(amp_array, amp_array_ref, atol=1e-8, rtol=1e-8)
 
+    def test_num_basis(self):
+        n = self.ps.num_basis(self.kwargs_ps, self.kwargs_lens)
+        n_ref = self.ps_ref.num_basis(self.kwargs_ps, self.kwargs_lens)
+        assert n == n_ref
+
     def test_image_amplitude(self):
         amp_list = self.ps.image_amplitude(self.kwargs_ps, self.kwargs_lens)
         amp_list_ref = self.ps_ref.image_amplitude(self.kwargs_ps, self.kwargs_lens)
@@ -149,6 +155,39 @@ class TestPointSource(object):
         for i in range(len(amp_list)):
             print(f"testing point_source_type_list {i}")
             npt.assert_allclose(amp_list[i], amp_list_ref[i], atol=1e-8, rtol=1e-8)
+
+    def test_linear_response_set(self):
+        ra_pos, dec_pos, amp, n = self.ps.linear_response_set(
+            self.kwargs_ps, self.kwargs_lens, with_amp=True
+        )
+        ra_pos_ref, dec_pos_ref, amp_ref, n_ref = self.ps_ref.linear_response_set(
+            self.kwargs_ps, self.kwargs_lens, with_amp=True
+        )
+        for i in range(len(ra_pos)):
+            print(f"testing point_source_type_list {i}")
+            npt.assert_allclose(ra_pos[i], ra_pos_ref[i], atol=1e-12, rtol=1e-12)
+            npt.assert_allclose(dec_pos[i], dec_pos_ref[i], atol=1e-12, rtol=1e-12)
+            npt.assert_allclose(amp[i], amp_ref[i], atol=1e-12, rtol=1e-12)
+        assert n == n_ref
+
+    def test_update_linear(self):
+        param = [1, 2, 3, 4, 5, 6, 7, 8]
+        kwargs_ps1 = copy.deepcopy(self.kwargs_ps)
+        kwargs_ps2 = copy.deepcopy(self.kwargs_ps)
+        kwargs_ps1, i = self.ps.update_linear(param, 0, kwargs_ps1, self.kwargs_lens)
+        kwargs_ps2, i_ref = self.ps_ref.update_linear(
+            param, 0, kwargs_ps2, self.kwargs_lens
+        )
+
+        assert i == i_ref
+        npt.assert_array_equal(kwargs_ps1[0]["point_amp"], kwargs_ps2[0]["point_amp"])
+        npt.assert_array_equal(kwargs_ps1[1]["point_amp"], kwargs_ps2[1]["point_amp"])
+        assert kwargs_ps1[2]["source_amp"] == kwargs_ps2[2]["source_amp"]
+
+    def test_linear_param_from_kwargs(self):
+        param = self.ps.linear_param_from_kwargs(self.kwargs_ps)
+        param_ref = self.ps_ref.linear_param_from_kwargs(self.kwargs_ps)
+        npt.assert_array_equal(param, param_ref)
 
     def test_check_image_position(self):
         within_tolerance = self.ps.check_image_positions(
@@ -175,6 +214,25 @@ class TestPointSource(object):
         npt.assert_array_equal(amp_list[0], kwargs_new[0]["point_amp"])
         npt.assert_array_equal(amp_list[1], kwargs_new[1]["point_amp"])
         npt.assert_array_equal(amp_list[2], kwargs_new[2]["source_amp"])
+
+    def test_check_positive_flux(self):
+        pos_bool = self.ps.check_positive_flux(self.kwargs_ps)
+        pos_bool_ref = self.ps_ref.check_positive_flux(self.kwargs_ps)
+        assert pos_bool == pos_bool_ref
+        assert pos_bool == True
+
+        self.kwargs_ps[2]["source_amp"] = -0.3
+        pos_bool = self.ps.check_positive_flux(self.kwargs_ps)
+        pos_bool_ref = self.ps_ref.check_positive_flux(self.kwargs_ps)
+        assert pos_bool == pos_bool_ref
+        assert pos_bool == False
+
+        self.kwargs_ps[1]["point_amp"] = [0.3, 0.3, 0.3, -0.3]
+        self.kwargs_ps[2]["source_amp"] = 0.3
+        pos_bool = self.ps.check_positive_flux(self.kwargs_ps)
+        pos_bool_ref = self.ps_ref.check_positive_flux(self.kwargs_ps)
+        assert pos_bool == pos_bool_ref
+        assert pos_bool == False
 
     def test_raises(self):
         npt.assert_raises(
@@ -229,7 +287,7 @@ class TestPointSourcewithFrames(TestPointSource):
         kwargs_ps3 = {
             "ra_image": [0.4321, 0.233, 0.345],
             "dec_image": [-0.123, 0.243, 0.389],
-            "source_amp": [1.5, 0.23, 16.1234],
+            "source_amp": 1.5,
         }
         self.kwargs_ps = [kwargs_ps1, kwargs_ps2, kwargs_ps3]
 
@@ -286,7 +344,7 @@ class TestPointSourcewithFluxList(TestPointSource):
         kwargs_ps3 = {
             "ra_image": [0.4321, 0.233, 0.345],
             "dec_image": [-0.123, 0.243, 0.389],
-            "source_amp": [1.5, 0.23, 16.1234],
+            "source_amp": 1.5,
         }
         self.kwargs_ps = [kwargs_ps1, kwargs_ps2, kwargs_ps3]
 
