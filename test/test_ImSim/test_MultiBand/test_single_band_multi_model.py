@@ -31,12 +31,12 @@ class TestSingleBandMultiModel(object):
         kwargs_data = sim_util.data_configure_simple(
             numPix, deltaPix, exp_time, sigma_bkg, inverse=True
         )
-        kwargs_data['image_data'] = np.ones((numPix, numPix)) * 30.5
+        kwargs_data["image_data"] = np.ones((numPix, numPix)) * 30.5
 
         kwargs_data2 = sim_util.data_configure_simple(
             numPix2, deltaPix, exp_time + 30, sigma_bkg + 0.01, inverse=True
         )
-        kwargs_data2['image_data'] = np.ones((numPix2, numPix2)) * 50.1
+        kwargs_data2["image_data"] = np.ones((numPix2, numPix2)) * 50.1
 
         # Create likelihood masks
         likelihood_mask = np.ones((numPix, numPix))
@@ -509,13 +509,15 @@ class TestSingleBandMultiModel_LinearSolver(object):
             kwargs_special=self.test.kwargs_special,
             inv_bool=False,
         )
-        model_ref, model_error_ref, cov_param_ref, param_ref = self.test.singleband0_ref.image_linear_solve(
-            kwargs_lens=self.test.kwargs_lens,
-            kwargs_source=self.test.kwargs_source,
-            kwargs_lens_light=self.test.kwargs_lens_light,
-            kwargs_ps=self.test.kwargs_ps,
-            kwargs_special=self.test.kwargs_special,
-            inv_bool=False,
+        model_ref, model_error_ref, cov_param_ref, param_ref = (
+            self.test.singleband0_ref.image_linear_solve(
+                kwargs_lens=self.test.kwargs_lens,
+                kwargs_source=self.test.kwargs_source,
+                kwargs_lens_light=self.test.kwargs_lens_light,
+                kwargs_ps=self.test.kwargs_ps,
+                kwargs_special=self.test.kwargs_special,
+                inv_bool=False,
+            )
         )
         npt.assert_allclose(model, model_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(model_error, model_error_ref, atol=1e-12, rtol=1e-12)
@@ -530,25 +532,35 @@ class TestSingleBandMultiModel_LinearSolver(object):
             kwargs_special=self.test.kwargs_special,
             inv_bool=True,
         )
-        model_ref, model_error_ref, cov_param_ref, param_ref = self.test.singleband0_ref.image_linear_solve(
-            kwargs_lens=self.test.kwargs_lens,
-            kwargs_source=self.test.kwargs_source,
-            kwargs_lens_light=self.test.kwargs_lens_light,
-            kwargs_ps=self.test.kwargs_ps,
-            kwargs_special=self.test.kwargs_special,
-            inv_bool=True,
+        model_ref, model_error_ref, cov_param_ref, param_ref = (
+            self.test.singleband0_ref.image_linear_solve(
+                kwargs_lens=self.test.kwargs_lens,
+                kwargs_source=self.test.kwargs_source,
+                kwargs_lens_light=self.test.kwargs_lens_light,
+                kwargs_ps=self.test.kwargs_ps,
+                kwargs_special=self.test.kwargs_special,
+                inv_bool=True,
+            )
         )
         npt.assert_allclose(model, model_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(model_error, model_error_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(cov_param, cov_param_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(param, param_ref, atol=1e-12, rtol=1e-12)
 
-        error_map = self.test.singleband0.error_map_source(self.test.kwargs_source, x, y, cov_param)
-        error_map_ref = self.test.singleband0_ref.error_map_source(self.test.kwargs_source, x, y, cov_param_ref)
+        error_map = self.test.singleband0.error_map_source(
+            self.test.kwargs_source, x, y, cov_param
+        )
+        error_map_ref = self.test.singleband0_ref.error_map_source(
+            self.test.kwargs_source, x, y, cov_param_ref
+        )
         npt.assert_allclose(error_map, error_map_ref, atol=1e-12, rtol=1e-12)
 
-        error_map = self.test.singleband0.error_map_source(self.test.kwargs_source, x, y, cov_param, model_index_select=False)
-        error_map_ref = self.test.singleband0_ref.error_map_source(self.test.kwargs_source, x, y, cov_param_ref, model_index_select=False)
+        error_map = self.test.singleband0.error_map_source(
+            self.test.kwargs_source, x, y, cov_param, model_index_select=False
+        )
+        error_map_ref = self.test.singleband0_ref.error_map_source(
+            self.test.kwargs_source, x, y, cov_param_ref, model_index_select=False
+        )
         npt.assert_allclose(error_map, error_map_ref, atol=1e-12, rtol=1e-12)
 
         model, model_error, cov_param, param = self.test.singleband1.image_linear_solve(
@@ -559,13 +571,15 @@ class TestSingleBandMultiModel_LinearSolver(object):
             kwargs_special=self.test.kwargs_special,
             inv_bool=False,
         )
-        model_ref, model_error_ref, cov_param_ref, param_ref = self.test.singleband1_ref.image_linear_solve(
-            kwargs_lens=self.test.kwargs_lens,
-            kwargs_source=self.test.kwargs_source,
-            kwargs_lens_light=self.test.kwargs_lens_light,
-            kwargs_ps=self.test.kwargs_ps,
-            kwargs_special=self.test.kwargs_special,
-            inv_bool=False,
+        model_ref, model_error_ref, cov_param_ref, param_ref = (
+            self.test.singleband1_ref.image_linear_solve(
+                kwargs_lens=self.test.kwargs_lens,
+                kwargs_source=self.test.kwargs_source,
+                kwargs_lens_light=self.test.kwargs_lens_light,
+                kwargs_ps=self.test.kwargs_ps,
+                kwargs_special=self.test.kwargs_special,
+                inv_bool=False,
+            )
         )
         npt.assert_allclose(model, model_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(model_error, model_error_ref, atol=1e-12, rtol=1e-12)
@@ -580,25 +594,35 @@ class TestSingleBandMultiModel_LinearSolver(object):
             kwargs_special=self.test.kwargs_special,
             inv_bool=True,
         )
-        model_ref, model_error_ref, cov_param_ref, param_ref = self.test.singleband1_ref.image_linear_solve(
-            kwargs_lens=self.test.kwargs_lens,
-            kwargs_source=self.test.kwargs_source,
-            kwargs_lens_light=self.test.kwargs_lens_light,
-            kwargs_ps=self.test.kwargs_ps,
-            kwargs_special=self.test.kwargs_special,
-            inv_bool=True,
+        model_ref, model_error_ref, cov_param_ref, param_ref = (
+            self.test.singleband1_ref.image_linear_solve(
+                kwargs_lens=self.test.kwargs_lens,
+                kwargs_source=self.test.kwargs_source,
+                kwargs_lens_light=self.test.kwargs_lens_light,
+                kwargs_ps=self.test.kwargs_ps,
+                kwargs_special=self.test.kwargs_special,
+                inv_bool=True,
+            )
         )
         npt.assert_allclose(model, model_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(model_error, model_error_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(cov_param, cov_param_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(param, param_ref, atol=1e-12, rtol=1e-12)
 
-        error_map = self.test.singleband1.error_map_source(self.test.kwargs_source, x, y, cov_param)
-        error_map_ref = self.test.singleband1_ref.error_map_source(self.test.kwargs_source, x, y, cov_param_ref)
+        error_map = self.test.singleband1.error_map_source(
+            self.test.kwargs_source, x, y, cov_param
+        )
+        error_map_ref = self.test.singleband1_ref.error_map_source(
+            self.test.kwargs_source, x, y, cov_param_ref
+        )
         npt.assert_allclose(error_map, error_map_ref, atol=1e-12, rtol=1e-12)
 
-        error_map = self.test.singleband1.error_map_source(self.test.kwargs_source, x, y, cov_param, model_index_select=False)
-        error_map_ref = self.test.singleband1_ref.error_map_source(self.test.kwargs_source, x, y, cov_param_ref, model_index_select=False)
+        error_map = self.test.singleband1.error_map_source(
+            self.test.kwargs_source, x, y, cov_param, model_index_select=False
+        )
+        error_map_ref = self.test.singleband1_ref.error_map_source(
+            self.test.kwargs_source, x, y, cov_param_ref, model_index_select=False
+        )
         npt.assert_allclose(error_map, error_map_ref, atol=1e-12, rtol=1e-12)
 
     def test_likelihood_data_given_model(self):
@@ -609,50 +633,123 @@ class TestSingleBandMultiModel_LinearSolver(object):
         kwargs_source = copy.deepcopy(self.test.kwargs_source)
         kwargs_lens_light = copy.deepcopy(self.test.kwargs_lens_light)
         kwargs_ps = copy.deepcopy(self.test.kwargs_ps)
-        _, kwargs_source, kwargs_lens_light, kwargs_ps = self.test.singleband0.update_linear_kwargs(param, self.test.kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps)
-        assert kwargs_source[0]['amp'] == 1
-        assert kwargs_lens_light[0]['amp'] == 2
-        assert kwargs_ps[0]['point_amp'] == 3
-        assert kwargs_ps[1]['source_amp'] == 4
+        _, kwargs_source, kwargs_lens_light, kwargs_ps = (
+            self.test.singleband0.update_linear_kwargs(
+                param,
+                self.test.kwargs_lens,
+                kwargs_source,
+                kwargs_lens_light,
+                kwargs_ps,
+            )
+        )
+        assert kwargs_source[0]["amp"] == 1
+        assert kwargs_lens_light[0]["amp"] == 2
+        assert kwargs_ps[0]["point_amp"] == 3
+        assert kwargs_ps[1]["source_amp"] == 4
 
         param = [1, 2, 3, 4, 5]
         kwargs_source = copy.deepcopy(self.test.kwargs_source)
         kwargs_lens_light = copy.deepcopy(self.test.kwargs_lens_light)
         kwargs_ps = copy.deepcopy(self.test.kwargs_ps)
-        _, kwargs_source, kwargs_lens_light, kwargs_ps = self.test.singleband1.update_linear_kwargs(param, self.test.kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps)
-        assert kwargs_source[0]['amp'] == 1
-        assert kwargs_lens_light[0]['amp'] == 2
-        assert kwargs_ps[0]['point_amp'] == 3
-        npt.assert_array_equal(kwargs_ps[1]['point_amp'], [4, 5])
+        _, kwargs_source, kwargs_lens_light, kwargs_ps = (
+            self.test.singleband1.update_linear_kwargs(
+                param,
+                self.test.kwargs_lens,
+                kwargs_source,
+                kwargs_lens_light,
+                kwargs_ps,
+            )
+        )
+        assert kwargs_source[0]["amp"] == 1
+        assert kwargs_lens_light[0]["amp"] == 2
+        assert kwargs_ps[0]["point_amp"] == 3
+        npt.assert_array_equal(kwargs_ps[1]["point_amp"], [4, 5])
 
     def test_num_param_linear(self):
-        num_param_linear = self.test.singleband0.num_param_linear(self.test.kwargs_lens, self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps)
-        num_param_linear_ref = self.test.singleband0_ref.num_param_linear(self.test.kwargs_lens, self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps)
+        num_param_linear = self.test.singleband0.num_param_linear(
+            self.test.kwargs_lens,
+            self.test.kwargs_source,
+            self.test.kwargs_lens_light,
+            self.test.kwargs_ps,
+        )
+        num_param_linear_ref = self.test.singleband0_ref.num_param_linear(
+            self.test.kwargs_lens,
+            self.test.kwargs_source,
+            self.test.kwargs_lens_light,
+            self.test.kwargs_ps,
+        )
         assert num_param_linear == num_param_linear_ref
         assert num_param_linear == 4
 
-        num_param_linear = self.test.singleband1.num_param_linear(self.test.kwargs_lens, self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps)
-        num_param_linear_ref = self.test.singleband1_ref.num_param_linear(self.test.kwargs_lens, self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps)
+        num_param_linear = self.test.singleband1.num_param_linear(
+            self.test.kwargs_lens,
+            self.test.kwargs_source,
+            self.test.kwargs_lens_light,
+            self.test.kwargs_ps,
+        )
+        num_param_linear_ref = self.test.singleband1_ref.num_param_linear(
+            self.test.kwargs_lens,
+            self.test.kwargs_source,
+            self.test.kwargs_lens_light,
+            self.test.kwargs_ps,
+        )
         assert num_param_linear == num_param_linear_ref
         assert num_param_linear == 5
 
     def test_linear_response_matrix(self):
-        A = self.test.singleband0.linear_response_matrix(self.test.kwargs_lens, self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps, None, self.test.kwargs_special)
-        A_ref = self.test.singleband0_ref.linear_response_matrix(self.test.kwargs_lens, self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps, None, self.test.kwargs_special)
+        A = self.test.singleband0.linear_response_matrix(
+            self.test.kwargs_lens,
+            self.test.kwargs_source,
+            self.test.kwargs_lens_light,
+            self.test.kwargs_ps,
+            None,
+            self.test.kwargs_special,
+        )
+        A_ref = self.test.singleband0_ref.linear_response_matrix(
+            self.test.kwargs_lens,
+            self.test.kwargs_source,
+            self.test.kwargs_lens_light,
+            self.test.kwargs_ps,
+            None,
+            self.test.kwargs_special,
+        )
         npt.assert_allclose(A, A_ref, atol=3e-12, rtol=3e-12)
 
-        A = self.test.singleband1.linear_response_matrix(self.test.kwargs_lens, self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps, None, self.test.kwargs_special)
-        A_ref = self.test.singleband1_ref.linear_response_matrix(self.test.kwargs_lens, self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps, None, self.test.kwargs_special)
+        A = self.test.singleband1.linear_response_matrix(
+            self.test.kwargs_lens,
+            self.test.kwargs_source,
+            self.test.kwargs_lens_light,
+            self.test.kwargs_ps,
+            None,
+            self.test.kwargs_special,
+        )
+        A_ref = self.test.singleband1_ref.linear_response_matrix(
+            self.test.kwargs_lens,
+            self.test.kwargs_source,
+            self.test.kwargs_lens_light,
+            self.test.kwargs_ps,
+            None,
+            self.test.kwargs_special,
+        )
         npt.assert_allclose(A, A_ref, atol=3e-12, rtol=3e-12)
 
     def test_linear_param_from_kwargs(self):
-        param = self.test.singleband0.linear_param_from_kwargs(self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps)
-        param_ref = self.test.singleband0_ref.linear_param_from_kwargs(self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps)
+        param = self.test.singleband0.linear_param_from_kwargs(
+            self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps
+        )
+        param_ref = self.test.singleband0_ref.linear_param_from_kwargs(
+            self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps
+        )
         npt.assert_array_equal(param, param_ref)
 
-        param = self.test.singleband1.linear_param_from_kwargs(self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps)
-        param_ref = self.test.singleband1_ref.linear_param_from_kwargs(self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps)
+        param = self.test.singleband1.linear_param_from_kwargs(
+            self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps
+        )
+        param_ref = self.test.singleband1_ref.linear_param_from_kwargs(
+            self.test.kwargs_source, self.test.kwargs_lens_light, self.test.kwargs_ps
+        )
         npt.assert_array_equal(param, param_ref)
+
 
 if __name__ == "__main__":
     pytest.main()

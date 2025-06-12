@@ -286,7 +286,9 @@ class FittingSequence(object):
         if "SHAPELETS" in light_model_list:
             index = light_model_list.index("SHAPELETS")
             num_profiles = len(light_model_list)
-            profile_kwargs_list = kwargs_model_copy.get("source_light_profile_kwargs_list", [{} for _ in range(num_profiles)])
+            profile_kwargs_list = kwargs_model_copy.get(
+                "source_light_profile_kwargs_list", [{} for _ in range(num_profiles)]
+            )
             n_max = self._updateManager.fixed_kwargs[1][index]["n_max"]
             profile_kwargs_list[index] = {"n_max": n_max}
             kwargs_model_copy["source_light_profile_kwargs_list"] = profile_kwargs_list
@@ -295,14 +297,19 @@ class FittingSequence(object):
         if "SHAPELETS" in light_model_list:
             index = light_model_list.index("SHAPELETS")
             num_profiles = len(light_model_list)
-            profile_kwargs_list = kwargs_model_copy.get("lens_light_profile_kwargs_list", [{} for _ in range(num_profiles)])
+            profile_kwargs_list = kwargs_model_copy.get(
+                "lens_light_profile_kwargs_list", [{} for _ in range(num_profiles)]
+            )
             n_max = self._updateManager.fixed_kwargs[2][index]["n_max"]
             profile_kwargs_list[index] = {"n_max": n_max}
             kwargs_model_copy["lens_light_profile_kwargs_list"] = profile_kwargs_list
 
         kwargs_likelihood = self._updateManager.kwargs_likelihood
         likelihoodModule = LikelihoodModule(
-            self.kwargs_data_joint, kwargs_model_copy, self.param_class, **kwargs_likelihood
+            self.kwargs_data_joint,
+            kwargs_model_copy,
+            self.param_class,
+            **kwargs_likelihood,
         )
         return likelihoodModule
 
@@ -516,7 +523,9 @@ class FittingSequence(object):
             same order as in chain
         """
         if threadCount != 1:
-            raise ValueError("threadCount argument for PSO must be set to 1 in jaxtronomy")
+            raise ValueError(
+                "threadCount argument for PSO must be set to 1 in jaxtronomy"
+            )
         param_class = self.param_class
         kwargs_temp = self._updateManager.parameter_state
         init_pos = param_class.kwargs2args(**kwargs_temp)

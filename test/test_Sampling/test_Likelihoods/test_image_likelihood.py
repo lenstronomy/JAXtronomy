@@ -11,7 +11,9 @@ import pytest
 
 class TestImageLikelihood(object):
     def setup_method(self):
-        self._setup_method(linear_solver=False, source_marg=False, check_positive_flux=False)
+        self._setup_method(
+            linear_solver=False, source_marg=False, check_positive_flux=False
+        )
 
     def _setup_method(self, linear_solver, source_marg, check_positive_flux):
         # data specifics
@@ -145,7 +147,7 @@ class TestImageLikelihood(object):
             image_likelihood_mask_list=likelihood_mask_list,
             linear_solver=linear_solver,
             source_marg=source_marg,
-            check_positive_flux=check_positive_flux
+            check_positive_flux=check_positive_flux,
         )
         self.image_likelihood_ref = ImageLikelihood_ref(
             self.multi_band_list,
@@ -154,7 +156,7 @@ class TestImageLikelihood(object):
             image_likelihood_mask_list=likelihood_mask_list,
             linear_solver=linear_solver,
             source_marg=source_marg,
-            check_positive_flux=check_positive_flux
+            check_positive_flux=check_positive_flux,
         )
 
     def test_raises(self):
@@ -194,19 +196,30 @@ class TestImageLikelihood(object):
 # Same tests as before but with linear solver turned on
 class TestImageLikelihood_LinearSolver1(TestImageLikelihood):
     def setup_method(self):
-        self._setup_method(linear_solver=True, source_marg=False, check_positive_flux=False)
+        self._setup_method(
+            linear_solver=True, source_marg=False, check_positive_flux=False
+        )
+
 
 class TestImageLikelihood_LinearSolver2(TestImageLikelihood):
     def setup_method(self):
-        self._setup_method(linear_solver=True, source_marg=True, check_positive_flux=False)
+        self._setup_method(
+            linear_solver=True, source_marg=True, check_positive_flux=False
+        )
+
 
 class TestImageLikelihood_LinearSolver3(TestImageLikelihood):
     def setup_method(self):
-        self._setup_method(linear_solver=True, source_marg=False, check_positive_flux=True)
+        self._setup_method(
+            linear_solver=True, source_marg=False, check_positive_flux=True
+        )
+
 
 class TestImageLikelihood_LinearSolver4(TestImageLikelihood):
     def setup_method(self):
-        self._setup_method(linear_solver=True, source_marg=True, check_positive_flux=True)
+        self._setup_method(
+            linear_solver=True, source_marg=True, check_positive_flux=True
+        )
 
 
 if __name__ == "__main__":

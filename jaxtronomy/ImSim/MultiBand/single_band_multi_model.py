@@ -282,7 +282,7 @@ class SingleBandMultiModel(ImageLinearFit, ImageModel):
             unconvolved=unconvolved,
             k=k,
         )
-    
+
     @partial(jit, static_argnums=(0, 7))
     def image_linear_solve(
         self,
@@ -460,7 +460,7 @@ class SingleBandMultiModel(ImageLinearFit, ImageModel):
                 )
             )
         return kwargs_lens_i, kwargs_source_i, kwargs_lens_light_i, kwargs_ps_i
-    
+
     @partial(jit, static_argnums=0)
     def num_param_linear(
         self,
@@ -491,7 +491,7 @@ class SingleBandMultiModel(ImageLinearFit, ImageModel):
         else:
             num = 0
         return num
-    
+
     @partial(jit, static_argnums=(0))
     def linear_response_matrix(
         self,
@@ -534,7 +534,7 @@ class SingleBandMultiModel(ImageLinearFit, ImageModel):
             kwargs_special,
         )
         return A
-    
+
     @partial(jit, static_argnums=(0, 5))
     def error_map_source(
         self, kwargs_source, x_grid, y_grid, cov_param, model_index_select=True

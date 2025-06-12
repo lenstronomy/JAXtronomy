@@ -311,7 +311,12 @@ class TestFittingSequence(object):
         n_i = 2
         fitting_list = []
 
-        kwargs_pso = {"sigma_scale": 1, "n_particles": n_p, "n_iterations": n_i, "threadCount": 4}
+        kwargs_pso = {
+            "sigma_scale": 1,
+            "n_particles": n_p,
+            "n_iterations": n_i,
+            "threadCount": 4,
+        }
         fitting_list.append(["PSO", kwargs_pso])
 
         npt.assert_raises(ValueError, fittingSequence.fit_sequence, fitting_list)
@@ -979,12 +984,16 @@ class TestFittingSequence(object):
         source_model_list = ["SHAPELETS"]
         kwargs_source = [kwargs_shapelets]
 
-        source_model_class = LightModel(source_model_list, profile_kwargs_list=[{"n_max": 1}])
+        source_model_class = LightModel(
+            source_model_list, profile_kwargs_list=[{"n_max": 1}]
+        )
 
         lens_light_model_list = ["SHAPELETS"]
         kwargs_lens_light = [copy.deepcopy(kwargs_shapelets)]
 
-        lens_light_model_class = LightModel(lens_light_model_list, profile_kwargs_list=[{"n_max": 1}])
+        lens_light_model_class = LightModel(
+            lens_light_model_list, profile_kwargs_list=[{"n_max": 1}]
+        )
         # generate the coordinate grid and image properties (we only read out the relevant lines we need)
         _, _, ra_at_xy_0, dec_at_xy_0, _, _, Mpix2coord, _ = (
             util.make_grid_with_coordtransform(
@@ -1101,7 +1110,7 @@ class TestFittingSequence(object):
         kwargs_lower_source = []
         kwargs_upper_source = []
 
-        fixed_source.append({'n_max': 1})
+        fixed_source.append({"n_max": 1})
         kwargs_source_init.append(
             {
                 "amp": [10.0, 10.0, 10.0],

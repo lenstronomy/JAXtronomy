@@ -102,7 +102,7 @@ class ImageLikelihood(object):
         :return: number of image data points
         """
         return self.imSim.num_data_evaluate
-    
+
     @partial(jit, static_argnums=0)
     def num_param_linear(
         self,
