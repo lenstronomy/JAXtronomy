@@ -471,6 +471,8 @@ class ImageLinearFit(ImageModel):
         :return: updated list of kwargs with linear parameter values
         """
         i = 0
+        param = jnp.asarray(param)
+
         kwargs_source, i = self.SourceModel.update_linear(
             param, i, kwargs_list=kwargs_source
         )
