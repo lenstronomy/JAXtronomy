@@ -365,11 +365,11 @@ class TestLikelihoodModule(object):
             # this is just needed to get param names
             lightModel = LightModel([source_profile])
 
-            if source_profile == 'SHAPELETS':
-                source_light_profile_kwargs_list = [{'n_max': 1}]
+            if source_profile == "SHAPELETS":
+                source_light_profile_kwargs_list = [{"n_max": 1}]
             else:
                 source_light_profile_kwargs_list = [{}]
-            
+
             kwargs_model = {
                 "lens_model_list": [],
                 "lens_light_model_list": [],
