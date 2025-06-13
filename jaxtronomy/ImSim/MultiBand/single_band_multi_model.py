@@ -336,8 +336,9 @@ class SingleBandMultiModel(ImageLinearFit, ImageModel):
         )
         # For the interfometric likelihood method,
         # return the array2 of [array1, array2] of the model output of _image_linear_solver.
-        if self.Data.likelihood_method() == "interferometry_natwt":
-            wls_model = wls_model[1]
+        # NOTE: Not implemented in jaxtronomy yet
+        #if self.Data.likelihood_method() == "interferometry_natwt":
+        #    wls_model = wls_model[1]
         return wls_model, error_map, cov_param, param
 
     @partial(jit, static_argnums=(0, 7, 8, 9, 10))
