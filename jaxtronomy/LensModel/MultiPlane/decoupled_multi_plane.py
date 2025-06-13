@@ -2,6 +2,7 @@ __author__ = "dangilman"
 
 from functools import partial
 from jax import config, jit
+
 config.update("jax_enable_x64", True)
 
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane
