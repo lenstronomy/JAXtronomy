@@ -212,6 +212,25 @@ class TestMultiPlaneDecoupled(object):
         npt.assert_allclose(beta_x, beta_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(beta_y, beta_y_ref, atol=1e-12, rtol=1e-12)
 
+        alpha_x, alpha_y = lens_model_decoupled.alpha(
+            self.x_image, self.y_image, self.kwargs_lens_free
+        )
+        alpha_x_ref, alpha_y_ref = lens_model_decoupled_ref.alpha(
+            self.x_image, self.y_image, self.kwargs_lens_free
+        )
+        npt.assert_allclose(alpha_x, alpha_x_ref, atol=1e-12, rtol=1e-12)
+        npt.assert_allclose(alpha_y, alpha_y_ref, atol=1e-12, rtol=1e-12)
+
+        f_xx, f_xy, f_yx, f_yy = lens_model_decoupled.hessian(self.x_image, self.y_image, self.kwargs_lens_free)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = lens_model_decoupled_ref.hessian(self.x_image, self.y_image, self.kwargs_lens_free)
+        npt.assert_allclose(f_xx, f_xx_ref, atol=5e-7, rtol=5e-7)
+        npt.assert_allclose(f_xy, f_xy_ref, atol=5e-7, rtol=5e-7)
+        npt.assert_allclose(f_yx, f_yx_ref, atol=5e-7, rtol=5e-7)
+        npt.assert_allclose(f_yy, f_yy_ref, atol=5e-7, rtol=5e-7)
+
+        npt.assert_raises(Exception, lens_model_decoupled.lens_model.geo_shapiro_delay)
+        npt.assert_raises(Exception, lens_model_decoupled.lens_model.ray_shooting_partial_comoving)
+
     def test_grid_deflection_model(self):
         lens_model_decoupled = LensModel(**self.kwargs_multiplane_model_grid)
         lens_model_decoupled_ref = LensModel_ref(**self.kwargs_multiplane_model_grid)
@@ -223,6 +242,22 @@ class TestMultiPlaneDecoupled(object):
         )
         npt.assert_allclose(beta_x, beta_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(beta_y, beta_y_ref, atol=1e-12, rtol=1e-12)
+
+        alpha_x, alpha_y = lens_model_decoupled.alpha(
+            self.x_image, self.y_image, self.kwargs_lens_free
+        )
+        alpha_x_ref, alpha_y_ref = lens_model_decoupled_ref.alpha(
+            self.x_image, self.y_image, self.kwargs_lens_free
+        )
+        npt.assert_allclose(alpha_x, alpha_x_ref, atol=1e-12, rtol=1e-12)
+        npt.assert_allclose(alpha_y, alpha_y_ref, atol=1e-12, rtol=1e-12)
+
+        f_xx, f_xy, f_yx, f_yy = lens_model_decoupled.hessian(self.x_image, self.y_image, self.kwargs_lens_free)
+        f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = lens_model_decoupled_ref.hessian(self.x_image, self.y_image, self.kwargs_lens_free)
+        npt.assert_allclose(f_xx, f_xx_ref, atol=5e-7, rtol=5e-7)
+        npt.assert_allclose(f_xy, f_xy_ref, atol=5e-7, rtol=5e-7)
+        npt.assert_allclose(f_yx, f_yx_ref, atol=5e-7, rtol=5e-7)
+        npt.assert_allclose(f_yy, f_yy_ref, atol=5e-7, rtol=5e-7)
 
     def test_multiple_image_deflection_model(self):
         npt.assert_raises(Exception, self._setup_multiple_images)
