@@ -1,6 +1,7 @@
 __author__ = "sibirrer"
 from jaxtronomy.LensModel.single_plane import SinglePlane
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
+from jaxtronomy.LensModel.MultiPlane.decoupled_multi_plane import MultiPlaneDecoupled
 
 # TODO: Implement multi plane
 # from lenstronomy.Cosmo.lens_cosmo import LensCosmo
@@ -112,21 +113,23 @@ class LensModel(object):
                 raise ValueError(
                     "LOS effects and multi-plane lensing are incompatible."
                 )
-                # self.lens_model = MultiPlaneDecoupled(
-                #    z_source,
-                #    lens_model_list,
-                #    lens_redshift_list,
-                #    cosmo=cosmo,
-                #    observed_convention_index=observed_convention_index,
-                #    z_source_convention=z_source_convention,
-                #    cosmo_interp=cosmo_interp,
-                #    z_interp_stop=z_interp_stop,
-                #    num_z_interp=num_z_interp,
-                #    **kwargs_multiplane_model
-                # )
+            if decouple_multi_plane:
+                self.lens_model = MultiPlaneDecoupled(
+                   z_source,
+                   lens_model_list,
+                   lens_redshift_list,
+                   cosmo=cosmo,
+                   observed_convention_index=observed_convention_index,
+                   z_source_convention=z_source_convention,
+                   cosmo_interp=cosmo_interp,
+                   z_interp_stop=z_interp_stop,
+                   num_z_interp=num_z_interp,
+                   **kwargs_multiplane_model
+                )
+                self.type = "MultiPlaneDecoupled"
             else:
                 raise ValueError(
-                    "multi plane lens model not supported in jaxtronomy yet"
+                    "Only decouple_multi_plane is currently supported in jaxtronomy"
                 )
                 # self.lens_model = MultiPlane(
                 #    z_source,
@@ -151,6 +154,7 @@ class LensModel(object):
                     z_source_convention=z_source_convention,
                     profile_kwargs_list=profile_kwargs_list,
                 )
+                self.type = "SinglePlaneLOS"
             else:
                 self.lens_model = SinglePlane(
                     lens_model_list,
@@ -158,9 +162,29 @@ class LensModel(object):
                     z_source_convention=z_source_convention,
                     profile_kwargs_list=profile_kwargs_list,
                 )
+                self.type = "SinglePlane"
 
         # if z_lens is not None and z_source is not None:
         #    self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
+
+        # Save these for convenience if class reinitialization is required
+        self.init_kwargs = {
+            "lens_model_list": lens_model_list,
+            "z_lens": z_lens,
+            "z_source": z_source,
+            "lens_redshift_list": lens_redshift_list,
+            "cosmo": cosmo,
+            "multi_plane": multi_plane,
+            "observed_convention_index": observed_convention_index,
+            "z_source_convention": z_source_convention,
+            "cosmo_interp": cosmo_interp,
+            "z_interp_stop": z_interp_stop,
+            "num_z_interp": num_z_interp,
+            "profile_kwargs_list": profile_kwargs_list,
+            "decouple_multi_plane": decouple_multi_plane,
+            "kwargs_multiplane_model": kwargs_multiplane_model,
+            "distance_ratio_sampling": distance_ratio_sampling,
+        }
 
     def info(self):
         """Shows what models are being initialized and what parameters are being
@@ -611,3 +635,9 @@ class LensModel(object):
     #    )
 
     #    return f_xx, f_xy, f_yx, f_yy
+
+    # Updating cosmology not allowed in JAX
+    def update_cosmology(self, cosmo=None):
+        """Returns an error if the user tries to update cosmology
+        """
+        raise Exception("Updating cosmology is not allowed in JAX. Create a new instance of LensModel instead. You can use LensModel.init_kwargs to extract the class initialization kwargs.")
