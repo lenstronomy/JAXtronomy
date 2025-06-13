@@ -418,8 +418,12 @@ class TestSingleBandMultiModel(object):
     def test_error_map_source(self):
         x = np.tile(np.linspace(-5, 5, 20), 20)
         y = np.repeat(np.linspace(-5, 5, 20), 20)
-        error_map = self.singleband0.error_map_source(self.kwargs_source, x, y, cov_param=None)
-        error_map_ref = self.singleband0_ref.error_map_source(self.kwargs_source, x, y, cov_param=None)
+        error_map = self.singleband0.error_map_source(
+            self.kwargs_source, x, y, cov_param=None
+        )
+        error_map_ref = self.singleband0_ref.error_map_source(
+            self.kwargs_source, x, y, cov_param=None
+        )
         npt.assert_array_equal(error_map, error_map_ref)
         npt.assert_array_equal(error_map, np.zeros_like(x))
 
