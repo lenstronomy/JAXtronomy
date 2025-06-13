@@ -399,6 +399,40 @@ class TestSingleBandMultiModel(object):
         npt.assert_allclose(c_d, c_d_ref, atol=1e-10, rtol=1e-10)
         npt.assert_allclose(error1, error1_ref, atol=1e-10, rtol=1e-10)
 
+    def test_num_param_linear(self):
+        num_param_linear = self.singleband0.num_param_linear(
+            self.kwargs_lens,
+            self.kwargs_source,
+            self.kwargs_lens_light,
+            self.kwargs_ps,
+        )
+        num_param_linear_ref = self.singleband0_ref.num_param_linear(
+            self.kwargs_lens,
+            self.kwargs_source,
+            self.kwargs_lens_light,
+            self.kwargs_ps,
+        )
+        assert num_param_linear == num_param_linear_ref
+        assert num_param_linear == 0
+
+    def test_error_map_source(self):
+        x = np.tile(np.linspace(-5, 5, 20), 20)
+        y = np.repeat(np.linspace(-5, 5, 20), 20)
+        error_map = self.singleband0.error_map_source(self.kwargs_source, x, y, cov_param=None)
+        error_map_ref = self.singleband0_ref.error_map_source(self.kwargs_source, x, y, cov_param=None)
+        npt.assert_array_equal(error_map, error_map_ref)
+        npt.assert_array_equal(error_map, np.zeros_like(x))
+
+    def test_linear_param_from_kwargs(self):
+        param = self.singleband0.linear_param_from_kwargs(
+            self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        param_ref = self.singleband0_ref.linear_param_from_kwargs(
+            self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        npt.assert_array_equal(param, param_ref)
+        npt.assert_array_equal(param, [])
+
     def test_select_kwargs(self):
         (
             kwargs_lens_i,

@@ -192,6 +192,10 @@ class TestImageLikelihood(object):
         assert self.image_likelihood.num_data == self.image_likelihood_ref.num_data
         assert self.image_likelihood.num_data == 100 * 100 - 70
 
+    def test_num_param_linear(self):
+        num = self.image_likelihood.num_param_linear(self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
+        num_ref = self.image_likelihood.num_param_linear(self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
+        assert num == num_ref
 
 # Same tests as before but with linear solver turned on
 class TestImageLikelihood_LinearSolver1(TestImageLikelihood):
