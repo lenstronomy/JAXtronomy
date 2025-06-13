@@ -1,7 +1,8 @@
 __author__ = "dangilman"
 
 from functools import partial
-from jax import jit
+from jax import config, jit
+config.update("jax_enable_x64", True)
 
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane
 from lenstronomy.Cosmo.background import Background
@@ -121,9 +122,6 @@ class MultiPlaneDecoupled(MultiPlane):
         raise Exception(
             "time delays are not yet implemented for the MultiPlaneDecoupled class"
         )
-
-    def ray_shooting_partial_comoving(self, *args, **kwargs):
-        raise Exception("ray_shooting_partial is not well defined for this class")
 
     def ray_shooting_partial_comoving(self, *args, **kwargs):
         raise Exception(
