@@ -10,6 +10,7 @@ from lenstronomy.Sampling.Samplers.dynesty_sampler import DynestySampler
 from lenstronomy.Sampling.Samplers.nautilus_sampler import NautilusSampler
 from lenstronomy.Sampling.Samplers.cobaya_sampler import CobayaSampler
 
+import copy
 import jax
 import numpy as np
 import lenstronomy.Util.analysis_util as analysis_util
@@ -277,10 +278,38 @@ class FittingSequence(object):
 
         :return: Likelihood() class instance reflecting the current state of FittingSequence
         """
-        kwargs_model = self._updateManager.kwargs_model
+        kwargs_model_copy = copy.deepcopy(self._updateManager.kwargs_model)
+
+        # Here we extract n_max from kwargs_fixed and place it into profile_kwargs_list so that
+        # n_max is set at initialization. Required for jaxtronomy
+        light_model_list = kwargs_model_copy.get("source_light_model_list", [])
+        if "SHAPELETS" in light_model_list:
+            index = light_model_list.index("SHAPELETS")
+            num_profiles = len(light_model_list)
+            profile_kwargs_list = kwargs_model_copy.get(
+                "source_light_profile_kwargs_list", [{} for _ in range(num_profiles)]
+            )
+            n_max = self._updateManager.fixed_kwargs[1][index]["n_max"]
+            profile_kwargs_list[index] = {"n_max": n_max}
+            kwargs_model_copy["source_light_profile_kwargs_list"] = profile_kwargs_list
+
+        light_model_list = kwargs_model_copy.get("lens_light_model_list", [])
+        if "SHAPELETS" in light_model_list:
+            index = light_model_list.index("SHAPELETS")
+            num_profiles = len(light_model_list)
+            profile_kwargs_list = kwargs_model_copy.get(
+                "lens_light_profile_kwargs_list", [{} for _ in range(num_profiles)]
+            )
+            n_max = self._updateManager.fixed_kwargs[2][index]["n_max"]
+            profile_kwargs_list[index] = {"n_max": n_max}
+            kwargs_model_copy["lens_light_profile_kwargs_list"] = profile_kwargs_list
+
         kwargs_likelihood = self._updateManager.kwargs_likelihood
         likelihoodModule = LikelihoodModule(
-            self.kwargs_data_joint, kwargs_model, self.param_class, **kwargs_likelihood
+            self.kwargs_data_joint,
+            kwargs_model_copy,
+            self.param_class,
+            **kwargs_likelihood,
         )
         return likelihoodModule
 
@@ -474,7 +503,7 @@ class FittingSequence(object):
         # Print results
         kwargs_result = param_class.args2kwargs(parameter_history[-1])
         print("best fit log_likelihood:", logL_history[-1])
-        print("Final parameters:", parameter_history[-1])
+        print("Final parameters:", kwargs_result)
 
         return parameter_history, logL_history, kwargs_result
 
@@ -493,7 +522,10 @@ class FittingSequence(object):
             each iteration [lnlikelihood, parameters, velocities], list of parameters in
             same order as in chain
         """
-
+        if threadCount != 1:
+            raise ValueError(
+                "threadCount argument for PSO must be set to 1 in jaxtronomy"
+            )
         param_class = self.param_class
         kwargs_temp = self._updateManager.parameter_state
         init_pos = param_class.kwargs2args(**kwargs_temp)
@@ -501,6 +533,11 @@ class FittingSequence(object):
         sigma_start = param_class.kwargs2args(**kwargs_sigma)
         lower_start = np.array(init_pos) - np.array(sigma_start) * sigma_scale
         upper_start = np.array(init_pos) + np.array(sigma_start) * sigma_scale
+
+        lower_limit = param_class.kwargs2args(**self._updateManager.lower_kwargs)
+        upper_limit = param_class.kwargs2args(**self._updateManager.upper_kwargs)
+        lower_start = np.maximum(lower_start, lower_limit)
+        upper_start = np.minimum(upper_start, upper_limit)
 
         num_param, param_list = param_class.num_param()
         # run PSO

@@ -11,6 +11,11 @@ import pytest
 
 class TestImageLikelihood(object):
     def setup_method(self):
+        self._setup_method(
+            linear_solver=False, source_marg=False, check_positive_flux=False
+        )
+
+    def _setup_method(self, linear_solver, source_marg, check_positive_flux):
         # data specifics
         sigma_bkg = 0.05  # background noise per pixel
         exp_time = 100  # exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
@@ -27,7 +32,7 @@ class TestImageLikelihood(object):
             numPix2, deltaPix, exp_time + 30, sigma_bkg + 0.01, inverse=True
         )
         kwargs_data["image_data"] = np.ones((numPix, numPix)) * 0.9392
-        kwargs_data2["image_data"] = np.ones((numPix, numPix)) * 0.3262
+        kwargs_data2["image_data"] = np.ones((numPix2, numPix2)) * 0.3262
 
         # Create likelihood masks
         # Likelihood mask 1 will mask out 70 pixels
@@ -108,6 +113,8 @@ class TestImageLikelihood(object):
         source_model_list = ["SERSIC_ELLIPSE"]
         self.kwargs_source = [kwargs_sersic_ellipse]
 
+        self.kwargs_ps = []
+
         kwargs_numerics = {
             "supersampling_factor": 3,
             "supersampling_convolution": True,
@@ -138,13 +145,18 @@ class TestImageLikelihood(object):
             "single-band",
             self.kwargs_model,
             image_likelihood_mask_list=likelihood_mask_list,
+            linear_solver=linear_solver,
+            source_marg=source_marg,
+            check_positive_flux=check_positive_flux,
         )
         self.image_likelihood_ref = ImageLikelihood_ref(
             self.multi_band_list,
             "single-band",
             self.kwargs_model,
             image_likelihood_mask_list=likelihood_mask_list,
-            linear_solver=False,
+            linear_solver=linear_solver,
+            source_marg=source_marg,
+            check_positive_flux=check_positive_flux,
         )
 
     def test_raises(self):
@@ -154,63 +166,69 @@ class TestImageLikelihood(object):
             self.multi_band_list,
             "single-band",
             self.kwargs_model,
-            source_marg=True,
-        )
-        npt.assert_raises(
-            ValueError,
-            ImageLikelihood,
-            self.multi_band_list,
-            "single-band",
-            self.kwargs_model,
-            linear_solver=True,
-        )
-        npt.assert_raises(
-            ValueError,
-            ImageLikelihood,
-            self.multi_band_list,
-            "single-band",
-            self.kwargs_model,
-            check_positive_flux=True,
-        )
-        npt.assert_raises(
-            ValueError,
-            ImageLikelihood,
-            self.multi_band_list,
-            "single-band",
-            self.kwargs_model,
             kwargs_pixelbased={"error": 1},
-        )
-        npt.assert_raises(
-            ValueError,
-            ImageLikelihood,
-            self.multi_band_list,
-            "single-band",
-            self.kwargs_model,
-            linear_prior=1,
         )
 
     def test_logL(self):
         logL, _ = self.image_likelihood.logL(
-            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
         )
         logL_ref, _ = self.image_likelihood_ref.logL(
-            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
         )
-        npt.assert_almost_equal(logL, logL_ref, decimal=8)
+        npt.assert_allclose(logL, logL_ref, atol=1e-12, rtol=1e-12)
 
         self.kwargs_lens[2]["gamma1"] = 0.05
 
         logL, _ = self.image_likelihood.logL(
-            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
         )
         logL_ref, _ = self.image_likelihood_ref.logL(
-            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
         )
-        npt.assert_almost_equal(logL, logL_ref, decimal=8)
+        npt.assert_allclose(logL, logL_ref, atol=1e-12, rtol=1e-12)
 
     def test_num_data(self):
         assert self.image_likelihood.num_data == self.image_likelihood_ref.num_data
         assert self.image_likelihood.num_data == 100 * 100 - 70
+
+    def test_num_param_linear(self):
+        num = self.image_likelihood.num_param_linear(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        num_ref = self.image_likelihood.num_param_linear(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        assert num == num_ref
+
+
+# Same tests as before but with linear solver turned on
+class TestImageLikelihood_LinearSolver1(TestImageLikelihood):
+    def setup_method(self):
+        self._setup_method(
+            linear_solver=True, source_marg=False, check_positive_flux=False
+        )
+
+
+class TestImageLikelihood_LinearSolver2(TestImageLikelihood):
+    def setup_method(self):
+        self._setup_method(
+            linear_solver=True, source_marg=True, check_positive_flux=False
+        )
+
+
+class TestImageLikelihood_LinearSolver3(TestImageLikelihood):
+    def setup_method(self):
+        self._setup_method(
+            linear_solver=True, source_marg=False, check_positive_flux=True
+        )
+
+
+class TestImageLikelihood_LinearSolver4(TestImageLikelihood):
+    def setup_method(self):
+        self._setup_method(
+            linear_solver=True, source_marg=True, check_positive_flux=True
+        )
 
 
 if __name__ == "__main__":

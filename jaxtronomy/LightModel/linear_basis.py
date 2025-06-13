@@ -168,6 +168,7 @@ class LinearBasis(LightModelBase):
         :param kwargs_list: list of keyword arguments of the model components
         :return: kwargs list with over-written or added 'amp' parameters according to the coefficients in param
         """
+        param = jnp.asarray(param)
         for k, model in enumerate(self.profile_type_list):
             if model in [
                 "SERSIC",

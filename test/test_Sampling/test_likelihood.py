@@ -180,7 +180,6 @@ class TestLikelihoodModule(object):
             kwargs_data_joint=self.kwargs_data_joint,
             kwargs_model=kwargs_model,
             param_class=self.param_class,
-            check_bounds=True,
             **kwargs_likelihood,
         )
         self.Likelihood_ref = LikelihoodModule_ref(
@@ -344,6 +343,7 @@ class TestLikelihoodModule(object):
             }
             likelihood = ImageLikelihood(
                 kwargs_model=kwargs_model,
+                linear_solver=False,
                 **self.kwargs_data_joint,
             )
 
@@ -362,15 +362,24 @@ class TestLikelihoodModule(object):
         del self.kwargs_data_joint["dec_image_list"]
         for source_profile in JAXXED_SOURCE_PROFILES:
             print(source_profile)
+            # this is just needed to get param names
             lightModel = LightModel([source_profile])
+
+            if source_profile == "SHAPELETS":
+                source_light_profile_kwargs_list = [{"n_max": 1}]
+            else:
+                source_light_profile_kwargs_list = [{}]
+
             kwargs_model = {
                 "lens_model_list": [],
                 "lens_light_model_list": [],
                 "source_light_model_list": [source_profile],
+                "source_light_profile_kwargs_list": source_light_profile_kwargs_list,
             }
             likelihood = ImageLikelihood(
                 kwargs_model=kwargs_model,
                 **self.kwargs_data_joint,
+                linear_solver=True,
             )
 
             kwargs_source = lightModel.func_list[0].lower_limit_default
@@ -380,7 +389,7 @@ class TestLikelihoodModule(object):
                     "MULTI_GAUSSIAN_ELLIPSE",
                     "SHAPELETS",
                 ] and key in ["amp", "sigma"]:
-                    kwargs_source[key] = [float(val)]
+                    kwargs_source[key] = [float(val)] * 3
                 else:
                     kwargs_source[key] = float(val)
             print(kwargs_source)
