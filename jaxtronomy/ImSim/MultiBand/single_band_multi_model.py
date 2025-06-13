@@ -375,7 +375,8 @@ class SingleBandMultiModel(ImageLinearFit, ImageModel):
         :param linear_prior: linear prior width in eigenvalues
         :param check_positive_flux: bool, should be false. True not supported in
             jaxtronomy
-        :param linear_solver: bool, determines whether to solve for linear amplitudes
+        :param linear_solver: bool, determines whether to solve for linear amplitudes.
+            Can also be None, in which case self.linear_solver will be used.
         :return: log likelihood (natural logarithm) (sum of the log likelihoods of the
             individual images)
         """
