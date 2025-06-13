@@ -3,6 +3,7 @@ __author__ = "dangilman"
 import copy
 
 from jax import config
+
 config.update("jax_enable_x64", True)
 import numpy.testing as npt
 from jaxtronomy.LensModel.lens_model import LensModel
@@ -24,7 +25,7 @@ from copy import deepcopy
 import numpy as np
 import pytest
 
- 
+
 def test_multiplane_decoupled_util_imports():
     assert setup_lens_model == setup_lens_model_ref
     assert setup_grids == setup_grids_ref
@@ -88,7 +89,7 @@ class TestMultiPlaneDecoupled(object):
         self.y_point = self.y_image[1]
         self._setup_point()
         self._setup_grid()
-        #self._setup_multiple_images()
+        # self._setup_multiple_images()
 
     def _setup_point(self):
         # SETUP TESTS FOR POINT, GRID, AND MULTIPLE IMAGES
@@ -222,7 +223,6 @@ class TestMultiPlaneDecoupled(object):
         )
         npt.assert_allclose(beta_x, beta_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(beta_y, beta_y_ref, atol=1e-12, rtol=1e-12)
-
 
     def test_multiple_image_deflection_model(self):
         npt.assert_raises(Exception, self._setup_multiple_images)

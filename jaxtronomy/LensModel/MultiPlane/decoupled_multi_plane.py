@@ -12,6 +12,7 @@ __all__ = ["MultiPlaneDecoupled"]
 # NOTE: MultiPlane has not been implemented in JAXtronomy, so the one from lenstronomy is inherited
 #       This is fine as long as only the init is needed
 
+
 class MultiPlaneDecoupled(MultiPlane):
     def __init__(
         self,
@@ -180,7 +181,7 @@ class MultiPlaneDecoupled(MultiPlane):
         beta_y = y / self._Ts + alpha_background_y * self._Tds / self._Ts
 
         return beta_x, beta_y
-    
+
     @partial(jit, static_argnums=0)
     def alpha(self, theta_x, theta_y, kwargs_lens, *args, **kwargs):
         """Reduced deflection angle.
@@ -191,7 +192,9 @@ class MultiPlaneDecoupled(MultiPlane):
         :return: deflection angles in x and y directions
         """
         beta_x, beta_y = self.ray_shooting(
-            theta_x, theta_y, kwargs_lens,
+            theta_x,
+            theta_y,
+            kwargs_lens,
         )
 
         alpha_x = theta_x - beta_x
@@ -200,15 +203,7 @@ class MultiPlaneDecoupled(MultiPlane):
         return alpha_x, alpha_y
 
     @partial(jit, static_argnums=0)
-    def hessian(
-        self,
-        theta_x,
-        theta_y,
-        kwargs_lens,
-        diff=0.00000001,
-        *args,
-        **kwargs
-    ):
+    def hessian(self, theta_x, theta_y, kwargs_lens, diff=0.00000001, *args, **kwargs):
         """Computes the hessian components f_xx, f_yy, f_xy from f_x and f_y with
         numerical differentiation.
 
@@ -222,14 +217,20 @@ class MultiPlaneDecoupled(MultiPlane):
         :return: f_xx, f_xy, f_yx, f_yy
         """
         alpha_ra, alpha_dec = self.alpha(
-            theta_x, theta_y, kwargs_lens,
+            theta_x,
+            theta_y,
+            kwargs_lens,
         )
 
         alpha_ra_dx, alpha_dec_dx = self.alpha(
-            theta_x + diff, theta_y, kwargs_lens,
+            theta_x + diff,
+            theta_y,
+            kwargs_lens,
         )
         alpha_ra_dy, alpha_dec_dy = self.alpha(
-            theta_x, theta_y + diff, kwargs_lens,
+            theta_x,
+            theta_y + diff,
+            kwargs_lens,
         )
 
         dalpha_rara = (alpha_ra_dx - alpha_ra) / diff

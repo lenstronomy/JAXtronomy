@@ -9,6 +9,7 @@ from lenstronomy.LensModel.Util.decouple_multi_plane_util import (
     setup_raytracing_lensmodels,
 )
 
+
 # Interpolation functions are imported from jax.scipy instead of scipy
 def decoupled_multiplane_class_setup(
     lens_model_free,
@@ -73,7 +74,7 @@ def decoupled_multiplane_class_setup(
     """
     if bounds_error:
         raise ValueError("JAX does not support bounds_error")
-    
+
     if coordinate_type == "GRID":
         from jax.scipy.interpolate import RegularGridInterpolator
 

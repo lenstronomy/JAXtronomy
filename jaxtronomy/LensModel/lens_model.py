@@ -115,16 +115,16 @@ class LensModel(object):
                 )
             if decouple_multi_plane:
                 self.lens_model = MultiPlaneDecoupled(
-                   z_source,
-                   lens_model_list,
-                   lens_redshift_list,
-                   cosmo=cosmo,
-                   observed_convention_index=observed_convention_index,
-                   z_source_convention=z_source_convention,
-                   cosmo_interp=cosmo_interp,
-                   z_interp_stop=z_interp_stop,
-                   num_z_interp=num_z_interp,
-                   **kwargs_multiplane_model
+                    z_source,
+                    lens_model_list,
+                    lens_redshift_list,
+                    cosmo=cosmo,
+                    observed_convention_index=observed_convention_index,
+                    z_source_convention=z_source_convention,
+                    cosmo_interp=cosmo_interp,
+                    z_interp_stop=z_interp_stop,
+                    num_z_interp=num_z_interp,
+                    **kwargs_multiplane_model
                 )
                 self.type = "MultiPlaneDecoupled"
             else:
@@ -638,6 +638,7 @@ class LensModel(object):
 
     # Updating cosmology not allowed in JAX
     def update_cosmology(self, cosmo=None):
-        """Returns an error if the user tries to update cosmology
-        """
-        raise Exception("Updating cosmology is not allowed in JAX. Create a new instance of LensModel instead. You can use LensModel.init_kwargs to extract the class initialization kwargs.")
+        """Returns an error if the user tries to update cosmology."""
+        raise Exception(
+            "Updating cosmology is not allowed in JAX. Create a new instance of LensModel instead. You can use LensModel.init_kwargs to extract the class initialization kwargs."
+        )
