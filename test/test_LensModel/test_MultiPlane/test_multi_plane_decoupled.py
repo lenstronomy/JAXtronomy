@@ -200,6 +200,37 @@ class TestMultiPlaneDecoupled(object):
             y_image=self.y_image,
         )
 
+    def test_raises(self):
+        npt.assert_raises(
+            ValueError,
+            decoupled_multiplane_class_setup,
+            self.lens_model_free,
+            self.x0_grid,
+            self.y0_grid,
+            self.alphax_foreground_grid,
+            self.alphay_foreground_grid,
+            self.alphax_background_grid,
+            self.alphay_background_grid,
+            self.z_split,
+            coordinate_type="GRID",
+            interp_points=self.interp_points_grid,
+            bounds_error=True,
+        )
+        npt.assert_raises(
+            Exception,
+            decoupled_multiplane_class_setup,
+            self.lens_model_free,
+            self.x0_grid,
+            self.y0_grid,
+            self.alphax_foreground_grid,
+            self.alphay_foreground_grid,
+            self.alphax_background_grid,
+            self.alphay_background_grid,
+            self.z_split,
+            coordinate_type="invalid",
+            interp_points=self.interp_points_grid,
+        )
+
     def test_point_deflection_model(self):
         lens_model_decoupled = LensModel(**self.kwargs_multiplane_model_point)
         lens_model_decoupled_ref = LensModel_ref(**self.kwargs_multiplane_model_point)
