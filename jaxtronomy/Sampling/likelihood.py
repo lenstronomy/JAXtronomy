@@ -2,6 +2,7 @@ __author__ = "sibirrer"
 
 from functools import partial
 import jax
+
 jax.config.update("jax_enable_x64", True)
 from jax import jit, lax, numpy as jnp
 import numpy as np
