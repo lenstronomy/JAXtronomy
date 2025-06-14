@@ -318,7 +318,11 @@ class TestLikelihoodModule(object):
             check_bounds=False,
         )
         args[0] = 1000000
-        npt.assert_allclose(Likelihood.logL(args, verbose=True), Likelihood_ref.logL(args, verbose=True), rtol=1e-6)
+        npt.assert_allclose(
+            Likelihood.logL(args, verbose=True),
+            Likelihood_ref.logL(args, verbose=True),
+            rtol=1e-6,
+        )
         assert Likelihood.logL(args) != -1e18
 
         # Test check_bounds = True
