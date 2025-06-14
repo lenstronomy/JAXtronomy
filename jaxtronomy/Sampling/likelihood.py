@@ -1,5 +1,12 @@
 __author__ = "sibirrer"
 
+from functools import partial
+import jax
+jax.config.update("jax_enable_x64", True)
+from jax import jit, lax, numpy as jnp
+import numpy as np
+
+import jaxtronomy.Util.class_creator as class_creator
 from jaxtronomy.Sampling.Likelihoods.image_likelihood import ImageLikelihood
 from jaxtronomy.Sampling.Likelihoods.position_likelihood import PositionLikelihood
 
@@ -7,12 +14,6 @@ from lenstronomy.Sampling.Likelihoods.prior_likelihood import PriorLikelihood
 
 # TODO: Implement other Likelihood classes intro jaxtronomy
 # Currently, only image likelihood is supported.
-
-import jaxtronomy.Util.class_creator as class_creator
-import jax
-from jax import jit, lax, numpy as jnp
-from functools import partial
-import numpy as np
 
 __all__ = ["LikelihoodModule"]
 
