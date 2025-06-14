@@ -301,18 +301,21 @@ class LikelihoodModule(object):
         :type verbose: boolean
         :returns: log likelihood of the data given the model (natural logarithm)
         """
-        bound_hit = False
+        # extract parameters
+        kwargs_return = self.param.args2kwargs(args, jax=True)
+
         if self._check_bounds is True:
             penalty, bound_hit = self.check_bounds(
                 args, self._lower_limit, self._upper_limit, verbose=verbose
             )
 
-        # extract parameters
-        kwargs_return = self.param.args2kwargs(args, jax=True)
+            def true_fun(*args, **kwargs):
+                return -(10.0**18)
+            
+            logL = lax.cond(bound_hit, true_fun, self.log_likelihood, kwargs_return)
+        else:
+            logL = self.log_likelihood(kwargs_return, verbose=verbose)
 
-        logL = jnp.where(
-            bound_hit, -(10.0**18), self.log_likelihood(kwargs_return, verbose=verbose)
-        )
         return logL
 
     @partial(jit, static_argnums=(0, 2))

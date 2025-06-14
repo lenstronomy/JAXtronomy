@@ -306,7 +306,7 @@ class EPLMajorAxis(LensProfileBase):
     @custom_jvp
     @staticmethod
     @jit
-    def _hyp2f1_evaluate(t, z):
+    def _hyp2f1_evaluate(f, t, z):
         """The series expansion for hyp2f1 converges faster when |z| is closer to the
         origin.
 
@@ -314,7 +314,6 @@ class EPLMajorAxis(LensProfileBase):
         the performance for ray-shooting is significantly improved.
         """
 
-        f = jnp.max(jnp.abs(z))
         B = t / 2.0
         C = 2.0 - B
 
@@ -347,7 +346,7 @@ class EPLMajorAxis(LensProfileBase):
         """This function defines the derivative of _hyp2f1_evaluate, so that when
         autodifferentiation is used, it will instead autodifferentiate through
         _hyp2f1_for_autodiff, resulting in performance boost."""
-        return jvp(EPLMajorAxis._hyp2f1_for_autodiff, primals, tangents)
+        return jvp(EPLMajorAxis._hyp2f1_for_autodiff, primals[1:3], tangents[1:3])
 
     @staticmethod
     @jit
@@ -388,7 +387,7 @@ class EPLMajorAxis(LensProfileBase):
         f = (1.0 - q) / (1.0 + q)
 
         # angular dependency with extra factor of R, eq. (23)
-        R_omega = Z * EPLMajorAxis._hyp2f1_evaluate(t, -f * Z / jnp.conj(Z))
+        R_omega = Z * EPLMajorAxis._hyp2f1_evaluate(f, t, -f * Z / jnp.conj(Z))
 
         # deflection, eq. (22)
         alpha = 2 / (1 + q) * (b / R) ** t * R_omega
