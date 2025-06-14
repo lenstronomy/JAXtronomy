@@ -311,7 +311,7 @@ class LikelihoodModule(object):
 
             def true_fun(*args, **kwargs):
                 return -(10.0**18)
-            
+
             logL = lax.cond(bound_hit, true_fun, self.log_likelihood, kwargs_return)
         else:
             logL = self.log_likelihood(kwargs_return, verbose=verbose)
