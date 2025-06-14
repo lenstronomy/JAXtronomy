@@ -368,7 +368,7 @@ class LikelihoodModule(object):
         )
 
         logL = jnp.nan_to_num(logL, nan=1e-18)
-        return logL
+        return logL.astype(float)
 
     @staticmethod
     @partial(jit, static_argnums=3)
