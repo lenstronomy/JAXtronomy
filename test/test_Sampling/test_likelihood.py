@@ -296,6 +296,47 @@ class TestLikelihoodModule(object):
         )
         assert not bound_hit
 
+        # Test check_bounds = False
+        args = self.param_class.kwargs2args(
+            kwargs_lens=self.kwargs_lens,
+            kwargs_source=self.kwargs_source,
+            kwargs_lens_light=self.kwargs_lens_light,
+            kwargs_ps=self.kwargs_ps,
+            kwargs_special=self.kwargs_special,
+        )
+
+        Likelihood = LikelihoodModule(
+            kwargs_data_joint=self.kwargs_data_joint,
+            kwargs_model=self.kwargs_model,
+            param_class=self.param_class,
+            check_bounds=False,
+        )
+        Likelihood_ref = LikelihoodModule_ref(
+            kwargs_data_joint=self.kwargs_data_joint,
+            kwargs_model=self.kwargs_model,
+            param_class=self.param_class,
+            check_bounds=False,
+        )
+        args[0] = 1000000
+        npt.assert_allclose(Likelihood.logL(args), Likelihood_ref.logL(args), rtol=1e-6)
+        assert Likelihood.logL(args) != -1e18
+
+        # Test check_bounds = True
+        Likelihood = LikelihoodModule(
+            kwargs_data_joint=self.kwargs_data_joint,
+            kwargs_model=self.kwargs_model,
+            param_class=self.param_class,
+            check_bounds=True,
+        )
+        Likelihood_ref = LikelihoodModule_ref(
+            kwargs_data_joint=self.kwargs_data_joint,
+            kwargs_model=self.kwargs_model,
+            param_class=self.param_class,
+            check_bounds=True,
+        )
+        assert Likelihood.logL(args) == -1e18
+        assert Likelihood.logL(args) == Likelihood_ref.logL(args)
+
     def test_kwargs_imaging(self):
         kwargs_imaging = self.Likelihood.kwargs_imaging
         kwargs_imaging_ref = self.Likelihood_ref.kwargs_imaging
@@ -325,9 +366,6 @@ class TestLikelihoodModule(object):
         )
 
         assert Likelihood.logL(args) == 0
-
-        args[0] = 1000000
-        assert Likelihood.logL(args) == -1e18
         assert Likelihood.logL(args) == Likelihood_ref.logL(args)
 
     def test_lensmodel_autodifferentiation(self):
