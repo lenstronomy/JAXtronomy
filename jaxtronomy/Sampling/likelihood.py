@@ -1,5 +1,13 @@
 __author__ = "sibirrer"
 
+from functools import partial
+import jax
+
+jax.config.update("jax_enable_x64", True)
+from jax import jit, lax, numpy as jnp
+import numpy as np
+
+import jaxtronomy.Util.class_creator as class_creator
 from jaxtronomy.Sampling.Likelihoods.image_likelihood import ImageLikelihood
 from jaxtronomy.Sampling.Likelihoods.position_likelihood import PositionLikelihood
 
@@ -7,12 +15,6 @@ from lenstronomy.Sampling.Likelihoods.prior_likelihood import PriorLikelihood
 
 # TODO: Implement other Likelihood classes intro jaxtronomy
 # Currently, only image likelihood is supported.
-
-import jaxtronomy.Util.class_creator as class_creator
-import jax
-from jax import jit, lax, numpy as jnp
-from functools import partial
-import numpy as np
 
 __all__ = ["LikelihoodModule"]
 
@@ -301,18 +303,21 @@ class LikelihoodModule(object):
         :type verbose: boolean
         :returns: log likelihood of the data given the model (natural logarithm)
         """
-        bound_hit = False
+        # extract parameters
+        kwargs_return = self.param.args2kwargs(args, jax=True)
+
         if self._check_bounds is True:
             penalty, bound_hit = self.check_bounds(
                 args, self._lower_limit, self._upper_limit, verbose=verbose
             )
 
-        # extract parameters
-        kwargs_return = self.param.args2kwargs(args, jax=True)
+            def true_fun(*args, **kwargs):
+                return -(10.0**18)
 
-        logL = jnp.where(
-            bound_hit, -(10.0**18), self.log_likelihood(kwargs_return, verbose=verbose)
-        )
+            logL = lax.cond(bound_hit, true_fun, self.log_likelihood, kwargs_return)
+        else:
+            logL = self.log_likelihood(kwargs_return, verbose=verbose)
+
         return logL
 
     @partial(jit, static_argnums=(0, 2))
@@ -365,7 +370,7 @@ class LikelihoodModule(object):
         )
 
         logL = jnp.nan_to_num(logL, nan=1e-18)
-        return logL
+        return logL.astype(float)
 
     @staticmethod
     @partial(jit, static_argnums=3)
