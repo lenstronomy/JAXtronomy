@@ -156,6 +156,7 @@ class TestLikelihoodModule(object):
             "source_position_likelihood": True,
             "source_position_sigma": 0.1,
             "astrometric_likelihood": True,
+            "check_bounds": False,
         }
         self.kwargs_data_joint = {
             "multi_band_list": [[kwargs_data, kwargs_psf, kwargs_numerics]],
