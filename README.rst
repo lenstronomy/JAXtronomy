@@ -68,22 +68,22 @@ These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz and an NV
     - 1.6x
     - 2.9x
     - 2.3x
-  * - EPL (e1 = e2 = 0.0)
-    - 0.1x
-    - 0.2x
-    - 1.6x
-  * - EPL (e1 = e2 = 0.5)
-    - 6.7x
-    - 10.8x
-    - 76.6x
-  * - EPL (jax) vs EPL_NUMBA (e1 = e2 = 0.0)
-    - 0.2x
-    - 0.3x
-    - 2.7x
-  * - EPL (jax) vs EPL_NUMBA (e1 = e2 = 0.5)
-    - 0.8x
-    - 1.5x
-    - 11.3x
+  * - EPL
+    - 1.1x - 15x
+    - 1.6x - 17x
+    - 6.4x - 120x
+  * - EPL (jax) vs EPL_NUMBA
+    - 1.8x
+    - 3.2x
+    - 13x
+  * - EPL_MULTIPOLE_M1M3M4
+    - 1.1x - 7x
+    - 3.3x - 13x
+    - 22x - 108x
+  * - EPL_MULTIPOLE_M1M3M4_ELL
+    - 1.2x - 3.3x
+    - 1.1x - 3.3x
+    - 18x - 140x
   * - GAUSSIAN
     - 1.0x
     - 1.8x
@@ -100,6 +100,14 @@ These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz and an NV
     - 3.8x
     - 5.9x
     - 40.3x
+  * - MULTIPOLE
+    - 0.9x
+    - 1.0x
+    - 10.0x
+  * - MULTIPOLE_ELL (m=1, m=3, m=4)
+    - 1.5x, 1.5x, 2.1x
+    - 1.3x, 1.3x, 1.9x
+    - 92x, 92x, 90x
   * - NFW
     - 1.6x
     - 3.3x
@@ -132,17 +140,13 @@ These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz and an NV
     - 1.4x
     - 3.0x
     - 2.0x
-  * - SPP
-    - 0.5x
-    - 1.0x
-    - 2.9x
   * - TNFW
     - 2.4x
     - 5.4x
     - 8.3x
 
-Note that some profiles' runtime may be dependent on function arguments. For example, the EPL profile involves performing a hyp2f1 calculation using a power series expansion.
-In lenstronomy, the number of terms used depends on how quickly the series converges, whereas in JAXtronomy, the power series always involves a fixed number of terms, which is required for autodifferentiation.
+Note that some profiles' runtime may be dependent on function arguments, such as the EPL profile which involves performing a hyp2f1 calculation using a power series expansion.
+The more terms involved, the better JAXtronomy performs compared to lenstronomy.
 
 A performance comparison notebook is available for more detailed analysis.
 
