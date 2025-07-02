@@ -65,6 +65,7 @@ A performance comparison notebook has been made available for reproducibility.
 **LensModel ray-shooting**
 
 The table below shows how much faster JAXtronomy is compared to lenstronomy for different deflector profiles and different grid sizes.
+Some comparisons vary significantly with values of function arguments.
 
 .. list-table::
   :header-rows: 1
@@ -157,9 +158,6 @@ The table below shows how much faster JAXtronomy is compared to lenstronomy for 
     - 2.4x
     - 5.4x
     - 8.3x
-
-Note that some profiles' runtime may be dependent on function arguments, such as the EPL profile which involves performing a hyp2f1 calculation using a power series expansion.
-The more terms involved, the better JAXtronomy performs compared to lenstronomy.
 
 **LightModel surface brightness**
 
