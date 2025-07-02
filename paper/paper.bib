@@ -1,18 +1,3 @@
-@article{Gu:2022,
-doi = {10.3847/1538-4357/ac6de4},
-url = {https://dx.doi.org/10.3847/1538-4357/ac6de4},
-year = {2022},
-month = {aug},
-publisher = {The American Astronomical Society},
-volume = {935},
-number = {1},
-pages = {49},
-author = {Gu, A. and Huang, X. and Sheu, W. and Aldering, G. and Bolton, A. S. and Boone, K. and Dey, A. and Filipp, A. and Jullo, E. and Perlmutter, S. and Rubin, D. and Schlafly, E. F. and Schlegel, D. J. and Shu, Y. and Suyu, S. H.},
-title = {GIGA-Lens: Fast Bayesian Inference for Strong Gravitational Lens Modeling},
-journal = {The Astrophysical Journal},
-abstract = {We present GIGA-Lens: a gradient-informed, GPU-accelerated Bayesian framework for modeling strong gravitational lensing systems, implemented in TensorFlow and JAX. The three components, optimization using multistart gradient descent, posterior covariance estimation with variational inference, and sampling via Hamiltonian Monte Carlo, all take advantage of gradient information through automatic differentiation and massive parallelization on graphics processing units (GPUs). We test our pipeline on a large set of simulated systems and demonstrate in detail its high level of performance. The average time to model a single system on four Nvidia A100 GPUs is 105 s. The robustness, speed, and scalability offered by this framework make it possible to model the large number of strong lenses found in current surveys and present a very promising prospect for the modeling of  lensing systems expected to be discovered in the era of the Vera C. Rubin Observatory, Euclid, and the Nancy Grace Roman Space Telescope.}
-}
-
 @article{Birrer:2018,
 title = {lenstronomy: Multi-purpose gravitational lens modelling software package},
 journal = {Physics of the Dark Universe},
@@ -40,6 +25,17 @@ author = {Birrer, Simon},
 title = {Gravitational Lensing Formalism in a Curved Arc Basis: A Continuous Description of Observables and Degeneracies from the Weak to the Strong Lensing Regime},
 journal = {The Astrophysical Journal},
 abstract = {Gravitationally lensed curved arcs provide a wealth of information about the underlying lensing distortions. Extracting precise lensing information from extended sources is a key component in many studies aiming to answer fundamental questions about the universe. To maintain accuracy with increased precision, it is of vital importance to characterize and understand the impact of degeneracies inherent in lensing observables. In this work, we present a formalism to describe the gravitational lensing distortion effects resulting in curved extended arcs based on the eigenvectors and eigenvalues of the local lensing Jacobian and their directional differentials. We identify a nonlocal and nonlinear extended deflector basis that inherits these local properties. Our parameterization is tightly linked to observable features in extended sources and allows one to accurately extract the lensing information of extended images without imposing an explicit global deflector model. We quantify what degeneracies can be broken based on specific assumptions about the local lensing nature and assumed intrinsic source shape. Our formalism is applicable from the weak linear regime to the semi-linear regime and all the way up to the highly nonlinear regime of highly magnified arcs of multiple images. The methodology and implementation presented in this work provides a framework to assessing systematics, to guide inference efforts in the right choices in complexity based on the data at hand, and to quantify the lensing information extracted in a model-independent way (https://github.com/sibirrer/curved_arcs).}
+}
+
+#TODO: Replace with journal BibTeX
+@article{Shajib:2025bho,
+    author = "Shajib, Anowar J. and Nihal, Nafis Sadik and Tan, Chin Yi and Sahu, Vedant and Birrer, Simon and Treu, Tommaso and Frieman, Joshua",
+    title = "{dolphin: A fully automated forward modeling pipeline powered by artificial intelligence for galaxy-scale strong lenses}",
+    eprint = "2503.22657",
+    archivePrefix = "arXiv",
+    primaryClass = "astro-ph.IM",
+    month = "3",
+    year = "2025"
 }
 
 @article{Ding:2020,
@@ -133,6 +129,21 @@ abstract = {Gravitationally lensed curved arcs provide a wealth of information a
     eprint = {https://academic.oup.com/mnras/article-pdf/491/4/6077/31628836/stz3480.pdf},
 }
 
+@article{Gu:2022,
+doi = {10.3847/1538-4357/ac6de4},
+url = {https://dx.doi.org/10.3847/1538-4357/ac6de4},
+year = {2022},
+month = {aug},
+publisher = {The American Astronomical Society},
+volume = {935},
+number = {1},
+pages = {49},
+author = {Gu, A. and Huang, X. and Sheu, W. and Aldering, G. and Bolton, A. S. and Boone, K. and Dey, A. and Filipp, A. and Jullo, E. and Perlmutter, S. and Rubin, D. and Schlafly, E. F. and Schlegel, D. J. and Shu, Y. and Suyu, S. H.},
+title = {GIGA-Lens: Fast Bayesian Inference for Strong Gravitational Lens Modeling},
+journal = {The Astrophysical Journal},
+abstract = {We present GIGA-Lens: a gradient-informed, GPU-accelerated Bayesian framework for modeling strong gravitational lensing systems, implemented in TensorFlow and JAX. The three components, optimization using multistart gradient descent, posterior covariance estimation with variational inference, and sampling via Hamiltonian Monte Carlo, all take advantage of gradient information through automatic differentiation and massive parallelization on graphics processing units (GPUs). We test our pipeline on a large set of simulated systems and demonstrate in detail its high level of performance. The average time to model a single system on four Nvidia A100 GPUs is 105 s. The robustness, speed, and scalability offered by this framework make it possible to model the large number of strong lenses found in current surveys and present a very promising prospect for the modeling of  lensing systems expected to be discovered in the era of the Vera C. Rubin Observatory, Euclid, and the Nancy Grace Roman Space Telescope.}
+}
+
 @article{Galan:2022,
        author = {{Galan}, A. and {Vernardos}, G. and {Peel}, A. and {Courbin}, F. and {Starck}, J. -L.},
         title = "{Using wavelets to capture deviations from smoothness in galaxy-scale strong lenses}",
@@ -151,17 +162,32 @@ archivePrefix = {arXiv},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
-@article{Wagner-Carena:2021,
-doi = {10.3847/1538-4357/abdf59},
-url = {https://dx.doi.org/10.3847/1538-4357/abdf59},
-year = {2021},
-month = {mar},
-publisher = {The American Astronomical Society},
-volume = {909},
-number = {2},
-pages = {187},
-author = {Wagner-Carena, Sebastian and Park, Ji Won and Birrer, Simon and Marshall, Philip J. and Roodman, Aaron and Wechsler, Risa H. and (LSST Dark Energy Science Collaboration)},
-title = {Hierarchical Inference with Bayesian Neural Networks: An Application to Strong Gravitational Lensing},
-journal = {The Astrophysical Journal},
-abstract = {In the past few years, approximate Bayesian Neural Networks (BNNs) have demonstrated the ability to produce statistically consistent posteriors on a wide range of inference problems at unprecedented speed and scale. However, any disconnect between training sets and the distribution of real-world objects can introduce bias when BNNs are applied to data. This is a common challenge in astrophysics and cosmology, where the unknown distribution of objects in our universe is often the science goal. In this work, we incorporate BNNs with flexible posterior parameterizations into a hierarchical inference framework that allows for the reconstruction of population hyperparameters and removes the bias introduced by the training distribution. We focus on the challenge of producing posterior PDFs for strong gravitational lens mass model parameters given Hubble Space Telescope–quality single-filter, lens-subtracted, synthetic imaging data. We show that the posterior PDFs are sufficiently accurate (statistically consistent with the truth) across a wide variety of power-law elliptical lens mass distributions. We then apply our approach to test data sets whose lens parameters are drawn from distributions that are drastically different from the training set. We show that our hierarchical inference framework mitigates the bias introduced by an unrepresentative training set’s interim prior. Simultaneously, we can precisely reconstruct the population hyperparameters governing our test distributions. Our full pipeline, from training to hierarchical inference on thousands of lenses, can be run in a day. The framework presented here will allow us to efficiently exploit the full constraining power of future ground- and space-based surveys (https://github.com/swagnercarena/ovejero).}
+@article{Wagner-Carena:2023,
+  doi = {10.3847/1538-4357/aca525},
+  url = {https://dx.doi.org/10.3847/1538-4357/aca525},
+  year = {2023},
+  month = {jan},
+  publisher = {The American Astronomical Society},
+  volume = {942},
+  number = {2},
+  pages = {75},
+  author = {Wagner-Carena, Sebastian and Aalbers, Jelle and Birrer, Simon and Nadler, Ethan O. and Darragh-Ford, Elise and Marshall, Philip J. and Wechsler, Risa H.},
+  title = {From Images to Dark Matter: End-to-end Inference of Substructure from Hundreds of Strong Gravitational Lenses},
+  journal = {The Astrophysical Journal},
+  abstract = {Constraining the distribution of small-scale structure in our universe allows us to probe alternatives to the cold dark matter paradigm. Strong gravitational lensing offers a unique window into small dark matter halos (&lt;1010  M ⊙) because these halos impart a gravitational lensing signal even if they do not host luminous galaxies. We create large data sets of strong lensing images with realistic low-mass halos, Hubble Space Telescope (HST) observational effects, and galaxy light from HST’s COSMOS field. Using a simulation-based inference pipeline, we train a neural posterior estimator of the subhalo mass function (SHMF) and place constraints on populations of lenses generated using a separate set of galaxy sources. We find that by combining our network with a hierarchical inference framework, we can both reliably infer the SHMF across a variety of configurations and scale efficiently to populations with hundreds of lenses. By conducting precise inference on large and complex simulated data sets, our method lays a foundation for extracting dark matter constraints from the next generation of wide-field optical imaging surveys.}
+}
+
+@article{Wagner-Carena:2024,
+  doi = {10.3847/1538-4357/ad6e70},
+  url = {https://dx.doi.org/10.3847/1538-4357/ad6e70},
+  year = {2024},
+  month = {nov},
+  publisher = {The American Astronomical Society},
+  volume = {975},
+  number = {2},
+  pages = {297},
+  author = {Wagner-Carena, Sebastian and Lee, Jaehoon and Pennington, Jeffrey and Aalbers, Jelle and Birrer, Simon and Wechsler, Risa H.},
+  title = {A Strong Gravitational Lens Is Worth a Thousand Dark Matter Halos: Inference on Small-scale Structure Using Sequential Methods},
+  journal = {The Astrophysical Journal},
+  abstract = {Strong gravitational lenses are a singular probe of the Universe’s small-scale structure—they are sensitive to the gravitational effects of low-mass (&lt;1010 M ⊙) halos even without a luminous counterpart. Recent strong-lensing analyses of dark matter structure rely on simulation-based inference (SBI). Modern SBI methods, which leverage neural networks as density estimators, have shown promise in extracting the halo-population signal. However, it is unclear whether the constraints from these models are limited by the methodology or the data. In this study, we introduce an accelerator-optimized simulation pipeline that can generate lens images with realistic subhalo populations in milliseconds. Leveraging this simulator, we identify the main limitation of our fiducial SBI analysis: training set size. We then adopt a sequential neural posterior estimation (SNPE) approach, allowing us to refine the training distribution to align with the observed data. Using only one-fifth as many mock Hubble Space Telescope images, SNPE matches the constraints on the low-mass halo population produced by our best nonsequential model. Our experiments suggest that an over 3 order-of-magnitude increase in training set size and GPU hours would be required to achieve an equivalent result without sequential methods. While the full potential of the existing lens sample remains to be explored, the notable improvement in constraining power enabled by our sequential approach highlights that current constraints are limited primarily by methodology and not the data itself. Moreover, our results emphasize the need to treat training set generation and model optimization as interconnected stages of any cosmological analysis using SBI.}
 }
