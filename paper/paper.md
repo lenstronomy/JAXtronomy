@@ -62,7 +62,7 @@ These ever-increasing computational costs have lead to the development of severa
 
 ## Deflection angle calculations
 
-The table below shows how much faster JAXtronomy is compared to lenstronomy at calculating deflections angles for different deflector profiles and different grid sizes.
+The table below shows how much faster JAXtronomy is compared to lenstronomy at calculating deflection angles for different deflector profiles and different grid sizes.
 Some comparisons vary significantly with values of function arguments.
 
 These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and JAX version 0.5.2.
@@ -108,7 +108,7 @@ Similarly, the table below shows how much faster JAXtronomy is compared to lenst
 
 We find that FFT convolution using JAX on CPU results in variable performance boosts or slowdowns compared to lenstronomy (which uses scipy's FFT convolution). On a 60x60 grid, and kernel sizes ranging from 3 to 45, JAX on CPU ranges from being 1.1x to 2.9x faster than lenstronomy, with no obvious correlation to kernel size. On a 180x180 grid, and kernel sizes ranging from 9 to 135, JAXtronomy on CPU ranges from being 0.7x to 2.5x as fast as lenstronomy, with no obvious correlation to kernel size.
 
-However, FFT convolution using JAX on GPU is significantly faster than scipy. On a 60x60 grid, and kernel sizes ranging from 3 to 45, JAX on GPU ranges from being 1.5x to 3.5x faster than lenstronomy, with JAX performing better with higher kernel sizes. On a 180x180 grid, and kernel sizes ranging from 9 t0 135, JAXtronomy on GPU is about 10x to 20x as fast as lenstronomy, with JAX performing better with higher kernel sizes.
+However, FFT convolution using JAX on GPU is significantly faster than scipy. On a 60x60 grid, and kernel sizes ranging from 3 to 45, JAX on GPU ranges from being 1.5x to 3.5x faster than lenstronomy, with JAX performing better at higher kernel sizes. On a 180x180 grid, and kernel sizes ranging from 9 t0 135, JAXtronomy on GPU is about 10x to 20x as fast as lenstronomy, again with JAX performing better at higher kernel sizes.
 
 ## Lens Modeling
 
