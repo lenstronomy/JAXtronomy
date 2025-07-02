@@ -38,20 +38,33 @@ The goal of this library is to reimplement lenstronomy functionalities in pure J
 
 **Installation**:
 
-``JAXtronomy`` can be installed with ::
+To use JAX with an NVIDIA GPU on Linux, an additional first step is needed. Install JAX with ::
+
+  pip install -U "jax[cuda12]"
+
+For other GPUs or operating systems, installation is more complicated.
+See the `JAX installation instructions for GPU <https://github.com/jax-ml/jax?tab=readme-ov-file#installation>_` for more details.
+If this step is skipped, then JAX will be installed only with CPU support.
+
+``JAXtronomy`` can then be installed with ::
 
   pip install jaxtronomy
+
+**Example notebook**:
+`An example notebook <https://github.com/lenstronomy/JAXtronomy/blob/main/notebooks/modeling_a_simple_Einstein_ring.ipynb>_` has been made available, which
+showcases the features and improvements in JAXtronomy.
 
 Performance comparison between JAXtronomy and lenstronomy
 ---------------------------------------------------------
 
 We compare the runtimes between JAXtronomy and lenstronomy by timing 10,000 function executions.
 While lenstronomy is always run using CPU, JAXtronomy can be run using either CPU or GPU.
+These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and JAX version 0.5.2.
+A performance comparison notebook has been made available for reproducibility.
 
 **LensModel ray-shooting**
 
 The table below shows how much faster JAXtronomy is compared to lenstronomy for different deflector profiles and different grid sizes.
-These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz and an NVIDIA A100 GPU.
 
 .. list-table::
   :header-rows: 1
@@ -148,8 +161,6 @@ These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz and an NV
 Note that some profiles' runtime may be dependent on function arguments, such as the EPL profile which involves performing a hyp2f1 calculation using a power series expansion.
 The more terms involved, the better JAXtronomy performs compared to lenstronomy.
 
-A performance comparison notebook is available for more detailed analysis.
-
 **LightModel surface brightness**
 
 The table below shows how much faster JAXtronomy is compared to lenstronomy for different source profiles and different grid sizes.
@@ -213,7 +224,6 @@ an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz and an NVIDIA A100 GPU.
 - For a 180x180 grid, and kernel sizes ranging from 9 to 135, jaxtronomy on CPU is about 0.7x to 2.5x as fast as lenstronomy, with no obvious correlation to kernel size.
 - For a 180x180 grid, and kernel sizes ranging from 9 t0 135, jaxtronomy on GPU is about 10x to 20x as fast as lenstronomy, with JAX performing better with higher kernel sizes.
 
-A performance comparison notebook is available for more detailed analysis.
 
 Related software packages
 -------------------------
@@ -227,6 +237,18 @@ The following lensing software packages do use JAX-accelerated computing that in
 .. _Herculens: https://github.com/herculens/herculens
 .. _GIGA-lens: https://github.com/giga-lens/gigalens
 .. _PaltaX: https://github.com/swagnercarena/paltax
+
+
+Community guidelines
+--------------------
+
+**Contributing to jaxtronomy**
+- Fork the repository
+- Write clean, well-documented code, following conventions
+- Submit pull requests
+
+**Reporting issues, seeking support, and feature requests**
+- Submit a Github issue
 
 
 
