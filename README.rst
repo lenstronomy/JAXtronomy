@@ -43,7 +43,7 @@ To use JAX with an NVIDIA GPU on Linux, an additional first step is needed. Inst
   pip install -U "jax[cuda12]"
 
 For other GPUs or operating systems, installation is more complicated.
-See the `JAX installation instructions for GPU <https://github.com/jax-ml/jax?tab=readme-ov-file#installation>_` for more details.
+See the `JAX installation instructions for GPU <https://github.com/jax-ml/jax?tab=readme-ov-file#installation>`_ for more details.
 If this step is skipped, then JAX will be installed only with CPU support.
 
 ``JAXtronomy`` can then be installed with ::
@@ -51,7 +51,7 @@ If this step is skipped, then JAX will be installed only with CPU support.
   pip install jaxtronomy
 
 **Example notebook**:
-`An example notebook <https://github.com/lenstronomy/JAXtronomy/blob/main/notebooks/modeling_a_simple_Einstein_ring.ipynb>_` has been made available, which
+`An example notebook <https://github.com/lenstronomy/JAXtronomy/blob/main/notebooks/modeling_a_simple_Einstein_ring.ipynb>`_ has been made available, which
 showcases the features and improvements in JAXtronomy.
 
 Performance comparison between JAXtronomy and lenstronomy
