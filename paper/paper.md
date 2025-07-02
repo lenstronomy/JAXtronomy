@@ -67,7 +67,7 @@ Some comparisons vary significantly with values of function arguments.
 
 These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and JAX version 0.5.2.
 
-| Deflector Profile        | 60x60       | 180x180 (cpu) | 180x180 (gpu) |
+| Deflector Profile        | 60x60 (cpu) | 180x180 (cpu) | 180x180 (gpu) |
 | :----------------------: | :---------: | :-----------: | :-----------: |
 | Convergence              | 0.4x        | 1.3x          | 0.4x          |
 | CSE                      | 1.6x        | 2.9x          | 2.3x          |
@@ -94,7 +94,7 @@ These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDI
 
 Similarly, the table below shows how much faster JAXtronomy is compared to lenstronomy at calculating fluxes for different light source profiles.
 
-| Light Profile            | 60x60       | 180x180 (cpu) | 180x180 (gpu) |
+| Light Profile            | 60x60 (cpu) | 180x180 (cpu) | 180x180 (gpu) |
 | :----------------------: | :---------: | :-----------: | :-----------: |
 | CORE_SERSIC              | 2.1x        | 10.2x         | 4.4x          |
 | GAUSSIAN                 | 1.6x        | 3.4x          | 1.6x          |
