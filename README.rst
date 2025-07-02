@@ -241,11 +241,13 @@ Community guidelines
 --------------------
 
 **Contributing to jaxtronomy**
+
 - Fork the repository
 - Write clean, well-documented code, following conventions
 - Submit pull requests
 
 **Reporting issues, seeking support, and feature requests**
+
 - Submit a Github issue
 
 
