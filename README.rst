@@ -162,7 +162,6 @@ Some comparisons vary significantly with values of function arguments.
 **LightModel surface brightness**
 
 The table below shows how much faster JAXtronomy is compared to lenstronomy for different source profiles and different grid sizes.
-These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz and an NVIDIA A100 GPU.
 
 .. list-table::
    :header-rows: 1
