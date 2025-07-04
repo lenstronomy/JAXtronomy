@@ -69,17 +69,17 @@ These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDI
 
 | Deflector Profile        | 60x60 (cpu) | 180x180 (cpu) | 180x180 (gpu) |
 | :----------------------: | :---------: | :-----------: | :-----------: |
-| CSE                      | 1.6x        | 2.9x          | 2.3x          |
-| EPL                      | 1.1x - 15x  | 1.6x - 17x    | 6.4x - 120x   |
-| EPL (jax) vs EPL_NUMBA   | 1.8x        | 3.2x          | 13x           |
-| EPL_MULTIPOLE_M1M3M4     | 1.1x - 7x   | 3.3x - 13x    | 22x - 108x    |
-| HERNQUIST                | 1.9x        | 3.6x          | 6.4x          |
-| HERNQUIST_ELLIPSE_CSE    | 3.8x        | 5.9x          | 40x           |
-| MULTIPOLE                | 0.9x        | 1.0x          | 10.0x         |
-| MULTIPOLE_ELL            | 1.5x - 2.1x | 1.3x - 1.9x   | 90x           |
-| NFW                      | 1.6x        | 3.3x          | 5.0x          |
-| NFW_ELLIPSE_CSE          | 4.1x        | 5.7x          | 36x           |
-| TNFW                     | 2.4x        | 5.4x          | 8.3x          |
+| CSE                      | 1.6x        | 3.4x          | 3.1x          |
+| EPL                      | 5.1x - 15x  | 9.2x - 17x    | 37x - 120x    |
+| EPL (jax) vs EPL_NUMBA   | 1.4x        | 3.0x          | 13x           |
+| EPL_MULTIPOLE_M1M3M4     | 2.1x - 7x   | 6.8x - 13x    | 42x - 108x    |
+| HERNQUIST                | 2.0x        | 3.4x          | 6.4x          |
+| HERNQUIST_ELLIPSE_CSE    | 3.8x        | 5.4x          | 40x           |
+| MULTIPOLE                | 0.9x        | 1.0x          | 8.3x - 14x    |
+| MULTIPOLE_ELL            | 1.5x - 2.1x | 2.0x - 2.8x   | 70x           |
+| NFW                      | 1.6x        | 3.3x          | 4.5x          |
+| NFW_ELLIPSE_CSE          | 4.1x        | 6.7x          | 37x           |
+| TNFW                     | 2.4x        | 5.8x          | 7.5x          |
 
 ## Flux calculations
 
@@ -87,13 +87,13 @@ Similarly, the table below shows how much faster JAXtronomy is compared to lenst
 
 | Light Profile            | 60x60 (cpu) | 180x180 (cpu) | 180x180 (gpu) |
 | :----------------------: | :---------: | :-----------: | :-----------: |
-| CORE_SERSIC              | 2.1x        | 10.2x         | 4.4x          |
-| GAUSSIAN                 | 1.6x        | 3.4x          | 1.6x          |
-| GAUSSIAN_ELLIPSE         | 1.5x        | 6.9x          | 2.1x          |
-| SERSIC                   | 2.3x        | 9.3x          | 4.2x          |
-| SERSIC_ELLIPSE           | 2.1x        | 8.5x          | 3.2x          |
-| SHAPELETS (n_max=6)      | 8.0x        | 5.2x          | 17.6x         |
-| SHAPELETS (n_max=10)     | 8.9x        | 6.1x          | 22.4x         |
+| CORE_SERSIC              | 2.0x        | 6.7x          | 4.4x          |
+| GAUSSIAN                 | 1.0x        | 2.6x          | 1.6x          |
+| GAUSSIAN_ELLIPSE         | 1.5x        | 3.7x          | 2.0x          |
+| SERSIC                   | 1.0x        | 1.7x          | 4.9x          |
+| SERSIC_ELLIPSE           | 1.9x        | 5.8x          | 3.2x          |
+| SHAPELETS (n_max=6)      | 6.2x        | 3.4x          | 18x           |
+| SHAPELETS (n_max=10)     | 6.0x        | 4.6x          | 22x           |
 
 ## FFT Convolution
 
