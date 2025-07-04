@@ -213,8 +213,7 @@ The table below shows how much faster JAXtronomy is compared to lenstronomy for 
 
 **FFT Pixel Kernel Convolution**
 
-Convolution runtimes vary significantly, depending on both grid size and kernel size. A short summary is as follows, using
-an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz and an NVIDIA A100 GPU.
+Convolution runtimes vary significantly, depending on both grid size and kernel size.
 
 - For a 60x60 grid, and kernel sizes ranging from 3 to 45, jaxtronomy on CPU is about 1.1x to 2.9x faster than lenstronomy, with no obvious correlation to kernel size.
 - For a 60x60 grid, and kernel sizes ranging from 3 to 45, jaxtronomy on GPU is about 1.5x to 3.5x faster than lenstronomy, with JAX performing better with higher kernel sizes.
