@@ -57,7 +57,7 @@ showcases the features and improvements in JAXtronomy.
 Performance comparison between JAXtronomy and lenstronomy
 ---------------------------------------------------------
 
-We compare the runtimes between JAXtronomy and lenstronomy by timing 10,000 function executions.
+We compare the runtimes between JAXtronomy and lenstronomy by timing 1,000 function executions.
 While lenstronomy is always run using CPU, JAXtronomy can be run using either CPU or GPU.
 These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and JAX version 0.6.2.
 A performance comparison notebook has been made available for reproducibility.
