@@ -68,7 +68,7 @@ These ever-increasing computational costs have lead to the development of severa
 The table below shows how much faster JAXtronomy is compared to lenstronomy at calculating deflection angles for different deflector profiles and different grid sizes. Deflector profiles which are already computationally inexpensive for lenstronomy are excluded from this table.
 Some comparisons vary significantly with values of function arguments.
 
-These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and JAX version 0.5.2.
+These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and JAX version 0.6.2.
 
 | Deflector Profile        | 60x60 (cpu) | 180x180 (cpu) | 180x180 (gpu) |
 | :----------------------: | :---------: | :-----------: | :-----------: |
