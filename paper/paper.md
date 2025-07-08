@@ -13,29 +13,32 @@ authors:
   - name: Simon Birrer
     orcid: 0000-0003-3195-5507
     affiliation: 1
-  - name: Aymeric Galan
-    orcid: 0000-0003-2547-9815
-    affiliation: 2, 3
   - name: Natalie Hogg
     orcid: 0000-0001-9346-4477
-    affiliation: 4
+    affiliation: 2
+  - name: Aymeric Galan
+    orcid: 0000-0003-2547-9815
+    affiliation: 3, 4
+  - name: Daniel Gilman
+    orcid: 0000-0002-5116-7287
+    affiliation: 5
   - name: Anowar Shajib
     orcid: 0000-0002-5558-888X
     affiliation: 5, 6, 7
 affiliations:
- - name: Department of Physics and Astronomy, Stony Brook University, USA
+ - name: Department of Physics and Astronomy, Stony Brook University, Stony Brook, NY 1794, USA
    index: 1
- - name: Max-Planck-Institut für Astrophysik, Germany
+ - name: Laboratoire Univers et Particules de Montpellier, CNRS and Université de Montpellier (UMR-5299), 34095 Montpellier, France
    index: 2
- - name: Max-Planck-Institut für Astrophysik, Germany Technical University of Munich, TUM School of Natural Sciences Physics Department, Germany
+ - name: Max-Planck-Institut für Astrophysik, Karl-Schwarzschild Straße 1, 85748 Garching, Germany
    index: 3
- - name: Laboratoire univers et particules de Montpellier, Université de Montpellier, France
+ - name: Technical University of Munich, TUM School of Natural Sciences, Physics Department, James-Franck-Straße 1, 85748 Garching, Germany
    index: 4
- - name: Department of Astronomy and Astrophysics, University of Chicago, USA
+ - name: Department of Astronomy and Astrophysics, University of Chicago, Chicago, Illinois 60637, USA
    index: 5
- - name: Kavli Institute for Cosmological Physics, University of Chicago, USA
+ - name: Kavli Institute for Cosmological Physics, University of Chicago, Chicago, IL 60637, USA
    index: 6
- - name: Center for Astronomy, Space Science and Astrophysics, Independent University, Bangladesh
+ - name: Center for Astronomy, Space Science and Astrophysics, Independent University, Bangladesh, Dhaka 1229, Bangladesh
    index: 7
 
 date:
