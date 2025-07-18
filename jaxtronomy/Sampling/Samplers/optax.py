@@ -12,8 +12,7 @@ __all__ = ["Jaxopt"]
 
 
 class OptaxMinimizer:
-    """
-    """
+    """"""
 
     def __init__(
         self,
@@ -57,7 +56,9 @@ class OptaxMinimizer:
 
         for i in range(len(init_param_list)):
             print(f"Running chain {i+1}")
-            final_params, num_iter = self.run_single(init_params=init_param_list[i], tol=tol)
+            final_params, num_iter = self.run_single(
+                init_params=init_param_list[i], tol=tol
+            )
             final_logL = self._loss(final_params)
             print(f"{num_iter} iterations performed.")
             print("Final logL:", -final_logL)
@@ -74,7 +75,6 @@ class OptaxMinimizer:
 
         return best_params
 
-
     @partial(jit, static_argnums=0)
     def run_single(self, init_params, tol):
 
@@ -82,24 +82,24 @@ class OptaxMinimizer:
             params, state = carry
             value, grad = self.value_and_grad_fun(params, state=state)
             updates, state = self.opt.update(
-              grad, state, params, value=value, grad=grad, value_fn=self._loss
+                grad, state, params, value=value, grad=grad, value_fn=self._loss
             )
             params = optax.apply_updates(params, updates)
             return params, state
 
         def continuing_criterion(carry):
             _, state = carry
-            iter_num = optax.tree.get(state, 'count')
-            grad = optax.tree.get(state, 'grad')
+            iter_num = optax.tree.get(state, "count")
+            grad = optax.tree.get(state, "grad")
             err = optax.tree.norm(grad)
-            return (iter_num == 0) | ((iter_num < self.maxiter) & (err >=tol))
+            return (iter_num == 0) | ((iter_num < self.maxiter) & (err >= tol))
 
         init_carry = (init_params, self.opt.init(init_params))
         final_params, final_state = jax.lax.while_loop(
-          continuing_criterion, step, init_carry
+            continuing_criterion, step, init_carry
         )
 
-        return final_params, optax.tree.get(final_state, 'count')
+        return final_params, optax.tree.get(final_state, "count")
 
     def _draw_init_params(self, num_chains, rng_int):
         """Draws initial parameters to be passed to the minimizer.

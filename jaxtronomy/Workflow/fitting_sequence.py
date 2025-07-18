@@ -209,9 +209,7 @@ class FittingSequence(object):
             elif fitting_type == "optax":
                 kwargs_result = self.optax(**kwargs)
                 self._updateManager.update_param_state(**kwargs_result)
-                chain_list.append(
-                    [fitting_type, kwargs_result]
-                )
+                chain_list.append([fitting_type, kwargs_result])
             else:
                 raise ValueError(
                     "fitting_sequence {} is not supported. Please use: 'PSO', 'SIMPLEX', "
@@ -513,9 +511,14 @@ class FittingSequence(object):
         print("Final parameters:", kwargs_result)
 
         return parameter_history, logL_history, kwargs_result
-    
+
     def optax(
-        self, num_chains, maxiter=500, tolerance=0, sigma_scale=1, rng_int=0,
+        self,
+        num_chains,
+        maxiter=500,
+        tolerance=0,
+        sigma_scale=1,
+        rng_int=0,
     ):
         param_class = self.param_class
         likelihood_module = self.likelihoodModule
@@ -544,9 +547,9 @@ class FittingSequence(object):
         )
 
         # Runs the minimizer
-        (
-            final_params
-        ) = minimizer.run(num_chains=num_chains, tol=tolerance, rng_int=rng_int)
+        (final_params) = minimizer.run(
+            num_chains=num_chains, tol=tolerance, rng_int=rng_int
+        )
 
         # Print results
         kwargs_result = param_class.args2kwargs(final_params)
