@@ -1,5 +1,4 @@
 from jaxtronomy.Sampling.likelihood import LikelihoodModule
-from jaxtronomy.Sampling.Samplers.jaxopt_minimizer import JaxoptMinimizer
 from jaxtronomy.Sampling.Samplers.optax import OptaxMinimizer
 
 from lenstronomy.Workflow.alignment_matching import AlignmentFitting
@@ -199,20 +198,13 @@ class FittingSequence(object):
                     print(len(points), "number of points sampled")
                 kwargs_result = self.best_fit_from_samples(points, log_l)
                 self._updateManager.update_param_state(**kwargs_result)
-
-            elif fitting_type == "Jaxopt":
-                args_history, logL_history, kwargs_result = self.jaxopt(**kwargs)
-                self._updateManager.update_param_state(**kwargs_result)
-                chain_list.append(
-                    [fitting_type, args_history, logL_history, kwargs_result]
-                )
             elif fitting_type == "optax":
                 kwargs_result = self.optax(**kwargs)
                 self._updateManager.update_param_state(**kwargs_result)
                 chain_list.append([fitting_type, kwargs_result])
             else:
                 raise ValueError(
-                    "fitting_sequence {} is not supported. Please use: 'PSO', 'SIMPLEX', "
+                    "fitting_sequence {} is not supported. Please use: 'PSO', 'SIMPLEX', 'optax', "
                     "'MCMC' or 'emcee', 'zeus', 'Cobaya', "
                     "'dynesty', 'dyPolyChord',  'Multinest', 'Nautilus, '"
                     "'psf_iteration', 'restart', 'update_settings', 'calibrate_images' or "
@@ -437,80 +429,6 @@ class FittingSequence(object):
 
         self._mcmc_init_samples = samples  # overwrites previous samples to continue from there in the next MCMC run
         return output
-
-    def jaxopt(
-        self,
-        method="BFGS",
-        num_chains=3,
-        maxiter=500,
-        tolerance=0,
-        sigma_scale=1,
-        rng_int=0,
-    ):
-        """Uses the Jaxopt Scipy Minimizer.
-
-        :param method: string. Otions are BFGS and TNC. Other options such as Nelder-
-            Mead, Powell, CG, Newton-CG, L-BFGS-B, COBYLA, SLSQP, trust-constr, dogleg,
-            trust-ncg, trust-exact, trust-krylov either do not work yet or do not
-            perform as well as BFGS and TNC
-        :param num_chains: int, number of chains to run the minimizer on. Initial
-            parameters for each chain are sampled from the user-provided distribution.
-            Running more chains takes more time but can help avoid local minima.
-        :param maxiter: int, number of iterations to perform during minimization of the
-            loss function
-        :param tolerance: float, only relevant when num_chains > 1. If |logL| <
-            tolerance at the end of a chain, the rest of the chains are not run.
-        :param sigma_scale: float, scales the values in kwargs_sigma which can allow the
-            minimizer to sample initial states from a wider distribution.
-        :param rng_int: int which seeds the JAX RNG.
-        """
-        print(
-            f"Running {method} minimization for {num_chains} chain(s) with {maxiter} max iterations each:"
-        )
-        param_class = self.param_class
-        likelihood_module = self.likelihoodModule
-
-        # Coonverts kwargs to args for the mean, sigma, lower, and upper parameter values
-        kwargs_temp = self._updateManager.parameter_state
-        args_mean = param_class.kwargs2args(**kwargs_temp)
-
-        kwargs_sigma = self._updateManager.sigma_kwargs
-        args_sigma = param_class.kwargs2args(**kwargs_sigma) * sigma_scale
-
-        kwargs_lower = self._updateManager._lower_kwargs
-        args_lower = param_class.kwargs2args(*kwargs_lower)
-
-        kwargs_upper = self._updateManager._upper_kwargs
-        args_upper = param_class.kwargs2args(*kwargs_upper)
-
-        # Initialize the solver class
-        minimizer = JaxoptMinimizer(
-            method=method,
-            logL_func=likelihood_module.logL,
-            args_mean=args_mean,
-            args_sigma=args_sigma,
-            args_lower=args_lower,
-            args_upper=args_upper,
-            maxiter=maxiter,
-        )
-
-        # Runs the minimizer
-        (
-            best_chain_index,
-            multi_chain_param_history,
-            multi_chain_logL_history,
-        ) = minimizer.run(num_chains, rng_int, tolerance)
-
-        # Select the best chain
-        logL_history = multi_chain_logL_history[best_chain_index]
-        parameter_history = multi_chain_param_history[best_chain_index]
-
-        # Print results
-        kwargs_result = param_class.args2kwargs(parameter_history[-1])
-        print("best fit log_likelihood:", logL_history[-1])
-        print("Final parameters:", kwargs_result)
-
-        return parameter_history, logL_history, kwargs_result
 
     def optax(
         self,
