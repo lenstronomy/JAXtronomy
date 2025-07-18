@@ -433,11 +433,19 @@ class FittingSequence(object):
     def optax(
         self,
         num_chains,
-        maxiter=500,
-        tolerance=0,
+        maxiter,
+        tolerance=50,
         sigma_scale=1,
         rng_int=0,
     ):
+        """ Uses Optax L-BFGS gradient descent to find best-fit parameters.
+
+        :param num_chains: int, number of minimization chains to run
+        :param maxiter: int, maximum number of iterations during gradient descent process
+        :param tolerance: float, if np.abs(logL) < tol, the gradient descent is stopped
+        :param sigma_scale: scales the standard deviation of the prior distribution
+        :param rng_int: int, used to generate random initial starting point from the prior distribution
+        """
         param_class = self.param_class
         likelihood_module = self.likelihoodModule
 
