@@ -1,5 +1,6 @@
 from jaxtronomy.Sampling.likelihood import LikelihoodModule
 from jaxtronomy.Sampling.Samplers.jaxopt_minimizer import JaxoptMinimizer
+from jaxtronomy.Sampling.Samplers.optax import OptaxMinimizer
 
 from lenstronomy.Workflow.alignment_matching import AlignmentFitting
 from lenstronomy.Workflow.multi_band_manager import MultiBandUpdateManager
@@ -204,6 +205,12 @@ class FittingSequence(object):
                 self._updateManager.update_param_state(**kwargs_result)
                 chain_list.append(
                     [fitting_type, args_history, logL_history, kwargs_result]
+                )
+            elif fitting_type == "optax":
+                kwargs_result = self.optax(**kwargs)
+                self._updateManager.update_param_state(**kwargs_result)
+                chain_list.append(
+                    [fitting_type, kwargs_result]
                 )
             else:
                 raise ValueError(
@@ -506,6 +513,47 @@ class FittingSequence(object):
         print("Final parameters:", kwargs_result)
 
         return parameter_history, logL_history, kwargs_result
+    
+    def optax(
+        self, num_chains, maxiter=500, tolerance=0, sigma_scale=1, rng_int=0,
+    ):
+        param_class = self.param_class
+        likelihood_module = self.likelihoodModule
+
+        # Coonverts kwargs to args for the mean, sigma, lower, and upper parameter values
+        kwargs_temp = self._updateManager.parameter_state
+        args_mean = param_class.kwargs2args(**kwargs_temp)
+
+        kwargs_sigma = self._updateManager.sigma_kwargs
+        args_sigma = param_class.kwargs2args(**kwargs_sigma) * sigma_scale
+
+        kwargs_lower = self._updateManager._lower_kwargs
+        args_lower = param_class.kwargs2args(*kwargs_lower)
+
+        kwargs_upper = self._updateManager._upper_kwargs
+        args_upper = param_class.kwargs2args(*kwargs_upper)
+
+        # Initialize the solver class
+        minimizer = OptaxMinimizer(
+            logL_func=likelihood_module.logL,
+            args_mean=args_mean,
+            args_sigma=args_sigma,
+            args_lower=args_lower,
+            args_upper=args_upper,
+            maxiter=maxiter,
+        )
+
+        # Runs the minimizer
+        (
+            final_params
+        ) = minimizer.run(num_chains=num_chains, tol=tolerance, rng_int=rng_int)
+
+        # Print results
+        kwargs_result = param_class.args2kwargs(final_params)
+        print("best fit log_likelihood:", likelihood_module.logL(final_params))
+        print("Final parameters:", kwargs_result)
+
+        return kwargs_result
 
     def pso(
         self, n_particles, n_iterations, sigma_scale=1, print_key="PSO", threadCount=1
