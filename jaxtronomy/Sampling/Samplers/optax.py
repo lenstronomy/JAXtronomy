@@ -7,10 +7,6 @@ import optax
 import numpyro, numpyro.distributions as dist
 from numpyro.infer.util import constrain_fn, unconstrain_fn
 
-
-__all__ = ["Jaxopt"]
-
-
 class OptaxMinimizer:
     """"""
 
@@ -90,15 +86,13 @@ class OptaxMinimizer:
         def continuing_criterion(carry):
             _, state = carry
             iter_num = optax.tree.get(state, "count")
-            grad = optax.tree.get(state, "grad")
-            err = optax.tree.norm(grad)
-            return (iter_num == 0) | ((iter_num < self.maxiter) & (err >= tol))
+            value = optax.tree.get(state, "value")
+            return (iter_num == 0) | ((iter_num < self.maxiter) & (value >= tol))
 
         init_carry = (init_params, self.opt.init(init_params))
         final_params, final_state = jax.lax.while_loop(
             continuing_criterion, step, init_carry
         )
-
         return final_params, optax.tree.get(final_state, "count")
 
     def _draw_init_params(self, num_chains, rng_int):
