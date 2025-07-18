@@ -11,8 +11,8 @@ from numpyro.infer.util import constrain_fn, unconstrain_fn
 
 
 class OptaxMinimizer:
-    """Gradient descent using Optax's L-BFGS method.
-    """
+    """Gradient descent using Optax's L-BFGS method."""
+
     def __init__(
         self,
         logL_func,
@@ -46,7 +46,8 @@ class OptaxMinimizer:
         """Runs the gradient descent.
 
         :param num_chains: int, number of chains to run
-        :param tol: float, when np.abs(logL) < tol, the gradient descent for that chain is stopped
+        :param tol: float, when np.abs(logL) < tol, the gradient descent for that chain
+            is stopped
         :param rng_int: int, used to draw initial parameters from the prior distribution
         """
 
@@ -86,6 +87,7 @@ class OptaxMinimizer:
         :param init_params: 1d array of floats, initial parameters for the loss function
         :param tol: float, when np.abs(logL) < tol, the gradient descent is stopped
         """
+
         def step(carry):
             params, state = carry
             value, grad = self.value_and_grad_fun(params, state=state)
