@@ -6,7 +6,7 @@ TODO: Import jaxified versions of other lenstronomy.Util.util.py
 """
 
 from functools import partial
-from jax import jit, numpy as jnp
+from jax import jit, lax, numpy as jnp
 import numpy as np
 
 from lenstronomy.Util.util import local_minima_2d, make_grid, make_subgrid, selectBest
@@ -33,7 +33,7 @@ def array2image(array, nx=0, ny=0):
                 % (jnp.size(array))
             )
         nx, ny = n, n
-    image = jnp.reshape(array, (nx, ny))
+    image = jnp.reshape(array, (ny, nx))
     return image
 
 
@@ -81,6 +81,41 @@ def image2array(image):
     imgh = jnp.reshape(image, jnp.size(image))  # change the shape to be 1d
     return imgh
 
+#@jit
+#def local_minima_2d(a, x, y):
+#    """Finds (local) minima in a 2d grid applies less rigid criteria for maximum without
+#    second-order tangential minima criteria.
+#    NOTE: Because array sizes have to be known at compile time, but the number of minima
+#    is not known until runtime, the original a, x, y arrays are returned but with non-minima
+#    locations filled with 999.
+#
+#    :param a: 1d array of displacements from the source positions
+#    :type a: numpy array with length numPix**2 in float
+#    :param x: 1d coordinate grid in x-direction
+#    :type x: numpy array with length numPix**2 in float
+#    :param y: 1d coordinate grid in x-direction
+#    :type y: numpy array with length numPix**2 in float
+#    :returns: array of indices of local minima, values of those minima
+#    :raises: AttributeError, KeyError
+#    """
+#    dim = int(np.sqrt(len(a)))
+#    def body_fun(i, min_array):
+#        is_minimum = True
+#        is_minimum = jnp.where(a[i] > a[i - 1], False, is_minimum)
+#        is_minimum = jnp.where(a[i] > a[i + 1], False, is_minimum)
+#        is_minimum = jnp.where(a[i] > a[i - dim], False, is_minimum)
+#        is_minimum = jnp.where(a[i] > a[i + dim], False, is_minimum)
+#        is_minimum = jnp.where(a[i] > a[i - (dim - 1)], False, is_minimum)
+#        is_minimum = jnp.where(a[i] > a[i - (dim + 1)], False, is_minimum)
+#        is_minimum = jnp.where(a[i] > a[i + (dim - 1)], False, is_minimum)
+#        is_minimum = jnp.where(a[i] > a[i + (dim + 1)], False, is_minimum)
+#        return min_array.at[i].set(is_minimum)
+#        
+#    is_minimum = lax.fori_loop(dim + 1, len(a) - dim - 1, body_fun, jnp.ones_like(a, dtype=bool))
+#    x_mins = jnp.where(is_minimum, x, 999)
+#    y_mins = jnp.where(is_minimum, y, 999)
+#    values = jnp.where(is_minimum, a, 999)
+#    return x_mins, y_mins, values
 
 @jit
 def map_coord2pix(ra, dec, x_0, y_0, M):
