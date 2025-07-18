@@ -11,8 +11,8 @@ from numpyro.infer.util import constrain_fn, unconstrain_fn
 
 
 class OptaxMinimizer:
-    """"""
-
+    """Gradient descent using Optax's L-BFGS method.
+    """
     def __init__(
         self,
         logL_func,
@@ -23,8 +23,6 @@ class OptaxMinimizer:
         maxiter=500,
     ):
         """
-        :param method: string, options are BFGS and TNC. Other options such as Nelder-Mead, Powell, CG, Newton-CG,
-            L-BFGS-B, COBYLA, SLSQP, trust-constr, dogleg, trust-ncg, trust-exact, trust-krylov have not been tested.
         :param logL_func: callable function, usually the logL function from the likelihood module
         :param args_mean: array of args, to be used as the mean of a normal distribution
             obtained by using Param.kwargs2args
@@ -45,6 +43,13 @@ class OptaxMinimizer:
         self.value_and_grad_fun = optax.value_and_grad_from_state(self._loss)
 
     def run(self, num_chains, tol, rng_int=0):
+        """Runs the gradient descent.
+
+        :param num_chains: int, number of chains to run
+        :param tol: float, when np.abs(logL) < tol, the gradient descent for that chain is stopped
+        :param rng_int: int, used to draw initial parameters from the prior distribution
+        """
+
         init_param_list = self._draw_init_params(num_chains=num_chains, rng_int=rng_int)
         init_param_list = unconstrain_fn(
             self._numpyro_model,
@@ -76,7 +81,11 @@ class OptaxMinimizer:
 
     @partial(jit, static_argnums=0)
     def run_single(self, init_params, tol):
+        """Runs the gradient descent for a single chain.
 
+        :param init_params: 1d array of floats, initial parameters for the loss function
+        :param tol: float, when np.abs(logL) < tol, the gradient descent is stopped
+        """
         def step(carry):
             params, state = carry
             value, grad = self.value_and_grad_fun(params, state=state)
