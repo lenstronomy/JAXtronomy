@@ -81,8 +81,9 @@ def image2array(image):
     imgh = jnp.reshape(image, jnp.size(image))  # change the shape to be 1d
     return imgh
 
-#@jit
-#def local_minima_2d(a, x, y):
+
+# @jit
+# def local_minima_2d(a, x, y):
 #    """Finds (local) minima in a 2d grid applies less rigid criteria for maximum without
 #    second-order tangential minima criteria.
 #    NOTE: Because array sizes have to be known at compile time, but the number of minima
@@ -110,12 +111,13 @@ def image2array(image):
 #        is_minimum = jnp.where(a[i] > a[i + (dim - 1)], False, is_minimum)
 #        is_minimum = jnp.where(a[i] > a[i + (dim + 1)], False, is_minimum)
 #        return min_array.at[i].set(is_minimum)
-#        
+#
 #    is_minimum = lax.fori_loop(dim + 1, len(a) - dim - 1, body_fun, jnp.ones_like(a, dtype=bool))
 #    x_mins = jnp.where(is_minimum, x, 999)
 #    y_mins = jnp.where(is_minimum, y, 999)
 #    values = jnp.where(is_minimum, a, 999)
 #    return x_mins, y_mins, values
+
 
 @jit
 def map_coord2pix(ra, dec, x_0, y_0, M):
