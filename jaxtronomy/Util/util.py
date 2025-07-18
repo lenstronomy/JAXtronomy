@@ -6,7 +6,7 @@ TODO: Import jaxified versions of other lenstronomy.Util.util.py
 """
 
 from functools import partial
-from jax import jit, lax, numpy as jnp
+from jax import jit, numpy as jnp
 import numpy as np
 
 from lenstronomy.Util.util import local_minima_2d, make_grid, make_subgrid, selectBest
