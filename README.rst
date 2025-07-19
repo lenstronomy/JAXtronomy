@@ -240,6 +240,10 @@ Community guidelines
 
 **Contributing to jaxtronomy**
 
+The contributing guidelines are the same as lenstronomy's.
+For more details, click `here<https://github.com/lenstronomy/lenstronomy/blob/main/CONTRIBUTING.rst>`_.
+In short,
+
 - Fork the repository
 - Write clean, well-documented code, following conventions
 - Submit pull requests
