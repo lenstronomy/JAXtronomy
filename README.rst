@@ -240,7 +240,7 @@ Community guidelines
 
 **Contributing to jaxtronomy**
 
-The guidelines for contributing to JAXtronomy are the same as lenstronomy, which can be found `here<https://github.com/lenstronomy/lenstronomy/blob/main/CONTRIBUTING.rst>`_.
+The guidelines for contributing to JAXtronomy are the same as lenstronomy, which can be found `here <https://github.com/lenstronomy/lenstronomy/blob/main/CONTRIBUTING.rst>`_.
 In short,
 
 - Fork the repository
