@@ -33,7 +33,7 @@ def array2image(array, nx=0, ny=0):
                 % (jnp.size(array))
             )
         nx, ny = n, n
-    image = jnp.reshape(array, (nx, ny))
+    image = jnp.reshape(array, (ny, nx))
     return image
 
 
