@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 requires = [
-    "lenstronomy>=1.13.1",
+    "lenstronomy>=1.13.2",
     "numpy>=1.25.0",
     "scipy>=0.19.1",
     "jax>=0.6.1",
@@ -11,7 +11,7 @@ tests_require = ["pytest"]
 
 setup(
     name="jaxtronomy",
-    version="0.1.0",
+    version="0.1.1",
     url="https://github.com/lenstronomy/JAXtronomy",
     author="jaxtronomy developers",
     description="lenstronomy, but in JAX",

@@ -1,5 +1,5 @@
 from jaxtronomy.Sampling.likelihood import LikelihoodModule
-from jaxtronomy.Sampling.Samplers.jaxopt_minimizer import JaxoptMinimizer
+from jaxtronomy.Sampling.Samplers.optax import OptaxMinimizer
 
 from lenstronomy.Workflow.alignment_matching import AlignmentFitting
 from lenstronomy.Workflow.multi_band_manager import MultiBandUpdateManager
@@ -198,16 +198,13 @@ class FittingSequence(object):
                     print(len(points), "number of points sampled")
                 kwargs_result = self.best_fit_from_samples(points, log_l)
                 self._updateManager.update_param_state(**kwargs_result)
-
-            elif fitting_type == "Jaxopt":
-                args_history, logL_history, kwargs_result = self.jaxopt(**kwargs)
+            elif fitting_type == "optax":
+                kwargs_result = self.optax(**kwargs)
                 self._updateManager.update_param_state(**kwargs_result)
-                chain_list.append(
-                    [fitting_type, args_history, logL_history, kwargs_result]
-                )
+                chain_list.append([fitting_type, kwargs_result])
             else:
                 raise ValueError(
-                    "fitting_sequence {} is not supported. Please use: 'PSO', 'SIMPLEX', "
+                    "fitting_sequence {} is not supported. Please use: 'PSO', 'SIMPLEX', 'optax', "
                     "'MCMC' or 'emcee', 'zeus', 'Cobaya', "
                     "'dynesty', 'dyPolyChord',  'Multinest', 'Nautilus, '"
                     "'psf_iteration', 'restart', 'update_settings', 'calibrate_images' or "
@@ -433,35 +430,24 @@ class FittingSequence(object):
         self._mcmc_init_samples = samples  # overwrites previous samples to continue from there in the next MCMC run
         return output
 
-    def jaxopt(
+    def optax(
         self,
-        method="BFGS",
-        num_chains=3,
-        maxiter=500,
-        tolerance=0,
+        num_chains,
+        maxiter,
+        tolerance=50,
         sigma_scale=1,
         rng_int=0,
     ):
-        """Uses the Jaxopt Scipy Minimizer.
+        """Uses Optax L-BFGS gradient descent to find best-fit parameters.
 
-        :param method: string. Otions are BFGS and TNC. Other options such as Nelder-
-            Mead, Powell, CG, Newton-CG, L-BFGS-B, COBYLA, SLSQP, trust-constr, dogleg,
-            trust-ncg, trust-exact, trust-krylov either do not work yet or do not
-            perform as well as BFGS and TNC
-        :param num_chains: int, number of chains to run the minimizer on. Initial
-            parameters for each chain are sampled from the user-provided distribution.
-            Running more chains takes more time but can help avoid local minima.
-        :param maxiter: int, number of iterations to perform during minimization of the
-            loss function
-        :param tolerance: float, only relevant when num_chains > 1. If |logL| <
-            tolerance at the end of a chain, the rest of the chains are not run.
-        :param sigma_scale: float, scales the values in kwargs_sigma which can allow the
-            minimizer to sample initial states from a wider distribution.
-        :param rng_int: int which seeds the JAX RNG.
+        :param num_chains: int, number of minimization chains to run
+        :param maxiter: int, maximum number of iterations during gradient descent
+            process
+        :param tolerance: float, if np.abs(logL) < tol, the gradient descent is stopped
+        :param sigma_scale: scales the standard deviation of the prior distribution
+        :param rng_int: int, used to generate random initial starting point from the
+            prior distribution
         """
-        print(
-            f"Running {method} minimization for {num_chains} chain(s) with {maxiter} max iterations each:"
-        )
         param_class = self.param_class
         likelihood_module = self.likelihoodModule
 
@@ -479,8 +465,7 @@ class FittingSequence(object):
         args_upper = param_class.kwargs2args(*kwargs_upper)
 
         # Initialize the solver class
-        minimizer = JaxoptMinimizer(
-            method=method,
+        minimizer = OptaxMinimizer(
             logL_func=likelihood_module.logL,
             args_mean=args_mean,
             args_sigma=args_sigma,
@@ -490,22 +475,16 @@ class FittingSequence(object):
         )
 
         # Runs the minimizer
-        (
-            best_chain_index,
-            multi_chain_param_history,
-            multi_chain_logL_history,
-        ) = minimizer.run(num_chains, rng_int, tolerance)
-
-        # Select the best chain
-        logL_history = multi_chain_logL_history[best_chain_index]
-        parameter_history = multi_chain_param_history[best_chain_index]
+        (final_params) = minimizer.run(
+            num_chains=num_chains, tol=tolerance, rng_int=rng_int
+        )
 
         # Print results
-        kwargs_result = param_class.args2kwargs(parameter_history[-1])
-        print("best fit log_likelihood:", logL_history[-1])
+        kwargs_result = param_class.args2kwargs(final_params)
+        print("best fit log_likelihood:", likelihood_module.logL(final_params))
         print("Final parameters:", kwargs_result)
 
-        return parameter_history, logL_history, kwargs_result
+        return kwargs_result
 
     def pso(
         self, n_particles, n_iterations, sigma_scale=1, print_key="PSO", threadCount=1

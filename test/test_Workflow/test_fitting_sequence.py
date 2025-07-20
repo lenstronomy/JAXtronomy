@@ -1193,28 +1193,21 @@ class TestFittingSequence(object):
             kwargs_params,
         )
 
-        # options are BFGS and TNC
-        # Other options such as Nelder-Mead, Powell, CG, Newton-CG, L-BFGS-B, COBYLA,
-        # SLSQP, trust-constr, dogleg, trust-ncg, trust-exact, trust-krylov
-        # either do not work yet or do not perform as well as BFGS and TNC
-        jaxopt_kwargs = {
-            "method": "BFGS",
+        optax_kwargs = {
             "maxiter": 300,
-            "num_chains": 5,
-            "tolerance": 1e-5,
+            "num_chains": 1,
+            "tolerance": 100,
             "sigma_scale": 1,
             "rng_int": 1,
         }
-        fitting_kwargs_list_jaxopt = [["Jaxopt", jaxopt_kwargs]]
+        fitting_kwargs_list_jaxopt = [["optax", optax_kwargs]]
         chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_jaxopt)
-        fitting_type, args_history, logL_history, kwargs_result = chain_list[0]
+        fitting_type, kwargs_result = chain_list[0]
 
-        assert fitting_type == "Jaxopt"
-        assert len(args_history) == len(logL_history)
+        assert fitting_type == "optax"
         npt.assert_almost_equal(
             kwargs_result["kwargs_lens"][0]["theta_E"], 0.66, decimal=1
         )
-        npt.assert_almost_equal(logL_history[-1], 0, decimal=0)
 
 
 if __name__ == "__main__":

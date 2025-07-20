@@ -69,11 +69,11 @@ class ImageData(PixelGrid, ImageNoise):
 
         :param image_data: 2d numpy array of the image data
         :param exposure_time: int or array of size the data; exposure time
-         (common for all pixels or individually for each individual pixel)
+            (common for all pixels or individually for each individual pixel)
         :param background_rms: root-mean-square value of Gaussian background noise in units counts per second
         :param noise_map: int or array of size the data; joint noise sqrt(variance) of each individual pixel.
         :param gradient_boost_factor: None or float, variance terms added in quadrature scaling with
-         gradient^2 * gradient_boost_factor
+            gradient^2 * gradient_boost_factor
         :param transform_pix2angle: 2x2 matrix, mapping of pixel to coordinate
         :param ra_at_xy_0: ra coordinate at pixel (0,0)
         :param dec_at_xy_0: dec coordinate at pixel (0,0)
@@ -82,13 +82,13 @@ class ImageData(PixelGrid, ImageNoise):
         :param phi_rot: rotation angle in regard to pixel coordinate transform_pix2angle
         :param log_likelihood_constant: float, allows user to input a constant that will be added to the log likelihood. Note that, as for now, this variable is ONLY used for interferometric mode.
         :param antenna_primary_beam: 2d numpy array with the same size of image_data;
-         more descriptions of the primary beam can be found in the AngularSensitivity class
+            more descriptions of the primary beam can be found in the AngularSensitivity class
         :param likelihood_method: string, type of method of log_likelihood computation: options are 'diagonal', 'interferometry_natwt'.
-         The default option 'diagonal' uses a diagonal covariance matrix, which is the case for CCD images.
-         The 'interferometry_natwt' option uses our special interferometric likelihood function based on natural weighting images.
+            The default option 'diagonal' uses a diagonal covariance matrix, which is the case for CCD images.
+            The 'interferometry_natwt' option uses our special interferometric likelihood function based on natural weighting images.
         :param flux_scaling: scales the model amplitudes to match the imaging data units. This can be used, for example,
-         when modeling multiple exposures that have different magnitude zero points (or flux normalizations) but demand
-         the same model normalization
+            when modeling multiple exposures that have different magnitude zero points (or flux normalizations) but demand
+            the same model normalization
         """
         if antenna_primary_beam is not None:
             raise ValueError("primary beam is not supported in jaxtronomy")

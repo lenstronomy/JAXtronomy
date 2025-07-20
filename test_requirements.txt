@@ -1,6 +1,6 @@
 # samplers for FittingSequence
 numpyro>=0.15.3
-jaxopt>=0.8.3
+optax
 dynesty
 zeus-mcmc
 cobaya
