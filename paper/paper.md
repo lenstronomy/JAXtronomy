@@ -25,6 +25,10 @@ authors:
   - name: Anowar J. Shajib
     orcid: 0000-0002-5558-888X
     affiliation: 5, 6, 7
+  - name: Nan Zhang
+    orcid: 0000-0002-4861-0081
+    affiliation: 8
+
 affiliations:
  - name: Department of Physics and Astronomy, Stony Brook University, Stony Brook, NY 1794, USA
    index: 1
@@ -40,6 +44,8 @@ affiliations:
    index: 6
  - name: Center for Astronomy, Space Science and Astrophysics, Independent University, Bangladesh, Dhaka 1229, Bangladesh
    index: 7
+ - name: Department of Physics, University of Illinois, 1110 West Green St., Urbana, IL 61801, USA
+   index: 8
 
 date:
 codeRepository: https://github.com/lenstronomy/JAXtronomy
