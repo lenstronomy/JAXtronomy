@@ -108,7 +108,7 @@ An analogous table for the different light profiles is shown below.
 
 ## FFT Convolution
 
-We find that FFT convolution using `JAX` on CPU results in variable performance boosts or slowdowns compared to `lenstronomy` (which uses `scipy`'s FFT convolution). On a 60x60 grid, and kernel sizes ranging from 3 to 45, JAX on CPU ranges from being 1.1x to 2.9x faster than `lenstronomy`, with no obvious correlation to kernel size. On a 180x180 grid, and kernel sizes ranging from 9 to 135, `JAXtronomy` on CPU ranges from being 0.7x to 2.5x as fast as `lenstronomy`, with no obvious correlation to kernel size.
+We find that FFT convolution using `JAX` on CPU results in variable performance boosts or slowdowns compared to `lenstronomy` (which uses `scipy`'s FFT convolution). On a 60x60 grid, and kernel sizes ranging from 3 to 45, `JAX` on CPU ranges from being 1.1x to 2.9x faster than `lenstronomy`, with no obvious correlation to kernel size. On a 180x180 grid, and kernel sizes ranging from 9 to 135, `JAXtronomy` on CPU ranges from being 0.7x to 2.5x as fast as `lenstronomy`, with no obvious correlation to kernel size.
 
 However, FFT convolution using JAX on GPU is significantly faster than `scipy`. On a 60x60 grid, and kernel sizes ranging from 3 to 45, JAX on GPU ranges from being 1.5x to 3.5x faster than `lenstronomy`, with JAX performing better at higher kernel sizes. On a 180x180 grid, and kernel sizes ranging from 9 to 135, `JAXtronomy` on GPU is about 10x to 20x as fast as `lenstronomy`, again with JAX performing better at higher kernel sizes.
 
