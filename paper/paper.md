@@ -72,7 +72,7 @@ These ever-increasing computational costs have lead to the development of severa
 
 The simulation of a lensed image comes in three main steps. The first step begins with a coordinate grid in the angles seen by the observer. These coordinates are ray-traced through the deflectors back to the source plane. This process requires the calculation of light ray deflection angles at each deflector. Second, the surface brightness of the source is calculated on the ray-traced coordinate grid. This produces a lensed image. Third, the lensed image gets convolved by the point spread function (PSF) originating from diffraction of the telescope optics and atmospheric turbulence. Due to the various choices in deflector mass profiles, light model profiles, grid size, and PSF kernel size, the overall runtime of the pipeline can vary significantly.
 
-In the following sections, we outline the improvements in performance that `JAXtronomy` has over `lenstronomy` for each step in the pipeline. These performance benchmarks were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and JAX version 0.6.2.
+In the following sections, we outline the improvements in performance that `JAXtronomy` has over `lenstronomy` for each step in the pipeline. These performance benchmarks were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and `JAX` version 0.6.2.
 
 ## Deflection angle calculations
 
@@ -110,13 +110,13 @@ An analogous table for the different light profiles is shown below.
 
 We find that FFT convolution using `JAX` on CPU results in variable performance boosts or slowdowns compared to `lenstronomy` (which uses `scipy`'s FFT convolution). On a 60x60 grid, and kernel sizes ranging from 3 to 45, `JAX` on CPU ranges from being 1.1x to 2.9x faster than `lenstronomy`, with no obvious correlation to kernel size. On a 180x180 grid, and kernel sizes ranging from 9 to 135, `JAXtronomy` on CPU ranges from being 0.7x to 2.5x as fast as `lenstronomy`, with no obvious correlation to kernel size.
 
-However, FFT convolution using JAX on GPU is significantly faster than `scipy`. On a 60x60 grid, and kernel sizes ranging from 3 to 45, JAX on GPU ranges from being 1.5x to 3.5x faster than `lenstronomy`, with JAX performing better at higher kernel sizes. On a 180x180 grid, and kernel sizes ranging from 9 to 135, `JAXtronomy` on GPU is about 10x to 20x as fast as `lenstronomy`, again with JAX performing better at higher kernel sizes.
+However, FFT convolution using `JAX` on GPU is significantly faster than `scipy`. On a 60x60 grid, and kernel sizes ranging from 3 to 45, JAX on GPU ranges from being 1.5x to 3.5x faster than `lenstronomy`, with `JAX` performing better at higher kernel sizes. On a 180x180 grid, and kernel sizes ranging from 9 to 135, `JAXtronomy` on GPU is about 10x to 20x as fast as `lenstronomy`, again with `JAX` performing better at higher kernel sizes.
 
 # Improvements over lenstronomy in lens modelling
 
 The process of lens modelling involves finding best-fit parameters describing a lensed system from real data. In `lenstronomy`, this typically involves a Particle Swarm Optimizer (PSO) [@Kennedy:1995] for optimization and Monte Carlo Markov Chains for posterior sampling.
 
-`JAXtronomy` retains all of the lens modelling algorithms from `lenstronomy` while benefitting from the increased performance outlined above. Additionally, using JAX's autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax`[^4] library [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information.
+`JAXtronomy` retains all of the lens modelling algorithms from `lenstronomy` while benefitting from the increased performance outlined above. Additionally, using `JAX`'s autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax`[^4] library [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information.
 
 [^4]: https://github.com/google-deepmind/optax
 
