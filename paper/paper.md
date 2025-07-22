@@ -49,9 +49,12 @@ bibliography: paper.bib
 
 # Summary
 
-`JAXtronomy` is a re-implementation of the gravitational lensing software package `lenstronomy`\footnote{https://github.com/lenstronomy/lenstronomy} [@Birrer:2018; @Birrer:2021] using `JAX`\footnote{https://github.com/jax-ml/jax}, a Python library that uses an accelerated linear algebra (XLA) compiler to improve the performance of computing software. Our core design principle of `JAXtronomy` is to maintain an identical API to that of `lenstronomy`.
+`JAXtronomy` is a re-implementation of the gravitational lensing software package `lenstronomy`[^1] [@Birrer:2018; @Birrer:2021] using `JAX`[^2], a Python library that uses an accelerated linear algebra (XLA) compiler to improve the performance of computing software. Our core design principle of `JAXtronomy` is to maintain an identical API to that of `lenstronomy`.
 
 The main `JAX` features utilized in `JAXtronomy` are just-in-time-compilation, which can lead to significant reductions in execution time, and automatic differentiation, which allows for the implementation of gradient-based algorithms that were previously impossible. Additionally, `JAX` allows code to be run on GPUs, further boosting the performance of `JAXtronomy`.
+
+[^1]: https://github.com/lenstronomy/lenstronomy
+[^2]: https://github.com/jax-ml/jax
 
 # Statement of need
 
@@ -61,7 +64,9 @@ Examples of packages dependent on `lenstronomy` for general-purpose lensing comp
 
 In many of these applications, computational constraints are the key limiting factor for strong gravitational lensing science. For example, increased data quality and number of lenses to analyze makes lens modeling a computational bottleneck, and expensive ray-tracing through tens of thousands of dark matter substructures limit the amount of images that can be simulated, especially for the training of neural networks and simulation-based inferences.
 
-These ever-increasing computational costs have lead to the development of several JAX-accelerated strong-lensing packages, such as `gigalens` [@Gu:2022], `herculens` [@Galan:2022], `paltax` [@Wagner-Carena:2024], `GLaD` [@Wang:2025], and `jaxstronomy`\footnote{https://github.com/google-research/google-research/tree/master/jaxstronomy}. Such packages have been directly inspired by `lenstronomy` and/or support specific use cases. With `JAXtronomy`, we aim to support a wide range of features offered by `lenstronomy` while maintaining an identical API so that packages dependent on `lenstronomy` can transition seamlessly to `JAXtronomy`.
+These ever-increasing computational costs have lead to the development of several JAX-accelerated strong-lensing packages, such as `gigalens` [@Gu:2022], `herculens` [@Galan:2022], `paltax` [@Wagner-Carena:2024], `GLaD` [@Wang:2025], and `jaxstronomy`[^3]. Such packages have been directly inspired by `lenstronomy` and/or support specific use cases. With `JAXtronomy`, we aim to support a wide range of features offered by `lenstronomy` while maintaining an identical API so that packages dependent on `lenstronomy` can transition seamlessly to `JAXtronomy`.
+
+[^3]: https://github.com/google-research/google-research/tree/master/jaxstronomy
 
 # Improvements over lenstronomy in image simulation
 
@@ -111,6 +116,8 @@ However, FFT convolution using JAX on GPU is significantly faster than `scipy`. 
 
 The process of lens modelling involves finding best-fit parameters describing a lensed system from real data. In `lenstronomy`, this typically involves a Particle Swarm Optimizer (PSO) [@Kennedy:1995] for optimization and Monte Carlo Markov Chains for posterior sampling.
 
-`JAXtronomy` retains all of the lens modelling algorithms from `lenstronomy` while benefitting from the increased performance outlined above. Additionally, using JAX's autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax` library\footnote{https://github.com/google-deepmind/optax} [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information.
+`JAXtronomy` retains all of the lens modelling algorithms from `lenstronomy` while benefitting from the increased performance outlined above. Additionally, using JAX's autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax` library[^4] [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information.
+
+[^4]: https://github.com/google-deepmind/optax
 
 # References
