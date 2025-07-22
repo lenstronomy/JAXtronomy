@@ -64,7 +64,7 @@ Examples of packages dependent on `lenstronomy` for general-purpose lensing comp
 
 In many of these applications, computational constraints are the key limiting factor for strong gravitational lensing science. For example, increased data quality and number of lenses to analyze makes lens modeling a computational bottleneck, and expensive ray-tracing through tens of thousands of dark matter substructures limit the amount of images that can be simulated, especially for the training of neural networks and simulation-based inferences.
 
-These ever-increasing computational costs have lead to the development of several JAX-accelerated strong-lensing packages, such as `gigalens` [@Gu:2022], `herculens` [@Galan:2022], `paltax` [@Wagner-Carena:2024], `GLaD` [@Wang:2025], and `jaxstronomy`[^3]. Such packages have been directly inspired by `lenstronomy` and/or support specific use cases. With `JAXtronomy`, we aim to support a wide range of features offered by `lenstronomy` while maintaining an identical API so that packages dependent on `lenstronomy` can transition seamlessly to `JAXtronomy`.
+These ever-increasing computational costs have lead to the development of several JAX-accelerated strong-lensing packages, such as `gigalens` [@Gu:2022], `herculens` [@Galan:2022], `paltax` [@Wagner-Carena:2024], `GLaD` [@Wang:2025], and Google Research's `jaxstronomy`[^3]. Such packages have been directly inspired by `lenstronomy` and/or support specific use cases. With `JAXtronomy`, we aim to support a wide range of features offered by `lenstronomy` while maintaining an identical API so that packages dependent on `lenstronomy` can transition seamlessly to `JAXtronomy`.
 
 [^3]: https://github.com/google-research/google-research/tree/master/jaxstronomy
 
