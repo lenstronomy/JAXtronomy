@@ -116,7 +116,7 @@ However, FFT convolution using JAX on GPU is significantly faster than `scipy`. 
 
 The process of lens modelling involves finding best-fit parameters describing a lensed system from real data. In `lenstronomy`, this typically involves a Particle Swarm Optimizer (PSO) [@Kennedy:1995] for optimization and Monte Carlo Markov Chains for posterior sampling.
 
-`JAXtronomy` retains all of the lens modelling algorithms from `lenstronomy` while benefitting from the increased performance outlined above. Additionally, using JAX's autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax`[^4] library[@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information.
+`JAXtronomy` retains all of the lens modelling algorithms from `lenstronomy` while benefitting from the increased performance outlined above. Additionally, using JAX's autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax`[^4] library [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information.
 
 [^4]: https://github.com/google-deepmind/optax
 
