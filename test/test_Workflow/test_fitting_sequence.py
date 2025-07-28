@@ -16,7 +16,6 @@ from jaxtronomy.Data.imaging_data import ImageData
 
 from lenstronomy.Data.psf import PSF
 
-
 class TestFittingSequence(object):
     """Test the fitting sequences."""
 
@@ -330,7 +329,7 @@ class TestFittingSequence(object):
             "stacking_method": "mean",
             "new_procedure": False,
         }
-        # fitting_list.append(["psf_iteration", kwargs_psf_iter])
+        fitting_list.append(["psf_iteration", kwargs_psf_iter])
         fitting_list.append(["restart", None])
         fitting_list.append(["fix_not_computed", {"free_bands": [True]}])
         n_sersic_overwrite = 4
@@ -398,9 +397,6 @@ class TestFittingSequence(object):
             fitting_list_three.append(["emcee", kwargs_test])
             fittingSequence.fit_sequence(fitting_list_three)
 
-        fitting_list4 = [["psf_iteration", kwargs_psf_iter]]
-        with t.assertRaises(ValueError):
-            fittingSequence.fit_sequence(fitting_list4)
         fitting_list5 = [["calibrate_images", {}]]
         with t.assertRaises(ValueError):
             fittingSequence.fit_sequence(fitting_list5)

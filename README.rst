@@ -59,7 +59,7 @@ Performance comparison between JAXtronomy and lenstronomy
 
 We compare the runtimes between JAXtronomy and lenstronomy by timing 1,000 function executions.
 While lenstronomy is always run using CPU, JAXtronomy can be run using either CPU or GPU.
-These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and JAX version 0.6.2.
+These tests were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and JAX version 0.7.0.
 A performance comparison notebook has been made available for reproducibility.
 
 **LensModel ray-shooting**
@@ -76,40 +76,40 @@ Some comparisons vary significantly with values of function arguments.
     - 180x180 grid (JAX w/ gpu)
   * - CONVERGENCE
     - 0.4x
-    - 1.3x
+    - 1.1x
     - 0.5x
   * - CSE
     - 1.6x
-    - 3.4x
-    - 3.1x
+    - 2.6x
+    - 2.6x
   * - EPL
     - 5.1x - 15x
-    - 9.2x - 18x
-    - 37x - 120x
+    - 8.4x - 18x
+    - 36x - 120x
   * - EPL (jax) vs EPL_NUMBA
     - 1.4x
     - 3.0x
     - 13x
   * - EPL_MULTIPOLE_M1M3M4
     - 2.1x - 7x
-    - 6.8x - 13x
+    - 6.4x - 13x
     - 42x - 108x
   * - EPL_MULTIPOLE_M1M3M4_ELL
     - 1.8x - 3.3x
-    - 2.6x - 3.3x
+    - 2.5x - 3.3x
     - 120x - 140x
   * - GAUSSIAN
     - 1.4x
-    - 3.0x
-    - 2.9x
+    - 2.8x
+    - 2.3x
   * - GAUSSIAN_POTENTIAL
     - 1.2x
     - 2.6x
-    - 2.4x
+    - 1.9x
   * - HERNQUIST
     - 2.0x
     - 3.4x
-    - 6.4x
+    - 5.8x
   * - HERNQUIST_ELLIPSE_CSE
     - 3.8x
     - 5.4x
@@ -129,7 +129,7 @@ Some comparisons vary significantly with values of function arguments.
   * - NFW_ELLIPSE_CSE
     - 4.1x
     - 6.7x
-    - 37x
+    - 31x
   * - NIE
     - 0.5x
     - 0.5x
@@ -145,7 +145,7 @@ Some comparisons vary significantly with values of function arguments.
   * - SHEAR
     - 0.7x
     - 2.0x
-    - 1.0x
+    - 0.9x
   * - SIE
     - 0.5x
     - 0.5x
@@ -173,14 +173,14 @@ The table below shows how much faster JAXtronomy is compared to lenstronomy for 
    * - CORE_SERSIC
      - 2.0x
      - 6.7x
-     - 4.4x
+     - 4.2x
    * - GAUSSIAN
      - 1.0x
-     - 2.6x
-     - 1.6x
+     - 2.5x
+     - 1.3x
    * - GAUSSIAN_ELLIPSE
      - 1.5x
-     - 3.7x
+     - 3.6x
      - 2.0x
    * - MULTI_GAUSSIAN (5 components)
      - 3.7x
@@ -188,15 +188,15 @@ The table below shows how much faster JAXtronomy is compared to lenstronomy for 
      - 7.8x
    * - MULTI_GAUSSIAN_ELLIPSE (5 components)
      - 4.0x
-     - 14x
-     - 8.2x
+     - 13x
+     - 6.9x
    * - SERSIC
      - 1.0x
      - 1.7x
-     - 4.9x
+     - 3.9x
    * - SERSIC_ELLIPSE
      - 1.9x
-     - 5.8x
+     - 5.7x
      - 3.2x
    * - SERSIC_ELLIPSE_Q_PHI
      - 1.7x
@@ -205,11 +205,11 @@ The table below shows how much faster JAXtronomy is compared to lenstronomy for 
    * - SHAPELETS (n_max=6)
      - 6.2x
      - 3.4x
-     - 18x
+     - 15x
    * - SHAPELETS (n_max=10)
      - 6.0x
-     - 4.6x
-     - 23x
+     - 4.5x
+     - 17x
 
 **FFT Pixel Kernel Convolution**
 
