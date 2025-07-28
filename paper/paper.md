@@ -47,7 +47,7 @@ affiliations:
  - name: Department of Physics, University of Illinois, 1110 West Green St., Urbana, IL 61801, USA
    index: 8
 
-date:
+date: 28 July 2025
 codeRepository: https://github.com/lenstronomy/JAXtronomy
 license: BSD 3-Clause License
 bibliography: paper.bib
