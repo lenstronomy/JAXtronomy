@@ -2,6 +2,13 @@ __author__ = "ahuang314"
 
 import numpy as np
 import numpy.testing as npt
+
+#--------------------------------------------------------------------------
+# Remove these lines when numpyro gets updated for JAX v0.7.0 compatibility
+import jax.experimental.pjit
+from jax.extend.core.primitives import jit_p
+jax.experimental.pjit.pjit_p = jit_p
+#--------------------------------------------------------------------------
 from numpyro.infer.util import unconstrain_fn
 import pytest
 
