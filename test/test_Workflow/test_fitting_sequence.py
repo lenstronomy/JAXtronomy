@@ -15,8 +15,6 @@ from jaxtronomy.ImSim.image_model import ImageModel
 from jaxtronomy.Data.imaging_data import ImageData
 
 from lenstronomy.Data.psf import PSF
-from lenstronomy.Workflow.fitting_sequence import FittingSequence as FittingSequence_ref
-
 
 class TestFittingSequence(object):
     """Test the fitting sequences."""
