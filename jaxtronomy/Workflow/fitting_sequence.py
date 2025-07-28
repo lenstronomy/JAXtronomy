@@ -75,6 +75,8 @@ class FittingSequence(object):
             num_bands=len(self.multi_band_list),
         )
         self._mcmc_init_samples = None
+        self._psf_iteration_memory = []
+        self._psf_iteration_index = 0  # index of the sequence of the PSF iteration (how many times it is being run)
 
     @property
     def kwargs_fixed(self):
@@ -935,3 +937,17 @@ class FittingSequence(object):
         # get corresponding kwargs
         kwargs_result = self.param_class.args2kwargs(best_fit_result, bijective=True)
         return kwargs_result
+
+    @property
+    def psf_iteration_memory(self):
+        """
+        returns all the psf iterations performed in the FittingSequence
+        It stores in a list of dictionaries:
+        "sequence": what PSF sequence it is (0, 1 etc)
+        "band": index of the imaging band that is being corrected
+        "psf_before" kwargs_psf prior to the iteration
+        "psf_after" kwargs_psf as a result of the iteration
+
+        :return: list of all psf corrections
+        """
+        return self._psf_iteration_memory
