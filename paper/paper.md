@@ -78,7 +78,7 @@ These ever-increasing computational costs have lead to the development of severa
 
 The simulation of a lensed image comes in three main steps. The first step begins with a coordinate grid in the angles seen by the observer. These coordinates are ray-traced through the deflectors back to the source plane. This process requires the calculation of light ray deflection angles at each deflector. Second, the surface brightness of the source is calculated on the ray-traced coordinate grid. This produces a lensed image. Third, the lensed image gets convolved by the point spread function (PSF) originating from diffraction of the telescope optics and atmospheric turbulence. Due to the various choices in deflector mass profiles, light model profiles, grid size, and PSF kernel size, the overall runtime of the pipeline can vary significantly.
 
-In the following sections, we outline the improvements in performance that `JAXtronomy` has over `lenstronomy` for each step in the pipeline. These performance benchmarks were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and `JAX` version 0.6.2.
+In the following sections, we outline the improvements in performance that `JAXtronomy` has over `lenstronomy` for each step in the pipeline. These performance benchmarks were run using an Intel(R) Xeon(R) Gold 6338 CPU @ 2.00GHz, an NVIDIA A100 GPU, and `JAX` version 0.7.0.
 
 ## Deflection angle calculations
 
@@ -86,16 +86,16 @@ Each entry in the table indicates how much faster `JAXtronomy` is compared to `l
 
 | Deflector Profile        | 60x60 grid (cpu) | 180x180 grid (cpu) | 180x180 grid (gpu) |
 | :----------------------: | :--------------: | :----------------: | :----------------: |
-| CSE                      | 1.6x             | 3.4x               | 3.1x               |
+| CSE                      | 1.6x             | 2.6x               | 2.6x               |
 | EPL                      | 5.1x - 15x       | 9.2x - 17x         | 37x - 120x         |
 | EPL (jax) vs EPL_NUMBA   | 1.4x             | 3.0x               | 13x                |
-| EPL_MULTIPOLE_M1M3M4     | 2.1x - 7x        | 6.8x - 13x         | 42x - 108x         |
-| HERNQUIST                | 2.0x             | 3.4x               | 6.4x               |
+| EPL_MULTIPOLE_M1M3M4     | 2.1x - 7x        | 6.4x - 13x         | 42x - 108x         |
+| HERNQUIST                | 2.0x             | 3.4x               | 5.8x               |
 | HERNQUIST_ELLIPSE_CSE    | 3.8x             | 5.4x               | 40x                |
 | MULTIPOLE                | 0.9x             | 1.0x               | 8.3x - 14x         |
 | MULTIPOLE_ELL            | 1.5x - 2.1x      | 2.0x - 2.8x        | 70x                |
 | NFW                      | 1.6x             | 3.3x               | 4.5x               |
-| NFW_ELLIPSE_CSE          | 4.1x             | 6.7x               | 37x                |
+| NFW_ELLIPSE_CSE          | 4.1x             | 6.7x               | 31x                |
 | TNFW                     | 2.4x             | 5.8x               | 7.5x               |
 
 ## Flux calculations
@@ -104,13 +104,13 @@ An analogous table for the different light profiles is shown below.
 
 | Light Profile            | 60x60 grid (cpu) | 180x180 grid (cpu) | 180x180 grid (gpu) |
 | :----------------------: | :--------------: | :----------------: | :----------------: |
-| CORE_SERSIC              | 2.0x             | 6.7x               | 4.4x               |
-| GAUSSIAN                 | 1.0x             | 2.6x               | 1.6x               |
-| GAUSSIAN_ELLIPSE         | 1.5x             | 3.7x               | 2.0x               |
-| SERSIC                   | 1.0x             | 1.7x               | 4.9x               |
-| SERSIC_ELLIPSE           | 1.9x             | 5.8x               | 3.2x               |
-| SHAPELETS (n_max=6)      | 6.2x             | 3.4x               | 18x                |
-| SHAPELETS (n_max=10)     | 6.0x             | 4.6x               | 22x                |
+| CORE_SERSIC              | 2.0x             | 6.7x               | 4.2x               |
+| GAUSSIAN                 | 1.0x             | 2.5x               | 1.3x               |
+| GAUSSIAN_ELLIPSE         | 1.5x             | 3.6x               | 2.0x               |
+| SERSIC                   | 1.0x             | 1.7x               | 3.9x               |
+| SERSIC_ELLIPSE           | 1.9x             | 5.7x               | 3.2x               |
+| SHAPELETS (n_max=6)      | 6.2x             | 3.4x               | 15x                |
+| SHAPELETS (n_max=10)     | 6.0x             | 4.5x               | 17x                |
 
 ## FFT Convolution
 
