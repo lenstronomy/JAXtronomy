@@ -16,6 +16,7 @@ from jaxtronomy.Data.imaging_data import ImageData
 
 from lenstronomy.Data.psf import PSF
 
+
 class TestFittingSequence(object):
     """Test the fitting sequences."""
 

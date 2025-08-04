@@ -668,7 +668,7 @@ class FittingSequence(object):
         ]
 
         return output
-    
+
     def psf_iteration(self, compute_bands=None, **kwargs_psf_iter):
         """Iterative PSF reconstruction.
 

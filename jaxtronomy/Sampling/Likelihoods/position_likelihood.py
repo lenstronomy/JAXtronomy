@@ -252,7 +252,7 @@ class PositionLikelihood(object):
                 / 2
             )
         return logL
-    
+
     @partial(jit, static_argnums=(0,))
     def source_position_likelihood(
         self,
@@ -280,7 +280,9 @@ class PositionLikelihood(object):
             return 0
 
         logL = 0
-        x_source_avg, y_source_avg = self._pointSource.source_position(kwargs_ps, kwargs_lens)
+        x_source_avg, y_source_avg = self._pointSource.source_position(
+            kwargs_ps, kwargs_lens
+        )
         # redshift_list = self._pointSource._redshift_list
 
         for k in range(len(kwargs_ps)):
@@ -295,10 +297,14 @@ class PositionLikelihood(object):
                 k_list = self._pointSource.k_list(k)
                 if k_list is None:
                     x_source, y_source = self._lensModel.ray_shooting(
-                        x_image, y_image, kwargs_lens,
+                        x_image,
+                        y_image,
+                        kwargs_lens,
                     )
                     f_xx, f_xy, f_yx, f_yy = self._lensModel.hessian(
-                        x_image, y_image, kwargs_lens,
+                        x_image,
+                        y_image,
+                        kwargs_lens,
                     )
                 else:
                     # This may crash on GPU due to memory error when using Optax lbfgs
@@ -321,7 +327,20 @@ class PositionLikelihood(object):
                         f_xy = f_xy.at[i].set(f_xy_i)
                         f_yx = f_yx.at[i].set(f_yx_i)
                         f_yy = f_yy.at[i].set(f_yy_i)
-                logL -= jnp.sum(compute_penalty(f_xx, f_xy, f_yx, f_yy, sigma, x_source_avg[k], y_source_avg[k], x_source, y_source, hard_bound_rms))
+                logL -= jnp.sum(
+                    compute_penalty(
+                        f_xx,
+                        f_xy,
+                        f_yx,
+                        f_yy,
+                        sigma,
+                        x_source_avg[k],
+                        y_source_avg[k],
+                        x_source,
+                        y_source,
+                        hard_bound_rms,
+                    )
+                )
         return logL
 
     @property
@@ -350,9 +369,21 @@ def image2source_covariance(A, Sigma_theta):
     ATSigma = jnp.matmul(A.T, Sigma_theta)
     return jnp.matmul(ATSigma, A)
 
+
 @jit
 @partial(vmap, in_axes=(0, 0, 0, 0, None, None, None, 0, 0, None))
-def compute_penalty(f_xx, f_xy, f_yx, f_yy, sigma, source_x, source_y, x_source, y_source, hard_bound_rms):
+def compute_penalty(
+    f_xx,
+    f_xy,
+    f_yx,
+    f_yy,
+    sigma,
+    source_x,
+    source_y,
+    x_source,
+    y_source,
+    hard_bound_rms,
+):
     A = jnp.array([[1 - f_xx, -f_xy], [-f_yx, 1 - f_yy]], dtype=float)
     Sigma_theta = jnp.array([[1, 0], [0, 1]], dtype=float) * sigma**2
     Sigma_beta = image2source_covariance(A, Sigma_theta)
