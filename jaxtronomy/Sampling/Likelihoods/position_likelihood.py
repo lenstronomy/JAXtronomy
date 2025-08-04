@@ -364,7 +364,7 @@ def image2source_covariance(A, Sigma_theta):
     """Computes error covariance in the source plane.
     
     :param A: 2d array, Hessian lensing matrix
-    :param Sigma_theta: 2d array, image plane covariance matrix of uncertainties.
+    :param Sigma_theta: 2d array, image plane covariance matrix of uncertainties
     """
     ATSigma = jnp.matmul(A.T, Sigma_theta)
     return jnp.matmul(ATSigma, A)
