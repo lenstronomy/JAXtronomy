@@ -2,10 +2,9 @@ from setuptools import setup, find_packages
 
 requires = [
     "lenstronomy>=1.13.2",
-    "numpy>=1.25.0",
-    "scipy>=0.19.1",
-    "jax>=0.6.1",
-    "jaxlib>=0.6.1",
+    "numpy>=2.0.0",
+    "jax>=0.7.0",
+    "jaxlib>=0.7.0",
 ]
 tests_require = ["pytest"]
 

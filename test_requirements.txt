@@ -1,5 +1,5 @@
 # samplers for FittingSequence
-numpyro>=0.15.3
+scipy
 optax
 dynesty
 zeus-mcmc
