@@ -343,6 +343,9 @@ class TestFittingSequence(object):
         fitting_list.append(["update_settings", kwargs_update])
 
         chain_list = fittingSequence.fit_sequence(fitting_list)
+        assert fittingSequence._psf_iteration_index == 1
+        assert len(fittingSequence._psf_iteration_memory) == 1
+        
         (
             lens_fixed,
             source_fixed,
