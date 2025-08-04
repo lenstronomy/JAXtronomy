@@ -270,8 +270,8 @@ class PositionLikelihood(object):
         :param kwargs_lens: lens model keyword argument list
         :param kwargs_ps: point source keyword argument list
         :param sigma: float, 1-sigma Gaussian uncertainty in the image plane
-        :param hard_bound_rms: float or None, hard bound deviation between the mapping of the images
-            back to the source plane (in source frame)
+        :param hard_bound_rms: float or None, hard bound deviation between the mapping
+            of the images back to the source plane (in source frame)
         :param verbose: unused
         :return: log likelihood of the model reproducing the correct image positions
             given an image position uncertainty
@@ -361,11 +361,9 @@ class PositionLikelihood(object):
 # Equation (13) in Birrer & Treu 2019
 @jit
 def image2source_covariance(A, Sigma_theta):
-    """
-    computes error covariance in the source plane
-    :param A: 2d array, Hessian lensing matrix
-    :param Sigma_theta: 2d array, image plane covariance matrix of uncertainties
-    """
+    """Computes error covariance in the source plane :param A: 2d array, Hessian lensing
+    matrix :param Sigma_theta: 2d array, image plane covariance matrix of
+    uncertainties."""
     ATSigma = jnp.matmul(A.T, Sigma_theta)
     return jnp.matmul(ATSigma, A)
 
@@ -384,8 +382,7 @@ def _compute_penalty(
     sigma,
     hard_bound_rms,
 ):
-    """
-    Computes logL penalty based on how offset each individual image's source position
+    """Computes logL penalty based on how offset each individual image's source position
     differs from the average of all of the images' source positions.
 
     NOTE: This function is vmapped, so although some function arguments are 1d arrays,
