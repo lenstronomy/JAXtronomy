@@ -1,5 +1,4 @@
 # samplers for FittingSequence
-numpyro>=2.0.0
 scipy
 optax
 dynesty
