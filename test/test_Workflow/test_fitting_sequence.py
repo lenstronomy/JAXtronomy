@@ -16,6 +16,7 @@ from jaxtronomy.Data.imaging_data import ImageData
 
 from lenstronomy.Data.psf import PSF
 
+
 class TestFittingSequence(object):
     """Test the fitting sequences."""
 
@@ -342,6 +343,9 @@ class TestFittingSequence(object):
         fitting_list.append(["update_settings", kwargs_update])
 
         chain_list = fittingSequence.fit_sequence(fitting_list)
+        assert fittingSequence._psf_iteration_index == 1
+        assert len(fittingSequence.psf_iteration_memory) == 1
+
         (
             lens_fixed,
             source_fixed,
