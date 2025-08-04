@@ -301,7 +301,7 @@ class PositionLikelihood(object):
                         x_image, y_image, kwargs_lens,
                     )
                 else:
-                    # This may crash on GPU due to memory error
+                    # This may crash on GPU due to memory error when using Optax lbfgs
                     x_source = jnp.zeros_like(x_image)
                     y_source = jnp.zeros_like(x_image)
                     f_xx = jnp.zeros_like(x_image)
