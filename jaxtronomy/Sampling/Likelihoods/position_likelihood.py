@@ -269,8 +269,8 @@ class PositionLikelihood(object):
 
         :param kwargs_lens: lens model keyword argument list
         :param kwargs_ps: point source keyword argument list
-        :param sigma: 1-sigma Gaussian uncertainty in the image plane
-        :param hard_bound_rms: hard bound deviation between the mapping of the images
+        :param sigma: float, 1-sigma Gaussian uncertainty in the image plane
+        :param hard_bound_rms: float or None, hard bound deviation between the mapping of the images
             back to the source plane (in source frame)
         :param verbose: unused
         :return: log likelihood of the model reproducing the correct image positions
@@ -328,16 +328,16 @@ class PositionLikelihood(object):
                         f_yx = f_yx.at[i].set(f_yx_i)
                         f_yy = f_yy.at[i].set(f_yy_i)
                 logL -= jnp.sum(
-                    compute_penalty(
+                    _compute_penalty(
                         f_xx,
                         f_xy,
                         f_yx,
                         f_yy,
-                        sigma,
                         x_source_avg[k],
                         y_source_avg[k],
                         x_source,
                         y_source,
+                        sigma,
                         hard_bound_rms,
                     )
                 )
@@ -363,32 +363,51 @@ class PositionLikelihood(object):
 def image2source_covariance(A, Sigma_theta):
     """
     computes error covariance in the source plane
-    A: Hessian lensing matrix
-    Sigma_theta: image plane covariance matrix of uncertainties
+    :param A: 2d array, Hessian lensing matrix
+    :param Sigma_theta: 2d array, image plane covariance matrix of uncertainties
     """
     ATSigma = jnp.matmul(A.T, Sigma_theta)
     return jnp.matmul(ATSigma, A)
 
 
 @jit
-@partial(vmap, in_axes=(0, 0, 0, 0, None, None, None, 0, 0, None))
-def compute_penalty(
+@partial(vmap, in_axes=(0, 0, 0, 0, None, None, 0, 0, None, None))
+def _compute_penalty(
     f_xx,
     f_xy,
     f_yx,
     f_yy,
-    sigma,
-    source_x,
-    source_y,
+    x_source_avg,
+    y_source_avg,
     x_source,
     y_source,
+    sigma,
     hard_bound_rms,
 ):
+    """
+    Computes logL penalty based on how offset each individual image's source position
+    differs from the average of all of the images' source positions.
+
+    NOTE: This function is vmapped, so although some function arguments are 1d arrays,
+    the code below should treat them as scalars.
+
+    :param f_xx: 1d array, partial derivative of lensing potential w.r.t xx at the point source image positions
+    :param f_xy: 1d array, partial derivative of lensing potential w.r.t xy at the point source image positions
+    :param f_yx: 1d array, partial derivative of lensing potential w.r.t yx at the point source image positions
+    :param f_yy: 1d array, partial derivative of lensing potential w.r.t yy at the point source image positions
+    :param x_source_avg: float, avg x source position obtained by ray shooting all point source images
+    :param y_source_avg: float, avg y source position obtained by ray shooting all point source images
+    :param x_source: 1d array, x source positions obtained by ray shooting individual point source images
+    :param y_source: 1d array, y source positions obtained by ray shooting individual point source images
+    :param sigma: float, 1-sigma Gaussian uncertainty in the image plane
+    :param hard_bound_rms: float or None, hard bound deviation between the mapping of the images
+        back to the source plane (in source frame)
+    """
     A = jnp.array([[1 - f_xx, -f_xy], [-f_yx, 1 - f_yy]], dtype=float)
     Sigma_theta = jnp.array([[1, 0], [0, 1]], dtype=float) * sigma**2
     Sigma_beta = image2source_covariance(A, Sigma_theta)
     delta = jnp.array(
-        [source_x - x_source, source_y - y_source],
+        [x_source_avg - x_source, y_source_avg - y_source],
         dtype=float,
     )
     a, b, c, d = (
