@@ -344,7 +344,7 @@ class TestFittingSequence(object):
 
         chain_list = fittingSequence.fit_sequence(fitting_list)
         assert fittingSequence._psf_iteration_index == 1
-        assert len(fittingSequence._psf_iteration_memory) == 1
+        assert len(fittingSequence.psf_iteration_memory) == 1
 
         (
             lens_fixed,
