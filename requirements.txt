@@ -3,3 +3,5 @@ numpy>=1.17.0
 scipy>=0.19.1
 jax>=0.4.12
 jaxlib>=0.4.12
+optax
+numpyro

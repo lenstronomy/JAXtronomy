@@ -1,5 +1,5 @@
 from functools import partial
-from jax import config, debug, jit, lax, numpy as jnp
+from jax import config, debug, jit, lax, numpy as jnp, vmap
 import warnings
 
 # from lenstronomy.Util.cosmo_util import get_astropy_cosmology
@@ -253,7 +253,7 @@ class PositionLikelihood(object):
             )
         return logL
 
-    @partial(jit, static_argnums=(0, 5))
+    @partial(jit, static_argnums=(0,))
     def source_position_likelihood(
         self,
         kwargs_lens,
@@ -269,32 +269,20 @@ class PositionLikelihood(object):
 
         :param kwargs_lens: lens model keyword argument list
         :param kwargs_ps: point source keyword argument list
-        :param sigma: 1-sigma Gaussian uncertainty in the image plane
-        :param hard_bound_rms: hard bound deviation between the mapping of the images
-            back to the source plane (in source frame)
-        :param verbose: bool, if True provides print statements with useful information.
+        :param sigma: float, 1-sigma Gaussian uncertainty in the image plane
+        :param hard_bound_rms: float or None, hard bound deviation between the mapping
+            of the images back to the source plane (in source frame)
+        :param verbose: unused
         :return: log likelihood of the model reproducing the correct image positions
             given an image position uncertainty
         """
         if len(kwargs_ps) < 1:
             return 0
-        if verbose:
-
-            def true_fun(i, k, delta, hard_bound_rms):
-                debug.print(
-                    "Source positions of image {i} of model {k} do not match to the same source position to the required "
-                    "precision. Achieved: {delta}, Required: {hard_bound_rms}.",
-                    i=i,
-                    k=k,
-                    delta=delta,
-                    hard_bound_rms=hard_bound_rms,
-                )
-
-            def false_fun(i, k, delta, hard_bound_rms):
-                pass
 
         logL = 0
-        source_x, source_y = self._pointSource.source_position(kwargs_ps, kwargs_lens)
+        x_source_avg, y_source_avg = self._pointSource.source_position(
+            kwargs_ps, kwargs_lens
+        )
         # redshift_list = self._pointSource._redshift_list
 
         for k in range(len(kwargs_ps)):
@@ -302,59 +290,57 @@ class PositionLikelihood(object):
                 "ra_image" in kwargs_ps[k]
                 and self._pointSource.point_source_type_list[k] == "LENSED_POSITION"
             ):
-                x_image = kwargs_ps[k]["ra_image"]
-                y_image = kwargs_ps[k]["dec_image"]
+                x_image = jnp.array(kwargs_ps[k]["ra_image"])
+                y_image = jnp.array(kwargs_ps[k]["dec_image"])
                 # self._lensModel.change_source_redshift(redshift_list[k])
                 # calculating the individual source positions from the image positions
                 k_list = self._pointSource.k_list(k)
-                for i in range(len(x_image)):
-                    if k_list is not None:
-                        k_lens = tuple(k_list[i])
-                    else:
-                        k_lens = None
-                    x_source_i, y_source_i = self._lensModel.ray_shooting(
-                        x_image[i], y_image[i], kwargs_lens, k=k_lens
+                if k_list is None:
+                    x_source, y_source = self._lensModel.ray_shooting(
+                        x_image,
+                        y_image,
+                        kwargs_lens,
                     )
                     f_xx, f_xy, f_yx, f_yy = self._lensModel.hessian(
-                        x_image[i], y_image[i], kwargs_lens, k=k_lens
+                        x_image,
+                        y_image,
+                        kwargs_lens,
                     )
-                    A = jnp.array([[1 - f_xx, -f_xy], [-f_yx, 1 - f_yy]], dtype=float)
-                    Sigma_theta = jnp.array([[1, 0], [0, 1]], dtype=float) * sigma**2
-                    Sigma_beta = image2source_covariance(A, Sigma_theta)
-                    delta = jnp.array(
-                        [source_x[k] - x_source_i, source_y[k] - y_source_i],
-                        dtype=float,
-                    )
-                    if hard_bound_rms is not None:
-                        bound_hit = jnp.where(
-                            delta[0] ** 2 + delta[1] ** 2 > hard_bound_rms**2,
-                            True,
-                            False,
+                else:
+                    # This may crash on GPU due to memory error when using Optax lbfgs
+                    x_source = jnp.zeros_like(x_image)
+                    y_source = jnp.zeros_like(x_image)
+                    f_xx = jnp.zeros_like(x_image)
+                    f_xy = jnp.zeros_like(x_image)
+                    f_yx = jnp.zeros_like(x_image)
+                    f_yy = jnp.zeros_like(x_image)
+                    for i in range(len(x_image)):
+                        x_source_i, y_source_i = self._lensModel.ray_shooting(
+                            x_image[i], y_image[i], kwargs_lens, k=tuple(k_list[i])
                         )
-                        logL = jnp.where(bound_hit, logL - 10**3, logL)
-                        if verbose is True:
-                            lax.cond(
-                                bound_hit,
-                                true_fun,
-                                false_fun,
-                                i,
-                                k,
-                                delta,
-                                hard_bound_rms,
-                            )
-                    a, b, c, d = (
-                        Sigma_beta[0][0],
-                        Sigma_beta[0][1],
-                        Sigma_beta[1][0],
-                        Sigma_beta[1][1],
+                        f_xx_i, f_xy_i, f_yx_i, f_yy_i = self._lensModel.hessian(
+                            x_image[i], y_image[i], kwargs_lens, k=tuple(k_list[i])
+                        )
+                        x_source = x_source.at[i].set(x_source_i)
+                        y_source = y_source.at[i].set(y_source_i)
+                        f_xx = f_xx.at[i].set(f_xx_i)
+                        f_xy = f_xy.at[i].set(f_xy_i)
+                        f_yx = f_yx.at[i].set(f_yx_i)
+                        f_yy = f_yy.at[i].set(f_yy_i)
+                logL -= jnp.sum(
+                    _compute_penalty(
+                        f_xx,
+                        f_xy,
+                        f_yx,
+                        f_yy,
+                        x_source_avg[k],
+                        y_source_avg[k],
+                        x_source,
+                        y_source,
+                        sigma,
+                        hard_bound_rms,
                     )
-                    det = a * d - b * c
-                    Sigma_inv = jnp.array([[d, -b], [-c, a]])
-                    logL = jnp.where(
-                        det == 0,
-                        -(10**15),
-                        logL - delta.T.dot(Sigma_inv.dot(delta)) / (2 * det),
-                    )
+                )
         return logL
 
     @property
@@ -375,10 +361,72 @@ class PositionLikelihood(object):
 # Equation (13) in Birrer & Treu 2019
 @jit
 def image2source_covariance(A, Sigma_theta):
-    """
-    computes error covariance in the source plane
-    A: Hessian lensing matrix
-    Sigma_theta: image plane covariance matrix of uncertainties
+    """Computes error covariance in the source plane.
+
+    :param A: 2d array, Hessian lensing matrix
+    :param Sigma_theta: 2d array, image plane covariance matrix of uncertainties
     """
     ATSigma = jnp.matmul(A.T, Sigma_theta)
     return jnp.matmul(ATSigma, A)
+
+
+@jit
+@partial(vmap, in_axes=(0, 0, 0, 0, None, None, 0, 0, None, None))
+def _compute_penalty(
+    f_xx,
+    f_xy,
+    f_yx,
+    f_yy,
+    x_source_avg,
+    y_source_avg,
+    x_source,
+    y_source,
+    sigma,
+    hard_bound_rms,
+):
+    """Computes logL penalty based on how offset each individual image's source position
+    differs from the average of all of the images' source positions.
+
+    NOTE: This function is vmapped, so although some function arguments are 1d arrays,
+    the code below should treat them as scalars.
+
+    :param f_xx: 1d array, partial derivative of lensing potential w.r.t xx at the point source image positions
+    :param f_xy: 1d array, partial derivative of lensing potential w.r.t xy at the point source image positions
+    :param f_yx: 1d array, partial derivative of lensing potential w.r.t yx at the point source image positions
+    :param f_yy: 1d array, partial derivative of lensing potential w.r.t yy at the point source image positions
+    :param x_source_avg: float, avg x source position obtained by ray shooting all point source images
+    :param y_source_avg: float, avg y source position obtained by ray shooting all point source images
+    :param x_source: 1d array, x source positions obtained by ray shooting individual point source images
+    :param y_source: 1d array, y source positions obtained by ray shooting individual point source images
+    :param sigma: float, 1-sigma Gaussian uncertainty in the image plane
+    :param hard_bound_rms: float or None, hard bound deviation between the mapping of the images
+        back to the source plane (in source frame)
+    """
+    A = jnp.array([[1 - f_xx, -f_xy], [-f_yx, 1 - f_yy]], dtype=float)
+    Sigma_theta = jnp.array([[1, 0], [0, 1]], dtype=float) * sigma**2
+    Sigma_beta = image2source_covariance(A, Sigma_theta)
+    delta = jnp.array(
+        [x_source_avg - x_source, y_source_avg - y_source],
+        dtype=float,
+    )
+    a, b, c, d = (
+        Sigma_beta[0][0],
+        Sigma_beta[0][1],
+        Sigma_beta[1][0],
+        Sigma_beta[1][1],
+    )
+    det = a * d - b * c
+    Sigma_inv = jnp.array([[d, -b], [-c, a]])
+    penalty = jnp.where(
+        det == 0,
+        10**15,
+        delta.T.dot(Sigma_inv.dot(delta)) / (2 * det),
+    )
+    if hard_bound_rms is not None:
+        bound_hit = jnp.where(
+            delta[0] ** 2 + delta[1] ** 2 > hard_bound_rms**2,
+            True,
+            False,
+        )
+        penalty = jnp.where(bound_hit, penalty + 10**3, penalty)
+    return penalty

@@ -330,7 +330,7 @@ class TestFittingSequence(object):
             "stacking_method": "mean",
             "new_procedure": False,
         }
-        # fitting_list.append(["psf_iteration", kwargs_psf_iter])
+        fitting_list.append(["psf_iteration", kwargs_psf_iter])
         fitting_list.append(["restart", None])
         fitting_list.append(["fix_not_computed", {"free_bands": [True]}])
         n_sersic_overwrite = 4
@@ -343,6 +343,9 @@ class TestFittingSequence(object):
         fitting_list.append(["update_settings", kwargs_update])
 
         chain_list = fittingSequence.fit_sequence(fitting_list)
+        assert fittingSequence._psf_iteration_index == 1
+        assert len(fittingSequence.psf_iteration_memory) == 1
+
         (
             lens_fixed,
             source_fixed,
@@ -398,9 +401,6 @@ class TestFittingSequence(object):
             fitting_list_three.append(["emcee", kwargs_test])
             fittingSequence.fit_sequence(fitting_list_three)
 
-        fitting_list4 = [["psf_iteration", kwargs_psf_iter]]
-        with t.assertRaises(ValueError):
-            fittingSequence.fit_sequence(fitting_list4)
         fitting_list5 = [["calibrate_images", {}]]
         with t.assertRaises(ValueError):
             fittingSequence.fit_sequence(fitting_list5)

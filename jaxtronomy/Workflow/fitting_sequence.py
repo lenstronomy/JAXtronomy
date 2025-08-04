@@ -1,6 +1,9 @@
 from jaxtronomy.Sampling.likelihood import LikelihoodModule
 from jaxtronomy.Sampling.Samplers.optax import OptaxMinimizer
 
+# Import SingeBandMultiModel from lenstronomy for PsfFitting
+from lenstronomy.ImSim.MultiBand.single_band_multi_model import SingleBandMultiModel
+from lenstronomy.Workflow.psf_fitting import PsfFitting
 from lenstronomy.Workflow.alignment_matching import AlignmentFitting
 from lenstronomy.Workflow.multi_band_manager import MultiBandUpdateManager
 from lenstronomy.Sampling.sampler import Sampler
@@ -72,6 +75,8 @@ class FittingSequence(object):
             num_bands=len(self.multi_band_list),
         )
         self._mcmc_init_samples = None
+        self._psf_iteration_memory = []
+        self._psf_iteration_index = 0  # index of the sequence of the PSF iteration (how many times it is being run)
 
     @property
     def kwargs_fixed(self):
@@ -121,7 +126,7 @@ class FittingSequence(object):
                 self.fix_not_computed(**kwargs)
 
             elif fitting_type == "psf_iteration":
-                raise ValueError("psf_iteration not supported in jaxtronomy")
+                self.psf_iteration(**kwargs)
 
             elif fitting_type == "align_images":
                 self.align_images(**kwargs)
@@ -664,6 +669,50 @@ class FittingSequence(object):
 
         return output
 
+    def psf_iteration(self, compute_bands=None, **kwargs_psf_iter):
+        """Iterative PSF reconstruction.
+
+        :param compute_bands: bool list, if multiple bands, this process can be limited
+            to a subset of bands
+        :param kwargs_psf_iter: keyword arguments as used or available in
+            PSFIteration.update_iterative() definition
+        :return: 0, updated PSF is stored in self.multi_band_list
+        """
+        kwargs_model = self._updateManager.kwargs_model
+        kwargs_likelihood = self._updateManager.kwargs_likelihood
+        likelihood_mask_list = kwargs_likelihood.get("image_likelihood_mask_list", None)
+        kwargs_pixelbased = kwargs_likelihood.get("kwargs_pixelbased", None)
+        kwargs_temp = self.best_fit(bijective=False)
+        if compute_bands is None:
+            compute_bands = [True] * len(self.multi_band_list)
+
+        for band_index in range(len(self.multi_band_list)):
+            if compute_bands[band_index] is True:
+                kwargs_psf = self.multi_band_list[band_index][1]
+                kwargs_psf_before = copy.deepcopy(kwargs_psf)
+                image_model = SingleBandMultiModel(
+                    self.multi_band_list,
+                    kwargs_model,
+                    likelihood_mask_list=likelihood_mask_list,
+                    band_index=band_index,
+                    kwargs_pixelbased=kwargs_pixelbased,
+                )
+                psf_iter = PsfFitting(image_model_class=image_model)
+                kwargs_psf = psf_iter.update_iterative(
+                    kwargs_psf, kwargs_params=kwargs_temp, **kwargs_psf_iter
+                )
+                self.multi_band_list[band_index][1] = kwargs_psf
+                self._psf_iteration_memory.append(
+                    {
+                        "sequence": self._psf_iteration_index,
+                        "band": band_index,
+                        "psf_before": kwargs_psf_before,
+                        "psf_after": kwargs_psf,
+                    }
+                )
+        self._psf_iteration_index += 1
+        return 0
+
     def align_images(
         self,
         n_particles=10,
@@ -888,3 +937,17 @@ class FittingSequence(object):
         # get corresponding kwargs
         kwargs_result = self.param_class.args2kwargs(best_fit_result, bijective=True)
         return kwargs_result
+
+    @property
+    def psf_iteration_memory(self):
+        """
+        returns all the psf iterations performed in the FittingSequence
+        It stores in a list of dictionaries:
+        "sequence": what PSF sequence it is (0, 1 etc)
+        "band": index of the imaging band that is being corrected
+        "psf_before" kwargs_psf prior to the iteration
+        "psf_after" kwargs_psf as a result of the iteration
+
+        :return: list of all psf corrections
+        """
+        return self._psf_iteration_memory
