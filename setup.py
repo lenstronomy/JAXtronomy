@@ -4,13 +4,15 @@ requires = [
     "lenstronomy>=1.13.2",
     "numpy>=2.0.0",
     "jax>=0.7.0",
-    "jaxlib>=0.7.0",
+    "numpyro>=0.19.0",
+    "optax>=0.2.5"
 ]
 tests_require = ["pytest"]
 
 setup(
     name="jaxtronomy",
     version="0.1.1",
+    python_requires='>=3.11',
     url="https://github.com/lenstronomy/JAXtronomy",
     author="jaxtronomy developers",
     description="lenstronomy, but in JAX",

@@ -1,6 +1,5 @@
 # samplers for FittingSequence
 scipy
-optax
 dynesty
 zeus-mcmc
 cobaya
