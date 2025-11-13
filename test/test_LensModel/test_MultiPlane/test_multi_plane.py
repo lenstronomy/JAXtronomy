@@ -4,11 +4,10 @@ jax.config.update("jax_enable_x64", True)
 import numpy.testing as npt
 import numpy as np
 import pytest
-import unittest
+
 from astropy.cosmology import FlatwCDM
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane as MultiPlane_ref
 from jaxtronomy.LensModel.MultiPlane.multi_plane import MultiPlane
-from jaxtronomy.LensModel.lens_model import LensModel
 
 class TestMultiPlane(object):
     """Tests the MultiPlane routines."""
