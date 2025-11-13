@@ -55,6 +55,9 @@ class TestLensModel(object):
         lens_model_list = ["SIS", "SIS"]
         lensModel = LensModel(lens_model_list, decouple_multi_plane=True)
 
+        lens_model_list = ["SIS", "SIS"]
+        lensModel = LensModel(lens_model_list, z_source=1.5, lens_redshift_list=[1.1, 1.2], multi_plane=True)
+
         lens_model_list = ["SIS", "LOS"]
         lensModel = LensModel(lens_model_list)
 
@@ -317,18 +320,24 @@ class TestLensModel(object):
 
 class TestRaise(unittest.TestCase):
     def test_raise(self):
+        # numeric differentiation of lensing potential to obtain alpha is not available in MultiPlane
         with self.assertRaises(ValueError):
             kwargs = [{"alpha_Rs": 1, "Rs": 0.5, "center_x": 0, "center_y": 0}]
             lensModel = LensModel(
                 ["NFW"], multi_plane=True, lens_redshift_list=[1], z_source=2
             )
             f_x, f_y = lensModel.alpha(1, 1, kwargs, diff=0.0001)
+
+        # missing z_source at initialization
         with self.assertRaises(ValueError):
             lensModel = LensModel(["NFW"], multi_plane=True, lens_redshift_list=[1])
+
         # with self.assertRaises(ValueError):
         #    kwargs = [{"alpha_Rs": 1, "Rs": 0.5, "center_x": 0, "center_y": 0}]
         #    lensModel = LensModel(["NFW"], multi_plane=False)
         #    t_arrival = lensModel.arrival_time(1, 1, kwargs)
+
+        # Not implemented in jaxtronomy yet
         with self.assertRaises(ValueError):
             z_lens = 0.5
             z_source = 1.5
@@ -341,23 +350,32 @@ class TestRaise(unittest.TestCase):
             )
             kwargs = [{"theta_E": 1.0, "center_x": 0.0, "center_y": 0.0}]
             fermat_pot = lensModel.fermat_potential(x_image, y_image, kwargs)
+
+        # wrong diff method
         with self.assertRaises(ValueError):
             lens_model = LensModel(lens_model_list=["SIS"])
             kwargs = [{"theta_E": 1.0, "center_x": 0.0, "center_y": 0.0}]
             lens_model.hessian(0, 0, kwargs, diff=0.001, diff_method="bad")
 
+        # only one LOS model is allowed
         with self.assertRaises(ValueError):
             lens_model = LensModel(lens_model_list=["LOS", "LOS_MINIMAL"])
+
+        # missing lens redshift list
         with self.assertRaises(ValueError):
             lens_model = LensModel(
                 lens_model_list=["EPL", "NFW"], multi_plane=True, z_source=1.0
             )
+
+        # missing z source
         with self.assertRaises(ValueError):
             lens_model = LensModel(
                 lens_model_list=["EPL", "NFW"],
                 multi_plane=True,
                 lens_redshift_list=[0.5, 0.5],
             )
+
+        # LOS model is incompatible with MultiPlane lensing
         with self.assertRaises(ValueError):
             lens_model = LensModel(
                 lens_model_list=["LOS", "EPL", "NFW"],

@@ -2,6 +2,7 @@ __author__ = "sibirrer"
 from jaxtronomy.LensModel.single_plane import SinglePlane
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
 from jaxtronomy.LensModel.MultiPlane.decoupled_multi_plane import MultiPlaneDecoupled
+from jaxtronomy.LensModel.MultiPlane.multi_plane import MultiPlane
 
 # TODO: Implement multi plane
 # from lenstronomy.Cosmo.lens_cosmo import LensCosmo
@@ -128,23 +129,20 @@ class LensModel(object):
                 )
                 self.type = "MultiPlaneDecoupled"
             else:
-                raise ValueError(
-                    "Only decouple_multi_plane is currently supported in jaxtronomy"
+                self.lens_model = MultiPlane(
+                   z_source,
+                   lens_model_list,
+                   lens_redshift_list,
+                   cosmo=cosmo,
+                   observed_convention_index=observed_convention_index,
+                   z_source_convention=z_source_convention,
+                   cosmo_interp=cosmo_interp,
+                   z_interp_stop=z_interp_stop,
+                   num_z_interp=num_z_interp,
+                   distance_ratio_sampling=distance_ratio_sampling,
+                   profile_kwargs_list=profile_kwargs_list,
                 )
-                # self.lens_model = MultiPlane(
-                #    z_source,
-                #    lens_model_list,
-                #    lens_redshift_list,
-                #    cosmo=cosmo,
-                #    observed_convention_index=observed_convention_index,
-                #    z_source_convention=z_source_convention,
-                #    cosmo_interp=cosmo_interp,
-                #    z_interp_stop=z_interp_stop,
-                #    num_z_interp=num_z_interp,
-                #    distance_ratio_sampling=distance_ratio_sampling,
-                #    profile_kwargs_list=profile_kwargs_list,
-                # )
-
+                self.type = "MultiPlane"
         else:
             if los_effects is True:
                 self.lens_model = SinglePlaneLOS(
@@ -238,6 +236,8 @@ class LensModel(object):
         :return: fermat potential in arcsec**2 without geometry term (second part of Eqn
             1 in Suyu et al. 2013) as a list
         """
+        if self.type == "MultiPlane":
+            raise ValueError("not implemented in JAXtronomy")
         # if hasattr(self.lens_model, "fermat_potential"):
         return self.lens_model.fermat_potential(
             x_image, y_image, kwargs_lens, x_source, y_source
@@ -326,14 +326,13 @@ class LensModel(object):
         """
         if diff is None:
             return self.lens_model.alpha(x, y, kwargs, k=k)
-        # elif self.multi_plane is False:
-        else:
+        elif self.multi_plane is False:
             return self._deflection_differential(x, y, kwargs, k=k, diff=diff)
-        # else:
-        #    raise ValueError(
-        #        "numerical differentiation of lensing potential is not available in the multi-plane "
-        #        "setting as analytical form of lensing potential is not available."
-        #    )
+        else:
+           raise ValueError(
+               "numerical differentiation of lensing potential is not available in the multi-plane "
+               "setting as analytical form of lensing potential is not available."
+           )
 
     @partial(jit, static_argnums=(0, 4, 6))
     def hessian(self, x, y, kwargs, k=None, diff=None, diff_method="square"):
