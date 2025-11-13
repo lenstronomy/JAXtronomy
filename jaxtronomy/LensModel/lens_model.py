@@ -130,17 +130,17 @@ class LensModel(object):
                 self.type = "MultiPlaneDecoupled"
             else:
                 self.lens_model = MultiPlane(
-                   z_source,
-                   lens_model_list,
-                   lens_redshift_list,
-                   cosmo=cosmo,
-                   observed_convention_index=observed_convention_index,
-                   z_source_convention=z_source_convention,
-                   cosmo_interp=cosmo_interp,
-                   z_interp_stop=z_interp_stop,
-                   num_z_interp=num_z_interp,
-                   distance_ratio_sampling=distance_ratio_sampling,
-                   profile_kwargs_list=profile_kwargs_list,
+                    z_source,
+                    lens_model_list,
+                    lens_redshift_list,
+                    cosmo=cosmo,
+                    observed_convention_index=observed_convention_index,
+                    z_source_convention=z_source_convention,
+                    cosmo_interp=cosmo_interp,
+                    z_interp_stop=z_interp_stop,
+                    num_z_interp=num_z_interp,
+                    distance_ratio_sampling=distance_ratio_sampling,
+                    profile_kwargs_list=profile_kwargs_list,
                 )
                 self.type = "MultiPlane"
         else:
@@ -329,10 +329,10 @@ class LensModel(object):
         elif self.multi_plane is False:
             return self._deflection_differential(x, y, kwargs, k=k, diff=diff)
         else:
-           raise ValueError(
-               "numerical differentiation of lensing potential is not available in the multi-plane "
-               "setting as analytical form of lensing potential is not available."
-           )
+            raise ValueError(
+                "numerical differentiation of lensing potential is not available in the multi-plane "
+                "setting as analytical form of lensing potential is not available."
+            )
 
     @partial(jit, static_argnums=(0, 4, 6))
     def hessian(self, x, y, kwargs, k=None, diff=None, diff_method="square"):

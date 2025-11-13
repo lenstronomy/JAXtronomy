@@ -147,7 +147,9 @@ class MultiPlane(object):
         if observed_convention_index is None:
             self._convention = PhysicalLocation()
         else:
-            raise ValueError("observed_convention_index is not yet supported in JAXtronomy")
+            raise ValueError(
+                "observed_convention_index is not yet supported in JAXtronomy"
+            )
             # assert isinstance(observed_convention_index, list)
             # self._convention = LensedLocation(
             #     self._multi_plane_base, observed_convention_index
@@ -220,7 +222,9 @@ class MultiPlane(object):
         :param z_source: float; source redshift
         :return: self variables update to new redshift
         """
-        raise Exception("Updating source redshift not allowed; please create a new class")
+        raise Exception(
+            "Updating source redshift not allowed; please create a new class"
+        )
 
     # Updating class variables not allowed
     def set_background_cosmo(self, cosmo):
@@ -279,8 +283,8 @@ class MultiPlane(object):
         return beta_x, beta_y
 
     # NOTE: not implemented
-    #@partial(jit, static_argnums=(0, 5, 6, 8, 9))
-    #def ray_shooting_partial_comoving(
+    # @partial(jit, static_argnums=(0, 5, 6, 8, 9))
+    # def ray_shooting_partial_comoving(
     #    self,
     #    x,
     #    y,
@@ -293,7 +297,7 @@ class MultiPlane(object):
     #    check_convention=True,
     #    T_ij_start=None,
     #    T_ij_end=None,
-    #):
+    # ):
     #    """Ray-tracing through parts of the cone, starting with (x,y) co-moving
     #    distances and angles (alpha_x, alpha_y) at redshift z_start and then backwards
     #    to redshift z_stop.
@@ -339,7 +343,7 @@ class MultiPlane(object):
     #    )
 
     # NOTE: not implemented
-    #def ray_shooting_partial(
+    # def ray_shooting_partial(
     #    self,
     #    theta_x,
     #    theta_y,
@@ -352,7 +356,7 @@ class MultiPlane(object):
     #    T_ij_start=None,
     #    T_ij_end=None,
     #    check_convention=True,
-    #):
+    # ):
     #    """Ray-tracing through parts of the cone, starting with (x,y) in angular units
     #    as seen on the sky without lensing and angles (alpha_x, alpha_y) as seen at
     #    redshift z_start and then backwards to redshift z_stop.
@@ -395,7 +399,7 @@ class MultiPlane(object):
     #    )
 
     # NOTE: not implemented
-    #def ray_shooting_partial_comoving(
+    # def ray_shooting_partial_comoving(
     #    self,
     #    x,
     #    y,
@@ -408,7 +412,7 @@ class MultiPlane(object):
     #    T_ij_start=None,
     #    T_ij_end=None,
     #    check_convention=True,
-    #):
+    # ):
     #    """Ray-tracing through parts of the cone, starting with (x,y) in angular units
     #    as seen on the sky without lensing and angles (alpha_x, alpha_y) as seen at
     #    redshift z_start and then backwards to redshift z_stop.
@@ -735,32 +739,32 @@ class PhysicalLocation(object):
 #     """center_x and center_y kwargs correspond to observed (lensed) locations of
 #     deflectors given a model for the line of sight structure, compute the angular
 #     position of the deflector without lensing contribution along the LOS."""
-# 
+#
 #     def __init__(self, multiplane_instance, observed_convention_index):
 #         """
-# 
+#
 #         :param multiplane_instance: instance of the MultiPlane class
 #         :param observed_convention_index: list of lens model indexes to be modelled in the observed plane
 #         """
-# 
+#
 #         self._multiplane = multiplane_instance
-# 
+#
 #         if len(observed_convention_index) == 1:
 #             self._inds = observed_convention_index
 #         else:
 #             inds = np.array(observed_convention_index)
 #             z = []
-# 
+#
 #             for ind in inds:
 #                 z.append(multiplane_instance._lens_redshift_list[ind])
-# 
+#
 #             sort = np.argsort(z)
-# 
+#
 #             self._inds = inds[sort]
-# 
+#
 #     def __call__(self, kwargs_lens):
 #         new_kwargs = deepcopy(kwargs_lens)
-# 
+#
 #         for ind in self._inds:
 #             theta_x = kwargs_lens[ind]["center_x"]
 #             theta_y = kwargs_lens[ind]["center_y"]
@@ -776,9 +780,9 @@ class PhysicalLocation(object):
 #                 T_ij_start=None,
 #                 T_ij_end=None,
 #             )
-# 
+#
 #             T = self._multiplane.T_z_list[ind]
 #             new_kwargs[ind]["center_x"] = x / T
 #             new_kwargs[ind]["center_y"] = y / T
-# 
+#
 #         return new_kwargs

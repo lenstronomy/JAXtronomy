@@ -328,9 +328,7 @@ class LightModelBase(object):
                     if norm is True:
                         if model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
                             new_amp = jnp.array(kwargs_new["amp"])
-                            new = {
-                                "amp": new_amp / jnp.sum(new_amp)
-                            }
+                            new = {"amp": new_amp / jnp.sum(new_amp)}
                         else:
                             new = {"amp": 1}
                         kwargs_new.update(new)

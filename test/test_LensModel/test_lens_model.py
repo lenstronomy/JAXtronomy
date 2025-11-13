@@ -56,7 +56,12 @@ class TestLensModel(object):
         lensModel = LensModel(lens_model_list, decouple_multi_plane=True)
 
         lens_model_list = ["SIS", "SIS"]
-        lensModel = LensModel(lens_model_list, z_source=1.5, lens_redshift_list=[1.1, 1.2], multi_plane=True)
+        lensModel = LensModel(
+            lens_model_list,
+            z_source=1.5,
+            lens_redshift_list=[1.1, 1.2],
+            multi_plane=True,
+        )
 
         lens_model_list = ["SIS", "LOS"]
         lensModel = LensModel(lens_model_list)
