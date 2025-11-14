@@ -193,7 +193,9 @@ class MultiPlaneBase(ProfileListBase):
         :return: co-moving position and angles at redshift z_stop
         """
         if z_start != 0 and T_ij_start is None:
-            raise ValueError("In jaxtronomy, either z_start must be zero or T_ij_start must be provided.")
+            raise ValueError(
+                "In jaxtronomy, either z_start must be zero or T_ij_start must be provided."
+            )
         if T_ij_end is None:
             raise ValueError("T_ij_end must be provided in jaxtronomy")
         x = jnp.array(x, dtype=float)

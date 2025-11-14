@@ -95,14 +95,12 @@ class TestMultiPlane(object):
 
         self.multiplane.model_info()
         T_ij_start, T_ij_end = self.multiplane.transverse_distance_start_stop(
-            z_start=0,
-            z_stop=self.multiplane.z_source,
-            include_z_start=False
+            z_start=0, z_stop=self.multiplane.z_source, include_z_start=False
         )
-        T_ij_start_ref, T_ij_end_ref = self.multiplane_ref.transverse_distance_start_stop(
-            z_start=0,
-            z_stop=self.multiplane_ref.z_source,
-            include_z_start=False
+        T_ij_start_ref, T_ij_end_ref = (
+            self.multiplane_ref.transverse_distance_start_stop(
+                z_start=0, z_stop=self.multiplane_ref.z_source, include_z_start=False
+            )
         )
         npt.assert_allclose(T_ij_start, T_ij_start_ref, atol=1e-8, rtol=1e-8)
         npt.assert_allclose(T_ij_end, T_ij_end_ref, atol=1e-8, rtol=1e-8)
@@ -246,19 +244,21 @@ class TestMultiPlane(object):
             kwargs_lens=self.kwargs_lens,
             include_z_start=True,
             T_ij_start=None,
-            T_ij_end=self.multiplane.T_ij_stop
+            T_ij_end=self.multiplane.T_ij_stop,
         )
-        f_x_ref, f_y_ref, _, _ = self.multiplane_ref.multi_plane_base.ray_shooting_partial_comoving(
-            np.zeros_like(x),
-            np.zeros_like(y),
-            x,
-            y,
-            z_start=0,
-            z_stop=self.multiplane_ref.z_source,
-            kwargs_lens=self.kwargs_lens,
-            include_z_start=True,
-            T_ij_start=None,
-            T_ij_end=self.multiplane_ref.T_ij_stop
+        f_x_ref, f_y_ref, _, _ = (
+            self.multiplane_ref.multi_plane_base.ray_shooting_partial_comoving(
+                np.zeros_like(x),
+                np.zeros_like(y),
+                x,
+                y,
+                z_start=0,
+                z_stop=self.multiplane_ref.z_source,
+                kwargs_lens=self.kwargs_lens,
+                include_z_start=True,
+                T_ij_start=None,
+                T_ij_end=self.multiplane_ref.T_ij_stop,
+            )
         )
         npt.assert_allclose(f_x, f_x_ref, atol=1e-8, rtol=1e-8)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-8, rtol=1e-8)
@@ -323,7 +323,9 @@ class TestMultiPlane(object):
         with pytest.raises(Exception):
             self.multiplane.set_background_cosmo(FlatwCDM(H0=71, Om0=0.3, w0=-0.8))
         with pytest.raises(Exception):
-            self.multiplane.multi_plane_base.set_background_cosmo(FlatwCDM(H0=71, Om0=0.3, w0=-0.8))
+            self.multiplane.multi_plane_base.set_background_cosmo(
+                FlatwCDM(H0=71, Om0=0.3, w0=-0.8)
+            )
 
         # set static and set dynamic are not supported in jaxtronomy
         with pytest.raises(Exception):
@@ -333,7 +335,8 @@ class TestMultiPlane(object):
 
 
 class TestMultiPlane2(TestMultiPlane):
-    """Tests the MultiPlane routines again, this time with observed_convention_index set."""
+    """Tests the MultiPlane routines again, this time with observed_convention_index
+    set."""
 
     def setup_method(self):
         z_source = 3.5
@@ -385,6 +388,7 @@ class TestMultiPlane2(TestMultiPlane):
 
     def test_set_static_dynamic(self):
         pass
+
 
 if __name__ == "__main__":
     pytest.main("-k TestLensModel")
