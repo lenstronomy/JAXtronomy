@@ -147,13 +147,10 @@ class MultiPlane(object):
         if observed_convention_index is None:
             self._convention = PhysicalLocation()
         else:
-            raise ValueError(
-                "observed_convention_index is not yet supported in JAXtronomy"
+            assert isinstance(observed_convention_index, list)
+            self._convention = LensedLocation(
+                self._multi_plane_base, observed_convention_index
             )
-            # assert isinstance(observed_convention_index, list)
-            # self._convention = LensedLocation(
-            #     self._multi_plane_base, observed_convention_index
-            # )
         self.ignore_observed_positions = ignore_observed_positions
 
     @property
@@ -235,7 +232,7 @@ class MultiPlane(object):
         """
         raise Exception("Updating cosmology not allowed; please create a new class")
 
-    # This function is called outside of jit
+    @partial(jit, static_argnums=0)
     def observed2flat_convention(self, kwargs_lens):
         """
 
@@ -689,17 +686,14 @@ class MultiPlane(object):
         theta_y = y / T_z
         return theta_x, theta_y
 
-    # This function is called outside of jit
+    # not allowed in jaxtronomy
     def set_static(self, kwargs):
         """
 
         :param kwargs: lens model keyword argument list
         :return: lens model keyword argument list with positional parameters all in flat sky coordinates
         """
-
-        kwargs = self.observed2flat_convention(kwargs)
-        self.ignore_observed_positions = True
-        return self._multi_plane_base.set_static(kwargs)
+        raise Exception("This functionality is not supported in jaxtronomy.")
 
     # This function is called outside of jit
     def set_dynamic(self):
@@ -707,8 +701,7 @@ class MultiPlane(object):
 
         :return:
         """
-        self.ignore_observed_positions = False
-        self._multi_plane_base.set_dynamic()
+        raise Exception("This functionality is not supported in jaxtronomy.")
 
     @staticmethod
     @partial(jit, static_argnums=0)
@@ -735,54 +728,55 @@ class PhysicalLocation(object):
         return kwargs_lens
 
 
-# class LensedLocation(object):
-#     """center_x and center_y kwargs correspond to observed (lensed) locations of
-#     deflectors given a model for the line of sight structure, compute the angular
-#     position of the deflector without lensing contribution along the LOS."""
-#
-#     def __init__(self, multiplane_instance, observed_convention_index):
-#         """
-#
-#         :param multiplane_instance: instance of the MultiPlane class
-#         :param observed_convention_index: list of lens model indexes to be modelled in the observed plane
-#         """
-#
-#         self._multiplane = multiplane_instance
-#
-#         if len(observed_convention_index) == 1:
-#             self._inds = observed_convention_index
-#         else:
-#             inds = np.array(observed_convention_index)
-#             z = []
-#
-#             for ind in inds:
-#                 z.append(multiplane_instance._lens_redshift_list[ind])
-#
-#             sort = np.argsort(z)
-#
-#             self._inds = inds[sort]
-#
-#     def __call__(self, kwargs_lens):
-#         new_kwargs = deepcopy(kwargs_lens)
-#
-#         for ind in self._inds:
-#             theta_x = kwargs_lens[ind]["center_x"]
-#             theta_y = kwargs_lens[ind]["center_y"]
-#             zstop = self._multiplane._lens_redshift_list[ind]
-#             x, y, _, _ = self._multiplane.ray_shooting_partial_comoving(
-#                 0,
-#                 0,
-#                 theta_x,
-#                 theta_y,
-#                 0,
-#                 zstop,
-#                 new_kwargs,
-#                 T_ij_start=None,
-#                 T_ij_end=None,
-#             )
-#
-#             T = self._multiplane.T_z_list[ind]
-#             new_kwargs[ind]["center_x"] = x / T
-#             new_kwargs[ind]["center_y"] = y / T
-#
-#         return new_kwargs
+class LensedLocation(object):
+    """center_x and center_y kwargs correspond to observed (lensed) locations of
+    deflectors given a model for the line of sight structure, compute the angular
+    position of the deflector without lensing contribution along the LOS."""
+
+    def __init__(self, multiplane_instance, observed_convention_index):
+        """
+
+        :param multiplane_instance: instance of the MultiPlaneBase class
+        :param observed_convention_index: list of lens model indexes to be modelled in the observed plane
+        """
+
+        self._multiplane = multiplane_instance
+
+        if len(observed_convention_index) == 1:
+            self._inds = observed_convention_index
+        else:
+            inds = np.array(observed_convention_index)
+            z = []
+
+            for ind in inds:
+                z.append(multiplane_instance._lens_redshift_list[ind])
+
+            sort = np.argsort(z)
+
+            self._inds = inds[sort]
+
+    @partial(jit, static_argnums=0)
+    def __call__(self, kwargs_lens):
+        new_kwargs = deepcopy(kwargs_lens)
+
+        for ind in self._inds:
+            theta_x = kwargs_lens[ind]["center_x"]
+            theta_y = kwargs_lens[ind]["center_y"]
+            zstop = self._multiplane._lens_redshift_list[ind]
+            x, y, _, _ = self._multiplane.ray_shooting_partial_comoving(
+                0,
+                0,
+                theta_x,
+                theta_y,
+                0,
+                zstop,
+                new_kwargs,
+                T_ij_start=None,
+                T_ij_end=0,
+            )
+
+            T = self._multiplane.T_z_list[ind]
+            new_kwargs[ind]["center_x"] = x / T
+            new_kwargs[ind]["center_y"] = y / T
+
+        return new_kwargs

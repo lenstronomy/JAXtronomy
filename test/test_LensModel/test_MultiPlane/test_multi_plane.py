@@ -16,7 +16,7 @@ class TestMultiPlane(object):
 
     def setup_method(self):
         z_source = 3.5
-        lens_model_list = ["NFW", "SIS", "NFW", "NFW", "NFW"]
+        lens_model_list = ["NFW", "NIE", "NFW", "NFW", "NFW"]
         redshift_list = [0.5, 1.1, 1.1, 1.5, 1.3]
         cosmo = FlatwCDM(H0=70, Om0=0.3, w0=-0.8)
         self.multiplane = MultiPlane(
@@ -47,10 +47,18 @@ class TestMultiPlane(object):
         kwargs_nfw2 = {"Rs": 1.4, "alpha_Rs": 3.18, "center_x": -0.11, "center_y": 1.1}
         kwargs_nfw3 = {"Rs": 1.5, "alpha_Rs": 1.11, "center_x": -0.13, "center_y": 1.2}
         kwargs_nfw4 = {"Rs": 1.1, "alpha_Rs": 2.12, "center_x": 0.21, "center_y": -2.2}
-        kwargs_sis = {"theta_E": 1.5}
+        kwargs_nie1 = {"theta_E": 1.5, "e1": 0.1, "e2": 0.2, "s_scale": 3.1}
+        kwargs_nie2 = {"theta_E": 3.5, "e1": 0.3, "e2": -0.2, "s_scale": 1.1}
         self.kwargs_lens = [
             kwargs_nfw1,
-            kwargs_sis,
+            kwargs_nie1,
+            kwargs_nfw2,
+            kwargs_nfw3,
+            kwargs_nfw4,
+        ]
+        self.kwargs_lens2 = [
+            kwargs_nfw1,
+            kwargs_nie2,
             kwargs_nfw2,
             kwargs_nfw3,
             kwargs_nfw4,
@@ -69,26 +77,38 @@ class TestMultiPlane(object):
         assert self.multiplane.T_ij_stop == self.multiplane_ref.T_ij_stop
 
         npt.assert_array_equal(
-            self.multiplane._multi_plane_base.T_z_list,
-            self.multiplane_ref._multi_plane_base.T_z_list,
+            self.multiplane.multi_plane_base.T_z_list,
+            self.multiplane_ref.multi_plane_base.T_z_list,
         )
         npt.assert_array_equal(
-            self.multiplane._multi_plane_base.T_ij_list,
-            self.multiplane_ref._multi_plane_base.T_ij_list,
+            self.multiplane.multi_plane_base.T_ij_list,
+            self.multiplane_ref.multi_plane_base.T_ij_list,
         )
         npt.assert_array_equal(
-            self.multiplane._multi_plane_base.z_source_convention,
-            self.multiplane_ref._multi_plane_base.z_source_convention,
+            self.multiplane.multi_plane_base.z_source_convention,
+            self.multiplane_ref.multi_plane_base.z_source_convention,
         )
         npt.assert_array_equal(
-            self.multiplane._multi_plane_base.sorted_redshift_index,
-            self.multiplane_ref._multi_plane_base.sorted_redshift_index,
+            self.multiplane.multi_plane_base.sorted_redshift_index,
+            self.multiplane_ref.multi_plane_base.sorted_redshift_index,
         )
 
         self.multiplane.model_info()
+        T_ij_start, T_ij_end = self.multiplane.transverse_distance_start_stop(
+            z_start=0,
+            z_stop=self.multiplane.z_source,
+            include_z_start=False
+        )
+        T_ij_start_ref, T_ij_end_ref = self.multiplane_ref.transverse_distance_start_stop(
+            z_start=0,
+            z_stop=self.multiplane_ref.z_source,
+            include_z_start=False
+        )
+        npt.assert_allclose(T_ij_start, T_ij_start_ref, atol=1e-8, rtol=1e-8)
+        npt.assert_allclose(T_ij_end, T_ij_end_ref, atol=1e-8, rtol=1e-8)
 
         z_source = 3.5
-        lens_model_list = ["NFW", "SIS", "NFW", "NFW", "NFW"]
+        lens_model_list = ["NFW", "NIE", "NFW", "NFW", "NFW"]
         redshift_list = [0.5, 1.1, 1.1, 1.5, 1.3]
 
         # Incorrect cosmology_model
@@ -133,20 +153,19 @@ class TestMultiPlane(object):
                 cosmology_sampling=False,
                 cosmology_model="FlatLambdaCDM",
             )
-        # observed convention index and LensedLocation not supported in jaxtronomy
+        # z_source_convention smaller than z_lens
         with pytest.raises(ValueError):
             MultiPlane(
                 z_source=z_source,
                 lens_model_list=lens_model_list,
                 lens_redshift_list=redshift_list,
-                z_interp_stop=4,
                 cosmo_interp=False,
                 distance_ratio_sampling=False,
                 z_lens_convention=0.5,
+                z_source_convention=0.1,
                 cosmo=None,
                 cosmology_sampling=False,
                 cosmology_model="FlatLambdaCDM",
-                observed_convention_index=[0, 1, 4],
             )
         # warn that both cosmo and cosmology_model are provided
         with pytest.warns(UserWarning):
@@ -191,6 +210,14 @@ class TestMultiPlane(object):
                 cosmology_model="FlatLambdaCDM",
             )
 
+        # empty lens model list
+        multiplane = MultiPlane(
+            z_source=0.1,
+            lens_model_list=[],
+            lens_redshift_list=[],
+        )
+        assert len(multiplane.multi_plane_base._sorted_redshift_index) == 0
+
     def test_alpha(self):
         x = np.tile(np.linspace(-5, 5, 20), 20)
         y = np.repeat(np.linspace(-5, 5, 20), 20)
@@ -206,6 +233,33 @@ class TestMultiPlane(object):
 
         f_x, f_y = self.multiplane.ray_shooting(x, y, self.kwargs_lens)
         f_x_ref, f_y_ref = self.multiplane_ref.ray_shooting(x, y, self.kwargs_lens)
+        npt.assert_allclose(f_x, f_x_ref, atol=1e-8, rtol=1e-8)
+        npt.assert_allclose(f_y, f_y_ref, atol=1e-8, rtol=1e-8)
+
+        f_x, f_y, _, _ = self.multiplane.multi_plane_base.ray_shooting_partial_comoving(
+            np.zeros_like(x),
+            np.zeros_like(y),
+            x,
+            y,
+            z_start=0,
+            z_stop=self.multiplane.z_source,
+            kwargs_lens=self.kwargs_lens,
+            include_z_start=True,
+            T_ij_start=None,
+            T_ij_end=self.multiplane.T_ij_stop
+        )
+        f_x_ref, f_y_ref, _, _ = self.multiplane_ref.multi_plane_base.ray_shooting_partial_comoving(
+            np.zeros_like(x),
+            np.zeros_like(y),
+            x,
+            y,
+            z_start=0,
+            z_stop=self.multiplane_ref.z_source,
+            kwargs_lens=self.kwargs_lens,
+            include_z_start=True,
+            T_ij_start=None,
+            T_ij_end=self.multiplane_ref.T_ij_stop
+        )
         npt.assert_allclose(f_x, f_x_ref, atol=1e-8, rtol=1e-8)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-8, rtol=1e-8)
 
@@ -233,9 +287,9 @@ class TestMultiPlane(object):
         with pytest.raises(ValueError):
             self.multiplane.ray_shooting(x, y, self.kwargs_lens, k=1)
 
-        # z_start must be 0
+        # z_start must be 0 OR T_ij_start must be given
         with pytest.raises(ValueError):
-            self.multiplane._multi_plane_base.ray_shooting_partial_comoving(
+            self.multiplane.multi_plane_base.ray_shooting_partial_comoving(
                 np.zeros_like(x),
                 np.zeros_like(x),
                 x,
@@ -243,25 +297,13 @@ class TestMultiPlane(object):
                 z_start=1,
                 z_stop=5,
                 kwargs_lens=self.kwargs_lens,
-                T_ij_start=self.multiplane._T_ij_start,
-                T_ij_end=self.multiplane._T_ij_stop,
-            )
-
-        # T_ij start and end must be supplied
-        with pytest.raises(ValueError):
-            self.multiplane._multi_plane_base.ray_shooting_partial_comoving(
-                np.zeros_like(x),
-                np.zeros_like(x),
-                x,
-                y,
-                z_start=0,
-                z_stop=5,
-                kwargs_lens=self.kwargs_lens,
                 T_ij_start=None,
                 T_ij_end=self.multiplane._T_ij_stop,
             )
+
+        # T_ij_end must be supplied
         with pytest.raises(ValueError):
-            self.multiplane._multi_plane_base.ray_shooting_partial_comoving(
+            self.multiplane.multi_plane_base.ray_shooting_partial_comoving(
                 np.zeros_like(x),
                 np.zeros_like(x),
                 x,
@@ -280,7 +322,69 @@ class TestMultiPlane(object):
         # updating cosmology not allowed in jaxtronomy
         with pytest.raises(Exception):
             self.multiplane.set_background_cosmo(FlatwCDM(H0=71, Om0=0.3, w0=-0.8))
+        with pytest.raises(Exception):
+            self.multiplane.multi_plane_base.set_background_cosmo(FlatwCDM(H0=71, Om0=0.3, w0=-0.8))
 
+        # set static and set dynamic are not supported in jaxtronomy
+        with pytest.raises(Exception):
+            self.multiplane.set_static(self.kwargs_lens)
+        with pytest.raises(Exception):
+            self.multiplane.set_dynamic()
+
+
+class TestMultiPlane2(TestMultiPlane):
+    """Tests the MultiPlane routines again, this time with observed_convention_index set."""
+
+    def setup_method(self):
+        z_source = 3.5
+        lens_model_list = ["NFW", "SIS", "NFW", "NFW", "NFW"]
+        redshift_list = [0.5, 1.1, 1.1, 1.5, 1.3]
+        cosmo = FlatwCDM(H0=70, Om0=0.3, w0=-0.8)
+        self.multiplane = MultiPlane(
+            z_source=z_source,
+            lens_model_list=lens_model_list,
+            lens_redshift_list=redshift_list,
+            observed_convention_index=[2, 3],
+            cosmo_interp=True,
+            distance_ratio_sampling=False,
+            z_lens_convention=0.5,
+            cosmo=cosmo,
+            cosmology_sampling=False,
+        )
+
+        self.multiplane_ref = MultiPlane_ref(
+            z_source=z_source,
+            lens_model_list=lens_model_list,
+            lens_redshift_list=redshift_list,
+            observed_convention_index=[2, 3],
+            cosmo_interp=True,
+            distance_ratio_sampling=False,
+            z_lens_convention=0.5,
+            cosmo=cosmo,
+            cosmology_sampling=False,
+        )
+
+        kwargs_nfw1 = {"Rs": 1.3, "alpha_Rs": 2.18, "center_x": 0.1, "center_y": -2.1}
+        kwargs_nfw2 = {"Rs": 1.4, "alpha_Rs": 3.18, "center_x": -0.11, "center_y": 1.1}
+        kwargs_nfw3 = {"Rs": 1.5, "alpha_Rs": 1.11, "center_x": -0.13, "center_y": 1.2}
+        kwargs_nfw4 = {"Rs": 1.1, "alpha_Rs": 2.12, "center_x": 0.21, "center_y": -2.2}
+        kwargs_sis = {"theta_E": 1.5}
+        self.kwargs_lens = [
+            kwargs_nfw1,
+            kwargs_sis,
+            kwargs_nfw2,
+            kwargs_nfw3,
+            kwargs_nfw4,
+        ]
+
+    def test_init(self):
+        pass
+
+    def test_raises(self):
+        pass
+
+    def test_set_static_dynamic(self):
+        pass
 
 if __name__ == "__main__":
     pytest.main("-k TestLensModel")

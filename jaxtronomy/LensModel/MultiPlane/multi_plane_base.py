@@ -192,17 +192,17 @@ class MultiPlaneBase(ProfileListBase):
             function gets executed.
         :return: co-moving position and angles at redshift z_stop
         """
-        if z_start != 0:
-            raise ValueError("Only z_start=0 is allowed in jaxtronomy")
-        if T_ij_start is None or T_ij_end is None:
-            raise ValueError("T_ij start and end must be supplied in jaxtronomy")
+        if z_start != 0 and T_ij_start is None:
+            raise ValueError("In jaxtronomy, either z_start must be zero or T_ij_start must be provided.")
+        if T_ij_end is None:
+            raise ValueError("T_ij_end must be provided in jaxtronomy")
         x = jnp.array(x, dtype=float)
         y = jnp.array(y, dtype=float)
 
         alpha_x = jnp.array(alpha_x)
         alpha_y = jnp.array(alpha_y)
 
-        z_lens_last = z_start
+        # z_lens_last = z_start
         for i, idex in enumerate(self._sorted_redshift_index):
             z_lens = self._lens_redshift_list[idex]
 
@@ -211,29 +211,17 @@ class MultiPlaneBase(ProfileListBase):
                 and z_lens <= z_stop
             ):
                 if i == 0:
-                    # if T_ij_start is None:
-                    #    if z_start == 0:
-                    #        delta_T = self._T_ij_list[0]
-                    #    else:
-                    #        delta_T = self._cosmo_bkg.T_xy(z_start, z_lens)
-                    # else:
-                    #    delta_T = T_ij_start
-                    delta_T = T_ij_start
+                    if T_ij_start is None:
+                        # z start is always zero in this case
+                        delta_T = self._T_ij_list[0]
+                    else:
+                        delta_T = T_ij_start
                 else:
                     delta_T = self._T_ij_list[i]
                 x, y = self._ray_step_add(x, y, alpha_x, alpha_y, delta_T)
                 alpha_x, alpha_y = self._add_deflection(
                     x, y, alpha_x, alpha_y, kwargs_lens, i
                 )
-                # z_lens_last = z_lens
-        # if T_ij_end is None:
-        #     delta_T = 0
-        #     if z_lens_last == z_stop:
-        #         delta_T = 0
-        #     else:
-        #         delta_T = self._cosmo_bkg.T_xy(z_lens_last, z_stop)
-        # else:
-        #     delta_T = T_ij_end
         delta_T = T_ij_end
         x, y = self._ray_step_add(x, y, alpha_x, alpha_y, delta_T)
         return x, y, alpha_x, alpha_y
