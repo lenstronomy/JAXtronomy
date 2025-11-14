@@ -161,16 +161,15 @@ class TestClassCreator(object):
         # TODO: implement multiple redshifts for point sources
         # assert point_source_class._redshift_list == [1, 1.5]
 
-        # TODO: implement multiplane
-        # (
-        #    lens_model_class,
-        #    source_model_class,
-        #    lens_light_model_class,
-        #    point_source_class,
-        #    extinction_class,
-        # ) = class_creator.create_class_instances(**self.kwargs_model_4)
-        # assert lens_model_class.lens_model_list[0] == "SIS"
-        # assert lens_model_class.lens_model._observed_convention_index[0] == 0
+        (
+           lens_model_class,
+           source_model_class,
+           lens_light_model_class,
+           point_source_class,
+           extinction_class,
+        ) = class_creator.create_class_instances(**self.kwargs_model_4)
+        assert lens_model_class.lens_model_list[0] == "SIS"
+        assert lens_model_class.lens_model._observed_convention_index[0] == 0
 
         (
             lens_model_class,
@@ -278,18 +277,6 @@ class TestRaise(unittest.TestCase):
             class_creator.create_class_instances(
                 source_redshift_list=[1], **kwargs_model
             )
-
-        # Multi_plane not supported yet
-        kwargs_model = {
-            "lens_model_list": ["SIS", "SIS"],
-            "lens_redshift_list": [0.3, 0.4],
-            "multi_plane": True,
-            "observed_convention_index": [0],
-            "index_lens_model_list": [[0]],
-            "z_source": 1,
-        }
-        with self.assertRaises(ValueError):
-            class_creator.create_class_instances(**kwargs_model)
 
         # source_position point source not supported yet
         kwargs_model = {
