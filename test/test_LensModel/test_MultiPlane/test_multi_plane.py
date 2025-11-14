@@ -9,6 +9,7 @@ import pytest
 from astropy.cosmology import FlatwCDM
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane as MultiPlane_ref
 from jaxtronomy.LensModel.MultiPlane.multi_plane import MultiPlane
+from lenstronomy.LensModel.MultiPlane.multi_plane_base import MultiPlaneBase
 
 
 class TestMultiPlane(object):
@@ -94,6 +95,7 @@ class TestMultiPlane(object):
         )
 
         self.multiplane.model_info()
+
         T_ij_start, T_ij_end = self.multiplane.transverse_distance_start_stop(
             z_start=0, z_stop=self.multiplane.z_source, include_z_start=False
         )
@@ -108,6 +110,12 @@ class TestMultiPlane(object):
         z_source = 3.5
         lens_model_list = ["NFW", "NIE", "NFW", "NFW", "NFW"]
         redshift_list = [0.5, 1.1, 1.1, 1.5, 1.3]
+
+        multi_plane_base = MultiPlaneBase(
+            lens_model_list=lens_model_list,
+            lens_redshift_list=redshift_list,
+            z_source_convention=z_source,
+        )
 
         # Incorrect cosmology_model
         with pytest.raises(ValueError):
@@ -381,7 +389,16 @@ class TestMultiPlane2(TestMultiPlane):
         ]
 
     def test_init(self):
-        pass
+        kwargs_lens = self.multiplane.observed2flat_convention(self.kwargs_lens)
+        kwargs_lens_ref = self.multiplane_ref.observed2flat_convention(self.kwargs_lens)
+
+        x = np.tile(np.linspace(-5, 5, 20), 20)
+        y = np.repeat(np.linspace(-5, 5, 20), 20)
+
+        f_x, f_y = self.multiplane.ray_shooting(x, y, kwargs_lens)
+        f_x_ref, f_y_ref = self.multiplane_ref.ray_shooting(x, y, kwargs_lens_ref)
+        npt.assert_allclose(f_x, f_x_ref, atol=1e-8, rtol=1e-8)
+        npt.assert_allclose(f_y, f_y_ref, atol=1e-8, rtol=1e-8)
 
     def test_raises(self):
         pass

@@ -173,17 +173,9 @@ class MultiPlane(object):
     def T_ij_start(self):
         return self._T_ij_start
 
-    @T_ij_start.setter
-    def T_ij_start(self, T_ij_start):
-        self._T_ij_start = T_ij_start
-
     @property
     def T_ij_stop(self):
         return self._T_ij_stop
-
-    @T_ij_stop.setter
-    def T_ij_stop(self, T_ij_stop):
-        self._T_ij_stop = T_ij_stop
 
     # This function is called outside of jit
     def model_info(self):

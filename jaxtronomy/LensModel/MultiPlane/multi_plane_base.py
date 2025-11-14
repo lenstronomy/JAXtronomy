@@ -138,21 +138,10 @@ class MultiPlaneBase(ProfileListBase):
         lens planes."""
         return self._T_z_list
 
-    @T_z_list.setter
-    def T_z_list(self, T_z_list):
-        """List of transverse angular diameter distances between the observer and the
-        lens planes."""
-        self._T_z_list = T_z_list
-
     @property
     def T_ij_list(self):
         """List of transverse angular diameter distances between the lens planes."""
         return self._T_ij_list
-
-    @T_ij_list.setter
-    def T_ij_list(self, T_ij_list):
-        """List of transverse angular diameter distances between the lens planes."""
-        self._T_ij_list = T_ij_list
 
     @partial(jit, static_argnums=(0, 5, 6, 8, 9, 10))
     def ray_shooting_partial_comoving(
