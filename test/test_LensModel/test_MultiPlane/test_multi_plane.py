@@ -9,7 +9,7 @@ import pytest
 from astropy.cosmology import FlatwCDM
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane as MultiPlane_ref
 from jaxtronomy.LensModel.MultiPlane.multi_plane import MultiPlane
-from lenstronomy.LensModel.MultiPlane.multi_plane_base import MultiPlaneBase
+from jaxtronomy.LensModel.MultiPlane.multi_plane_base import MultiPlaneBase
 
 
 class TestMultiPlane(object):
