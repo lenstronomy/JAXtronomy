@@ -301,8 +301,9 @@ class MultiPlaneBase(ProfileListBase):
     # This function is called in the init, outside of jit; requires cosmology calculations
     def transverse_distance_start_stop(self, z_start, z_stop, include_z_start=False):
         """Computes the transverse distances (T_ij) that are required by ray-tracing.
-        T_ij_start is the distance between the starting redshift and the first deflector after z_start.
-        T_ij_end is the distance between the last deflector before z_stop and z_stop.
+        T_ij_start is the distance between the starting redshift and the first deflector
+        after z_start. T_ij_end is the distance between the last deflector before z_stop
+        and z_stop.
 
         :param z_start: redshift of the start of the ray-tracing
         :param z_stop: stop of ray-tracing
@@ -328,8 +329,7 @@ class MultiPlaneBase(ProfileListBase):
 
     # This function is called outside of jit
     def compute_source_distance(self, z_source):
-        """Compute the relevant angular diameter distance to a specific source
-        redshift.
+        """Compute the relevant angular diameter distance to a specific source redshift.
 
         :param z_source: float, source redshift
         :return: transverse angular distance between z=0 and z_source
@@ -349,14 +349,16 @@ class MultiPlaneBase(ProfileListBase):
         :param kwargs_lens: lens model keyword argument list
         :param z_stop: redshift of the source to stop the backwards ray-tracing
         :param T_z_stop: transverse angular distance from z=0 to z_stop
-        :param T_ij_end: transverse angular distance between the last deflector before z_stop and z_stop
+        :param T_ij_end: transverse angular distance between the last deflector before
+            z_stop and z_stop
         :return: dt_geo, dt_shapiro, [days]
         """
         if T_z_stop is None or T_ij_end is None:
-            raise ValueError("In jaxtronomy, T_z_stop (transverse angular distance from z=0 to z_stop) and T_ij_end\n" \
-            "(transverse angular distance between the last deflector before z_stop and z_stop) must be provided." \
-            "You can use MultiPlaneBase.compute_source_distance(z_stop) to compute T_z_stop, and" \
-            "MultiPlaneBase.transverse_distance_start_stop(z_start, z_stop) to compute T_ij_end."
+            raise ValueError(
+                "In jaxtronomy, T_z_stop (transverse angular distance from z=0 to z_stop) and T_ij_end\n"
+                "(transverse angular distance between the last deflector before z_stop and z_stop) must be provided."
+                "You can use MultiPlaneBase.compute_source_distance(z_stop) to compute T_z_stop, and"
+                "MultiPlaneBase.transverse_distance_start_stop(z_start, z_stop) to compute T_ij_end."
             )
 
         dt_grav = jnp.zeros_like(theta_x, dtype=float)
