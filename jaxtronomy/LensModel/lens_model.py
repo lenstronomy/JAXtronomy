@@ -66,7 +66,9 @@ class LensModel(object):
             distance ratios to update T_ij value in multi-lens plane computation.
         """
         if len(lens_model_list) > 100:
-            warn("Compile times grow exponentially with number of lenses. JAXtronomy may become unusable when number of lenses exceeds 100.")
+            warn(
+                "Compile times grow exponentially with number of lenses. JAXtronomy may become unusable when number of lenses exceeds 100."
+            )
         self.lens_model_list = lens_model_list
         self.z_lens = z_lens
         self.z_source = z_source
@@ -164,7 +166,7 @@ class LensModel(object):
                 self.type = "SinglePlane"
 
         if z_lens is not None and z_source is not None:
-           self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
+            self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
 
         # Save these for convenience if class reinitialization is required
         self.init_kwargs = {
@@ -244,16 +246,16 @@ class LensModel(object):
             )
         # For MultiPlane
         elif hasattr(self.lens_model, "arrival_time") and hasattr(self, "_lensCosmo"):
-           dt = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
-           fermat_pot_eff = (
-               dt
-               * const.c
-               / self._lensCosmo.ddt
-               / const.Mpc
-               * const.day_s
-               / const.arcsec**2
-           )
-           return fermat_pot_eff
+            dt = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
+            fermat_pot_eff = (
+                dt
+                * const.c
+                / self._lensCosmo.ddt
+                / const.Mpc
+                * const.day_s
+                / const.arcsec**2
+            )
+            return fermat_pot_eff
         else:
             raise ValueError(
                 "In multi-plane lensing you need to provide a specific z_lens and z_source for which the "
@@ -262,35 +264,35 @@ class LensModel(object):
 
     @partial(jit, static_argnums=0)
     def arrival_time(
-       self, x_image, y_image, kwargs_lens, kappa_ext=0, x_source=None, y_source=None
+        self, x_image, y_image, kwargs_lens, kappa_ext=0, x_source=None, y_source=None
     ):
-       """Arrival time of images relative to a straight line without lensing. Negative
-       values correspond to images arriving earlier, and positive signs correspond to
-       images arriving later.
+        """Arrival time of images relative to a straight line without lensing. Negative
+        values correspond to images arriving earlier, and positive signs correspond to
+        images arriving later.
 
-       :param x_image: image position
-       :param y_image: image position
-       :param kwargs_lens: lens model parameter keyword argument list
-       :param kappa_ext: external convergence contribution not accounted in the lens
-           model that leads to the same observables in position and relative fluxes but
-           rescales the time delays
-       :param x_source: source position (optional), otherwise computed with ray-tracing
-       :param y_source: source position (optional), otherwise computed with ray-tracing
-       :return: arrival time of image positions in units of days
-       """
-       if hasattr(self.lens_model, "arrival_time"):
-           arrival_time = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
-       else:
-           if not hasattr(self, "_lensCosmo"):
-               raise ValueError(
-                   "LensModel class was not initialized with lens and source redshifts!"
-               )
-           fermat_pot = self.lens_model.fermat_potential(
-               x_image, y_image, kwargs_lens, x_source=x_source, y_source=y_source
-           )
-           arrival_time = self._lensCosmo.time_delay_units(fermat_pot)
-       arrival_time *= 1 - kappa_ext
-       return arrival_time
+        :param x_image: image position
+        :param y_image: image position
+        :param kwargs_lens: lens model parameter keyword argument list
+        :param kappa_ext: external convergence contribution not accounted in the lens
+            model that leads to the same observables in position and relative fluxes but
+            rescales the time delays
+        :param x_source: source position (optional), otherwise computed with ray-tracing
+        :param y_source: source position (optional), otherwise computed with ray-tracing
+        :return: arrival time of image positions in units of days
+        """
+        if hasattr(self.lens_model, "arrival_time"):
+            arrival_time = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
+        else:
+            if not hasattr(self, "_lensCosmo"):
+                raise ValueError(
+                    "LensModel class was not initialized with lens and source redshifts!"
+                )
+            fermat_pot = self.lens_model.fermat_potential(
+                x_image, y_image, kwargs_lens, x_source=x_source, y_source=y_source
+            )
+            arrival_time = self._lensCosmo.time_delay_units(fermat_pot)
+        arrival_time *= 1 - kappa_ext
+        return arrival_time
 
     @partial(jit, static_argnums=(0, 4))
     def potential(self, x, y, kwargs, k=None):

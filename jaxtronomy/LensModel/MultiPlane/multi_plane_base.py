@@ -116,11 +116,14 @@ class MultiPlaneBase(ProfileListBase):
 
     # This function is called in the init outside of JIT
     def set_ddts(self):
-        """Computes time delay distance (in units of Mpc) from each lens redshift to the source."""
+        """Computes time delay distance (in units of Mpc) from each lens redshift to the
+        source."""
 
         self._D_dt_list = []
         for z_lens in self._lens_redshift_list:
-            self._D_dt_list.append(self._cosmo_bkg.ddt(z_lens, self.z_source_convention))
+            self._D_dt_list.append(
+                self._cosmo_bkg.ddt(z_lens, self.z_source_convention)
+            )
 
     # Updating class variables not allowed
     def set_background_cosmo(self, cosmo):
@@ -334,13 +337,15 @@ class MultiPlaneBase(ProfileListBase):
         :param kwargs_lens: lens model keyword argument list
         :param z_stop: redshift of the source to stop the backwards ray-tracing
         :param T_z_stop: transversal angular distance from z=0 to z_stop
-        :param T_ij_end: transversal angular distance between the last lensing
-            plane and z_stop
+        :param T_ij_end: transversal angular distance between the last lensing plane and
+            z_stop
         :return: dt_geo, dt_shapiro, [days]
         """
         if T_z_stop is None or T_ij_end is None:
-            raise ValueError("In jaxtronomy, T_z_stop (transversal angular distance from z=0 to z_stop) and T_ij_end\n" \
-            "(transversal angular distance between the last lensing plane and z_stop) must be provided.")
+            raise ValueError(
+                "In jaxtronomy, T_z_stop (transversal angular distance from z=0 to z_stop) and T_ij_end\n"
+                "(transversal angular distance between the last lensing plane and z_stop) must be provided."
+            )
 
         dt_grav = jnp.zeros_like(theta_x, dtype=float)
         dt_geo = jnp.zeros_like(theta_x, dtype=float)
@@ -413,7 +418,7 @@ class MultiPlaneBase(ProfileListBase):
     @partial(jit, static_argnums=(0, 4))
     def _gravitational_delay(self, x, y, kwargs_lens, index):
         """
-    
+
         :param x: co-moving coordinate at the lens plane
         :param y: co-moving coordinate at the lens plane
         :param kwargs_lens: lens model keyword arguments
@@ -426,12 +431,12 @@ class MultiPlaneBase(ProfileListBase):
         D_dt = self._D_dt_list[index]
         delay_days = const.delay_arcsec2days(potential, D_dt)
         return -delay_days
-    
+
     @staticmethod
     @jit
     def _geometrical_delay(beta_i_x, beta_i_y, beta_j_x, beta_j_y, T_i, T_j, T_ij):
         """
-    
+
         :param beta_i_x: angle on the sky at plane i
         :param beta_i_y: angle on the sky at plane i
         :param beta_j_x: angle on the sky at plane j
