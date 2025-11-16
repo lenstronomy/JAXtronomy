@@ -194,7 +194,6 @@ class MultiPlane(object):
         :param z_source: float, source redshift
         :return: self variables
         """
-        self._z_source = z_source
         (
             self._T_ij_start,
             self._T_ij_stop,
