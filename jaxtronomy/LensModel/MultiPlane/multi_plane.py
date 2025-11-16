@@ -459,45 +459,46 @@ class MultiPlane(object):
             z_start, z_stop, include_z_start
         )
 
-    # NOTE: not implemented
-    # def arrival_time(self, theta_x, theta_y, kwargs_lens, check_convention=True):
-    #     """Light travel time relative to a straight path through the coordinate (0,0)
-    #     Negative sign means earlier arrival time.
+    @partial(jit, static_argnums=(0, 4))
+    def arrival_time(self, theta_x, theta_y, kwargs_lens, check_convention=True):
+        """Light travel time relative to a straight path through the coordinate (0,0)
+        Negative sign means earlier arrival time.
 
-    #     :param theta_x: angle in x-direction on the image
-    #     :param theta_y: angle in y-direction on the image
-    #     :param kwargs_lens: lens model keyword argument list
-    #     :param kwargs_cosmo: cosmo keyword argument
-    #     :return: travel time in unit of days
-    #     """
-    #     dt_geo, dt_grav = self.geo_shapiro_delay(
-    #         theta_x, theta_y, kwargs_lens, check_convention=check_convention
-    #     )
-    #     return dt_geo + dt_grav
+        :param theta_x: angle in x-direction on the image
+        :param theta_y: angle in y-direction on the image
+        :param kwargs_lens: lens model keyword argument list
+        :param check_convention: boolean, if True goes through the lens model list and
+            checks whether the positional conventions are satisfied.
+        :return: travel time in unit of days
+        """
+        dt_geo, dt_grav = self.geo_shapiro_delay(
+            theta_x, theta_y, kwargs_lens, check_convention=check_convention
+        )
+        return dt_geo + dt_grav
 
-    # NOTE: not implemented
-    # def geo_shapiro_delay(self, theta_x, theta_y, kwargs_lens, check_convention=True):
-    #     """Geometric and Shapiro (gravitational) light travel time relative to a
-    #     straight path through the coordinate (0,0) Negative sign means earlier arrival
-    #     time.
+    @partial(jit, static_argnums=(0, 4))
+    def geo_shapiro_delay(self, theta_x, theta_y, kwargs_lens, check_convention=True):
+        """Geometric and Shapiro (gravitational) light travel time relative to a
+        straight path through the coordinate (0,0) Negative sign means earlier arrival
+        time.
 
-    #     :param theta_x: angle in x-direction on the image
-    #     :param theta_y: angle in y-direction on the image
-    #     :param kwargs_lens: lens model keyword argument list
-    #     :param check_convention: boolean, if True goes through the lens model list and
-    #         checks whether the positional conventions are satisfied.
-    #     :return: geometric delay, gravitational delay [days]
-    #     """
-    #     if check_convention and not self.ignore_observed_positions:
-    #         kwargs_lens = self._convention(kwargs_lens)
-    #     return self._multi_plane_base.geo_shapiro_delay(
-    #         theta_x,
-    #         theta_y,
-    #         kwargs_lens,
-    #         z_stop=self._z_source,
-    #         T_z_stop=self._T_z_source,
-    #         T_ij_end=self._T_ij_stop,
-    #     )
+        :param theta_x: angle in x-direction on the image
+        :param theta_y: angle in y-direction on the image
+        :param kwargs_lens: lens model keyword argument list
+        :param check_convention: boolean, if True goes through the lens model list and
+            checks whether the positional conventions are satisfied.
+        :return: geometric delay, gravitational delay [days]
+        """
+        if check_convention and not self.ignore_observed_positions:
+            kwargs_lens = self._convention(kwargs_lens)
+        return self._multi_plane_base.geo_shapiro_delay(
+            theta_x,
+            theta_y,
+            kwargs_lens,
+            z_stop=self._z_source,
+            T_z_stop=self._T_z_source,
+            T_ij_end=self._T_ij_stop,
+        )
 
     @partial(jit, static_argnums=(0, 4, 5))
     def alpha(self, theta_x, theta_y, kwargs_lens, check_convention=True, k=None):
