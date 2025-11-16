@@ -333,14 +333,14 @@ class MultiPlaneBase(ProfileListBase):
         :param theta_y: angle in y-direction on the image
         :param kwargs_lens: lens model keyword argument list
         :param z_stop: redshift of the source to stop the backwards ray-tracing
-        :param T_z_stop: optional, transversal angular distance from z=0 to z_stop
-        :param T_ij_end: optional, transversal angular distance between the last lensing
+        :param T_z_stop: transversal angular distance from z=0 to z_stop
+        :param T_ij_end: transversal angular distance between the last lensing
             plane and z_stop
         :return: dt_geo, dt_shapiro, [days]
         """
         if T_z_stop is None or T_ij_end is None:
             raise ValueError("In jaxtronomy, T_z_stop (transversal angular distance from z=0 to z_stop) and T_ij_end\n" \
-            "transversal angular distance between the last lensing plane and z_stop must be provided.")
+            "(transversal angular distance between the last lensing plane and z_stop) must be provided.")
 
         dt_grav = jnp.zeros_like(theta_x, dtype=float)
         dt_geo = jnp.zeros_like(theta_x, dtype=float)
