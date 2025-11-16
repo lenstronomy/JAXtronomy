@@ -116,11 +116,14 @@ class MultiPlaneBase(ProfileListBase):
 
     # This function is called in the init outside of JIT
     def set_ddts(self):
-        """Computes time delay distance (in units of Mpc) from each lens redshift to the source."""
+        """Computes time delay distance (in units of Mpc) from each lens redshift to the
+        source."""
 
         self._D_dt_list = []
         for z_lens in self._lens_redshift_list:
-            self._D_dt_list.append(self._cosmo_bkg.ddt(z_lens, self.z_source_convention))
+            self._D_dt_list.append(
+                self._cosmo_bkg.ddt(z_lens, self.z_source_convention)
+            )
 
     # Updating class variables not allowed
     def set_background_cosmo(self, cosmo):
@@ -427,7 +430,7 @@ class MultiPlaneBase(ProfileListBase):
     @partial(jit, static_argnums=(0, 4))
     def _gravitational_delay(self, x, y, kwargs_lens, index):
         """
-    
+
         :param x: co-moving coordinate at the lens plane
         :param y: co-moving coordinate at the lens plane
         :param kwargs_lens: lens model keyword arguments
@@ -440,12 +443,12 @@ class MultiPlaneBase(ProfileListBase):
         D_dt = self._D_dt_list[index]
         delay_days = const.delay_arcsec2days(potential, D_dt)
         return -delay_days
-    
+
     @staticmethod
     @jit
     def _geometrical_delay(beta_i_x, beta_i_y, beta_j_x, beta_j_y, T_i, T_j, T_ij):
         """
-    
+
         :param beta_i_x: angle on the sky at plane i
         :param beta_i_y: angle on the sky at plane i
         :param beta_j_x: angle on the sky at plane j

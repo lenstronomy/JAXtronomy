@@ -205,7 +205,16 @@ class TestLensModel(object):
             z_lens=z_lens,
             z_source=z_source,
         )
-        kwargs = [{"theta_E": 1.0, "gamma": 1.7, "e1": 0.1, "e2": 0.2, "center_x": 0.1, "center_y": -1.0}]
+        kwargs = [
+            {
+                "theta_E": 1.0,
+                "gamma": 1.7,
+                "e1": 0.1,
+                "e2": 0.2,
+                "center_x": 0.1,
+                "center_y": -1.0,
+            }
+        ]
         arrival_time = lensModel.arrival_time(x_image, y_image, kwargs)
         arrival_time_ref = lensModel_ref.arrival_time(x_image, y_image, kwargs)
         npt.assert_allclose(arrival_time, arrival_time_ref, rtol=1e-10, atol=1e-10)
@@ -366,9 +375,9 @@ class TestRaise(unittest.TestCase):
         # missing z_source and z_lens at initialization; required to convert fermat potential to arrival time
         # in single plane lensinig
         with self.assertRaises(ValueError):
-           kwargs = [{"alpha_Rs": 1, "Rs": 0.5, "center_x": 0, "center_y": 0}]
-           lensModel = LensModel(["NFW"], multi_plane=False)
-           t_arrival = lensModel.arrival_time(1, 1, kwargs)
+            kwargs = [{"alpha_Rs": 1, "Rs": 0.5, "center_x": 0, "center_y": 0}]
+            lensModel = LensModel(["NFW"], multi_plane=False)
+            t_arrival = lensModel.arrival_time(1, 1, kwargs)
 
         # missing z_lens at initialization; specific lens redshift is required to compute effective fermat potential
         # in multi plane lensing
