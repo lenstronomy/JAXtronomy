@@ -155,7 +155,7 @@ class MultiPlaneBase(ProfileListBase):
         """List of transverse angular diameter distances between the lens planes."""
         return self._T_ij_list
 
-    @partial(jit, static_argnums=(0, 5, 6, 8, 9, 10))
+    @partial(jit, static_argnums=(0, 5, 6, 8))
     def ray_shooting_partial_comoving(
         self,
         x,
@@ -171,7 +171,7 @@ class MultiPlaneBase(ProfileListBase):
     ):
         """Ray-tracing through parts of the cone, starting with (x,y) co-moving
         distances and angles (alpha_x, alpha_y) at redshift z_start and then backwards
-        to redshift z_stop.
+        to redshift z_stop. NOTE: This function recompiles each time a new z_start or z_stop is supplied.
 
         :param x: co-moving position [Mpc]
         :param y: co-moving position [Mpc]
@@ -342,7 +342,7 @@ class MultiPlaneBase(ProfileListBase):
     ):
         """Geometric and Shapiro (gravitational) light travel time relative to a
         straight path through the coordinate (0,0) Negative sign means earlier arrival
-        time.
+        time. NOTE: This function recompiles each time a new z_stop is supplied.
 
         :param theta_x: angle in x-direction on the image
         :param theta_y: angle in y-direction on the image
