@@ -171,7 +171,8 @@ class MultiPlaneBase(ProfileListBase):
     ):
         """Ray-tracing through parts of the cone, starting with (x,y) co-moving
         distances and angles (alpha_x, alpha_y) at redshift z_start and then backwards
-        to redshift z_stop. NOTE: This function recompiles each time a new z_start or z_stop is supplied.
+        to redshift z_stop. NOTE: This function recompiles each time a new z_start or
+        z_stop is supplied.
 
         :param x: co-moving position [Mpc]
         :param y: co-moving position [Mpc]
