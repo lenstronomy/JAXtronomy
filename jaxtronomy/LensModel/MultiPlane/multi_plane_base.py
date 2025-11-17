@@ -122,7 +122,7 @@ class MultiPlaneBase(ProfileListBase):
         self._D_dt_list = []
         for z_lens in self._lens_redshift_list:
             self._D_dt_list.append(
-                self._cosmo_bkg.ddt(z_lens, self.z_source_convention)
+                self._cosmo_bkg.ddt(z_lens, self._z_source_convention)
             )
 
     # Updating class variables not allowed
@@ -355,10 +355,10 @@ class MultiPlaneBase(ProfileListBase):
         """
         if T_z_stop is None or T_ij_end is None:
             raise ValueError(
-                "In jaxtronomy, T_z_stop (transverse angular distance from z=0 to z_stop) and T_ij_end\n"
-                "(transverse angular distance between the last deflector before z_stop and z_stop) must be provided."
-                "You can use MultiPlaneBase.compute_source_distance(z_stop) to compute T_z_stop, and"
-                "MultiPlaneBase.transverse_distance_start_stop(z_start, z_stop) to compute T_ij_end."
+                "In jaxtronomy, T_z_stop (transverse angular distance from z=0 to z_stop) and T_ij_end "
+                "(transverse angular distance between the last deflector before z_stop and z_stop) must be provided.\n"
+                "You can do T_z_stop = MultiPlaneBase.compute_source_distance(z_stop) and "
+                "_, T_ij_end = MultiPlaneBase.transverse_distance_start_stop(0, z_stop)."
             )
 
         dt_grav = jnp.zeros_like(theta_x, dtype=float)
@@ -442,7 +442,7 @@ class MultiPlaneBase(ProfileListBase):
         theta_x, theta_y = self._co_moving2angle(x, y, index)
         k = self._sorted_redshift_index[index]
         potential = self.func_list[k].function(theta_x, theta_y, **kwargs_lens[k])
-        D_dt = self._D_dt_list[index]
+        D_dt = self._D_dt_list[k]
         delay_days = const.delay_arcsec2days(potential, D_dt)
         return -delay_days
 

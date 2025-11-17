@@ -172,20 +172,20 @@ class TestLensModel(object):
         z_source = 1.5
         x_image, y_image = 1.032, -2.0234
         lensModel = LensModel(
-            lens_model_list=["SIS"],
+            lens_model_list=["SIS", "SIS", "SIS"],
             multi_plane=True,
-            lens_redshift_list=[z_lens],
+            lens_redshift_list=[z_lens, 0.7, 0.9],
             z_lens=z_lens,
             z_source=z_source,
         )
         lensModel_ref = LensModel_ref(
-            lens_model_list=["SIS"],
+            lens_model_list=["SIS", "SIS", "SIS"],
             multi_plane=True,
-            lens_redshift_list=[z_lens],
+            lens_redshift_list=[z_lens, 0.7, 0.9],
             z_lens=z_lens,
             z_source=z_source,
         )
-        kwargs = [{"theta_E": 1.0, "center_x": 0.0, "center_y": 0.0}]
+        kwargs = [{"theta_E": 1.1, "center_x": 0.0, "center_y": 0.0}, {"theta_E": 1.2, "center_x": 0.1, "center_y": -0.1}, {"theta_E": 1.3, "center_x": -0.2, "center_y": 0.2}]
         arrival_time = lensModel.arrival_time(x_image, y_image, kwargs)
         arrival_time_ref = lensModel_ref.arrival_time(x_image, y_image, kwargs)
         npt.assert_allclose(arrival_time, arrival_time_ref, rtol=1e-10, atol=1e-10)

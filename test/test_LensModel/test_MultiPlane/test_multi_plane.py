@@ -287,6 +287,47 @@ class TestMultiPlane(object):
         npt.assert_allclose(f_yx, f_yx_ref, atol=1e-8, rtol=1e-8)
         npt.assert_allclose(f_yy, f_yy_ref, atol=1e-8, rtol=1e-8)
 
+    def test_geo_shapiro_delay(self):
+        theta_x = 1.238
+        theta_y = -2.381
+
+        # First test: z_stop = z_source
+        z_stop = self.multiplane._z_source
+
+        # In jaxtronomy these need to be computed ahead of time since there's no JAXified cosmology library
+        T_z_stop = self.multiplane.multi_plane_base.compute_source_distance(z_stop)
+        _, T_ij_end = self.multiplane.multi_plane_base.transverse_distance_start_stop(z_start=0, z_stop=z_stop)
+        npt.assert_allclose(T_z_stop, self.multiplane_ref._T_z_source)
+        npt.assert_allclose(T_ij_end, self.multiplane_ref.T_ij_stop)
+
+        dt_geo, dt_grav = self.multiplane._multi_plane_base.geo_shapiro_delay(theta_x, theta_y, kwargs_lens=self.kwargs_lens, z_stop=z_stop, T_z_stop=T_z_stop, T_ij_end=T_ij_end)
+        dt_geo_ref, dt_grav_ref = self.multiplane_ref._multi_plane_base.geo_shapiro_delay(theta_x, theta_y, kwargs_lens=self.kwargs_lens, z_stop=z_stop)
+        npt.assert_allclose(dt_geo, dt_geo_ref, atol=1e-8, rtol=1e-8)
+        npt.assert_allclose(dt_grav, dt_grav_ref, atol=1e-8, rtol=1e-8)
+
+
+        # Second test: z_stop is arbitrary and bigger than all values in lens_redshift_list
+        z_stop = 3.47
+
+        # In jaxtronomy these need to be computed ahead of time since there's no JAXified cosmology library
+        T_z_stop = self.multiplane.multi_plane_base.compute_source_distance(z_stop)
+        _, T_ij_end = self.multiplane.multi_plane_base.transverse_distance_start_stop(z_start=0, z_stop=z_stop)
+        dt_geo, dt_grav = self.multiplane._multi_plane_base.geo_shapiro_delay(theta_x, theta_y, kwargs_lens=self.kwargs_lens, z_stop=z_stop, T_z_stop=T_z_stop, T_ij_end=T_ij_end)
+        dt_geo_ref, dt_grav_ref = self.multiplane_ref._multi_plane_base.geo_shapiro_delay(theta_x, theta_y, kwargs_lens=self.kwargs_lens, z_stop=z_stop)
+        npt.assert_allclose(dt_geo, dt_geo_ref, atol=1e-8, rtol=1e-8)
+        npt.assert_allclose(dt_grav, dt_grav_ref, atol=1e-8, rtol=1e-8)
+
+        # Third test: z_stop is arbitrary and between some values in lens_redshift_list
+        z_stop = 1.4
+
+        # In jaxtronomy these need to be computed ahead of time since there's no JAXified cosmology library
+        T_z_stop = self.multiplane.multi_plane_base.compute_source_distance(z_stop)
+        _, T_ij_end = self.multiplane.multi_plane_base.transverse_distance_start_stop(z_start=0, z_stop=z_stop)
+        dt_geo, dt_grav = self.multiplane._multi_plane_base.geo_shapiro_delay(theta_x, theta_y, kwargs_lens=self.kwargs_lens, z_stop=z_stop, T_z_stop=T_z_stop, T_ij_end=T_ij_end)
+        dt_geo_ref, dt_grav_ref = self.multiplane_ref._multi_plane_base.geo_shapiro_delay(theta_x, theta_y, kwargs_lens=self.kwargs_lens, z_stop=z_stop)
+        npt.assert_allclose(dt_geo, dt_geo_ref, atol=1e-8, rtol=1e-8)
+        npt.assert_allclose(dt_grav, dt_grav_ref, atol=1e-8, rtol=1e-8)
+
     def test_raises(self):
         x = np.tile(np.linspace(-5, 5, 20), 20)
         y = np.repeat(np.linspace(-5, 5, 20), 20)
@@ -295,7 +336,7 @@ class TestMultiPlane(object):
         with pytest.raises(ValueError):
             self.multiplane.ray_shooting(x, y, self.kwargs_lens, k=1)
 
-        # z_start must be 0 OR T_ij_start must be given
+        # z_start must be 0 OR T_ij_start must be given when ray shooting
         with pytest.raises(ValueError):
             self.multiplane.multi_plane_base.ray_shooting_partial_comoving(
                 np.zeros_like(x),
@@ -309,7 +350,7 @@ class TestMultiPlane(object):
                 T_ij_end=self.multiplane._T_ij_stop,
             )
 
-        # T_ij_end must be supplied
+        # T_ij_end must be supplied in ray shooting
         with pytest.raises(ValueError):
             self.multiplane.multi_plane_base.ray_shooting_partial_comoving(
                 np.zeros_like(x),
@@ -322,6 +363,17 @@ class TestMultiPlane(object):
                 T_ij_start=self.multiplane._T_ij_start,
                 T_ij_end=None,
             )
+
+        theta_x = 1.238
+        theta_y = -2.381
+        z_stop = 1.4
+        # T_z_stop must be supplied when computing geo shapiro delay
+        with pytest.raises(ValueError):
+            dt_geo, dt_grav = self.multiplane._multi_plane_base.geo_shapiro_delay(theta_x, theta_y, kwargs_lens=self.kwargs_lens, z_stop=z_stop, T_ij_end=1.21)
+
+        # T_ij_end must be supplied when computing geo shapiro delay
+        with pytest.raises(ValueError):
+            dt_geo, dt_grav = self.multiplane._multi_plane_base.geo_shapiro_delay(theta_x, theta_y, kwargs_lens=self.kwargs_lens, z_stop=z_stop, T_z_stop=1.21)
 
         # updating source redshift not allowed in jaxtronomy
         with pytest.raises(Exception):
