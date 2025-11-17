@@ -83,6 +83,7 @@ class MultiPlaneBase(ProfileListBase):
         self._reduced2physical_factor = []
 
         self.set_T_zs_and_T_ijs()
+        self.set_ddts()
 
     # This function in called in the init, outside of jit
     def set_T_zs_and_T_ijs(self):
@@ -112,6 +113,17 @@ class MultiPlaneBase(ProfileListBase):
             self._T_ij_list.append(delta_T)
             self._T_z_list.append(T_z)
             z_before = z_lens
+
+    # This function is called in the init outside of JIT
+    def set_ddts(self):
+        """Computes time delay distance (in units of Mpc) from each lens redshift to the
+        source."""
+
+        self._D_dt_list = []
+        for z_lens in self._lens_redshift_list:
+            self._D_dt_list.append(
+                self._cosmo_bkg.ddt(z_lens, self._z_source_convention)
+            )
 
     # Updating class variables not allowed
     def set_background_cosmo(self, cosmo):
@@ -143,7 +155,7 @@ class MultiPlaneBase(ProfileListBase):
         """List of transverse angular diameter distances between the lens planes."""
         return self._T_ij_list
 
-    @partial(jit, static_argnums=(0, 5, 6, 8, 9, 10))
+    @partial(jit, static_argnums=(0, 5, 6, 8))
     def ray_shooting_partial_comoving(
         self,
         x,
@@ -159,7 +171,8 @@ class MultiPlaneBase(ProfileListBase):
     ):
         """Ray-tracing through parts of the cone, starting with (x,y) co-moving
         distances and angles (alpha_x, alpha_y) at redshift z_start and then backwards
-        to redshift z_stop.
+        to redshift z_stop. NOTE: This function recompiles each time a new z_start or
+        z_stop is supplied.
 
         :param x: co-moving position [Mpc]
         :param y: co-moving position [Mpc]
@@ -174,19 +187,21 @@ class MultiPlaneBase(ProfileListBase):
             always! This can lead to duplications in the computation of deflection
             angles.
         :param T_ij_start: transverse angular distance between the starting redshift to
-            the first lens plane to follow. If not set, will compute the distance each
-            time this function gets executed.
+            the first lens plane to follow.
         :param T_ij_end: transverse angular distance between the last lens plane being
-            computed and z_end. If not set, will compute the distance each time this
-            function gets executed.
+            computed and z_end.
         :return: co-moving position and angles at redshift z_stop
         """
         if z_start != 0 and T_ij_start is None:
             raise ValueError(
-                "In jaxtronomy, either z_start must be zero or T_ij_start must be provided."
+                "In jaxtronomy, either z_start must be zero or T_ij_start must be provided. You can use the class function \n"
+                "MultiPlaneBase.transverse_distance_start_stop(z_start, z_stop) to compute T_ij_start."
             )
         if T_ij_end is None:
-            raise ValueError("T_ij_end must be provided in jaxtronomy")
+            raise ValueError(
+                "T_ij_end must be provided in jaxtronomy. You can use the class function \n"
+                "MultiPlaneBase.transverse_distance_start_stop(z_start, z_stop) to compute T_ij_end."
+            )
         x = jnp.array(x, dtype=float)
         y = jnp.array(y, dtype=float)
 
@@ -286,9 +301,10 @@ class MultiPlaneBase(ProfileListBase):
 
     # This function is called in the init, outside of jit; requires cosmology calculations
     def transverse_distance_start_stop(self, z_start, z_stop, include_z_start=False):
-        """Computes the transverse distance (T_ij) that is required by the ray-tracing
-        between the starting redshift and the first deflector afterwards and the last
-        deflector before the end of the ray-tracing.
+        """Computes the transverse distances (T_ij) that are required by ray-tracing.
+        T_ij_start is the distance between the starting redshift and the first deflector
+        after z_start. T_ij_end is the distance between the last deflector before z_stop
+        and z_stop.
 
         :param z_start: redshift of the start of the ray-tracing
         :param z_stop: stop of ray-tracing
@@ -312,73 +328,83 @@ class MultiPlaneBase(ProfileListBase):
         T_ij_end = self._cosmo_bkg.T_xy(z_lens_last, z_stop)
         return T_ij_start, T_ij_end
 
-    # Not implemented in jaxtronomy yet
+    # This function is called outside of jit
+    def compute_source_distance(self, z_source):
+        """Compute the relevant angular diameter distance to a specific source redshift.
 
-    #    def geo_shapiro_delay(
-    #        self, theta_x, theta_y, kwargs_lens, z_stop, T_z_stop=None, T_ij_end=None
-    #    ):
-    #        """Geometric and Shapiro (gravitational) light travel time relative to a
-    #        straight path through the coordinate (0,0) Negative sign means earlier arrival
-    #        time.
-    #
-    #        :param theta_x: angle in x-direction on the image
-    #        :param theta_y: angle in y-direction on the image
-    #        :param kwargs_lens: lens model keyword argument list
-    #        :param z_stop: redshift of the source to stop the backwards ray-tracing
-    #        :param T_z_stop: optional, transversal angular distance from z=0 to z_stop
-    #        :param T_ij_end: optional, transversal angular distance between the last lensing
-    #            plane and the source plane
-    #        :return: dt_geo, dt_shapiro, [days]
-    #        """
-    #        dt_grav = np.zeros_like(theta_x, dtype=float)
-    #        dt_geo = np.zeros_like(theta_x, dtype=float)
-    #        x = np.zeros_like(theta_x, dtype=float)
-    #        y = np.zeros_like(theta_y, dtype=float)
-    #        alpha_x = np.array(theta_x, dtype=float)
-    #        alpha_y = np.array(theta_y, dtype=float)
-    #
-    #        i = 0
-    #        z_lens_last = 0
-    #        for i, index in enumerate(self._sorted_redshift_index):
-    #            z_lens = self._lens_redshift_list[index]
-    #            if z_lens <= z_stop:
-    #                T_ij = self._T_ij_list[i]
-    #                x_new, y_new = self._ray_step(x, y, alpha_x, alpha_y, T_ij)
-    #                if i == 0:
-    #                    pass
-    #                elif T_ij > 0:
-    #                    T_j = self._T_z_list[i]
-    #                    T_i = self._T_z_list[i - 1]
-    #                    beta_i_x, beta_i_y = x / T_i, y / T_i
-    #                    beta_j_x, beta_j_y = x_new / T_j, y_new / T_j
-    #                    dt_geo_new = self._geometrical_delay(
-    #                        beta_i_x, beta_i_y, beta_j_x, beta_j_y, T_i, T_j, T_ij
-    #                    )
-    #                    dt_geo += dt_geo_new
-    #                x, y = x_new, y_new
-    #                dt_grav_new = self._gravitational_delay(x, y, kwargs_lens, i, z_lens)
-    #                alpha_x, alpha_y = self._add_deflection(
-    #                    x, y, alpha_x, alpha_y, kwargs_lens, i
-    #                )
-    #
-    #                dt_grav += dt_grav_new
-    #                z_lens_last = z_lens
-    #        if T_ij_end is None:
-    #            T_ij_end = self._cosmo_bkg.T_xy(z_lens_last, z_stop)
-    #        T_ij = T_ij_end
-    #        x_new, y_new = self._ray_step(x, y, alpha_x, alpha_y, T_ij)
-    #        if T_z_stop is None:
-    #            T_z_stop = self._cosmo_bkg.T_xy(0, z_stop)
-    #        T_j = T_z_stop
-    #        T_i = self._T_z_list[i]
-    #        beta_i_x, beta_i_y = x / T_i, y / T_i
-    #        beta_j_x, beta_j_y = x_new / T_j, y_new / T_j
-    #        dt_geo_new = self._geometrical_delay(
-    #            beta_i_x, beta_i_y, beta_j_x, beta_j_y, T_i, T_j, T_ij
-    #        )
-    #        dt_geo += dt_geo_new
-    #        return dt_geo, dt_grav
+        :param z_source: float, source redshift
+        :return: transverse angular distance between z=0 and z_source
+        """
+        return self._cosmo_bkg.T_xy(0, z_source)
 
+    @partial(jit, static_argnums=(0, 4))
+    def geo_shapiro_delay(
+        self, theta_x, theta_y, kwargs_lens, z_stop, T_z_stop=None, T_ij_end=None
+    ):
+        """Geometric and Shapiro (gravitational) light travel time relative to a
+        straight path through the coordinate (0,0) Negative sign means earlier arrival
+        time. NOTE: This function recompiles each time a new z_stop is supplied.
+
+        :param theta_x: angle in x-direction on the image
+        :param theta_y: angle in y-direction on the image
+        :param kwargs_lens: lens model keyword argument list
+        :param z_stop: redshift of the source to stop the backwards ray-tracing
+        :param T_z_stop: transverse angular distance from z=0 to z_stop
+        :param T_ij_end: transverse angular distance between the last deflector before
+            z_stop and z_stop
+        :return: dt_geo, dt_shapiro, [days]
+        """
+        if T_z_stop is None or T_ij_end is None:
+            raise ValueError(
+                "In jaxtronomy, T_z_stop (transverse angular distance from z=0 to z_stop) and T_ij_end "
+                "(transverse angular distance between the last deflector before z_stop and z_stop) must be provided.\n"
+                "You can do T_z_stop = MultiPlaneBase.compute_source_distance(z_stop) and "
+                "_, T_ij_end = MultiPlaneBase.transverse_distance_start_stop(0, z_stop)."
+            )
+
+        dt_grav = jnp.zeros_like(theta_x, dtype=float)
+        dt_geo = jnp.zeros_like(theta_x, dtype=float)
+        x = jnp.zeros_like(theta_x, dtype=float)
+        y = jnp.zeros_like(theta_y, dtype=float)
+        alpha_x = jnp.array(theta_x, dtype=float)
+        alpha_y = jnp.array(theta_y, dtype=float)
+
+        for i, index in enumerate(self._sorted_redshift_index):
+            z_lens = self._lens_redshift_list[index]
+            if z_lens <= z_stop:
+                T_ij = self._T_ij_list[i]
+                x_new, y_new = self._ray_step(x, y, alpha_x, alpha_y, T_ij)
+                if i == 0:
+                    pass
+                elif T_ij > 0:
+                    T_j = self._T_z_list[i]
+                    T_i = self._T_z_list[i - 1]
+                    beta_i_x, beta_i_y = x / T_i, y / T_i
+                    beta_j_x, beta_j_y = x_new / T_j, y_new / T_j
+                    dt_geo_new = self._geometrical_delay(
+                        beta_i_x, beta_i_y, beta_j_x, beta_j_y, T_i, T_j, T_ij
+                    )
+                    dt_geo += dt_geo_new
+                x, y = x_new, y_new
+                dt_grav_new = self._gravitational_delay(x, y, kwargs_lens, i)
+                alpha_x, alpha_y = self._add_deflection(
+                    x, y, alpha_x, alpha_y, kwargs_lens, i
+                )
+
+                dt_grav += dt_grav_new
+        T_ij = T_ij_end
+        x_new, y_new = self._ray_step(x, y, alpha_x, alpha_y, T_ij)
+        T_j = T_z_stop
+        T_i = self._T_z_list[i]
+        beta_i_x, beta_i_y = x / T_i, y / T_i
+        beta_j_x, beta_j_y = x_new / T_j, y_new / T_j
+        dt_geo_new = self._geometrical_delay(
+            beta_i_x, beta_i_y, beta_j_x, beta_j_y, T_i, T_j, T_ij
+        )
+        dt_geo += dt_geo_new
+        return dt_geo, dt_grav
+
+    # This function is called in the init outside of JIT
     @staticmethod
     def _index_ordering(redshift_list):
         """
@@ -404,54 +430,41 @@ class MultiPlaneBase(ProfileListBase):
         factor = self._reduced2physical_factor[index_lens]
         return alpha_reduced * factor
 
-    #    def _gravitational_delay(self, x, y, kwargs_lens, index, z_lens):
-    #        """
-    #
-    #        :param x: co-moving coordinate at the lens plane
-    #        :param y: co-moving coordinate at the lens plane
-    #        :param kwargs_lens: lens model keyword arguments
-    #        :param z_lens: redshift of the deflector
-    #        :param index: index of the lens model in sorted redshfit convention
-    #        :return: gravitational delay in units of days as seen at z=0
-    #        """
-    #        theta_x, theta_y = self._co_moving2angle(x, y, index)
-    #        k = self._sorted_redshift_index[index]
-    #        potential = self.func_list[k].function(theta_x, theta_y, **kwargs_lens[k])
-    #        delay_days = self._lensing_potential2time_delay(
-    #            potential, z_lens, z_source=self._z_source_convention
-    #        )
-    #        return -delay_days
-    #
-    #    @staticmethod
-    #    def _geometrical_delay(beta_i_x, beta_i_y, beta_j_x, beta_j_y, T_i, T_j, T_ij):
-    #        """
-    #
-    #        :param beta_i_x: angle on the sky at plane i
-    #        :param beta_i_y: angle on the sky at plane i
-    #        :param beta_j_x: angle on the sky at plane j
-    #        :param beta_j_y: angle on the sky at plane j
-    #        :param T_i: transverse diameter distance to z_i
-    #        :param T_j: transverse diameter distance to z_j
-    #        :param T_ij: transverse diameter distance from z_i to z_j
-    #        :return: excess delay relative to a straight line
-    #        """
-    #        d_beta_x = beta_j_x - beta_i_x
-    #        d_beta_y = beta_j_y - beta_i_y
-    #        tau_ij = T_i * T_j / T_ij * const.Mpc / const.c / const.day_s * const.arcsec**2
-    #        return tau_ij * (d_beta_x**2 + d_beta_y**2) / 2
-    #
-    #    def _lensing_potential2time_delay(self, potential, z_lens, z_source):
-    #        """Transforms the lensing potential (in units arcsec^2) to a gravitational time-
-    #        delay as measured at z=0.
-    #
-    #        :param potential: lensing potential
-    #        :param z_lens: redshift of the deflector
-    #        :param z_source: redshift of source for the definition of the lensing quantities
-    #        :return: gravitational time-delay in units of days
-    #        """
-    #        D_dt = self._cosmo_bkg.ddt(z_lens, z_source)
-    #        delay_days = const.delay_arcsec2days(potential, D_dt)
-    #        return delay_days
+    @partial(jit, static_argnums=(0, 4))
+    def _gravitational_delay(self, x, y, kwargs_lens, index):
+        """
+
+        :param x: co-moving coordinate at the lens plane
+        :param y: co-moving coordinate at the lens plane
+        :param kwargs_lens: lens model keyword arguments
+        :param index: index of the lens model in sorted redshfit convention
+        :return: gravitational delay in units of days as seen at z=0
+        """
+        theta_x, theta_y = self._co_moving2angle(x, y, index)
+        k = self._sorted_redshift_index[index]
+        potential = self.func_list[k].function(theta_x, theta_y, **kwargs_lens[k])
+        D_dt = self._D_dt_list[k]
+        delay_days = const.delay_arcsec2days(potential, D_dt)
+        return -delay_days
+
+    @staticmethod
+    @jit
+    def _geometrical_delay(beta_i_x, beta_i_y, beta_j_x, beta_j_y, T_i, T_j, T_ij):
+        """
+
+        :param beta_i_x: angle on the sky at plane i
+        :param beta_i_y: angle on the sky at plane i
+        :param beta_j_x: angle on the sky at plane j
+        :param beta_j_y: angle on the sky at plane j
+        :param T_i: transverse diameter distance to z_i
+        :param T_j: transverse diameter distance to z_j
+        :param T_ij: transverse diameter distance from z_i to z_j
+        :return: excess delay relative to a straight line
+        """
+        d_beta_x = beta_j_x - beta_i_x
+        d_beta_y = beta_j_y - beta_i_y
+        tau_ij = T_i * T_j / T_ij * const.Mpc / const.c / const.day_s * const.arcsec**2
+        return tau_ij * (d_beta_x**2 + d_beta_y**2) / 2
 
     @partial(jit, static_argnums=(0, 3))
     def _co_moving2angle(self, x, y, index):
@@ -467,22 +480,23 @@ class MultiPlaneBase(ProfileListBase):
         theta_y = y / T_z
         return theta_x, theta_y
 
-    # @staticmethod
-    # def _ray_step(x, y, alpha_x, alpha_y, delta_T):
-    #     """Ray propagation with small angle approximation The difference to
-    #     _ray_step_add() is that the previous input position (x, y) do NOT get
-    #     overwritten and are still accessible.
+    @staticmethod
+    @jit
+    def _ray_step(x, y, alpha_x, alpha_y, delta_T):
+        """Ray propagation with small angle approximation The difference to
+        _ray_step_add() is that the previous input position (x, y) do NOT get
+        overwritten and are still accessible.
 
-    #     :param x: co-moving x-position
-    #     :param y: co-moving y-position
-    #     :param alpha_x: deflection angle in x-direction at (x, y)
-    #     :param alpha_y: deflection angle in y-direction at (x, y)
-    #     :param delta_T: transverse angular diameter distance to the next step
-    #     :return: co-moving position at the next step (backwards)
-    #     """
-    #     x_ = x + alpha_x * delta_T
-    #     y_ = y + alpha_y * delta_T
-    #     return x_, y_
+        :param x: co-moving x-position
+        :param y: co-moving y-position
+        :param alpha_x: deflection angle in x-direction at (x, y)
+        :param alpha_y: deflection angle in y-direction at (x, y)
+        :param delta_T: transverse angular diameter distance to the next step
+        :return: co-moving position at the next step (backwards)
+        """
+        x_ = x + alpha_x * delta_T
+        y_ = y + alpha_y * delta_T
+        return x_, y_
 
     @staticmethod
     @jit
