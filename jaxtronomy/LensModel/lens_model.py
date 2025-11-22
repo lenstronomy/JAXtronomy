@@ -6,7 +6,6 @@ from jaxtronomy.LensModel.MultiPlane.multi_plane import MultiPlane
 
 from lenstronomy.Cosmo.lens_cosmo import LensCosmo
 from lenstronomy.Util import constants as const
-from astropy.cosmology import default_cosmology
 
 from functools import partial
 from jax import jit
@@ -89,6 +88,8 @@ class LensModel(object):
         self.profile_kwargs_list = profile_kwargs_list
 
         if cosmo is None:
+            from astropy.cosmology import default_cosmology
+            
             cosmo = default_cosmology.get()
         self.cosmo = cosmo
 
