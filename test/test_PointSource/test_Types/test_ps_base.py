@@ -20,6 +20,7 @@ class TestPSBase(object):
             lens_model=LensModel(lens_model_list=["SIS"]),
             fixed_magnification=False,
             additional_images=False,
+            redshift=0.5
         )
         self.kwargs_ps = {"image_amp": 1, "ra_image": 0.1, "dec_image": 0.1}
 
@@ -29,7 +30,7 @@ class TestPSBase(object):
         assert type(self.ps._lens_model.lens_model.func_list[0]) == SIS
         assert type(self.ps._solver.lensModel.lens_model.func_list[0]) == SIS
         assert self.ps.k_list is None
-        assert self.ps._redshift is None
+        assert self.ps._redshift == 0.5
 
         # 2 bands, each with 2 different lens models
         index_lens_model_list = [[0, 1], [2, 3]]
@@ -46,8 +47,8 @@ class TestPSBase(object):
         assert ps._fixed_magnification == True
         assert ps.k_list == [(0, 1), (2, 3), (2, 3), (0, 1)]
 
+        # Not supported in jaxtronomy
         npt.assert_raises(ValueError, PSBase, additional_images=True)
-        npt.assert_raises(ValueError, PSBase, redshift=3)
 
     def test_image_position(self):
         npt.assert_raises(ValueError, self.ps.image_position, self.kwargs_ps)
