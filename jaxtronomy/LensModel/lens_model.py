@@ -6,7 +6,6 @@ from jaxtronomy.LensModel.MultiPlane.multi_plane import MultiPlane
 
 from lenstronomy.Cosmo.lens_cosmo import LensCosmo
 from lenstronomy.Util import constants as const
-from lenstronomy.Util.cosmo_util import get_astropy_cosmology
 from astropy.cosmology import default_cosmology
 
 from functools import partial
