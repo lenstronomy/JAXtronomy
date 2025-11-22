@@ -422,6 +422,15 @@ class TestRaise(unittest.TestCase):
                 lens_redshift_list=[0.5, 0.5],
             )
 
+        # missing z_lens when z_source != z_source_convention in SinglePlane mode
+        with self.assertRaises(ValueError):
+            lens_model = LensModel(
+                lens_model_list=["NFW"],
+                multi_plane=False,
+                z_source=1.1,
+                z_source_convention=1.0
+            )
+
         # LOS model is incompatible with MultiPlane lensing
         with self.assertRaises(ValueError):
             lens_model = LensModel(
