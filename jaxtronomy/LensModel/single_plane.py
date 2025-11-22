@@ -168,7 +168,12 @@ class SinglePlane(ProfileListBase):
                 f_xy += f_xy_i
                 f_yx += f_yx_i
                 f_yy += f_yy_i
-        return f_xx * self._alpha_scaling, f_xy * self._alpha_scaling, f_yx * self._alpha_scaling, f_yy * self._alpha_scaling
+        return (
+            f_xx * self._alpha_scaling,
+            f_xy * self._alpha_scaling,
+            f_yx * self._alpha_scaling,
+            f_yy * self._alpha_scaling,
+        )
 
     def change_redshift_scaling(self, alpha_scaling):
         """
@@ -176,7 +181,9 @@ class SinglePlane(ProfileListBase):
         :param alpha_scaling: scaling parameter of the reduced deflection angle relative to z_source_convention
         :return: None
         """
-        raise Exception("Changing redshift scaling is not supported in JAXtronomy. Create a new class instead.")
+        raise Exception(
+            "Changing redshift scaling is not supported in JAXtronomy. Create a new class instead."
+        )
 
     @property
     def alpha_scaling(self):

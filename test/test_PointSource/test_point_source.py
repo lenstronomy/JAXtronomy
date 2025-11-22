@@ -1,4 +1,5 @@
 import jax, jax.numpy as jnp
+
 jax.config.update("jax_enable_x64", True)
 
 import pytest
@@ -14,26 +15,37 @@ from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
 
 
 class TestPointSource(object):
-    """Tests PointSource functionality with SinglePlane lens model"""
+    """Tests PointSource functionality with SinglePlane lens model."""
+
     def setup_method(self):
 
         lens_model_list = ["EPL", "SIS"]
         point_source_type_list = ["LENSED_POSITION", "UNLENSED", "LENSED_POSITION"]
 
-        lensmodel = LensModel(lens_model_list=lens_model_list, multi_plane=False, z_source_convention=1.1, z_lens=0.7)
+        lensmodel = LensModel(
+            lens_model_list=lens_model_list,
+            multi_plane=False,
+            z_source_convention=1.1,
+            z_lens=0.7,
+        )
         self.ps = PointSource(
             point_source_type_list=point_source_type_list,
             lens_model=lensmodel,
             fixed_magnification_list=[False, False, True],
-            redshift_list=[1.1, 1.3, 1.5]
+            redshift_list=[1.1, 1.3, 1.5],
         )
 
-        lensmodel_ref = LensModel_ref(lens_model_list=lens_model_list, multi_plane=False, z_source_convention=1.1, z_lens=0.7)
+        lensmodel_ref = LensModel_ref(
+            lens_model_list=lens_model_list,
+            multi_plane=False,
+            z_source_convention=1.1,
+            z_lens=0.7,
+        )
         self.ps_ref = PointSource_ref(
             point_source_type_list=point_source_type_list,
             lens_model=lensmodel_ref,
             fixed_magnification_list=[False, False, True],
-            redshift_list=[1.1, 1.3, 1.5]
+            redshift_list=[1.1, 1.3, 1.5],
         )
 
         kwargs_ps1 = {
@@ -257,20 +269,32 @@ class TestPointSource2(TestPointSource):
         lens_model_list = ["EPL", "SIS"]
         point_source_type_list = ["LENSED_POSITION", "UNLENSED", "LENSED_POSITION"]
 
-        lensmodel = LensModel(lens_model_list=lens_model_list, lens_redshift_list=[0.6, 0.8], multi_plane=True, z_source=1.1, z_source_convention=1.1)
+        lensmodel = LensModel(
+            lens_model_list=lens_model_list,
+            lens_redshift_list=[0.6, 0.8],
+            multi_plane=True,
+            z_source=1.1,
+            z_source_convention=1.1,
+        )
         self.ps = PointSource(
             point_source_type_list=point_source_type_list,
             lens_model=lensmodel,
             fixed_magnification_list=[False, False, True],
-            redshift_list=[1.1, 1.3, 1.5]
+            redshift_list=[1.1, 1.3, 1.5],
         )
 
-        lensmodel_ref = LensModel_ref(lens_model_list=lens_model_list, lens_redshift_list=[0.6, 0.8], multi_plane=True, z_source=1.1, z_source_convention=1.1)
+        lensmodel_ref = LensModel_ref(
+            lens_model_list=lens_model_list,
+            lens_redshift_list=[0.6, 0.8],
+            multi_plane=True,
+            z_source=1.1,
+            z_source_convention=1.1,
+        )
         self.ps_ref = PointSource_ref(
             point_source_type_list=point_source_type_list,
             lens_model=lensmodel_ref,
             fixed_magnification_list=[False, False, True],
-            redshift_list=[1.1, 1.3, 1.5]
+            redshift_list=[1.1, 1.3, 1.5],
         )
 
         kwargs_ps1 = {

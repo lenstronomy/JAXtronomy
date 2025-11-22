@@ -445,7 +445,7 @@ class TestRaise(unittest.TestCase):
                 multi_plane=True,
                 z_source=1.0,
                 lens_redshift_list=[0.5, 0.5],
-                cosmology_sampling=True
+                cosmology_sampling=True,
             )
         # No distance ratio sampling in jaxtronomy
         with self.assertRaises(ValueError):
@@ -454,7 +454,7 @@ class TestRaise(unittest.TestCase):
                 multi_plane=True,
                 z_source=1.0,
                 lens_redshift_list=[0.5, 0.5],
-                distance_ratio_sampling=True
+                distance_ratio_sampling=True,
             )
 
     # def test_hessian_z1z2_raise(self):

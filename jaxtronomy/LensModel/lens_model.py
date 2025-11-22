@@ -214,7 +214,6 @@ class LensModel(object):
             "cosmology_model": "FlatLambdaCDM",
         }
 
-
     def info(self):
         """Shows what models are being initialized and what parameters are being
         requested for. Should be used outside of JIT.

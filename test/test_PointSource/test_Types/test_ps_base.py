@@ -20,7 +20,7 @@ class TestPSBase(object):
             lens_model=LensModel(lens_model_list=["SIS"]),
             fixed_magnification=False,
             additional_images=False,
-            redshift=0.5
+            redshift=0.5,
         )
         self.kwargs_ps = {"image_amp": 1, "ra_image": 0.1, "dec_image": 0.1}
 
