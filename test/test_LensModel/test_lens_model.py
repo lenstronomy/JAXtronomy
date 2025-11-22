@@ -428,7 +428,7 @@ class TestRaise(unittest.TestCase):
                 lens_model_list=["NFW"],
                 multi_plane=False,
                 z_source=1.1,
-                z_source_convention=1.0
+                z_source_convention=1.0,
             )
 
         # LOS model is incompatible with MultiPlane lensing

@@ -1,6 +1,7 @@
 __author__ = "sibirrer"
 
 import jax
+
 jax.config.update("jax_enable_x64", True)  # 64-bit floats
 
 import numpy.testing as npt
@@ -279,6 +280,7 @@ class TestRaise(unittest.TestCase):
         with self.assertRaises(Exception):
             singleplane = SinglePlane(lens_model_list=["EPL"])
             singleplane.change_redshift_scaling(1.1)
+
 
 if __name__ == "__main__":
     pytest.main("-k TestLensModel")
