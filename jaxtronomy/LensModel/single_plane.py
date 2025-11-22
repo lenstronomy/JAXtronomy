@@ -13,6 +13,31 @@ __all__ = ["SinglePlane"]
 class SinglePlane(ProfileListBase):
     """Class to handle an arbitrary list of lens models in a single lensing plane."""
 
+    def __init__(
+        self,
+        lens_model_list,
+        profile_kwargs_list=None,
+        lens_redshift_list=None,
+        z_source_convention=None,
+        alpha_scaling=1,
+    ):
+        """
+
+        :param lens_model_list: list of strings with lens model names
+        :param profile_kwargs_list: list of dicts, keyword arguments used to initialize profile classes
+            in the same order of the lens_model_list. If any of the profile_kwargs are None, then that
+            profile will be initialized using default settings.
+        :param alpha_scaling: scaling factor of deflection angle relative to z_source_convention
+        """
+        self._alpha_scaling = alpha_scaling
+        ProfileListBase.__init__(
+            self,
+            lens_model_list=lens_model_list,
+            profile_kwargs_list=profile_kwargs_list,
+            lens_redshift_list=lens_redshift_list,
+            z_source_convention=z_source_convention,
+        )
+
     @partial(jit, static_argnums=(0, 4))
     def ray_shooting(self, x, y, kwargs, k=None):
         """Maps image to source position (inverse deflection).
@@ -78,7 +103,7 @@ class SinglePlane(ProfileListBase):
         for i, func in enumerate(self.func_list):
             if bool_list[i] is True:
                 potential += func.function(x, y, **kwargs[i])
-        return potential
+        return potential * self._alpha_scaling
 
     @partial(jit, static_argnums=(0, 4))
     def alpha(self, x, y, kwargs, k=None):
@@ -107,7 +132,7 @@ class SinglePlane(ProfileListBase):
                 f_x += f_x_i
                 f_y += f_y_i
 
-        return f_x, f_y
+        return f_x * self._alpha_scaling, f_y * self._alpha_scaling
 
     @partial(jit, static_argnums=(0, 4))
     def hessian(self, x, y, kwargs, k=None):
@@ -143,7 +168,23 @@ class SinglePlane(ProfileListBase):
                 f_xy += f_xy_i
                 f_yx += f_yx_i
                 f_yy += f_yy_i
-        return f_xx, f_xy, f_yx, f_yy
+        return f_xx * self._alpha_scaling, f_xy * self._alpha_scaling, f_yx * self._alpha_scaling, f_yy * self._alpha_scaling
+
+    def change_redshift_scaling(self, alpha_scaling):
+        """
+
+        :param alpha_scaling: scaling parameter of the reduced deflection angle relative to z_source_convention
+        :return: None
+        """
+        raise Exception("Changing redshift scaling is not supported in JAXtronomy. Create a new class instead.")
+
+    @property
+    def alpha_scaling(self):
+        """Deflector scaling factor.
+
+        :return: alpha_scaling
+        """
+        return self._alpha_scaling
 
     @partial(jit, static_argnums=(0, 3))
     def mass_3d(self, r, kwargs, k=None):

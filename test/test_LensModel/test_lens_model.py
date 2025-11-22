@@ -438,6 +438,25 @@ class TestRaise(unittest.TestCase):
                 lens_redshift_list=[0.5, 0.5, 0.5],
             )
 
+        # No cosmology sampling in jaxtronomy
+        with self.assertRaises(ValueError):
+            lens_model = LensModel(
+                lens_model_list=["EPL", "NFW"],
+                multi_plane=True,
+                z_source=1.0,
+                lens_redshift_list=[0.5, 0.5],
+                cosmology_sampling=True
+            )
+        # No distance ratio sampling in jaxtronomy
+        with self.assertRaises(ValueError):
+            lens_model = LensModel(
+                lens_model_list=["EPL", "NFW"],
+                multi_plane=True,
+                z_source=1.0,
+                lens_redshift_list=[0.5, 0.5],
+                distance_ratio_sampling=True
+            )
+
     # def test_hessian_z1z2_raise(self):
     #    lensModel = LensModel(
     #        lens_model_list=["SIS"],
