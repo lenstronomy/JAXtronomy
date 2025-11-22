@@ -89,7 +89,7 @@ class LensModel(object):
 
         if cosmo is None:
             from astropy.cosmology import default_cosmology
-            
+
             cosmo = default_cosmology.get()
         self.cosmo = cosmo
 
