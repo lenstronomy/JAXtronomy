@@ -1,5 +1,9 @@
 __author__ = "sibirrer"
 
+import jax
+
+jax.config.update("jax_enable_x64", True)  # 64-bit floats
+
 import numpy.testing as npt
 import pytest
 
@@ -11,11 +15,6 @@ from lenstronomy.LensModel.Profiles.sis import SIS as SIS_ref
 from jaxtronomy.LensModel.profile_list_base import _JAXXED_MODELS
 
 import unittest
-
-import jax
-import jax.numpy as jnp
-
-jax.config.update("jax_enable_x64", True)  # 64-bit floats
 
 try:
     import fastell4py
@@ -29,8 +28,8 @@ class TestSinglePlane(object):
     """Tests the Single Plane lens model routines."""
 
     def setup_method(self):
-        self.lensModel = SinglePlane(["EPL", "SHEAR"])
-        self.lensModel_ref = SinglePlane_ref(["EPL", "SHEAR"])
+        self.lensModel = SinglePlane(["EPL", "SHEAR"], alpha_scaling=1.1)
+        self.lensModel_ref = SinglePlane_ref(["EPL", "SHEAR"], alpha_scaling=1.1)
 
         self.kwargs = [
             {
@@ -250,6 +249,7 @@ class TestSinglePlane(object):
             "CURVED_ARC_SPP",
         ]
         npt.assert_raises(ValueError, SinglePlane, lens_model_list)
+        assert self.lensModel.alpha_scaling == 1.1
 
     def test_profile_list_base(self):
         # this tests the giant elif statement in profile_list_base
@@ -276,6 +276,10 @@ class TestRaise(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             SinglePlane(lens_model_list=["MY_FAKE_PROFILE"])
+
+        with self.assertRaises(Exception):
+            singleplane = SinglePlane(lens_model_list=["EPL"])
+            singleplane.change_redshift_scaling(1.1)
 
 
 if __name__ == "__main__":

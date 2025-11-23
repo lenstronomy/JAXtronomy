@@ -422,6 +422,15 @@ class TestRaise(unittest.TestCase):
                 lens_redshift_list=[0.5, 0.5],
             )
 
+        # missing z_lens when z_source != z_source_convention in SinglePlane mode
+        with self.assertRaises(ValueError):
+            lens_model = LensModel(
+                lens_model_list=["NFW"],
+                multi_plane=False,
+                z_source=1.1,
+                z_source_convention=1.0,
+            )
+
         # LOS model is incompatible with MultiPlane lensing
         with self.assertRaises(ValueError):
             lens_model = LensModel(
@@ -436,6 +445,25 @@ class TestRaise(unittest.TestCase):
                 multi_plane=True,
                 z_source=1.0,
                 lens_redshift_list=[0.5, 0.5, 0.5],
+            )
+
+        # No cosmology sampling in jaxtronomy
+        with self.assertRaises(ValueError):
+            lens_model = LensModel(
+                lens_model_list=["EPL", "NFW"],
+                multi_plane=True,
+                z_source=1.0,
+                lens_redshift_list=[0.5, 0.5],
+                cosmology_sampling=True,
+            )
+        # No distance ratio sampling in jaxtronomy
+        with self.assertRaises(ValueError):
+            lens_model = LensModel(
+                lens_model_list=["EPL", "NFW"],
+                multi_plane=True,
+                z_source=1.0,
+                lens_redshift_list=[0.5, 0.5],
+                distance_ratio_sampling=True,
             )
 
     # def test_hessian_z1z2_raise(self):

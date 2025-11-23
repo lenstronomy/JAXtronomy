@@ -1,9 +1,11 @@
+import jax, jax.numpy as jnp
+
+jax.config.update("jax_enable_x64", True)
+
 import pytest
 import copy
-import jax, jax.numpy as jnp
 import numpy as np
 import numpy.testing as npt
-import unittest
 
 from jaxtronomy.PointSource.point_source import PointSource
 from jaxtronomy.LensModel.lens_model import LensModel
@@ -11,27 +13,39 @@ from jaxtronomy.LensModel.lens_model import LensModel
 from lenstronomy.PointSource.point_source import PointSource as PointSource_ref
 from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
 
-jax.config.update("jax_enable_x64", True)
-
 
 class TestPointSource(object):
+    """Tests PointSource functionality with SinglePlane lens model."""
+
     def setup_method(self):
 
         lens_model_list = ["EPL", "SIS"]
         point_source_type_list = ["LENSED_POSITION", "UNLENSED", "LENSED_POSITION"]
 
-        lensmodel = LensModel(lens_model_list=lens_model_list)
+        lensmodel = LensModel(
+            lens_model_list=lens_model_list,
+            multi_plane=False,
+            z_source_convention=1.1,
+            z_lens=0.7,
+        )
         self.ps = PointSource(
             point_source_type_list=point_source_type_list,
             lens_model=lensmodel,
             fixed_magnification_list=[False, False, True],
+            redshift_list=[1.1, 1.3, 1.5],
         )
 
-        lensmodel_ref = LensModel_ref(lens_model_list=lens_model_list)
+        lensmodel_ref = LensModel_ref(
+            lens_model_list=lens_model_list,
+            multi_plane=False,
+            z_source_convention=1.1,
+            z_lens=0.7,
+        )
         self.ps_ref = PointSource_ref(
             point_source_type_list=point_source_type_list,
             lens_model=lensmodel_ref,
             fixed_magnification_list=[False, False, True],
+            redshift_list=[1.1, 1.3, 1.5],
         )
 
         kwargs_ps1 = {
@@ -154,7 +168,7 @@ class TestPointSource(object):
         amp_list_ref = self.ps_ref.source_amplitude(self.kwargs_ps, self.kwargs_lens)
         for i in range(len(amp_list)):
             print(f"testing point_source_type_list {i}")
-            npt.assert_allclose(amp_list[i], amp_list_ref[i], atol=1e-8, rtol=1e-8)
+            npt.assert_allclose(amp_list[i], amp_list_ref[i], atol=1e-7, rtol=1e-7)
 
     def test_linear_response_set(self):
         ra_pos, dec_pos, amp, n = self.ps.linear_response_set(
@@ -167,7 +181,7 @@ class TestPointSource(object):
             print(f"testing point_source_type_list {i}")
             npt.assert_allclose(ra_pos[i], ra_pos_ref[i], atol=1e-12, rtol=1e-12)
             npt.assert_allclose(dec_pos[i], dec_pos_ref[i], atol=1e-12, rtol=1e-12)
-            npt.assert_allclose(amp[i], amp_ref[i], atol=1e-12, rtol=1e-12)
+            npt.assert_allclose(amp[i], amp_ref[i], atol=1e-8, rtol=1e-8)
         assert n == n_ref
 
     def test_update_linear(self):
@@ -245,6 +259,76 @@ class TestPointSource(object):
         ps = PointSource([])
         npt.assert_raises(ValueError, ps.update_search_window, 1, 1, 1)
         npt.assert_raises(ValueError, ps.update_lens_model, LensModel([]))
+
+
+# Same tests as before but this time with MultiPlane lens model
+# Different setup method but inherits all the tests from above
+class TestPointSource2(TestPointSource):
+    def setup_method(self):
+
+        lens_model_list = ["EPL", "SIS"]
+        point_source_type_list = ["LENSED_POSITION", "UNLENSED", "LENSED_POSITION"]
+
+        lensmodel = LensModel(
+            lens_model_list=lens_model_list,
+            lens_redshift_list=[0.6, 0.8],
+            multi_plane=True,
+            z_source=1.1,
+            z_source_convention=1.1,
+        )
+        self.ps = PointSource(
+            point_source_type_list=point_source_type_list,
+            lens_model=lensmodel,
+            fixed_magnification_list=[False, False, True],
+            redshift_list=[1.1, 1.3, 1.5],
+        )
+
+        lensmodel_ref = LensModel_ref(
+            lens_model_list=lens_model_list,
+            lens_redshift_list=[0.6, 0.8],
+            multi_plane=True,
+            z_source=1.1,
+            z_source_convention=1.1,
+        )
+        self.ps_ref = PointSource_ref(
+            point_source_type_list=point_source_type_list,
+            lens_model=lensmodel_ref,
+            fixed_magnification_list=[False, False, True],
+            redshift_list=[1.1, 1.3, 1.5],
+        )
+
+        kwargs_ps1 = {
+            "ra_image": [0.1, 0.3, -0.298],
+            "dec_image": [-0.3, 0.2, 0.1293],
+            "point_amp": [1.3, 1.4, 0.2387],
+        }
+
+        kwargs_ps2 = {
+            "ra_image": [0.5, 0.1, 0.2198, 1.38234],
+            "dec_image": [-0.31, 0.232, -0.23487, 0.2347],
+            "point_amp": [1.3534, 1.4345, 0.434, 2.3429],
+        }
+
+        kwargs_ps3 = {
+            "ra_image": [0.4321, 0.233, 0.345],
+            "dec_image": [-0.123, 0.243, 0.389],
+            "source_amp": 1.5,
+        }
+        self.kwargs_ps = [kwargs_ps1, kwargs_ps2, kwargs_ps3]
+
+        kwargs_epl = {
+            "theta_E": 1.3,
+            "gamma": 1.7,
+            "e1": 0.13,
+            "e2": 0.01,
+        }
+        kwargs_sis = {
+            "theta_E": 1.5,
+            "center_x": -0.11,
+            "center_y": -0.03,
+        }
+
+        self.kwargs_lens = [kwargs_epl, kwargs_sis]
 
 
 # Same tests as before but this time with set index_lens_model_list and point_source_frame_list

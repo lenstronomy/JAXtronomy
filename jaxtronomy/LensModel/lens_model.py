@@ -3,6 +3,7 @@ from jaxtronomy.LensModel.single_plane import SinglePlane
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
 from jaxtronomy.LensModel.MultiPlane.decoupled_multi_plane import MultiPlaneDecoupled
 from jaxtronomy.LensModel.MultiPlane.multi_plane import MultiPlane
+
 from lenstronomy.Cosmo.lens_cosmo import LensCosmo
 from lenstronomy.Util import constants as const
 
@@ -36,6 +37,7 @@ class LensModel(object):
         decouple_multi_plane=False,
         kwargs_multiplane_model=None,
         distance_ratio_sampling=False,
+        cosmology_sampling=False,
     ):
         """
 
@@ -63,8 +65,14 @@ class LensModel(object):
             in the same order of the lens_model_list. If any of the profile_kwargs are None, then that
             profile will be initialized using default settings.
         :param distance_ratio_sampling: bool, if True, will use sampled
-            distance ratios to update T_ij value in multi-lens plane computation.
+            distance ratios to update T_ij value in multi-lens plane computation. Not supported in JAXtronomy.
+        :param cosmology_sampling: bool, if True, will use sampled cosmology
+            to update T_ij value in multi-lens plane computation. Not supported in JAXtronomy.
         """
+        if cosmology_sampling:
+            raise ValueError("Cosmology sampling not supported in JAXtronomy")
+        if distance_ratio_sampling:
+            raise ValueError("Distance ratio sampling not supported in JAXtronomy")
         if len(lens_model_list) > 100:
             warn(
                 "Compile times grow exponentially with number of lenses. JAXtronomy may become unusable when number of lenses exceeds 100."
@@ -101,7 +109,8 @@ class LensModel(object):
             raise ValueError(
                 "You can only have one model for line-of-sight corrections."
             )
-
+        if z_lens is not None and z_source is not None:
+            self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
         # Multi-plane or single-plane lensing?
         self.multi_plane = multi_plane
         if multi_plane is True:
@@ -157,16 +166,27 @@ class LensModel(object):
                 )
                 self.type = "SinglePlaneLOS"
             else:
+                alpha_scaling = 1
+                if z_source is not None and z_source_convention is not None:
+                    if z_source != z_source_convention:
+                        if z_lens is None:
+                            raise ValueError(
+                                "a lens redshift needs to provided when z_source != z_source_convention"
+                            )
+                        else:
+                            alpha_scaling = self._lensCosmo.beta_double_source_plane(
+                                z_lens=self.z_lens,
+                                z_source_1=z_source,
+                                z_source_2=self._z_source_convention,
+                            )
                 self.lens_model = SinglePlane(
                     lens_model_list,
                     lens_redshift_list=lens_redshift_list,
                     z_source_convention=z_source_convention,
                     profile_kwargs_list=profile_kwargs_list,
+                    alpha_scaling=alpha_scaling,
                 )
                 self.type = "SinglePlane"
-
-        if z_lens is not None and z_source is not None:
-            self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
 
         # Save these for convenience if class reinitialization is required
         self.init_kwargs = {
@@ -184,7 +204,8 @@ class LensModel(object):
             "profile_kwargs_list": profile_kwargs_list,
             "decouple_multi_plane": decouple_multi_plane,
             "kwargs_multiplane_model": kwargs_multiplane_model,
-            "distance_ratio_sampling": distance_ratio_sampling,
+            "distance_ratio_sampling": False,
+            "cosmology_sampling": False,
         }
 
     def info(self):
@@ -565,7 +586,7 @@ class LensModel(object):
         :param k: int, tuple of ints or None, indicating a subset of lens models to be
             evaluated
         :param diff: float, scale of the finite differential (diff/2 in each direction
-            used to compute the differential
+            used to compute the differential)
         :return: f_xx, f_xy, f_yx, f_yy
         """
         alpha_ra_dx, alpha_dec_dx = self.alpha(x + diff / 2, y, kwargs, k=k)

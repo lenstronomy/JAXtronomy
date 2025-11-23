@@ -1,7 +1,9 @@
 from jaxtronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver
+from jaxtronomy.LensModel.lens_model import LensModel
 import numpy as np
 from jax import jit, numpy as jnp
 from functools import partial
+from copy import deepcopy
 
 __all__ = ["PSBase", "_expand_to_array", "_shrink_array"]
 
@@ -35,10 +37,13 @@ class PSBase(object):
         :param redshift: redshift of the source, only required for multiple source redshifts
         :type redshift: None or float
         """
-        if redshift is not None:
-            raise ValueError("multiple source redshifts not supported in jaxtronomy")
         self._redshift = redshift
+
         self._lens_model = lens_model
+        if lens_model is not None and redshift != lens_model.z_source:
+            new_init_kwargs = deepcopy(lens_model.init_kwargs)
+            new_init_kwargs["z_source"] = redshift
+            self._lens_model = LensModel(**new_init_kwargs)
 
         # Combine point_source_frame_list and index_lens_model_list to obtain k_list,
         # which assigns each image the corresponding lens models from its band
