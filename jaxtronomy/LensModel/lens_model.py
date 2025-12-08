@@ -2,13 +2,14 @@ __author__ = "sibirrer"
 from jaxtronomy.LensModel.single_plane import SinglePlane
 from jaxtronomy.LensModel.LineOfSight.single_plane_los import SinglePlaneLOS
 from jaxtronomy.LensModel.MultiPlane.decoupled_multi_plane import MultiPlaneDecoupled
+from jaxtronomy.LensModel.MultiPlane.multi_plane import MultiPlane
 
-# TODO: Implement multi plane
-# from lenstronomy.Cosmo.lens_cosmo import LensCosmo
-# from lenstronomy.Util import constants as const
+from lenstronomy.Cosmo.lens_cosmo import LensCosmo
+from lenstronomy.Util import constants as const
 
 from functools import partial
 from jax import jit
+from warnings import warn
 
 __all__ = ["LensModel"]
 
@@ -36,6 +37,7 @@ class LensModel(object):
         decouple_multi_plane=False,
         kwargs_multiplane_model=None,
         distance_ratio_sampling=False,
+        cosmology_sampling=False,
     ):
         """
 
@@ -63,8 +65,18 @@ class LensModel(object):
             in the same order of the lens_model_list. If any of the profile_kwargs are None, then that
             profile will be initialized using default settings.
         :param distance_ratio_sampling: bool, if True, will use sampled
-            distance ratios to update T_ij value in multi-lens plane computation.
+            distance ratios to update T_ij value in multi-lens plane computation. Not supported in JAXtronomy.
+        :param cosmology_sampling: bool, if True, will use sampled cosmology
+            to update T_ij value in multi-lens plane computation. Not supported in JAXtronomy.
         """
+        if cosmology_sampling:
+            raise ValueError("Cosmology sampling not supported in JAXtronomy")
+        if distance_ratio_sampling:
+            raise ValueError("Distance ratio sampling not supported in JAXtronomy")
+        if len(lens_model_list) > 100:
+            warn(
+                "Compile times grow exponentially with number of lenses. JAXtronomy may become unusable when number of lenses exceeds 100."
+            )
         self.lens_model_list = lens_model_list
         self.z_lens = z_lens
         self.z_source = z_source
@@ -97,7 +109,8 @@ class LensModel(object):
             raise ValueError(
                 "You can only have one model for line-of-sight corrections."
             )
-
+        if z_lens is not None and z_source is not None:
+            self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
         # Multi-plane or single-plane lensing?
         self.multi_plane = multi_plane
         if multi_plane is True:
@@ -128,23 +141,20 @@ class LensModel(object):
                 )
                 self.type = "MultiPlaneDecoupled"
             else:
-                raise ValueError(
-                    "Only decouple_multi_plane is currently supported in jaxtronomy"
+                self.lens_model = MultiPlane(
+                    z_source,
+                    lens_model_list,
+                    lens_redshift_list,
+                    cosmo=cosmo,
+                    observed_convention_index=observed_convention_index,
+                    z_source_convention=z_source_convention,
+                    cosmo_interp=cosmo_interp,
+                    z_interp_stop=z_interp_stop,
+                    num_z_interp=num_z_interp,
+                    distance_ratio_sampling=distance_ratio_sampling,
+                    profile_kwargs_list=profile_kwargs_list,
                 )
-                # self.lens_model = MultiPlane(
-                #    z_source,
-                #    lens_model_list,
-                #    lens_redshift_list,
-                #    cosmo=cosmo,
-                #    observed_convention_index=observed_convention_index,
-                #    z_source_convention=z_source_convention,
-                #    cosmo_interp=cosmo_interp,
-                #    z_interp_stop=z_interp_stop,
-                #    num_z_interp=num_z_interp,
-                #    distance_ratio_sampling=distance_ratio_sampling,
-                #    profile_kwargs_list=profile_kwargs_list,
-                # )
-
+                self.type = "MultiPlane"
         else:
             if los_effects is True:
                 self.lens_model = SinglePlaneLOS(
@@ -156,16 +166,27 @@ class LensModel(object):
                 )
                 self.type = "SinglePlaneLOS"
             else:
+                alpha_scaling = 1
+                if z_source is not None and z_source_convention is not None:
+                    if z_source != z_source_convention:
+                        if z_lens is None:
+                            raise ValueError(
+                                "a lens redshift needs to provided when z_source != z_source_convention"
+                            )
+                        else:
+                            alpha_scaling = self._lensCosmo.beta_double_source_plane(
+                                z_lens=self.z_lens,
+                                z_source_1=z_source,
+                                z_source_2=self._z_source_convention,
+                            )
                 self.lens_model = SinglePlane(
                     lens_model_list,
                     lens_redshift_list=lens_redshift_list,
                     z_source_convention=z_source_convention,
                     profile_kwargs_list=profile_kwargs_list,
+                    alpha_scaling=alpha_scaling,
                 )
                 self.type = "SinglePlane"
-
-        # if z_lens is not None and z_source is not None:
-        #    self._lensCosmo = LensCosmo(z_lens, z_source, cosmo=cosmo)
 
         # Save these for convenience if class reinitialization is required
         self.init_kwargs = {
@@ -183,7 +204,8 @@ class LensModel(object):
             "profile_kwargs_list": profile_kwargs_list,
             "decouple_multi_plane": decouple_multi_plane,
             "kwargs_multiplane_model": kwargs_multiplane_model,
-            "distance_ratio_sampling": distance_ratio_sampling,
+            "distance_ratio_sampling": False,
+            "cosmology_sampling": False,
         }
 
     def info(self):
@@ -238,57 +260,60 @@ class LensModel(object):
         :return: fermat potential in arcsec**2 without geometry term (second part of Eqn
             1 in Suyu et al. 2013) as a list
         """
-        # if hasattr(self.lens_model, "fermat_potential"):
-        return self.lens_model.fermat_potential(
-            x_image, y_image, kwargs_lens, x_source, y_source
-        )
-        # elif hasattr(self.lens_model, "arrival_time") and hasattr(self, "_lensCosmo"):
-        #    dt = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
-        #    fermat_pot_eff = (
-        #        dt
-        #        * const.c
-        #        / self._lensCosmo.ddt
-        #        / const.Mpc
-        #        * const.day_s
-        #        / const.arcsec**2
-        #    )
-        #    return fermat_pot_eff
-        # else:
-        #     raise ValueError(
-        #         "In multi-plane lensing you need to provide a specific z_lens and z_source for which the "
-        #         "effective Fermat potential is evaluated"
-        #     )
+        # For SinglePlane
+        if hasattr(self.lens_model, "fermat_potential"):
+            return self.lens_model.fermat_potential(
+                x_image, y_image, kwargs_lens, x_source, y_source
+            )
+        # For MultiPlane
+        elif hasattr(self.lens_model, "arrival_time") and hasattr(self, "_lensCosmo"):
+            dt = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
+            fermat_pot_eff = (
+                dt
+                * const.c
+                / self._lensCosmo.ddt
+                / const.Mpc
+                * const.day_s
+                / const.arcsec**2
+            )
+            return fermat_pot_eff
+        else:
+            raise ValueError(
+                "In multi-plane lensing you need to provide a specific z_lens and z_source for which the "
+                "effective Fermat potential is evaluated"
+            )
 
-    # def arrival_time(
-    #    self, x_image, y_image, kwargs_lens, kappa_ext=0, x_source=None, y_source=None
-    # ):
-    #    """Arrival time of images relative to a straight line without lensing. Negative
-    #    values correspond to images arriving earlier, and positive signs correspond to
-    #    images arriving later.
+    @partial(jit, static_argnums=0)
+    def arrival_time(
+        self, x_image, y_image, kwargs_lens, kappa_ext=0, x_source=None, y_source=None
+    ):
+        """Arrival time of images relative to a straight line without lensing. Negative
+        values correspond to images arriving earlier, and positive signs correspond to
+        images arriving later.
 
-    #    :param x_image: image position
-    #    :param y_image: image position
-    #    :param kwargs_lens: lens model parameter keyword argument list
-    #    :param kappa_ext: external convergence contribution not accounted in the lens
-    #        model that leads to the same observables in position and relative fluxes but
-    #        rescales the time delays
-    #    :param x_source: source position (optional), otherwise computed with ray-tracing
-    #    :param y_source: source position (optional), otherwise computed with ray-tracing
-    #    :return: arrival time of image positions in units of days
-    #    """
-    #    if hasattr(self.lens_model, "arrival_time"):
-    #        arrival_time = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
-    #    else:
-    #        fermat_pot = self.lens_model.fermat_potential(
-    #            x_image, y_image, kwargs_lens, x_source=x_source, y_source=y_source
-    #        )
-    #        if not hasattr(self, "_lensCosmo"):
-    #            raise ValueError(
-    #                "LensModel class was not initialized with lens and source redshifts!"
-    #            )
-    #        arrival_time = self._lensCosmo.time_delay_units(fermat_pot)
-    #    arrival_time *= 1 - kappa_ext
-    #    return arrival_time
+        :param x_image: image position
+        :param y_image: image position
+        :param kwargs_lens: lens model parameter keyword argument list
+        :param kappa_ext: external convergence contribution not accounted in the lens
+            model that leads to the same observables in position and relative fluxes but
+            rescales the time delays
+        :param x_source: source position (optional), otherwise computed with ray-tracing
+        :param y_source: source position (optional), otherwise computed with ray-tracing
+        :return: arrival time of image positions in units of days
+        """
+        if hasattr(self.lens_model, "arrival_time"):
+            arrival_time = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
+        else:
+            if not hasattr(self, "_lensCosmo"):
+                raise ValueError(
+                    "LensModel class was not initialized with lens and source redshifts!"
+                )
+            fermat_pot = self.lens_model.fermat_potential(
+                x_image, y_image, kwargs_lens, x_source=x_source, y_source=y_source
+            )
+            arrival_time = self._lensCosmo.time_delay_units(fermat_pot)
+        arrival_time *= 1 - kappa_ext
+        return arrival_time
 
     @partial(jit, static_argnums=(0, 4))
     def potential(self, x, y, kwargs, k=None):
@@ -326,14 +351,13 @@ class LensModel(object):
         """
         if diff is None:
             return self.lens_model.alpha(x, y, kwargs, k=k)
-        # elif self.multi_plane is False:
-        else:
+        elif self.multi_plane is False:
             return self._deflection_differential(x, y, kwargs, k=k, diff=diff)
-        # else:
-        #    raise ValueError(
-        #        "numerical differentiation of lensing potential is not available in the multi-plane "
-        #        "setting as analytical form of lensing potential is not available."
-        #    )
+        else:
+            raise ValueError(
+                "numerical differentiation of lensing potential is not available in the multi-plane "
+                "setting as analytical form of lensing potential is not available."
+            )
 
     @partial(jit, static_argnums=(0, 4, 6))
     def hessian(self, x, y, kwargs, k=None, diff=None, diff_method="square"):
@@ -562,7 +586,7 @@ class LensModel(object):
         :param k: int, tuple of ints or None, indicating a subset of lens models to be
             evaluated
         :param diff: float, scale of the finite differential (diff/2 in each direction
-            used to compute the differential
+            used to compute the differential)
         :return: f_xx, f_xy, f_yx, f_yy
         """
         alpha_ra_dx, alpha_dec_dx = self.alpha(x + diff / 2, y, kwargs, k=k)
