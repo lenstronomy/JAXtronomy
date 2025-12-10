@@ -39,8 +39,20 @@ class TestLensModelGPU(object):
             lens_model_list=self.lens_model_list,
         )
 
-        kwargs_tnfw1 = {"Rs": 1.3, "alpha_Rs": 2.18, "r_trunc": 1.5, "center_x": 0.1, "center_y": -2.1}
-        kwargs_tnfw2 = {"Rs": 1.4, "alpha_Rs": 3.18, "r_trunc": 1.5, "center_x": -0.11, "center_y": 1.1}
+        kwargs_tnfw1 = {
+            "Rs": 1.3,
+            "alpha_Rs": 2.18,
+            "r_trunc": 1.5,
+            "center_x": 0.1,
+            "center_y": -2.1,
+        }
+        kwargs_tnfw2 = {
+            "Rs": 1.4,
+            "alpha_Rs": 3.18,
+            "r_trunc": 1.5,
+            "center_x": -0.11,
+            "center_y": 1.1,
+        }
         kwargs_epl = {"theta_E": 1.5, "gamma": 1.7, "e1": 0.1, "e2": 0.2}
         kwargs_shear = {"gamma1": 1.1, "gamma2": 0.3}
         self.kwargs_lens = [
@@ -61,7 +73,9 @@ class TestLensModelGPU(object):
             lens_redshift_list=self.redshift_list,
         )
         f_x, f_y = self.lens_model_multi.ray_shooting(x, y, ray_shooting_kwargs)
-        f_x_ref, f_y_ref = self.lens_model_multi_ref.ray_shooting(x, y, self.kwargs_lens)
+        f_x_ref, f_y_ref = self.lens_model_multi_ref.ray_shooting(
+            x, y, self.kwargs_lens
+        )
         npt.assert_allclose(f_x, f_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-12, rtol=1e-12)
 
@@ -73,7 +87,9 @@ class TestLensModelGPU(object):
             num_deflectors=6,
         )
         f_x, f_y = self.lens_model_multi.ray_shooting(x, y, ray_shooting_kwargs)
-        f_x_ref, f_y_ref = self.lens_model_multi_ref.ray_shooting(x, y, self.kwargs_lens)
+        f_x_ref, f_y_ref = self.lens_model_multi_ref.ray_shooting(
+            x, y, self.kwargs_lens
+        )
         npt.assert_allclose(f_x, f_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-12, rtol=1e-12)
 
@@ -86,7 +102,9 @@ class TestLensModelGPU(object):
             kwargs_lens=self.kwargs_lens,
         )
         f_x, f_y = self.lens_model_single.ray_shooting(x, y, ray_shooting_kwargs)
-        f_x_ref, f_y_ref = self.lens_model_single_ref.ray_shooting(x, y, self.kwargs_lens)
+        f_x_ref, f_y_ref = self.lens_model_single_ref.ray_shooting(
+            x, y, self.kwargs_lens
+        )
         npt.assert_allclose(f_x, f_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-12, rtol=1e-12)
 
@@ -96,7 +114,9 @@ class TestLensModelGPU(object):
             num_deflectors=6,
         )
         f_x, f_y = self.lens_model_single.ray_shooting(x, y, ray_shooting_kwargs)
-        f_x_ref, f_y_ref = self.lens_model_single_ref.ray_shooting(x, y, self.kwargs_lens)
+        f_x_ref, f_y_ref = self.lens_model_single_ref.ray_shooting(
+            x, y, self.kwargs_lens
+        )
         npt.assert_allclose(f_x, f_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-12, rtol=1e-12)
 

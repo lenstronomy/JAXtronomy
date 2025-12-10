@@ -108,5 +108,5 @@ class TestMultiPlaneGPU(object):
                 kwargs_lens=self.kwargs_lens,
                 z_source=self.z_source,
                 lens_redshift_list=self.redshift_list,
-                num_deflectors=3
+                num_deflectors=3,
             )

@@ -7,6 +7,7 @@ jax.config.update("jax_enable_x64", True)
 
 __all__ = ["Null"]
 
+
 class Null(LensProfileBase):
 
     param_names = []
@@ -44,4 +45,9 @@ class Null(LensProfileBase):
         :param y: y position
         """
 
-        return jnp.zeros_like(x), jnp.zeros_like(x), jnp.zeros_like(x), jnp.zeros_like(x)
+        return (
+            jnp.zeros_like(x),
+            jnp.zeros_like(x),
+            jnp.zeros_like(x),
+            jnp.zeros_like(x),
+        )

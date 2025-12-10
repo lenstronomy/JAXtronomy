@@ -7,6 +7,7 @@ from functools import partial
 from jax import jit, lax, numpy as jnp
 import numpy as np
 
+
 class MultiPlaneGPU(ProfileListBase):
     """This class should be used whenever either of the following conditions are met:
 
@@ -14,6 +15,7 @@ class MultiPlaneGPU(ProfileListBase):
     2) ray tracing is performed on CPU and the number of profile components exceeds 500,
         making the usual LensModel class unusable due to exploding compile times.
     """
+
     def __init__(
         self,
         unique_lens_model_list,
@@ -40,7 +42,10 @@ class MultiPlaneGPU(ProfileListBase):
             z_source_convention=None,
         )
 
-        self._derivatives_list = [_select_kwargs(self.func_list[i], self.param_name_list[i]) for i in range(len(self.func_list))]
+        self._derivatives_list = [
+            _select_kwargs(self.func_list[i], self.param_name_list[i])
+            for i in range(len(self.func_list))
+        ]
 
         if cosmo is None and cosmology_model == "FlatLambdaCDM":
             cosmo = default_cosmology.get()
@@ -55,33 +60,43 @@ class MultiPlaneGPU(ProfileListBase):
         kwargs_lens,
         z_source,
         lens_redshift_list,
-        num_deflectors=None
+        num_deflectors=None,
     ):
-        """This is a helper functon which should be used to convert a lens_model_list and kwargs_lens
-        from the typical lenstronomy convention to a format that is compatible with JAX scan.
+        """This is a helper functon which should be used to convert a lens_model_list
+        and kwargs_lens from the typical lenstronomy convention to a format that is
+        compatible with JAX scan.
 
         :param lens_model_list: list of lens models in the usual lenstronomy convention
-        :param kwargs_lens: list of dictionaries for all keyword arguments for each lens model in the same order
-            of the lens_model_list (same as in lenstronomy)
+        :param kwargs_lens: list of dictionaries for all keyword arguments for each lens
+            model in the same order of the lens_model_list (same as in lenstronomy)
         :param z_source: float, redshift of source
         :param lens_redshift_list: list of redshifts for each deflector
-        :param num_deflectors: optional int, fills the lens_model_list with NULL lens models until the length of
-            lens_model_list is equal to num_deflectors + 1 (the source will be treated as a deflector). Keeping
-            num_deflectors fixed will avoid the recompilation of JAX functions, even if lens_model_list changes
-            (since JAX needs to recompile functions whenever input arrays have a new shape)
-
-        :return: ray_shooting_kwargs, a dictionary of kwargs for the ray_shooting() function. See docstring for ray_shooting().
+        :param num_deflectors: optional int, fills the lens_model_list with NULL lens
+            models until the length of lens_model_list is equal to num_deflectors + 1
+            (the source will be treated as a deflector). Keeping num_deflectors fixed
+            will avoid the recompilation of JAX functions, even if lens_model_list
+            changes (since JAX needs to recompile functions whenever input arrays have a
+            new shape)
+        :return: ray_shooting_kwargs, a dictionary of kwargs for the ray_shooting()
+            function. See docstring for ray_shooting().
         """
-        if len(lens_model_list) != len(kwargs_lens) or len(kwargs_lens) != len(lens_redshift_list):
-            raise ValueError(f"length of lens model list {len(lens_model_list)}, length of kwargs_lens {len(kwargs_lens)}, and length of redshift list {len(lens_redshift_list)} should match")
+        if len(lens_model_list) != len(kwargs_lens) or len(kwargs_lens) != len(
+            lens_redshift_list
+        ):
+            raise ValueError(
+                f"length of lens model list {len(lens_model_list)}, length of kwargs_lens {len(kwargs_lens)}, and length of redshift list {len(lens_redshift_list)} should match"
+            )
 
         if num_deflectors is None:
             num_deflectors = len(lens_model_list)
         elif num_deflectors < len(lens_model_list):
-            raise ValueError(f"The provided num_deflectors {num_deflectors} is smaller than the length of lens_model_list {len(lens_model_list)}")
+            raise ValueError(
+                f"The provided num_deflectors {num_deflectors} is smaller than the length of lens_model_list {len(lens_model_list)}"
+            )
 
-        lens_model_list, lens_redshift_list, kwargs_lens = self._sort_lists_by_redshift(lens_model_list, lens_redshift_list, kwargs_lens)
-
+        lens_model_list, lens_redshift_list, kwargs_lens = self._sort_lists_by_redshift(
+            lens_model_list, lens_redshift_list, kwargs_lens
+        )
 
         # Converts lens_model_list from typical lenstronomy convention to a list of indices, required for jax.lax.scan
         index_list = []
@@ -93,10 +108,11 @@ class MultiPlaneGPU(ProfileListBase):
         index_list += [len(self.unique_lens_model_list)] * (num_filler + 1)
         index_list = jnp.array(index_list)
 
-
         # Converts kwargs_lens from typical lenstronomy convention to a format required for JAX parallelization
         all_kwargs = {}
-        unique_kwargs = set(param for sublist in self.param_name_list for param in sublist)
+        unique_kwargs = set(
+            param for sublist in self.param_name_list for param in sublist
+        )
 
         for kwarg in unique_kwargs:
             all_kwargs[kwarg] = []
@@ -109,7 +125,9 @@ class MultiPlaneGPU(ProfileListBase):
             all_kwargs[kwarg] = np.array(all_kwargs[kwarg])
 
         # Compute transverse comoving distances with the source included
-        T_ij_list, T_z_list, reduced2physical_factor = self._set_T_zs_and_T_ijs(lens_redshift_list, z_source, self._cosmo_bkg)
+        T_ij_list, T_z_list, reduced2physical_factor = self._set_T_zs_and_T_ijs(
+            lens_redshift_list, z_source, self._cosmo_bkg
+        )
 
         # Fills distance lists so that they are of size num_deflectors+1
         T_ij_list += [0] * num_filler
@@ -119,16 +137,15 @@ class MultiPlaneGPU(ProfileListBase):
         reduced2physical_factor += [0] * (num_filler + 1)
         reduced2physical_factor = np.array(reduced2physical_factor)
 
-        
         ray_shooting_kwargs = {
             "all_kwargs": all_kwargs,
             "index_list": index_list,
             "T_ij_list": T_ij_list,
             "T_z_list": T_z_list,
-            "reduced2physical_factor": reduced2physical_factor
+            "reduced2physical_factor": reduced2physical_factor,
         }
         return ray_shooting_kwargs
-    
+
     @partial(jit, static_argnums=(0,))
     def ray_shooting(
         self,
@@ -144,14 +161,16 @@ class MultiPlaneGPU(ProfileListBase):
 
         :param alpha_x: ray angle at z_start=0 [arcsec]
         :param alpha_y: ray angle at z_start=0 [arcsec]
-        :param all_kwargs: dictionary of JAX or numpy arrays, containing all parameters for all lens models
-        :param index_list: list of ints, maps each element in lens_model_list to the unique_lens_model_list
-            that was provided at class initialization
-        :param T_ij_list: array of transverse angular distances between z=0 to the first deflector, then between
-            the first deflector to the second deflector, etc
-        :param T_z_list: array of transverse angular distances between z=0 to each deflector
-        :param reduced2physical_factor: jnp.array of conversion factors from reduced deflection angles to physical deflection angles
-
+        :param all_kwargs: dictionary of JAX or numpy arrays, containing all parameters
+            for all lens models
+        :param index_list: list of ints, maps each element in lens_model_list to the
+            unique_lens_model_list that was provided at class initialization
+        :param T_ij_list: array of transverse angular distances between z=0 to the first
+            deflector, then between the first deflector to the second deflector, etc
+        :param T_z_list: array of transverse angular distances between z=0 to each
+            deflector
+        :param reduced2physical_factor: jnp.array of conversion factors from reduced
+            deflection angles to physical deflection angles
         :return: angles at the source plane
         """
         alpha_x = jnp.array(alpha_x, dtype=float)
@@ -159,18 +178,29 @@ class MultiPlaneGPU(ProfileListBase):
         x = jnp.zeros_like(alpha_x)
         y = jnp.zeros_like(alpha_y)
 
-
         def body_fun(carry, xs):
             alpha_x, alpha_y, x, y = carry[0], carry[1], carry[2], carry[3]
-            all_kwargs, index, delta_T, T_z, reduced2physical_factor = xs[0], xs[1], xs[2], xs[3], xs[4]
+            all_kwargs, index, delta_T, T_z, reduced2physical_factor = (
+                xs[0],
+                xs[1],
+                xs[2],
+                xs[3],
+                xs[4],
+            )
             x += alpha_x * delta_T
             y += alpha_y * delta_T
-            alpha_x_red, alpha_y_red = lax.switch(index, self._derivatives_list, x / T_z, y / T_z, all_kwargs)
+            alpha_x_red, alpha_y_red = lax.switch(
+                index, self._derivatives_list, x / T_z, y / T_z, all_kwargs
+            )
             alpha_x -= alpha_x_red * reduced2physical_factor
             alpha_y -= alpha_y_red * reduced2physical_factor
             return (alpha_x, alpha_y, x, y), 0
 
-        (alpha_x, alpha_y, x, y), _ = lax.scan(body_fun, (alpha_x, alpha_y, x, y), (all_kwargs, index_list, T_ij_list, T_z_list, reduced2physical_factor))
+        (alpha_x, alpha_y, x, y), _ = lax.scan(
+            body_fun,
+            (alpha_x, alpha_y, x, y),
+            (all_kwargs, index_list, T_ij_list, T_z_list, reduced2physical_factor),
+        )
 
         beta_x = x / T_z_list[-1]
         beta_y = y / T_z_list[-1]
@@ -179,11 +209,12 @@ class MultiPlaneGPU(ProfileListBase):
     # This function is called outside of jit
     @staticmethod
     def _sort_lists_by_redshift(lens_model_list, lens_redshift_list, kwargs_lens):
-        """Sorts the lens model list, lens redshift list, and kwargs_lens by increasing redshift.
+        """Sorts the lens model list, lens redshift list, and kwargs_lens by increasing
+        redshift.
 
         :param lens_model_list: list of lens models in the usual lenstronomy convention
-        :param kwargs_lens: list of dictionaries for all keyword arguments for each lens model in the same order
-            of the lens_model_list (same as in lenstronomy)
+        :param kwargs_lens: list of dictionaries for all keyword arguments for each lens
+            model in the same order of the lens_model_list (same as in lenstronomy)
         :param lens_redshift_list: list of redshifts for each deflector
         :returns: same as the inputs but sorted by increasing redshift
         """
@@ -197,12 +228,11 @@ class MultiPlaneGPU(ProfileListBase):
 
         return lens_model_list, lens_redshift_list, kwargs_lens
 
-
     # This function is called outside of jit
     @staticmethod
     def _set_T_zs_and_T_ijs(lens_redshift_list, z_source, cosmo_bkg):
-        """Set the transverse comoving distances between the observer and the
-        lens planes and between the lens planes.
+        """Set the transverse comoving distances between the observer and the lens
+        planes and between the lens planes.
 
         :param lens_redshift_list: a SORTED np.array of redshifts
         :param z_source: float, redshift of source
@@ -217,9 +247,9 @@ class MultiPlaneGPU(ProfileListBase):
 
         # reduced2physical_factor calculation
         z_source_array = np.ones(lens_redshift_list.shape) * z_source
-        reduced2physical_factor = cosmo_bkg.d_xy(
-            0, z_source
-        ) / cosmo_bkg.d_xy(lens_redshift_list, z_source_array)
+        reduced2physical_factor = cosmo_bkg.d_xy(0, z_source) / cosmo_bkg.d_xy(
+            lens_redshift_list, z_source_array
+        )
 
         # Transverse comoving distance calculations
         T_ij_list = []
@@ -237,12 +267,13 @@ class MultiPlaneGPU(ProfileListBase):
             z_before = z
 
         return T_ij_list, T_z_list, reduced2physical_factor.tolist()
-    
+
+
 def _select_kwargs(profile, params):
-    """Returns a callable function that calculates deflection angles after down-selecting
-    the relevant kwargs for a given lens model profile
-    """
+    """Returns a callable function that calculates deflection angles after down-
+    selecting the relevant kwargs for a given lens model profile."""
+
     def derivative_wrapper(x, y, all_kwargs, params):
         return profile.derivatives(x, y, *[all_kwargs[param] for param in params])
-        
+
     return partial(derivative_wrapper, params=params)

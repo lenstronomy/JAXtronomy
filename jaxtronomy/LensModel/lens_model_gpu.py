@@ -70,20 +70,23 @@ class LensModelGPU(object):
         lens_redshift_list=None,
         num_deflectors=None,
     ):
-        """This is a helper functon which should be used to convert a lens_model_list and kwargs_lens
-        from the typical lenstronomy convention to a format that is compatible with JAX scan.
+        """This is a helper functon which should be used to convert a lens_model_list
+        and kwargs_lens from the typical lenstronomy convention to a format that is
+        compatible with JAX scan.
 
         :param lens_model_list: list of lens models in the usual lenstronomy convention
-        :param kwargs_lens: list of dictionaries for all keyword arguments for each lens model in the same order
-            of the lens_model_list (same as in lenstronomy)
+        :param kwargs_lens: list of dictionaries for all keyword arguments for each lens
+            model in the same order of the lens_model_list (same as in lenstronomy)
         :param z_source: float, redshift of source
         :param lens_redshift_list: list of redshifts for each deflector
-        :param num_deflectors: optional int, fills the lens_model_list with NULL lens models until the length of
-            lens_model_list is equal to num_deflectors + 1 (the source will be treated as a deflector). Keeping
-            num_deflectors fixed will avoid the recompilation of JAX functions, even if lens_model_list changes
-            (since JAX needs to recompile functions whenever input arrays have a new shape)
-
-        :return: ray_shooting_kwargs, a dictionary of kwargs for the ray_shooting() function. See docstring for ray_shooting().
+        :param num_deflectors: optional int, fills the lens_model_list with NULL lens
+            models until the length of lens_model_list is equal to num_deflectors + 1
+            (the source will be treated as a deflector). Keeping num_deflectors fixed
+            will avoid the recompilation of JAX functions, even if lens_model_list
+            changes (since JAX needs to recompile functions whenever input arrays have a
+            new shape)
+        :return: ray_shooting_kwargs, a dictionary of kwargs for the ray_shooting()
+            function. See docstring for ray_shooting().
         """
         multi_plane_kwargs = {}
         if self.type == "MultiPlaneGPU":
@@ -99,7 +102,7 @@ class LensModelGPU(object):
                 "z_source": z_source,
                 "lens_redshift_list": lens_redshift_list,
             }
-            
+
         return self.lens_model.prepare_ray_shooting_kwargs(
             lens_model_list=lens_model_list,
             kwargs_lens=kwargs_lens,
@@ -113,10 +116,10 @@ class LensModelGPU(object):
 
         :param x: x-position (preferentially arcsec)
         :param y: y-position (preferentially arcsec)
-        :param ray_shooting_kwargs: dict of ray shooting kwargs, should be obtained by first calling
-            prepare_ray_shooting_kwargs(). For more details about these kwargs, see
-            docstring for SinglePlaneGPU.ray_shooting() or MultiPlaneGPU.ray_shooting()
-
+        :param ray_shooting_kwargs: dict of ray shooting kwargs, should be obtained by
+            first calling prepare_ray_shooting_kwargs(). For more details about these
+            kwargs, see docstring for SinglePlaneGPU.ray_shooting() or
+            MultiPlaneGPU.ray_shooting()
         :return: source plane positions corresponding to (x, y) in the image plane
         """
         return self.lens_model.ray_shooting(x, y, **ray_shooting_kwargs)
