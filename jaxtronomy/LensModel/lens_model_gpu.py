@@ -62,24 +62,6 @@ class LensModelGPU(object):
             "cosmology_model": cosmology_model,
         }
 
-    def info(self):
-        """Shows what models are being initialized and what parameters are being
-        requested for. Should be used outside of JIT.
-
-        :return: None
-        """
-        self.lens_model.model_info()
-
-    def check_parameters(self, kwargs_list):
-        """Checks whether parameter list is consistent with the parameters required by
-        the model. Should be used outside of JIT.
-
-        :param kwargs_list: keyword argument list as parameterised models
-        :return: None or raise ValueError with error message of what parameter is not
-            supported.
-        """
-        self.lens_model.check_parameters(kwargs_list)
-
     def prepare_ray_shooting_kwargs(
         self,
         lens_model_list,
