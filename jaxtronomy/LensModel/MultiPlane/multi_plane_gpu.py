@@ -80,8 +80,10 @@ class MultiPlaneGPU(ProfileListBase):
         :return: ray_shooting_kwargs, a dictionary of kwargs for the ray_shooting()
             function. See docstring for ray_shooting().
         """
-        if len(lens_model_list) != len(kwargs_lens) or len(kwargs_lens) != len(
-            lens_redshift_list
+        if (
+            len(lens_model_list) != len(kwargs_lens) or
+            len(kwargs_lens) != len(lens_redshift_list) or
+            len(lens_model_list) != len(lens_redshift_list)
         ):
             raise ValueError(
                 f"length of lens model list {len(lens_model_list)}, length of kwargs_lens {len(kwargs_lens)}, and length of redshift list {len(lens_redshift_list)} should match"
