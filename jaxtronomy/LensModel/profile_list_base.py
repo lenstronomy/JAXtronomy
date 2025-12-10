@@ -610,6 +610,10 @@ def lens_class(
     #     from lenstronomy.LensModel.Profiles.nie import NIEMajorAxis
 
     #     return NIEMajorAxis(**profile_kwargs)
+    elif lens_type == "NULL":
+        from jaxtronomy.LensModel.Profiles.null import Null
+
+        return Null(**profile_kwargs)
     # elif lens_type == "PEMD":
     #     from lenstronomy.LensModel.Profiles.pemd import PEMD
 
