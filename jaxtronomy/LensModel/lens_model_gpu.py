@@ -138,12 +138,3 @@ class LensModelGPU(object):
         :return: source plane positions corresponding to (x, y) in the image plane
         """
         return self.lens_model.ray_shooting(x, y, **ray_shooting_kwargs)
-    
-def _select_kwargs(profile, params):
-    """Returns a callable function that calculates deflection angles after down-selecting
-    the relevant kwargs for a given lens model profile
-    """
-    def derivative_wrapper(x, y, all_kwargs, params):
-        return profile.derivatives(x, y, *[all_kwargs[param] for param in params])
-        
-    return partial(derivative_wrapper, params=params)

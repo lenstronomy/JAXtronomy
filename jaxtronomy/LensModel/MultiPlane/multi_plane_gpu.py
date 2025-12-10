@@ -1,4 +1,3 @@
-from jaxtronomy.LensModel.lens_model_gpu import _select_kwargs
 from jaxtronomy.LensModel.profile_list_base import ProfileListBase
 from lenstronomy.Cosmo.background import Background
 from lenstronomy.Util.cosmo_util import get_astropy_cosmology
@@ -35,7 +34,7 @@ class MultiPlaneGPU(ProfileListBase):
 
         ProfileListBase.__init__(
             self,
-            unique_lens_model_list,
+            unique_lens_model_list + ["NULL"],
             profile_kwargs_list,
             lens_redshift_list=None,
             z_source_convention=None,
@@ -73,8 +72,8 @@ class MultiPlaneGPU(ProfileListBase):
 
         :return: ray_shooting_kwargs, a dictionary of kwargs for the ray_shooting() function. See docstring for ray_shooting().
         """
-        if len(lens_model_list) != len(kwargs_lens):
-            raise ValueError(f"length of lens model list {len(lens_model_list)} and length of kwargs_lens {len(kwargs_lens)} do not match")
+        if len(lens_model_list) != len(kwargs_lens) or len(kwargs_lens) != len(lens_redshift_list):
+            raise ValueError(f"length of lens model list {len(lens_model_list)}, length of kwargs_lens {len(kwargs_lens)}, and length of redshift list {len(lens_redshift_list)} should match")
 
         if num_deflectors is None:
             num_deflectors = len(lens_model_list)
@@ -180,6 +179,15 @@ class MultiPlaneGPU(ProfileListBase):
     # This function is called outside of jit
     @staticmethod
     def _sort_lists_by_redshift(lens_model_list, lens_redshift_list, kwargs_lens):
+        """Sorts the lens model list, lens redshift list, and kwargs_lens by increasing redshift.
+
+        :param lens_model_list: list of lens models in the usual lenstronomy convention
+        :param kwargs_lens: list of dictionaries for all keyword arguments for each lens model in the same order
+            of the lens_model_list (same as in lenstronomy)
+        :param lens_redshift_list: list of redshifts for each deflector
+        :returns: same as the inputs but sorted by increasing redshift
+        """
+
         lens_redshift_list = np.array(lens_redshift_list)
         sorted_indices = np.argsort(lens_redshift_list)
 
@@ -201,10 +209,10 @@ class MultiPlaneGPU(ProfileListBase):
         :cosmo_bkg: instance of lenstronomy.Cosmo.background.Background class
 
         Returns:
-            T_ij_list, list of transverse comoving distances going from deflector i to deflector i+1,
+            T_ij_list: list of transverse comoving distances going from deflector i to deflector i+1,
                 also includes the distance between the last deflector and z_source.
-            T_z_list, list of transverse comoving distances between z=0 to each deflector and z_source.
-            reduced2physical_factor, list of conversion factors from reduced deflection angles to physical deflection angles.
+            T_z_list: list of transverse comoving distances between z=0 to each deflector and z_source.
+            reduced2physical_factor: list of conversion factors from reduced deflection angles to physical deflection angles.
         """
 
         # reduced2physical_factor calculation
@@ -229,3 +237,12 @@ class MultiPlaneGPU(ProfileListBase):
             z_before = z
 
         return T_ij_list, T_z_list, reduced2physical_factor.tolist()
+    
+def _select_kwargs(profile, params):
+    """Returns a callable function that calculates deflection angles after down-selecting
+    the relevant kwargs for a given lens model profile
+    """
+    def derivative_wrapper(x, y, all_kwargs, params):
+        return profile.derivatives(x, y, *[all_kwargs[param] for param in params])
+        
+    return partial(derivative_wrapper, params=params)
