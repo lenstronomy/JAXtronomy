@@ -81,9 +81,9 @@ class MultiPlaneGPU(ProfileListBase):
             function. See docstring for ray_shooting().
         """
         if (
-            len(lens_model_list) != len(kwargs_lens) or
-            len(kwargs_lens) != len(lens_redshift_list) or
-            len(lens_model_list) != len(lens_redshift_list)
+            len(lens_model_list) != len(kwargs_lens)
+            or len(kwargs_lens) != len(lens_redshift_list)
+            or len(lens_model_list) != len(lens_redshift_list)
         ):
             raise ValueError(
                 f"length of lens model list {len(lens_model_list)}, length of kwargs_lens {len(kwargs_lens)}, and length of redshift list {len(lens_redshift_list)} should match"
