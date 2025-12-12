@@ -67,7 +67,7 @@ class TestLensModel(object):
 
         lensModel.info()
 
-        lens_model_list = ["SIS"] * 101
+        lens_model_list = ["SIS"] * 301
         npt.assert_raises(ValueError, LensModel, lens_model_list)
 
     def test_check_parameters(self):
