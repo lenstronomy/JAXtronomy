@@ -2,7 +2,7 @@ __author__ = "sibirrer"
 
 import jax
 from jax import jit, lax, numpy as jnp
-from jaxtronomy.LensModel.profile_list_base import ProfileListBase
+from jaxtronomy.LensModel.profile_list_base import ProfileListBase, _select_kwargs
 from functools import partial
 import numpy as np
 
@@ -129,13 +129,3 @@ class SinglePlaneGPU(ProfileListBase):
         f_x, f_y = lax.map(body_fun, (all_kwargs, index_list))
 
         return x - jnp.sum(f_x, axis=0), y - jnp.sum(f_y, axis=0)
-
-
-def _select_kwargs(profile, params):
-    """Returns a callable function that calculates deflection angles after down-
-    selecting the relevant kwargs for a given lens model profile."""
-
-    def derivative_wrapper(x, y, all_kwargs, params):
-        return profile.derivatives(x, y, *[all_kwargs[param] for param in params])
-
-    return partial(derivative_wrapper, params=params)

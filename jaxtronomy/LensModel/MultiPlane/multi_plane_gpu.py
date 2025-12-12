@@ -1,4 +1,4 @@
-from jaxtronomy.LensModel.profile_list_base import ProfileListBase
+from jaxtronomy.LensModel.profile_list_base import ProfileListBase, _select_kwargs
 from lenstronomy.Cosmo.background import Background
 from lenstronomy.Util.cosmo_util import get_astropy_cosmology
 
@@ -108,9 +108,9 @@ class MultiPlaneGPU(ProfileListBase):
         # fills the rest of the list with empty lens models so that the array has size num_deflectors + 1
         num_filler = num_deflectors - len(lens_model_list)
         index_list += [len(self.unique_lens_model_list)] * (num_filler + 1)
-        index_list = jnp.array(index_list)
+        index_list = np.array(index_list)
 
-        # Converts kwargs_lens from typical lenstronomy convention to a format required for JAX parallelization
+        # Converts kwargs_lens from typical lenstronomy convention to a format required for JAX
         all_kwargs = {}
         unique_kwargs = set(
             param for sublist in self.param_name_list for param in sublist
@@ -131,7 +131,7 @@ class MultiPlaneGPU(ProfileListBase):
             lens_redshift_list, z_source, self._cosmo_bkg
         )
 
-        # Fills distance lists so that they are of size num_deflectors+1
+        # Fills distance lists so that they are of size num_deflectors + 1
         T_ij_list += [0] * num_filler
         T_ij_list = np.array(T_ij_list)
         T_z_list += [T_z_list[-1]] * num_filler
@@ -171,7 +171,7 @@ class MultiPlaneGPU(ProfileListBase):
             deflector, then between the first deflector to the second deflector, etc
         :param T_z_list: array of transverse angular distances between z=0 to each
             deflector
-        :param reduced2physical_factor: jnp.array of conversion factors from reduced
+        :param reduced2physical_factor: array of conversion factors from reduced
             deflection angles to physical deflection angles
         :return: angles at the source plane
         """
@@ -180,6 +180,7 @@ class MultiPlaneGPU(ProfileListBase):
         x = jnp.zeros_like(alpha_x)
         y = jnp.zeros_like(alpha_y)
 
+        # This function is called iteratively to ray trace through all deflectors
         def body_fun(carry, xs):
             alpha_x, alpha_y, x, y = carry[0], carry[1], carry[2], carry[3]
             all_kwargs, index, delta_T, T_z, reduced2physical_factor = (
@@ -200,8 +201,8 @@ class MultiPlaneGPU(ProfileListBase):
 
         (alpha_x, alpha_y, x, y), _ = lax.scan(
             body_fun,
-            (alpha_x, alpha_y, x, y),
-            (all_kwargs, index_list, T_ij_list, T_z_list, reduced2physical_factor),
+            init=(alpha_x, alpha_y, x, y),
+            xs=(all_kwargs, index_list, T_ij_list, T_z_list, reduced2physical_factor),
         )
 
         beta_x = x / T_z_list[-1]
@@ -269,13 +270,3 @@ class MultiPlaneGPU(ProfileListBase):
             z_before = z
 
         return T_ij_list, T_z_list, reduced2physical_factor.tolist()
-
-
-def _select_kwargs(profile, params):
-    """Returns a callable function that calculates deflection angles after down-
-    selecting the relevant kwargs for a given lens model profile."""
-
-    def derivative_wrapper(x, y, all_kwargs, params):
-        return profile.derivatives(x, y, *[all_kwargs[param] for param in params])
-
-    return partial(derivative_wrapper, params=params)
