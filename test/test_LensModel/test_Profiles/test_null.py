@@ -24,7 +24,7 @@ class TestGaussian(object):
     def test_hessian(self):
         x = np.tile(np.linspace(-5, 5, 20), 20)
         y = np.repeat(np.linspace(-5, 5, 20), 20)
-        f_xx, f_xy, f_yx, f_yy = self.profile.derivatives(x, y)
+        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y)
         npt.assert_allclose(f_xx, np.zeros_like(x), atol=1e-16)
         npt.assert_allclose(f_xy, np.zeros_like(x), atol=1e-16)
         npt.assert_allclose(f_yx, np.zeros_like(x), atol=1e-16)

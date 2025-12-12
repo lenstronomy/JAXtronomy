@@ -14,7 +14,7 @@ class TestSinglePlaneGPU(object):
     """Tests the SinglePlaneGPU routines."""
 
     def setup_method(self):
-        self.lens_model_list = ["NFW"]
+        self.lens_model_list = ["NFW", "NFW"]
         self.singleplane = SinglePlaneGPU(
             unique_lens_model_list=self.lens_model_list,
         )
@@ -25,6 +25,7 @@ class TestSinglePlaneGPU(object):
 
         kwargs_nfw1 = {"Rs": 1.3, "alpha_Rs": 2.18, "center_x": 0.1, "center_y": -2.1}
         self.kwargs_lens = [
+            kwargs_nfw1,
             kwargs_nfw1,
         ]
 
@@ -54,5 +55,5 @@ class TestSinglePlaneGPU(object):
             ray_shooting_kwargs = self.singleplane.prepare_ray_shooting_kwargs(
                 lens_model_list=self.lens_model_list,
                 kwargs_lens=self.kwargs_lens,
-                num_deflectors=3,
+                num_deflectors=1,
             )
