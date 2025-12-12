@@ -15,7 +15,7 @@ class SinglePlaneGPU(ProfileListBase):
     """This class should be used whenever either of the following conditions are met:
 
     1) ray tracing is performed on GPU
-    2) ray tracing is performed on CPU and the number of profile components exceeds 500,
+    2) ray tracing is performed on CPU and the number of profile components exceeds 300,
         making the usual LensModel class unusable due to exploding compile times.
     """
 
