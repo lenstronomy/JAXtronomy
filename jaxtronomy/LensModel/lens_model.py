@@ -76,7 +76,7 @@ class LensModel(object):
         if len(lens_model_list) > 300:
             raise ValueError(
                 "Compile times grow exponentially with number of lenses. JAXtronomy's LensModel class may become unusable when number of lenses exceeds 300.\n"
-                "Instead, consider using the LensModelGPU class from jaxtronomy.LensModel.lens_model_gpu"
+                "Instead, consider using the LensModelGPU class from jaxtronomy.LensModel.lens_model_gpu, which sidesteps this issue at the cost of having a different API."
             )
         self.lens_model_list = lens_model_list
         self.z_lens = z_lens
