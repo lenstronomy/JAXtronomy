@@ -74,8 +74,9 @@ class LensModel(object):
         if distance_ratio_sampling:
             raise ValueError("Distance ratio sampling not supported in JAXtronomy")
         if len(lens_model_list) > 100:
-            warn(
-                "Compile times grow exponentially with number of lenses. JAXtronomy may become unusable when number of lenses exceeds 100."
+            raise ValueError(
+                "Compile times grow exponentially with number of lenses. JAXtronomy may become unusable when number of lenses exceeds 100.\n"
+                "Instead, consider using the LensModelGPU class from jaxtronomy.LensModel.lens_model_gpu"
             )
         self.lens_model_list = lens_model_list
         self.z_lens = z_lens
