@@ -4,6 +4,7 @@ import pytest
 
 from jaxtronomy.LensModel.Profiles.null import Null
 
+
 class TestGaussian(object):
     def setup_method(self):
         self.profile = Null()
