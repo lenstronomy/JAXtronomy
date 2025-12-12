@@ -180,7 +180,7 @@ class MultiPlaneGPU(ProfileListBase):
         x = jnp.zeros_like(alpha_x)
         y = jnp.zeros_like(alpha_y)
 
-        # This function is called iteratively to ray trace through all deflectors
+        # This function is called iteratively by jax.lax.scan to ray trace through all deflectors
         def body_fun(carry, xs):
             alpha_x, alpha_y, x, y = carry[0], carry[1], carry[2], carry[3]
             all_kwargs, index, delta_T, T_z, reduced2physical_factor = (

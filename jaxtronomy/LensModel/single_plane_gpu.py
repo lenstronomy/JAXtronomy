@@ -122,10 +122,11 @@ class SinglePlaneGPU(ProfileListBase):
             unique_lens_model_list that was provided at class initialization
         """
 
+        # This function is called iteratively by jax.lax.map to compute deflection angles for each deflector
         def body_fun(xs):
             all_kwargs, index = xs[0], xs[1]
             return lax.switch(index, self._derivatives_list, x, y, all_kwargs)
 
-        f_x, f_y = lax.map(body_fun, (all_kwargs, index_list))
+        f_x, f_y = lax.map(body_fun, xs=(all_kwargs, index_list))
 
         return x - jnp.sum(f_x, axis=0), y - jnp.sum(f_y, axis=0)
