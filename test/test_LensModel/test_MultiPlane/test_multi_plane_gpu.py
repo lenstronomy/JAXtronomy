@@ -28,6 +28,18 @@ class TestMultiPlaneGPU(object):
             lens_redshift_list=self.redshift_list,
         )
 
+        self.multiplane2 = MultiPlaneGPU(
+            unique_lens_model_list=unique_lens_model_list,
+            cosmology_model="LambdaCDM",
+        )
+
+        self.multiplane2_ref = MultiPlane_ref(
+            z_source=self.z_source,
+            lens_model_list=self.lens_model_list,
+            lens_redshift_list=self.redshift_list,
+            cosmology_model="LambdaCDM",
+        )
+
         kwargs_nfw1 = {"Rs": 1.3, "alpha_Rs": 2.18, "center_x": 0.1, "center_y": -2.1}
         kwargs_nfw2 = {"Rs": 1.4, "alpha_Rs": 3.18, "center_x": -0.11, "center_y": 1.1}
         kwargs_nfw3 = {"Rs": 1.5, "alpha_Rs": 1.11, "center_x": -0.13, "center_y": 1.2}
@@ -64,15 +76,15 @@ class TestMultiPlaneGPU(object):
         npt.assert_allclose(f_x, f_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-12, rtol=1e-12)
 
-        ray_shooting_kwargs = self.multiplane.prepare_ray_shooting_kwargs(
+        ray_shooting_kwargs = self.multiplane2.prepare_ray_shooting_kwargs(
             lens_model_list=self.lens_model_list,
             kwargs_lens=self.kwargs_lens2,
             z_source=self.z_source,
             lens_redshift_list=self.redshift_list,
             num_deflectors=6,
         )
-        f_x, f_y = self.multiplane.ray_shooting(x, y, **ray_shooting_kwargs)
-        f_x_ref, f_y_ref = self.multiplane_ref.ray_shooting(x, y, self.kwargs_lens2)
+        f_x, f_y = self.multiplane2.ray_shooting(x, y, **ray_shooting_kwargs)
+        f_x_ref, f_y_ref = self.multiplane2_ref.ray_shooting(x, y, self.kwargs_lens2)
         npt.assert_allclose(f_x, f_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-12, rtol=1e-12)
 
