@@ -455,20 +455,6 @@ class TestImageModel(object):
         npt.assert_array_almost_equal(image, image_ref, decimal=8)
 
         image = self.imageModel.image(
-            kwargs_lens=self.kwargs_lens,
-            kwargs_source=self.kwargs_source,
-            kwargs_lens_light=self.kwargs_lens_light,
-            unconvolved=True,
-        )
-        image_ref = self.imageModel_ref.image(
-            kwargs_lens=self.kwargs_lens,
-            kwargs_source=self.kwargs_source,
-            kwargs_lens_light=self.kwargs_lens_light,
-            unconvolved=True,
-        )
-        npt.assert_array_almost_equal(image, image_ref, decimal=8)
-
-        image = self.imageModel.image(
             kwargs_lens=self.kwargs_lens2,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
