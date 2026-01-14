@@ -1,12 +1,12 @@
 from jaxtronomy.Sampling.likelihood import LikelihoodModule
 from jaxtronomy.Sampling.Samplers.optax import OptaxMinimizer
+from jaxtronomy.Sampling.sampler import Sampler
 
 # Import SingeBandMultiModel from lenstronomy for PsfFitting
 from lenstronomy.ImSim.MultiBand.single_band_multi_model import SingleBandMultiModel
 from lenstronomy.Workflow.psf_fitting import PsfFitting
 from lenstronomy.Workflow.alignment_matching import AlignmentFitting
 from lenstronomy.Workflow.multi_band_manager import MultiBandUpdateManager
-from lenstronomy.Sampling.sampler import Sampler
 from lenstronomy.Sampling.Samplers.multinest_sampler import MultiNestSampler
 from lenstronomy.Sampling.Samplers.polychord_sampler import DyPolyChordSampler
 from lenstronomy.Sampling.Samplers.dynesty_sampler import DynestySampler
@@ -439,7 +439,7 @@ class FittingSequence(object):
         self,
         num_chains,
         maxiter,
-        tolerance=50,
+        tolerance=0.01,
         sigma_scale=1,
         rng_int=0,
     ):
@@ -448,7 +448,7 @@ class FittingSequence(object):
         :param num_chains: int, number of minimization chains to run
         :param maxiter: int, maximum number of iterations during gradient descent
             process
-        :param tolerance: float, if np.abs(logL) < tol, the gradient descent is stopped
+        :param tolerance: float, if |logL[i] - logL[i-1]| < tol, the gradient descent is stopped
         :param sigma_scale: scales the standard deviation of the prior distribution
         :param rng_int: int, used to generate random initial starting point from the
             prior distribution
@@ -492,7 +492,7 @@ class FittingSequence(object):
         return kwargs_result
 
     def pso(
-        self, n_particles, n_iterations, sigma_scale=1, print_key="PSO", threadCount=1
+        self, n_particles, n_iterations, sigma_scale=1, print_key="PSO", threadCount=None
     ):
         """Particle Swarm Optimization.
 
@@ -506,10 +506,7 @@ class FittingSequence(object):
             each iteration [lnlikelihood, parameters, velocities], list of parameters in
             same order as in chain
         """
-        if threadCount != 1:
-            raise ValueError(
-                "threadCount argument for PSO must be set to 1 in jaxtronomy"
-            )
+
         param_class = self.param_class
         kwargs_temp = self._updateManager.parameter_state
         init_pos = param_class.kwargs2args(**kwargs_temp)
