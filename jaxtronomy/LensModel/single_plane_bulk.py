@@ -8,10 +8,10 @@ import numpy as np
 
 jax.config.update("jax_enable_x64", True)
 
-__all__ = ["SinglePlaneGPU"]
+__all__ = ["SinglePlaneBulk"]
 
 
-class SinglePlaneGPU(ProfileListBase):
+class SinglePlaneBulk(ProfileListBase):
     """This class should be used whenever either of the following conditions are met:
 
     1) ray tracing is performed on GPU
@@ -112,7 +112,7 @@ class SinglePlaneGPU(ProfileListBase):
     def ray_shooting(self, x, y, all_kwargs, index_list):
         """This function computes the ray tracing through all of the lens models given
         by index_list. The arguments all_kwargs and index_list should be obtained by
-        calling SinglePlaneGPU.prepare_ray_shooting_kwargs().
+        calling SinglePlaneBulk.prepare_ray_shooting_kwargs().
 
         :param x: x-position (preferentially arcsec)
         :param y: y-position (preferentially arcsec)

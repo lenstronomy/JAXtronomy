@@ -8,7 +8,7 @@ from jax import jit, lax, numpy as jnp
 import numpy as np
 
 
-class MultiPlaneGPU(ProfileListBase):
+class MultiPlaneBulk(ProfileListBase):
     """This class should be used whenever either of the following conditions are met:
 
     1) ray tracing is performed on GPU

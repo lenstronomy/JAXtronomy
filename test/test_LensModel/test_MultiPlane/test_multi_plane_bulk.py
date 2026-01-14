@@ -7,18 +7,18 @@ import numpy as np
 import pytest
 
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane as MultiPlane_ref
-from jaxtronomy.LensModel.MultiPlane.multi_plane_gpu import MultiPlaneGPU
+from jaxtronomy.LensModel.MultiPlane.multi_plane_bulk import MultiPlaneBulk
 
 
-class TestMultiPlaneGPU(object):
-    """Tests the MultiPlaneGPU routines."""
+class TestMultiPlaneBulk(object):
+    """Tests the MultiPlaneBulk routines."""
 
     def setup_method(self):
         self.z_source = 3.5
         self.lens_model_list = ["NFW", "NIE", "NFW", "NFW", "NFW"]
         unique_lens_model_list = list(set(self.lens_model_list))
         self.redshift_list = [0.5, 1.1, 1.1, 1.5, 1.3]
-        self.multiplane = MultiPlaneGPU(
+        self.multiplane = MultiPlaneBulk(
             unique_lens_model_list=unique_lens_model_list,
         )
 
@@ -28,7 +28,7 @@ class TestMultiPlaneGPU(object):
             lens_redshift_list=self.redshift_list,
         )
 
-        self.multiplane2 = MultiPlaneGPU(
+        self.multiplane2 = MultiPlaneBulk(
             unique_lens_model_list=unique_lens_model_list,
             cosmology_model="LambdaCDM",
         )

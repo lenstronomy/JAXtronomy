@@ -1,13 +1,13 @@
-from jaxtronomy.LensModel.single_plane_gpu import SinglePlaneGPU
-from jaxtronomy.LensModel.MultiPlane.multi_plane_gpu import MultiPlaneGPU
+from jaxtronomy.LensModel.single_plane_bulk import SinglePlaneBulk
+from jaxtronomy.LensModel.MultiPlane.multi_plane_bulk import MultiPlaneBulk
 
 from functools import partial
 from jax import jit
 
-__all__ = ["LensModelGPU"]
+__all__ = ["LensModelBulk"]
 
 
-class LensModelGPU(object):
+class LensModelBulk(object):
     """This class should be used whenever either of the following conditions are met:
 
     1) ray tracing is performed on GPU
@@ -39,19 +39,19 @@ class LensModelGPU(object):
 
         # Multi-plane or single-plane lensing?
         if multi_plane:
-            self.lens_model = MultiPlaneGPU(
+            self.lens_model = MultiPlaneBulk(
                 unique_lens_model_list=unique_lens_model_list,
                 cosmo=cosmo,
                 profile_kwargs_list=profile_kwargs_list,
                 cosmology_model=cosmology_model,
             )
-            self.type = "MultiPlaneGPU"
+            self.type = "MultiPlaneBulk"
         else:
-            self.lens_model = SinglePlaneGPU(
+            self.lens_model = SinglePlaneBulk(
                 unique_lens_model_list=unique_lens_model_list,
                 profile_kwargs_list=profile_kwargs_list,
             )
-            self.type = "SinglePlaneGPU"
+            self.type = "SinglePlaneBulk"
 
         # Save these for convenience if class reinitialization is required
         self.init_kwargs = {
@@ -89,7 +89,7 @@ class LensModelGPU(object):
             function. See docstring for ray_shooting().
         """
         multi_plane_kwargs = {}
-        if self.type == "MultiPlaneGPU":
+        if self.type == "MultiPlaneBulk":
             if lens_redshift_list is None:
                 raise ValueError(
                     "In multi-plane lensing, you need to specify the redshifts of the lensing planes."
@@ -118,8 +118,8 @@ class LensModelGPU(object):
         :param y: y-position (preferentially arcsec)
         :param ray_shooting_kwargs: dict of ray shooting kwargs, should be obtained by
             first calling prepare_ray_shooting_kwargs(). For more details about these
-            kwargs, see docstring for SinglePlaneGPU.ray_shooting() or
-            MultiPlaneGPU.ray_shooting()
+            kwargs, see docstring for SinglePlaneBulk.ray_shooting() or
+            MultiPlaneBulk.ray_shooting()
         :return: source plane positions corresponding to (x, y) in the image plane
         """
         return self.lens_model.ray_shooting(x, y, **ray_shooting_kwargs)

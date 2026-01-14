@@ -7,23 +7,23 @@ import numpy as np
 import pytest
 
 from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
-from jaxtronomy.LensModel.lens_model_gpu import LensModelGPU
+from jaxtronomy.LensModel.lens_model_bulk import LensModelBulk
 
 
-class TestLensModelGPU(object):
-    """Tests the LensModelGPU routines."""
+class TestLensModelBulk(object):
+    """Tests the LensModelBulk routines."""
 
     def setup_method(self):
         self.z_source = 3.5
         self.lens_model_list = ["EPL", "TNFW", "TNFW", "SHEAR"]
         unique_lens_model_list = list(set(self.lens_model_list))
         self.redshift_list = [1.1, 0.5, 1.3, 1.5]
-        self.lens_model_multi = LensModelGPU(
+        self.lens_model_multi = LensModelBulk(
             unique_lens_model_list=unique_lens_model_list,
             multi_plane=True,
         )
 
-        self.lens_model_single = LensModelGPU(
+        self.lens_model_single = LensModelBulk(
             unique_lens_model_list=unique_lens_model_list,
             multi_plane=False,
         )

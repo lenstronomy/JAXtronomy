@@ -7,15 +7,15 @@ import numpy as np
 import pytest
 
 from lenstronomy.LensModel.single_plane import SinglePlane as SinglePlane_ref
-from jaxtronomy.LensModel.single_plane_gpu import SinglePlaneGPU
+from jaxtronomy.LensModel.single_plane_bulk import SinglePlaneBulk
 
 
-class TestSinglePlaneGPU(object):
-    """Tests the SinglePlaneGPU routines."""
+class TestSinglePlaneBulk(object):
+    """Tests the SinglePlaneBulk routines."""
 
     def setup_method(self):
         self.lens_model_list = ["NFW", "NFW"]
-        self.singleplane = SinglePlaneGPU(
+        self.singleplane = SinglePlaneBulk(
             unique_lens_model_list=self.lens_model_list,
         )
 
