@@ -46,7 +46,7 @@ class OptaxMinimizer:
         """Runs the gradient descent.
 
         :param num_chains: int, number of chains to run
-        :param tol: float, when np.abs(logL) < tol, the gradient descent for that chain
+        :param tol: float, when |logL[i] - logL[i-1]| < tol, the gradient descent for that chain
             is stopped
         :param rng_int: int, used to draw initial parameters from the prior distribution
         """
@@ -61,12 +61,13 @@ class OptaxMinimizer:
 
         for i in range(len(init_param_list)):
             print(f"Running chain {i+1}")
-            final_params, num_iter = self.run_single(
+            final_params, num_iter, final_diff = self.run_single(
                 init_params=init_param_list[i], tol=tol
             )
             final_logL = self._loss(final_params)
             print(f"{num_iter} iterations performed.")
             print("Final logL:", -final_logL)
+            print(f"In the final iteration, the logL improved by {final_diff}\n")
             if i == 0 or final_logL < best_logL:
                 best_logL = final_logL
                 best_params = final_params
@@ -85,29 +86,31 @@ class OptaxMinimizer:
         """Runs the gradient descent for a single chain.
 
         :param init_params: 1d array of floats, initial parameters for the loss function
-        :param tol: float, when np.abs(logL) < tol, the gradient descent is stopped
+        :param tol: float, when |logL[i] - logL[i-1]| < tol, the gradient descent is stopped
         """
 
         def step(carry):
-            params, state = carry
+            params, state, _ = carry
             value, grad = self.value_and_grad_fun(params, state=state)
             updates, state = self.opt.update(
                 grad, state, params, value=value, grad=grad, value_fn=self._loss
             )
             params = optax.apply_updates(params, updates)
-            return params, state
+
+            new_value = optax.tree.get(state, "value")
+            diff = value - new_value
+            return params, state, diff
 
         def continuing_criterion(carry):
-            _, state = carry
+            _, state, diff = carry
             iter_num = optax.tree.get(state, "count")
-            value = optax.tree.get(state, "value")
-            return (iter_num == 0) | ((iter_num < self.maxiter) & (value >= tol))
+            return (iter_num == 0) | ((iter_num < self.maxiter) & (diff >= tol))
 
-        init_carry = (init_params, self.opt.init(init_params))
-        final_params, final_state = jax.lax.while_loop(
+        init_carry = (init_params, self.opt.init(init_params), 0)
+        final_params, final_state, diff = jax.lax.while_loop(
             continuing_criterion, step, init_carry
         )
-        return final_params, optax.tree.get(final_state, "count")
+        return final_params, optax.tree.get(final_state, "count"), diff
 
     def _draw_init_params(self, num_chains, rng_int):
         """Draws initial parameters to be passed to the minimizer.
