@@ -417,8 +417,6 @@ class ImageModel(object):
         :return: rendered point source images
         """
         point_source_image = jnp.zeros((self.Data.num_pixel_axes))
-        if self.PointSource is None:
-            return point_source_image
         ra_pos, dec_pos, amp = self.PointSource.point_source_list(
             kwargs_ps, kwargs_lens=kwargs_lens, k=k
         )
