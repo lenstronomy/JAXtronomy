@@ -2,6 +2,7 @@ from jaxtronomy.Util import image_util, kernel_util, util
 
 from functools import partial
 from jax import jit, numpy as jnp
+import numpy as np
 
 __all__ = ["PointSourceRendering"]
 
@@ -29,13 +30,14 @@ class PointSourceRendering(object):
             self._supersampling_factor, updata_cache=False
         )
 
-    @partial(jit, static_argnums=0)
-    def point_source_rendering(self, ra_pos, dec_pos, amp):
+    @partial(jit, static_argnums=(0, 4))
+    def point_source_rendering(self, ra_pos, dec_pos, amp, unconvolved=False):
         """
 
         :param ra_pos: list of RA positions of point source(s)
         :param dec_pos: list of DEC positions of point source(s)
         :param amp: list of amplitudes of point source(s)
+        :param unconvolved: bool, if True, renders point source on a single pixel instead of proper PSF
         :return: 2d numpy array of size of the image with the point source(s) rendered
         """
         subgrid = self._supersampling_factor
@@ -49,7 +51,11 @@ class PointSourceRendering(object):
         # translate coordinates to higher resolution grid
         x_pos_subgrid = x_pos * subgrid + (subgrid - 1) / 2.0
         y_pos_subgrid = y_pos * subgrid + (subgrid - 1) / 2.0
-        kernel_point_source_subgrid = self._kernel_supersampled
+        if unconvolved:
+            kernel_point_source_subgrid = np.zeros((3, 3))
+            kernel_point_source_subgrid[1, 1] = 1
+        else:
+            kernel_point_source_subgrid = self._kernel_supersampled
         # initialize grid with higher resolution
         subgrid2d = jnp.zeros((self._nx * subgrid, self._ny * subgrid))
         # add_layer2image
