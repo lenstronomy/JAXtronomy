@@ -14,8 +14,7 @@ __all__ = ["Sampler"]
 
 class Sampler(Sampler_lenstronomy):
     """Inherits samplers from lenstronomy, but modifies the PSO and mcmc to parallelize
-    computations across hardware devices.
-    """
+    computations across hardware devices."""
 
     def pso(
         self,
@@ -49,7 +48,9 @@ class Sampler(Sampler_lenstronomy):
         """
 
         if threadCount is not None:
-            raise ValueError("PSO threadCount must be None. In JAXtronomy, parallelization across devices is done automatically.")
+            raise ValueError(
+                "PSO threadCount must be None. In JAXtronomy, parallelization across devices is done automatically."
+            )
         if mpi:
             raise ValueError("mpi must be False in JAXtronomy")
 
@@ -138,7 +139,9 @@ class Sampler(Sampler_lenstronomy):
         if mpi:
             raise ValueError("mpi must be False in JAXtronomy")
         if threadCount is not None:
-            raise ValueError("MCMC threadCount must be set to None in JAXtronomy, since parallelization is done automatically.")
+            raise ValueError(
+                "MCMC threadCount must be set to None in JAXtronomy, since parallelization is done automatically."
+            )
         if start_from_backend:
             raise ValueError("start_from_backend must be False in JAXtronomy")
         if backend_filename is not None:
@@ -167,10 +170,10 @@ class Sampler(Sampler_lenstronomy):
         def pmapped_func_wrapper(args):
             args = np.array(args)
             old_shape = args.shape
-            new_shape = (num_devices, int(old_shape[0]/num_devices), old_shape[-1])
+            new_shape = (num_devices, int(old_shape[0] / num_devices), old_shape[-1])
 
             return pmapped_func(args.reshape(new_shape)).reshape(old_shape[0])
-        
+
         sampler = emcee.EnsembleSampler(
             n_walkers, num_param, pmapped_func_wrapper, vectorize=True
         )

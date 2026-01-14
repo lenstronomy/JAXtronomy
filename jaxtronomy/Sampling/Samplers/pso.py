@@ -1,4 +1,7 @@
-from lenstronomy.Sampling.Samplers.pso import ParticleSwarmOptimizer as PSO_lenstronomy, Particle
+from lenstronomy.Sampling.Samplers.pso import (
+    ParticleSwarmOptimizer as PSO_lenstronomy,
+    Particle,
+)
 
 import jax
 import numpy as np
@@ -63,8 +66,10 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
         self.num_devices = jax.device_count()
 
         if particle_count % self.num_devices != 0:
-            raise ValueError(f"PSO particle count {particle_count} must be divisible by the number of CPU/GPU devices for parallelization. "
-                             f"There are {self.num_devices} {jax.default_backend()} devices currently recognized by JAX.")
+            raise ValueError(
+                f"PSO particle count {particle_count} must be divisible by the number of CPU/GPU devices for parallelization. "
+                f"There are {self.num_devices} {jax.default_backend()} devices currently recognized by JAX."
+            )
 
     def _get_fitness(self, swarm):
         """Set fitness (probability) of the particles in swarm.
@@ -78,8 +83,14 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
 
         position = np.array(position)
         old_shape = position.shape
-        new_shape = (self.num_devices, int(old_shape[0]/self.num_devices), old_shape[-1])
-        ln_probability = self.parallelized_func(position.reshape(new_shape)).reshape(old_shape[0])
+        new_shape = (
+            self.num_devices,
+            int(old_shape[0] / self.num_devices),
+            old_shape[-1],
+        )
+        ln_probability = self.parallelized_func(position.reshape(new_shape)).reshape(
+            old_shape[0]
+        )
 
         for i, particle in enumerate(swarm):
             particle.fitness = ln_probability[i]

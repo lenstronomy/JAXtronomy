@@ -492,7 +492,12 @@ class FittingSequence(object):
         return kwargs_result
 
     def pso(
-        self, n_particles, n_iterations, sigma_scale=1, print_key="PSO", threadCount=None
+        self,
+        n_particles,
+        n_iterations,
+        sigma_scale=1,
+        print_key="PSO",
+        threadCount=None,
     ):
         """Particle Swarm Optimization.
 
