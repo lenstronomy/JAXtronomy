@@ -372,7 +372,6 @@ class FittingSequence(object):
          by the specific sampler used
         """
         param_class = self.param_class
-        # run PSO
         mcmc_class = Sampler(likelihoodModule=self.likelihoodModule)
         kwargs_temp = self._updateManager.parameter_state
         mean_start = param_class.kwargs2args(**kwargs_temp)
@@ -424,7 +423,7 @@ class FittingSequence(object):
                 mean_start,
                 sigma_start,
                 mpi=self._mpi,
-                threadCount=threadCount,
+                threadCount=None,
                 progress=progress,
                 initpos=initpos,
                 backend_filename=backend_filename,
