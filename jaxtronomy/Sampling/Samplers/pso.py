@@ -90,7 +90,7 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
 
             def logL_func(position):
                 return vmapped_func(position).flatten()
-            
+
             self.logL_func = logL_func
 
     def _get_fitness(self, swarm):
