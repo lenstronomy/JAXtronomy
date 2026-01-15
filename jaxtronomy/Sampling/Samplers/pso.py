@@ -86,7 +86,7 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
                 )
         else:
             batch_size = 10
-            vmapped_func = partial(jax.lax.map, func, batch_size=batch_size)
+            vmapped_func = partial(jax.lax.map, func)
 
             def logL_func(position):
                 return vmapped_func(position).flatten()
