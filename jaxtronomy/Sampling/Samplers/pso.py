@@ -11,7 +11,9 @@ __all__ = ["ParticleSwarmOptimizer"]
 
 
 class ParticleSwarmOptimizer(PSO_lenstronomy):
-    """Optimizer using a swarm of particles.
+    """Optimizer using a swarm of particles. Same as the PSO from lenstronomy, but parallelizes
+    computations across CPU cores automatically using JAX. For computation on GPU, only
+    one GPU is used due to memory transfer overheads.
 
     :param func:
         A function that takes a vector in the parameter space as input and
@@ -61,15 +63,35 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
         self.swarm = self._init_swarm()
         self.global_best = Particle.create(self.param_count)
 
-        mapped_func = partial(jax.lax.map, func)
-        self.parallelized_func = jax.pmap(mapped_func, devices=jax.devices())
-        self.num_devices = jax.device_count()
+        if jax.default_backend() == "cpu":
+            mapped_func = partial(jax.lax.map, func)
+            pmapped_func = jax.pmap(mapped_func, devices=jax.devices())
+            num_devices = jax.device_count()
 
-        if particle_count % self.num_devices != 0:
-            raise ValueError(
-                f"PSO particle count {particle_count} must be divisible by the number of CPU/GPU devices for parallelization. "
-                f"There are {self.num_devices} {jax.default_backend()} devices currently recognized by JAX."
-            )
+            def logL_func(position):
+                old_shape = position.shape
+                new_shape = (
+                    num_devices,
+                    int(old_shape[0] / num_devices),
+                    old_shape[-1],
+                )
+                return pmapped_func(position.reshape(new_shape)).reshape(old_shape[0])
+
+            self.logL_func = logL_func
+
+            if particle_count % num_devices != 0:
+                raise ValueError(
+                    f"PSO particle count {particle_count} must be divisible by the number of CPU devices for parallelization. "
+                    f"There are {num_devices} cpu devices currently recognized by JAX."
+                )
+        else:
+            batch_size = 10
+            vmapped_func = partial(jax.lax.map, func, batch_size=batch_size)
+
+            def logL_func(position):
+                return vmapped_func(position).flatten()
+
+
 
     def _get_fitness(self, swarm):
         """Set fitness (probability) of the particles in swarm.
@@ -82,15 +104,7 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
         position = [particle.position for particle in swarm]
 
         position = np.array(position)
-        old_shape = position.shape
-        new_shape = (
-            self.num_devices,
-            int(old_shape[0] / self.num_devices),
-            old_shape[-1],
-        )
-        ln_probability = self.parallelized_func(position.reshape(new_shape)).reshape(
-            old_shape[0]
-        )
+        ln_probability = self.logL_func(position)
 
         for i, particle in enumerate(swarm):
             particle.fitness = ln_probability[i]
