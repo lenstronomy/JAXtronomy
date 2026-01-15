@@ -11,9 +11,9 @@ __all__ = ["ParticleSwarmOptimizer"]
 
 
 class ParticleSwarmOptimizer(PSO_lenstronomy):
-    """Optimizer using a swarm of particles. Same as the PSO from lenstronomy, but parallelizes
-    computations across CPU cores automatically using JAX. For computation on GPU, only
-    one GPU is used due to memory transfer overheads.
+    """Optimizer using a swarm of particles. Same as the PSO from lenstronomy, but
+    parallelizes computations across CPU cores automatically using JAX. For computation
+    on GPU, only one GPU is used due to memory transfer overheads.
 
     :param func:
         A function that takes a vector in the parameter space as input and
@@ -90,8 +90,6 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
 
             def logL_func(position):
                 return vmapped_func(position).flatten()
-
-
 
     def _get_fitness(self, swarm):
         """Set fitness (probability) of the particles in swarm.
