@@ -340,7 +340,7 @@ class FittingSequence(object):
         walkerRatio=None,
         n_walkers=None,
         sigma_scale=1,
-        threadCount=None,
+        threadCount=1,
         init_samples=None,
         re_use_samples=True,
         sampler_type="emcee",
