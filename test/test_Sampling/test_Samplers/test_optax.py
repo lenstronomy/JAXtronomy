@@ -39,10 +39,10 @@ class TestJaxoptMinimizer(object):
 
     def test_run(self):
         # Tests to see if the minimizer gets close to the analytical answer
-        final_result = self.minimizer.run(num_chains=3, rng_int=0, tol=1e-14)
+        final_result = self.minimizer.run(num_chains=3, rng_seed=0, tol=1e-14)
         npt.assert_array_almost_equal(final_result, [0.6], decimal=6)
 
-        final_result = self.minimizer2.run(num_chains=3, rng_int=0, tol=1e-14)
+        final_result = self.minimizer2.run(num_chains=3, rng_seed=0, tol=1e-14)
         npt.assert_array_almost_equal(final_result, [0.25], decimal=2)
 
     def test_loss(self):

@@ -1198,7 +1198,7 @@ class TestFittingSequence(object):
             "num_chains": 1,
             "tolerance": 100,
             "sigma_scale": 1,
-            "rng_int": 1,
+            "rng_seed": 1,
         }
         fitting_kwargs_list_jaxopt = [["optax", optax_kwargs]]
         chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_jaxopt)
