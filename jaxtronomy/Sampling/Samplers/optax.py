@@ -51,7 +51,9 @@ class OptaxMinimizer:
         :param rng_seed: int, used to draw initial parameters from the prior distribution
         """
 
-        init_param_list = self._draw_init_params(num_chains=num_chains, rng_seed=rng_seed)
+        init_param_list = self._draw_init_params(
+            num_chains=num_chains, rng_seed=rng_seed
+        )
         init_param_list = unconstrain_fn(
             self._numpyro_model,
             model_args=(),

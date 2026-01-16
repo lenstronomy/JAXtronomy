@@ -510,7 +510,8 @@ class FittingSequence(object):
             width in the initial settings
         :param print_key: string, printed text when executing this routine
         :param threadCount: number of CPU threads. If MPI option is set, threadCount=1
-        :param rng_seed: int, seed used for randomness in PSO. If None, a random seed is generated.
+        :param rng_seed: int, seed used for randomness in PSO. If None, a random seed is
+            generated.
         :return: result of the best fit, the PSO chain of the best fit parameter after
             each iteration [lnlikelihood, parameters, velocities], list of parameters in
             same order as in chain
