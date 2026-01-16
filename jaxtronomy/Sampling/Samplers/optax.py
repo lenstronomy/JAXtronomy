@@ -42,16 +42,16 @@ class OptaxMinimizer:
         self.maxiter = maxiter
         self.value_and_grad_fun = optax.value_and_grad_from_state(self._loss)
 
-    def run(self, num_chains, tol, rng_int=0):
+    def run(self, num_chains, tol, rng_seed):
         """Runs the gradient descent.
 
         :param num_chains: int, number of chains to run
         :param tol: float, when |logL[i] - logL[i-1]| < tol, the gradient descent for that chain
             is stopped
-        :param rng_int: int, used to draw initial parameters from the prior distribution
+        :param rng_seed: int, used to draw initial parameters from the prior distribution
         """
 
-        init_param_list = self._draw_init_params(num_chains=num_chains, rng_int=rng_int)
+        init_param_list = self._draw_init_params(num_chains=num_chains, rng_seed=rng_seed)
         init_param_list = unconstrain_fn(
             self._numpyro_model,
             model_args=(),
@@ -112,15 +112,15 @@ class OptaxMinimizer:
         )
         return final_params, optax.tree.get(final_state, "count"), diff
 
-    def _draw_init_params(self, num_chains, rng_int):
+    def _draw_init_params(self, num_chains, rng_seed):
         """Draws initial parameters to be passed to the minimizer.
 
         :param num_chains: int, number of chains to run the minimizer on. Initial
             parameters for each chain are sampled from the user-provided distribution.
             Running more chains takes more time but can help avoid local minima.
-        :param rng_int: int, used to seed the JAX RNG
+        :param rng_seed: int, used to seed the JAX RNG
         """
-        rng = jax.random.split(jax.random.PRNGKey(rng_int), 1)[0]
+        rng = jax.random.split(jax.random.PRNGKey(rng_seed), 1)[0]
         array_of_init_params = numpyro.sample(
             "args", self.dist, rng_key=rng, sample_shape=(num_chains,)
         )
