@@ -500,7 +500,6 @@ class FittingSequence(object):
         sigma_scale=1,
         print_key="PSO",
         threadCount=None,
-        rng_seed=None,
     ):
         """Particle Swarm Optimization.
 
@@ -540,7 +539,6 @@ class FittingSequence(object):
             upper_start,
             init_pos=init_pos,
             threadCount=threadCount,
-            rng_seed=rng_seed,
             mpi=self._mpi,
             print_key=print_key,
             verbose=self._verbose,
