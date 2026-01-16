@@ -440,7 +440,7 @@ class FittingSequence(object):
         maxiter,
         tolerance=0.01,
         sigma_scale=1,
-        rng_int=0,
+        rng_seed=None,
     ):
         """Uses Optax L-BFGS gradient descent to find best-fit parameters.
 
@@ -449,9 +449,12 @@ class FittingSequence(object):
             process
         :param tolerance: float, if |logL[i] - logL[i-1]| < tol, the gradient descent is stopped
         :param sigma_scale: scales the standard deviation of the prior distribution
-        :param rng_int: int, used to generate random initial starting point from the
-            prior distribution
+        :param rng_seed: int, used to generate random initial starting point from the
+            prior distribution. If None, a random seed will be used.
         """
+        if rng_seed is None:
+            rng_seed = int(np.random.uniform(0, 1) * 1000000)
+
         param_class = self.param_class
         likelihood_module = self.likelihoodModule
 
@@ -480,7 +483,7 @@ class FittingSequence(object):
 
         # Runs the minimizer
         (final_params) = minimizer.run(
-            num_chains=num_chains, tol=tolerance, rng_int=rng_int
+            num_chains=num_chains, tol=tolerance, rng_seed=rng_seed
         )
 
         # Print results
@@ -497,6 +500,7 @@ class FittingSequence(object):
         sigma_scale=1,
         print_key="PSO",
         threadCount=None,
+        rng_seed=None,
     ):
         """Particle Swarm Optimization.
 
@@ -506,6 +510,7 @@ class FittingSequence(object):
             width in the initial settings
         :param print_key: string, printed text when executing this routine
         :param threadCount: number of CPU threads. If MPI option is set, threadCount=1
+        :param rng_seed: int, seed used for randomness in PSO. If None, a random seed is generated.
         :return: result of the best fit, the PSO chain of the best fit parameter after
             each iteration [lnlikelihood, parameters, velocities], list of parameters in
             same order as in chain
@@ -534,6 +539,7 @@ class FittingSequence(object):
             upper_start,
             init_pos=init_pos,
             threadCount=threadCount,
+            rng_seed=rng_seed,
             mpi=self._mpi,
             print_key=print_key,
             verbose=self._verbose,
