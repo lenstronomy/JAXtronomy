@@ -447,7 +447,7 @@ class FittingSequence(object):
         :param num_chains: int, number of minimization chains to run
         :param maxiter: int, maximum number of iterations during gradient descent
             process
-        :param tolerance: float, if |logL[i] - logL[i-1]| < tol, the gradient descent is stopped
+        :param tolerance: float, if |logL[i] - logL[i-1]| < tol three times in a row, the gradient descent is stopped
         :param sigma_scale: scales the standard deviation of the prior distribution
         :param rng_seed: int, used to generate random initial starting point from the
             prior distribution. If None, a random seed will be used.

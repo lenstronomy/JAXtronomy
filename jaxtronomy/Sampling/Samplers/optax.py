@@ -3,7 +3,7 @@ __author__ = "ahuang314"
 import jax
 
 jax.config.update("jax_enable_x64", True)
-from jax import jit
+from jax import jit, numpy as jnp
 from functools import partial
 import optax
 import numpyro, numpyro.distributions as dist
@@ -46,7 +46,7 @@ class OptaxMinimizer:
         """Runs the gradient descent.
 
         :param num_chains: int, number of chains to run
-        :param tol: float, when |logL[i] - logL[i-1]| < tol, the gradient descent for that chain
+        :param tol: float, when |logL[i] - logL[i-1]| < tol three times in a row, the gradient descent for that chain
             is stopped
         :param rng_seed: int, used to draw initial parameters from the prior distribution
         """
@@ -63,13 +63,12 @@ class OptaxMinimizer:
 
         for i in range(len(init_param_list)):
             print(f"Running chain {i+1}")
-            final_params, num_iter, final_diff = self.run_single(
+            final_params, num_iter = self.run_single(
                 init_params=init_param_list[i], tol=tol
             )
             final_logL = self._loss(final_params)
             print(f"{num_iter} iterations performed.")
             print("Final logL:", -final_logL)
-            print(f"In the final iteration, the logL improved by {final_diff}\n")
             if i == 0 or final_logL < best_logL:
                 best_logL = final_logL
                 best_params = final_params
@@ -88,11 +87,11 @@ class OptaxMinimizer:
         """Runs the gradient descent for a single chain.
 
         :param init_params: 1d array of floats, initial parameters for the loss function
-        :param tol: float, when |logL[i] - logL[i-1]| < tol, the gradient descent is stopped
+        :param tol: float, when |logL[i] - logL[i-1]| < tol three times in a row, the gradient descent is stopped
         """
 
         def step(carry):
-            params, state, _ = carry
+            params, state, tol_hit = carry
             value, grad = self.value_and_grad_fun(params, state=state)
             updates, state = self.opt.update(
                 grad, state, params, value=value, grad=grad, value_fn=self._loss
@@ -101,18 +100,19 @@ class OptaxMinimizer:
 
             new_value = optax.tree.get(state, "value")
             diff = value - new_value
-            return params, state, diff
+            tol_hit = jnp.where(diff < tol, tol_hit + 1, 0)
+            return params, state, tol_hit
 
         def continuing_criterion(carry):
-            _, state, diff = carry
+            _, state, tol_hit = carry
             iter_num = optax.tree.get(state, "count")
-            return (iter_num == 0) | ((iter_num < self.maxiter) & (diff >= tol))
+            return (iter_num < self.maxiter) & (tol_hit != 3)
 
         init_carry = (init_params, self.opt.init(init_params), 0)
         final_params, final_state, diff = jax.lax.while_loop(
             continuing_criterion, step, init_carry
         )
-        return final_params, optax.tree.get(final_state, "count"), diff
+        return final_params, optax.tree.get(final_state, "count")
 
     def _draw_init_params(self, num_chains, rng_seed):
         """Draws initial parameters to be passed to the minimizer.
