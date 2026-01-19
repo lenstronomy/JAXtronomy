@@ -3,7 +3,6 @@ from functools import partial
 from jax import jit, lax, numpy as jnp
 import numpy as np
 
-
 __all__ = ["PointSource"]
 
 # NOTE: In jaxtronomy, only UNLENSED and LENSED_POSITION with additional_images=False models are currently supported
