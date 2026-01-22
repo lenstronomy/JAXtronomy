@@ -174,14 +174,12 @@ class Sampler(Sampler_lenstronomy):
         backend = jax.default_backend()
         if backend == "cpu":
             num_devices = jax.device_count()
-            if n_walkers % num_devices != 0:
+            if n_walkers % (2 * num_devices) != 0:
                 raise ValueError(
-                    f"Number of MCMC walkers {n_walkers} must be divisible by the number of CPU devices for parallelization. "
+                    f"Number of MCMC walkers {n_walkers} must be divisible by two times the number of CPU devices for parallelization. "
                     f"There are {num_devices} cpu devices currently recognized by JAX."
                 )
         logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
-
-        sampler = emcee.EnsembleSampler(n_walkers, num_param, logL_func, vectorize=True)
 
         sampler = emcee.EnsembleSampler(n_walkers, num_param, logL_func, vectorize=True)
 
