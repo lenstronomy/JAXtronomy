@@ -73,13 +73,6 @@ class Sampler(Sampler_lenstronomy):
                 )
         logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
 
-        pso = ParticleSwarmOptimizer(
-            logL_func, lower_start, upper_start, n_particles
-        )
-        logL_func = prepare_logL_func(
-            backend=jax.default_backend(), logL_func=self.chain.logL
-        )
-
         pso = ParticleSwarmOptimizer(logL_func, lower_start, upper_start, n_particles)
 
         if init_pos is None:
