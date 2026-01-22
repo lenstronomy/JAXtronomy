@@ -15,11 +15,8 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
     parallelizes computations across CPU cores automatically using JAX. For computation
     on GPU, only one GPU is used due to memory transfer overheads.
 
-    :param func:
-        A function that takes a vector in the parameter space as input and
-        returns the natural logarithm of the posterior probability for that
-        position.
-
+    :param func: A function that takes a vector in the parameter space as input and
+        returns the natural logarithm of the posterior probability for that position.
     :param low: array of the lower bound of the parameter space
     :param high: array of the upper bound of the parameter space
     :param particle_count: the number of particles to use.
