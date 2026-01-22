@@ -63,11 +63,11 @@ class Sampler(Sampler_lenstronomy):
             lower_start = np.maximum(lower_start, self.lower_limit)
             upper_start = np.minimum(upper_start, self.upper_limit)
 
-        logL_func = prepare_logL_func(backend=jax.default_backend(), logL_func=self.chain.logL)
-
-        pso = ParticleSwarmOptimizer(
-            logL_func, lower_start, upper_start, n_particles
+        logL_func = prepare_logL_func(
+            backend=jax.default_backend(), logL_func=self.chain.logL
         )
+
+        pso = ParticleSwarmOptimizer(logL_func, lower_start, upper_start, n_particles)
 
         if init_pos is None:
             init_pos = (upper_start - lower_start) / 2 + lower_start
@@ -165,11 +165,11 @@ class Sampler(Sampler_lenstronomy):
 
         time_start = time.time()
 
-        logL_func = prepare_logL_func(backend=jax.default_backend(), logL_func=self.chain.logL)
-
-        sampler = emcee.EnsembleSampler(
-            n_walkers, num_param, logL_func, vectorize=True
+        logL_func = prepare_logL_func(
+            backend=jax.default_backend(), logL_func=self.chain.logL
         )
+
+        sampler = emcee.EnsembleSampler(n_walkers, num_param, logL_func, vectorize=True)
 
         sampler.run_mcmc(initpos, n_run_eff, progress=progress)
         flat_samples = sampler.get_chain(discard=n_burn, thin=1, flat=True)
@@ -196,15 +196,15 @@ def prepare_logL_func(backend, logL_func):
             new_shape = (num_devices, int(old_shape[0] / num_devices), old_shape[-1])
             result = pmapped_func(args.reshape(new_shape))
             return np.array(result).flatten()
-        
+
     elif backend == "gpu":
         vmapped_func = jax.jit(jax.vmap(logL_func))
 
         def new_logL_func(args):
             result = vmapped_func(args)
             return np.array(result).flatten()
-        
+
     else:
         raise ValueError("backend must be either cpu or gpu")
-    
+
     return new_logL_func
