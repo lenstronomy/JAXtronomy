@@ -1,7 +1,7 @@
 import time
 
 import numpy as np
-from jaxtronomy.Sampling.Samplers.pso import ParticleSwarmOptimizer
+from lenstronomy.Sampling.Samplers.pso import ParticleSwarmOptimizer
 from lenstronomy.Sampling.sampler import Sampler as Sampler_lenstronomy
 from lenstronomy.Util import sampling_util
 
@@ -49,7 +49,7 @@ class Sampler(Sampler_lenstronomy):
 
         if threadCount is not None:
             raise ValueError(
-                "PSO threadCount must be None. In JAXtronomy, parallelization across devices is done automatically."
+                "PSO threadCount must be None. In JAXtronomy, parallelization across CPU cores is done automatically."
             )
         if mpi:
             raise ValueError("mpi must be False in JAXtronomy")
@@ -63,8 +63,10 @@ class Sampler(Sampler_lenstronomy):
             lower_start = np.maximum(lower_start, self.lower_limit)
             upper_start = np.minimum(upper_start, self.upper_limit)
 
+        logL_func = prepare_logL_func(backend=jax.default_backend(), logL_func=self.chain.logL)
+
         pso = ParticleSwarmOptimizer(
-            self.chain.logL, lower_start, upper_start, n_particles
+            logL_func, lower_start, upper_start, n_particles
         )
 
         if init_pos is None:
@@ -163,19 +165,10 @@ class Sampler(Sampler_lenstronomy):
 
         time_start = time.time()
 
-        mapped_func = partial(lax.map, self.chain.logL)
-        pmapped_func = jax.pmap(mapped_func, devices=jax.devices())
-        num_devices = jax.device_count()
-
-        def pmapped_func_wrapper(args):
-            args = np.array(args)
-            old_shape = args.shape
-            new_shape = (num_devices, int(old_shape[0] / num_devices), old_shape[-1])
-
-            return pmapped_func(args.reshape(new_shape)).reshape(old_shape[0])
+        logL_func = prepare_logL_func(backend=jax.default_backend(), logL_func=self.chain.logL)
 
         sampler = emcee.EnsembleSampler(
-            n_walkers, num_param, pmapped_func_wrapper, vectorize=True
+            n_walkers, num_param, logL_func, vectorize=True
         )
 
         sampler.run_mcmc(initpos, n_run_eff, progress=progress)
@@ -188,3 +181,30 @@ class Sampler(Sampler_lenstronomy):
         time_end = time.time()
         print(time_end - time_start, "time taken for MCMC sampling")
         return flat_samples, dist
+
+
+def prepare_logL_func(backend, logL_func):
+    if backend == "cpu":
+
+        mapped_func = partial(lax.map, logL_func)
+        pmapped_func = jax.pmap(mapped_func, devices=jax.devices())
+        num_devices = jax.device_count()
+
+        def new_logL_func(args):
+            args = np.array(args)
+            old_shape = args.shape
+            new_shape = (num_devices, int(old_shape[0] / num_devices), old_shape[-1])
+            result = pmapped_func(args.reshape(new_shape))
+            return np.array(result).flatten()
+        
+    elif backend == "gpu":
+        vmapped_func = jax.jit(jax.vmap(logL_func))
+
+        def new_logL_func(args):
+            result = vmapped_func(args)
+            return np.array(result).flatten()
+        
+    else:
+        raise ValueError("backend must be either cpu or gpu")
+    
+    return new_logL_func
