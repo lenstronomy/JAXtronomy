@@ -73,9 +73,7 @@ class Sampler(Sampler_lenstronomy):
                 )
         logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
 
-        pso = ParticleSwarmOptimizer(
-            logL_func, lower_start, upper_start, n_particles
-        )
+        pso = ParticleSwarmOptimizer(logL_func, lower_start, upper_start, n_particles)
         logL_func = prepare_logL_func(
             backend=jax.default_backend(), logL_func=self.chain.logL
         )
@@ -188,9 +186,7 @@ class Sampler(Sampler_lenstronomy):
                 )
         logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
 
-        sampler = emcee.EnsembleSampler(
-            n_walkers, num_param, logL_func, vectorize=True
-        )
+        sampler = emcee.EnsembleSampler(n_walkers, num_param, logL_func, vectorize=True)
 
         sampler = emcee.EnsembleSampler(n_walkers, num_param, logL_func, vectorize=True)
 
