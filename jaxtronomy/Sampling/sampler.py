@@ -181,9 +181,7 @@ class Sampler(Sampler_lenstronomy):
                 )
         logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
 
-        sampler = emcee.EnsembleSampler(
-            n_walkers, num_param, logL_func, vectorize=True
-        )
+        sampler = emcee.EnsembleSampler(n_walkers, num_param, logL_func, vectorize=True)
 
         sampler = emcee.EnsembleSampler(n_walkers, num_param, logL_func, vectorize=True)
 
