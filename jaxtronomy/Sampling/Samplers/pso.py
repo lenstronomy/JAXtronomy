@@ -32,7 +32,11 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
     """
 
     def __init__(
-        self, func, low, high, particle_count=25,
+        self,
+        func,
+        low,
+        high,
+        particle_count=25,
     ):
         """
 
