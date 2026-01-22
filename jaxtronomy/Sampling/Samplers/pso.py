@@ -77,6 +77,7 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
                     f"There are {num_devices} cpu devices currently recognized by JAX."
                 )
         else:
+
             @jax.jit
             def logL_func(position):
                 return jax.vmap(func)(position).flatten()
