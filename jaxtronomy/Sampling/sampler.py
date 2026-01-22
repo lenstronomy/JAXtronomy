@@ -226,6 +226,6 @@ def prepare_logL_func(backend, logL_func):
             return np.array(result).flatten()
 
     else:
-        raise ValueError("backend must be either cpu or gpu")
+        raise ValueError("backend must be either 'cpu' or 'gpu'")
 
     return new_logL_func
