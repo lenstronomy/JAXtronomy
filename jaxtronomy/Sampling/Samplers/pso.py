@@ -48,32 +48,7 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
         self.param_count = len(self.low)
         self.global_best = Particle.create(self.param_count)
 
-        if jax.default_backend() == "cpu":
-            mapped_func = partial(jax.lax.map, func)
-            pmapped_func = jax.pmap(mapped_func, devices=jax.devices())
-            num_devices = jax.device_count()
-
-            def logL_func(position):
-                old_shape = position.shape
-                new_shape = (
-                    num_devices,
-                    int(old_shape[0] / num_devices),
-                    old_shape[-1],
-                )
-                return pmapped_func(position.reshape(new_shape)).flatten()
-
-            if particle_count % num_devices != 0:
-                raise ValueError(
-                    f"PSO particle count {particle_count} must be divisible by the number of CPU devices for parallelization. "
-                    f"There are {num_devices} cpu devices currently recognized by JAX."
-                )
-        else:
-
-            @jax.jit
-            def logL_func(position):
-                return jax.vmap(func)(position).flatten()
-
-        self.logL_func = logL_func
+        self.logL_func = func
         self.swarm = self._init_swarm()
 
     def _get_fitness(self, swarm):

@@ -1,7 +1,7 @@
 import time
 
 import numpy as np
-from lenstronomy.Sampling.Samplers.pso import ParticleSwarmOptimizer
+from jaxtronomy.Sampling.Samplers.pso import ParticleSwarmOptimizer
 from lenstronomy.Sampling.sampler import Sampler as Sampler_lenstronomy
 from lenstronomy.Util import sampling_util
 
@@ -63,7 +63,15 @@ class Sampler(Sampler_lenstronomy):
             lower_start = np.maximum(lower_start, self.lower_limit)
             upper_start = np.minimum(upper_start, self.upper_limit)
 
-        logL_func = prepare_logL_func(backend=jax.default_backend(), logL_func=self.chain.logL)
+        backend = jax.default_backend()
+        if backend == "cpu":
+            num_devices = jax.device_count()
+            if n_particles % num_devices != 0:
+                raise ValueError(
+                    f"PSO particle count {n_particles} must be divisible by the number of CPU devices for parallelization. "
+                    f"There are {num_devices} cpu devices currently recognized by JAX."
+                )
+        logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
 
         pso = ParticleSwarmOptimizer(
             logL_func, lower_start, upper_start, n_particles
@@ -165,7 +173,15 @@ class Sampler(Sampler_lenstronomy):
 
         time_start = time.time()
 
-        logL_func = prepare_logL_func(backend=jax.default_backend(), logL_func=self.chain.logL)
+        backend = jax.default_backend()
+        if backend == "cpu":
+            num_devices = jax.device_count()
+            if n_walkers % num_devices != 0:
+                raise ValueError(
+                    f"Number of MCMC walkers {n_walkers} must be divisible by the number of CPU devices for parallelization. "
+                    f"There are {num_devices} cpu devices currently recognized by JAX."
+                )
+        logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
 
         sampler = emcee.EnsembleSampler(
             n_walkers, num_param, logL_func, vectorize=True
