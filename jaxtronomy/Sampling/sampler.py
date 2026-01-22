@@ -196,6 +196,14 @@ class Sampler(Sampler_lenstronomy):
 
 
 def prepare_logL_func(backend, logL_func):
+    """Parallelizes the logL function for CPU backend, and vectorizes the
+    logL function for GPU backend.
+
+    :param backend: string, must be 'cpu' or 'gpu'.
+    :param logL_func: callable function that takes a position vector and returns a log likelihood.
+
+    :returns: a callable function that takes a set of position vectors and returns a set of log likelihoods.
+    """
     if backend == "cpu":
 
         mapped_func = partial(lax.map, logL_func)

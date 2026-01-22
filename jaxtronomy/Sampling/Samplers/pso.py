@@ -31,7 +31,7 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
     ):
         """
 
-        :param func: function to call to return log likelihood
+        :param func: function to call to return log likelihood. Must be a vectorized logL function.
         :type func: python definition
         :param low: lower bound of the parameters
         :type low: numpy array
