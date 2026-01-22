@@ -32,7 +32,7 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
     """
 
     def __init__(
-        self, func, low, high, particle_count=25, pool=None, args=None, kwargs=None
+        self, func, low, high, particle_count=25,
     ):
         """
 
@@ -44,23 +44,13 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
         :type high: numpy array
         :param particle_count: number of particles in each iteration of the PSO
         :type particle_count: int
-        :param pool: MPI pool for mapping different processes
-        :type pool: None or MPI pool
-        :param args: positional arguments to send to `func`. The function
-        will be called as `func(x, *args, **kwargs)`.
-        :type args: `list`
-        :param kwargs: keyword arguments to send to `func`. The function
-        will be called as `func(x, *args, **kwargs)`
-        :type kwargs: `dict`
         """
         self.low = [l for l in low]
         self.high = [h for h in high]
         self.particleCount = particle_count
-        self.pool = pool
+        self.pool = None
 
         self.param_count = len(self.low)
-
-        self.swarm = self._init_swarm()
         self.global_best = Particle.create(self.param_count)
 
         if jax.default_backend() == "cpu":
@@ -75,9 +65,7 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
                     int(old_shape[0] / num_devices),
                     old_shape[-1],
                 )
-                return pmapped_func(position.reshape(new_shape)).reshape(old_shape[0])
-
-            self.logL_func = logL_func
+                return pmapped_func(position.reshape(new_shape)).flatten()
 
             if particle_count % num_devices != 0:
                 raise ValueError(
@@ -86,12 +74,13 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
                 )
         else:
             batch_size = 10
-            vmapped_func = partial(jax.lax.map, func)
 
+            @jax.jit
             def logL_func(position):
-                return vmapped_func(position).flatten()
+                return jax.lax.map(func, position).flatten()
 
-            self.logL_func = logL_func
+        self.logL_func = logL_func
+        self.swarm = self._init_swarm()
 
     def _get_fitness(self, swarm):
         """Set fitness (probability) of the particles in swarm.
@@ -104,7 +93,7 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
         position = [particle.position for particle in swarm]
 
         position = np.array(position)
-        ln_probability = self.logL_func(position)
+        ln_probability = np.array(self.logL_func(position))
 
         for i, particle in enumerate(swarm):
             particle.fitness = ln_probability[i]
