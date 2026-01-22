@@ -23,12 +23,6 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
     :param low: array of the lower bound of the parameter space
     :param high: array of the upper bound of the parameter space
     :param particle_count: the number of particles to use.
-    :param pool: (optional)
-        An alternative method of using the parallelized algorithm. If
-        provided, the value of ``threads`` is ignored and the
-        object provided by ``pool`` is used for all parallelization. It
-        can be any object with a ``map`` method that follows the same
-        calling sequence as the built-in ``map`` function.
     """
 
     def __init__(
