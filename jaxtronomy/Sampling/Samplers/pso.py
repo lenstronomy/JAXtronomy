@@ -9,8 +9,8 @@ __all__ = ["ParticleSwarmOptimizer"]
 
 
 class ParticleSwarmOptimizer(PSO_lenstronomy):
-    """Optimizer using a swarm of particles. Same as the PSO from lenstronomy, but
-    the input log likelihood function is assumed to be vectorized.
+    """Optimizer using a swarm of particles. Same as the PSO from lenstronomy, but the
+    input log likelihood function is assumed to be vectorized.
 
     :param func: A function that takes a vector in the parameter space as input and
         returns the natural logarithm of the posterior probability for that position.
