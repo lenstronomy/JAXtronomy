@@ -53,7 +53,7 @@ class Sampler(Sampler_lenstronomy):
             )
         if mpi:
             raise ValueError("mpi must be False in JAXtronomy")
-        
+
         backend = jax.default_backend()
         if backend == "cpu":
             num_devices = jax.device_count()
@@ -154,7 +154,7 @@ class Sampler(Sampler_lenstronomy):
             raise ValueError("start_from_backend must be False in JAXtronomy")
         if backend_filename is not None:
             raise ValueError("backend_filename not supported in JAXtronomy")
-        
+
         backend = jax.default_backend()
         if backend == "cpu":
             num_devices = jax.device_count()

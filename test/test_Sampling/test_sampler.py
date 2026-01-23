@@ -144,8 +144,12 @@ class TestSampler(object):
 
         assert len(result) == 16
 
-        npt.assert_raises(ValueError, self.sampler.pso, n_particles, n_iterations, mpi=True)
-        npt.assert_raises(ValueError, self.sampler.pso, n_particles, n_iterations, threadCount=2)
+        npt.assert_raises(
+            ValueError, self.sampler.pso, n_particles, n_iterations, mpi=True
+        )
+        npt.assert_raises(
+            ValueError, self.sampler.pso, n_particles, n_iterations, threadCount=2
+        )
         npt.assert_raises(ValueError, self.sampler.pso, 1.5, n_iterations)
 
     def test_mcmc_emcee(self):
@@ -164,16 +168,61 @@ class TestSampler(object):
         assert len(samples) == n_walkers * n_run
         assert len(dist) == len(samples)
 
-        npt.assert_raises(ValueError, self.sampler.mcmc_emcee, n_walkers, n_run, n_burn, mean_start, sigma_start, mpi=True)
-        npt.assert_raises(ValueError, self.sampler.mcmc_emcee, n_walkers, n_run, n_burn, mean_start, sigma_start, threadCount=2)
-        npt.assert_raises(ValueError, self.sampler.mcmc_emcee, n_walkers, n_run, n_burn, mean_start, sigma_start, start_from_backend=True)
-        npt.assert_raises(ValueError, self.sampler.mcmc_emcee, n_walkers, n_run, n_burn, mean_start, sigma_start, backend_filename="sjd")
-        npt.assert_raises(ValueError, self.sampler.mcmc_emcee, 1.5, n_run, n_burn, mean_start, sigma_start)
-
+        npt.assert_raises(
+            ValueError,
+            self.sampler.mcmc_emcee,
+            n_walkers,
+            n_run,
+            n_burn,
+            mean_start,
+            sigma_start,
+            mpi=True,
+        )
+        npt.assert_raises(
+            ValueError,
+            self.sampler.mcmc_emcee,
+            n_walkers,
+            n_run,
+            n_burn,
+            mean_start,
+            sigma_start,
+            threadCount=2,
+        )
+        npt.assert_raises(
+            ValueError,
+            self.sampler.mcmc_emcee,
+            n_walkers,
+            n_run,
+            n_burn,
+            mean_start,
+            sigma_start,
+            start_from_backend=True,
+        )
+        npt.assert_raises(
+            ValueError,
+            self.sampler.mcmc_emcee,
+            n_walkers,
+            n_run,
+            n_burn,
+            mean_start,
+            sigma_start,
+            backend_filename="sjd",
+        )
+        npt.assert_raises(
+            ValueError,
+            self.sampler.mcmc_emcee,
+            1.5,
+            n_run,
+            n_burn,
+            mean_start,
+            sigma_start,
+        )
 
     def test_prepare_logL_func(self):
         new_logL_func = prepare_logL_func(backend="gpu", logL_func=self.Likelihood.logL)
-        npt.assert_raises(ValueError, prepare_logL_func, "fake_backend", self.Likelihood.logL)
+        npt.assert_raises(
+            ValueError, prepare_logL_func, "fake_backend", self.Likelihood.logL
+        )
 
 
 if __name__ == "__main__":
