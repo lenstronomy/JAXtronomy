@@ -36,20 +36,32 @@ The goal of this library is to reimplement lenstronomy functionalities in pure J
 - Code should be pip installable on any machine, no compilation required.
 - Any notable differences between the JAX and reference implementations will be clearly documented.
 
-**Installation**:
+Installation and Usage
+---------------------------------------------------------
 
-To use JAX with an NVIDIA GPU on Linux, an additional first step is needed. Install JAX with ::
+**GPU**
+To use ``JAX`` with an NVIDIA GPU on Linux, first install JAX with ::
 
-  pip install -U "jax[cuda12]"
+  pip install -U "jax[cuda13]"
 
 For other GPUs or operating systems, installation is more complicated.
 See the `JAX installation instructions for GPU <https://github.com/jax-ml/jax?tab=readme-ov-file#installation>`_ for more details.
 
-``JAXtronomy`` can be installed with ::
+By default, JAX will still use CPU for computations. To change this, run the following line of code immediately after importing JAX ::
+
+  jax.config.update("jax_platform_name", "gpu")
+
+**CPU**
+
+For standard CPU-only usage, ``JAXtronomy`` and ``JAX`` can both be installed with ::
 
   pip install jaxtronomy
 
-Note that pip installing jaxtronomy without performing the first step will by default install JAX only with CPU support.
+For computations parallelized across CPU cores, an environment variable needs to be set before importing JAX
+indicating the number CPU devices to use. For example, to use 16 CPU cores, this can be done with ::
+
+  os.environ["XLA_FLAGS"] = "--xla_force_host_platform_device_count=16"
+
 **Example notebook**:
 `An example notebook <https://github.com/lenstronomy/JAXtronomy/blob/main/notebooks/modeling_a_simple_Einstein_ring.ipynb>`_ has been made available, which
 showcases the features and improvements in JAXtronomy.
