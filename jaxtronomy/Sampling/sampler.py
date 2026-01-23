@@ -53,16 +53,7 @@ class Sampler(Sampler_lenstronomy):
             )
         if mpi:
             raise ValueError("mpi must be False in JAXtronomy")
-
-        if lower_start is None or upper_start is None:
-            lower_start, upper_start = np.array(self.lower_limit), np.array(
-                self.upper_limit
-            )
-            print("PSO initialises its particles with default values")
-        else:
-            lower_start = np.maximum(lower_start, self.lower_limit)
-            upper_start = np.minimum(upper_start, self.upper_limit)
-
+        
         backend = jax.default_backend()
         if backend == "cpu":
             num_devices = jax.device_count()
@@ -72,6 +63,15 @@ class Sampler(Sampler_lenstronomy):
                     f"There are {num_devices} cpu devices currently recognized by JAX."
                 )
         logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
+
+        if lower_start is None or upper_start is None:
+            lower_start, upper_start = np.array(self.lower_limit), np.array(
+                self.upper_limit
+            )
+            print("PSO initialises its particles with default values")
+        else:
+            lower_start = np.maximum(lower_start, self.lower_limit)
+            upper_start = np.minimum(upper_start, self.upper_limit)
 
         pso = ParticleSwarmOptimizer(logL_func, lower_start, upper_start, n_particles)
 
@@ -154,6 +154,16 @@ class Sampler(Sampler_lenstronomy):
             raise ValueError("start_from_backend must be False in JAXtronomy")
         if backend_filename is not None:
             raise ValueError("backend_filename not supported in JAXtronomy")
+        
+        backend = jax.default_backend()
+        if backend == "cpu":
+            num_devices = jax.device_count()
+            if n_walkers % (2 * num_devices) != 0:
+                raise ValueError(
+                    f"Number of MCMC walkers {n_walkers} must be divisible by two times the number of CPU devices for parallelization. "
+                    f"There are {num_devices} cpu devices currently recognized by JAX."
+                )
+        logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
 
         import emcee
 
@@ -170,16 +180,6 @@ class Sampler(Sampler_lenstronomy):
         n_run_eff = n_burn + n_run
 
         time_start = time.time()
-
-        backend = jax.default_backend()
-        if backend == "cpu":
-            num_devices = jax.device_count()
-            if n_walkers % (2 * num_devices) != 0:
-                raise ValueError(
-                    f"Number of MCMC walkers {n_walkers} must be divisible by two times the number of CPU devices for parallelization. "
-                    f"There are {num_devices} cpu devices currently recognized by JAX."
-                )
-        logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
 
         sampler = emcee.EnsembleSampler(n_walkers, num_param, logL_func, vectorize=True)
 
