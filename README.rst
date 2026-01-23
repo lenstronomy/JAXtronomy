@@ -40,12 +40,16 @@ Installation and Usage
 ---------------------------------------------------------
 
 **GPU**
-To use ``JAX`` with an NVIDIA GPU on Linux, first install JAX with ::
+
+To use ``JAXtronomy`` with an NVIDIA GPU on Linux, first install JAX with ::
 
   pip install -U "jax[cuda13]"
 
 For other GPUs or operating systems, installation is more complicated.
 See the `JAX installation instructions for GPU <https://github.com/jax-ml/jax?tab=readme-ov-file#installation>`_ for more details.
+Then, install ``JAXtronomy`` with ::
+  
+  pip install jaxtronomy
 
 By default, JAX will still use CPU for computations. To change this, run the following line of code immediately after importing JAX ::
 
