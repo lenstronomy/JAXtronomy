@@ -222,13 +222,13 @@ class TestSampler(object):
 
         def logL_func(args):
             return args**2 - 4
+
         new_logL_func = prepare_logL_func(backend="gpu", logL_func=logL_func)
 
-        x = np.array([[1, 2],[3, 4]])
+        x = np.array([[1, 2], [3, 4]])
         logL = new_logL_func(x)
         expected = np.array([-3, 0, 5, 12])
         npt.assert_allclose(expected, logL, atol=1e-16, rtol=1e-16)
-
 
         new_logL_func = prepare_logL_func(backend="cpu", logL_func=logL_func)
         logL = new_logL_func(x)
