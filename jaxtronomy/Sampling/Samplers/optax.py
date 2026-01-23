@@ -3,7 +3,7 @@ __author__ = "ahuang314"
 import jax
 
 jax.config.update("jax_enable_x64", True)
-from jax import jit
+from jax import jit, numpy as jnp
 from functools import partial
 import optax
 import numpyro, numpyro.distributions as dist
@@ -42,16 +42,18 @@ class OptaxMinimizer:
         self.maxiter = maxiter
         self.value_and_grad_fun = optax.value_and_grad_from_state(self._loss)
 
-    def run(self, num_chains, tol, rng_int=0):
+    def run(self, num_chains, tol, rng_seed):
         """Runs the gradient descent.
 
         :param num_chains: int, number of chains to run
-        :param tol: float, when np.abs(logL) < tol, the gradient descent for that chain
+        :param tol: float, when |logL[i] - logL[i-1]| < tol three times in a row, the gradient descent for that chain
             is stopped
-        :param rng_int: int, used to draw initial parameters from the prior distribution
+        :param rng_seed: int, used to draw initial parameters from the prior distribution
         """
 
-        init_param_list = self._draw_init_params(num_chains=num_chains, rng_int=rng_int)
+        init_param_list = self._draw_init_params(
+            num_chains=num_chains, rng_seed=rng_seed
+        )
         init_param_list = unconstrain_fn(
             self._numpyro_model,
             model_args=(),
@@ -85,39 +87,42 @@ class OptaxMinimizer:
         """Runs the gradient descent for a single chain.
 
         :param init_params: 1d array of floats, initial parameters for the loss function
-        :param tol: float, when np.abs(logL) < tol, the gradient descent is stopped
+        :param tol: float, when |logL[i] - logL[i-1]| < tol three times in a row, the gradient descent is stopped
         """
 
         def step(carry):
-            params, state = carry
+            params, state, tol_hit = carry
             value, grad = self.value_and_grad_fun(params, state=state)
             updates, state = self.opt.update(
                 grad, state, params, value=value, grad=grad, value_fn=self._loss
             )
             params = optax.apply_updates(params, updates)
-            return params, state
+
+            new_value = optax.tree.get(state, "value")
+            diff = value - new_value
+            tol_hit = jnp.where(diff < tol, tol_hit + 1, 0)
+            return params, state, tol_hit
 
         def continuing_criterion(carry):
-            _, state = carry
+            _, state, tol_hit = carry
             iter_num = optax.tree.get(state, "count")
-            value = optax.tree.get(state, "value")
-            return (iter_num == 0) | ((iter_num < self.maxiter) & (value >= tol))
+            return (iter_num < self.maxiter) & (tol_hit != 3)
 
-        init_carry = (init_params, self.opt.init(init_params))
-        final_params, final_state = jax.lax.while_loop(
+        init_carry = (init_params, self.opt.init(init_params), 0)
+        final_params, final_state, _ = jax.lax.while_loop(
             continuing_criterion, step, init_carry
         )
         return final_params, optax.tree.get(final_state, "count")
 
-    def _draw_init_params(self, num_chains, rng_int):
+    def _draw_init_params(self, num_chains, rng_seed):
         """Draws initial parameters to be passed to the minimizer.
 
         :param num_chains: int, number of chains to run the minimizer on. Initial
             parameters for each chain are sampled from the user-provided distribution.
             Running more chains takes more time but can help avoid local minima.
-        :param rng_int: int, used to seed the JAX RNG
+        :param rng_seed: int, used to seed the JAX RNG
         """
-        rng = jax.random.split(jax.random.PRNGKey(rng_int), 1)[0]
+        rng = jax.random.split(jax.random.PRNGKey(rng_seed), 1)[0]
         array_of_init_params = numpyro.sample(
             "args", self.dist, rng_key=rng, sample_shape=(num_chains,)
         )
