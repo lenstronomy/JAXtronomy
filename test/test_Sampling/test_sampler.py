@@ -1,8 +1,5 @@
-__author__ = "sibirrer"
-
 import pytest
 import numpy as np, numpy.testing as npt
-import os
 import lenstronomy.Util.simulation_util as sim_util
 from lenstronomy.ImSim.image_model import ImageModel
 from jaxtronomy.Sampling.likelihood import LikelihoodModule
