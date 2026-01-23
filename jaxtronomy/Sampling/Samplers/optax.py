@@ -109,7 +109,7 @@ class OptaxMinimizer:
             return (iter_num < self.maxiter) & (tol_hit != 3)
 
         init_carry = (init_params, self.opt.init(init_params), 0)
-        final_params, final_state, diff = jax.lax.while_loop(
+        final_params, final_state, _ = jax.lax.while_loop(
             continuing_criterion, step, init_carry
         )
         return final_params, optax.tree.get(final_state, "count")
