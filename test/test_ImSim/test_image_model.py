@@ -500,12 +500,14 @@ class TestImageModel(object):
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
+            kwargs_ps=self.kwargs_ps,
             unconvolved=True,
         )
         image_ref = self.imageModel_nomask_ref.image(
             kwargs_lens=self.kwargs_lens,
             kwargs_source=self.kwargs_source,
             kwargs_lens_light=self.kwargs_lens_light,
+            kwargs_ps=self.kwargs_ps,
             unconvolved=True,
         )
         npt.assert_array_almost_equal(image, image_ref, decimal=8)
