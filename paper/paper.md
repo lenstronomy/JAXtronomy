@@ -138,14 +138,29 @@ However, FFT convolution using `JAX` on GPU is significantly faster than `scipy`
 
 The process of lens modelling involves finding best-fit parameters describing a lensed system from real data. In `lenstronomy`, this typically involves a Particle Swarm Optimizer (PSO) [@Kennedy:1995] for optimization and Monte Carlo Markov Chains for posterior sampling. `JAXtronomy` retains these lens modelling algorithms from `lenstronomy` while benefitting from the increased performance outlined above.
 
-In the following table, we compare `JAXtronomy`'s PSO performance to that of `lenstronomy` when modeling a lens with an elliptical power-law mass profile, Sersic light profile, and a quadruply-imaged point source. We use a 100x100 grid and a size 13 PSF kernel. These benchmarks were performed using the same hardware as in the previous section.
+In the following table, we compare `JAXtronomy`'s PSO performance to that of `lenstronomy` when modeling a lens with an elliptical power-law (EPL) mass profile, Sersic light profile, and a quadruply-imaged point source. The image is simulated using a 100x100 grid and FFT convolved using a PSF kernel with a size of 13 pixels. These benchmarks were performed using the same hardware as in the previous section.
 
-| Number of Particles | 1 CPU core | 64 CPU cores (parallelized)| GPU  |
-| :-----------------: | :--------: | :------------------------: | :--: |
-| 64                  | 4x         | 16x                        | 5x   |
-| 128                 | 4x         | 18x                        | 5.5x |
-| 256                 | 4.7x       | 30x                        | 9x   |
-| 512                 | 4.7x       | 34x                        | 11x  |
+| Device       | 64 Particles | 128 Particles | 256 Particles | 512 Particles |
+| :-------- -: | :----------: | :-----------: | :-----------: | :-----------: |
+| 1 CPU core   | 4x           | 4x            | 5x            | 5x            |
+| 2 CPU cores  | 6x           | 7x            | 9x            | 8x            |
+| 4 CPU cores  | 11x          | 11x           | 17x           | 15x           |
+| 8 CPU cores  | 14x          | 17x           | 24x           | 30x           |
+| 16 CPU cores | 16x          | 21x           | 33x           | 38x           |
+| 32 CPU cores | 16x          | 18x           | 30x           | 34x           |
+| GPU          | 5x           | 6x            | 9x            | 11x           |
+
+The following table shows the same comparison but with the EPL mass profile replaced by a singular isothermal ellipsoid (SIE).
+
+| Device       | 64 Particles | 128 Particles | 256 Particles | 512 Particles |
+| :-------- -: | :----------: | :-----------: | :-----------: | :-----------: |
+| 1 CPU core   | 3x           | 3x            | 3x            | 4x            |
+| 2 CPU cores  | 5x           | 6x            | 6x            | 7x            |
+| 4 CPU cores  | 8x           | 12x           | 11x           | 12x           |
+| 8 CPU cores  | 11x          | 17x           | 17x           | 24x           |
+| 16 CPU cores | 13x          | 20x           | 22x           | 29x           |
+| 32 CPU cores | 13x          | 20x           | 20x           | 29x           |
+| GPU          | 8x           | 7x            | 27x           | 46x           |
 
 
 Additionally, using `JAX`'s autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax`[^5] library [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information. Due to the random nature of the PSO, we do not present a concrete comparison between `lenstronomy` and `JAXtronomy` for how long it takes to find best-fit parameters. However, we note that `JAXtronomy` can find a good fit within one minute, while `lenstronomy` can take hours.
