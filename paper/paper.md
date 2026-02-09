@@ -141,7 +141,7 @@ The process of lens modelling involves finding best-fit parameters describing a 
 In the following table, we compare `JAXtronomy`'s PSO performance to that of `lenstronomy` when modeling a lens with an elliptical power-law (EPL) mass profile, Sersic light profile, and a quadruply-imaged point source. The image is simulated using a 100x100 grid and FFT convolved using a PSF kernel with a size of 13 pixels. These benchmarks were performed using the same hardware as in the previous section.
 
 | Device       | 64 Particles | 128 Particles | 256 Particles | 512 Particles |
-| :-------- -: | :----------: | :-----------: | :-----------: | :-----------: |
+| :----------: | :----------: | :-----------: | :-----------: | :-----------: |
 | 1 CPU core   | 4x           | 4x            | 5x            | 5x            |
 | 2 CPU cores  | 6x           | 7x            | 9x            | 8x            |
 | 4 CPU cores  | 11x          | 11x           | 17x           | 15x           |
@@ -153,7 +153,7 @@ In the following table, we compare `JAXtronomy`'s PSO performance to that of `le
 The following table shows the same comparison but with the EPL mass profile replaced by a singular isothermal ellipsoid (SIE).
 
 | Device       | 64 Particles | 128 Particles | 256 Particles | 512 Particles |
-| :-------- -: | :----------: | :-----------: | :-----------: | :-----------: |
+| :----------: | :----------: | :-----------: | :-----------: | :-----------: |
 | 1 CPU core   | 3x           | 3x            | 3x            | 4x            |
 | 2 CPU cores  | 5x           | 6x            | 6x            | 7x            |
 | 4 CPU cores  | 8x           | 12x           | 11x           | 12x           |
