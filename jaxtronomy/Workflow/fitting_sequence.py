@@ -1,12 +1,12 @@
 from jaxtronomy.Sampling.likelihood import LikelihoodModule
 from jaxtronomy.Sampling.Samplers.optax import OptaxMinimizer
+from jaxtronomy.Sampling.sampler import Sampler
 
 # Import SingeBandMultiModel from lenstronomy for PsfFitting
 from lenstronomy.ImSim.MultiBand.single_band_multi_model import SingleBandMultiModel
 from lenstronomy.Workflow.psf_fitting import PsfFitting
 from lenstronomy.Workflow.alignment_matching import AlignmentFitting
 from lenstronomy.Workflow.multi_band_manager import MultiBandUpdateManager
-from lenstronomy.Sampling.sampler import Sampler
 from lenstronomy.Sampling.Samplers.multinest_sampler import MultiNestSampler
 from lenstronomy.Sampling.Samplers.polychord_sampler import DyPolyChordSampler
 from lenstronomy.Sampling.Samplers.dynesty_sampler import DynestySampler
@@ -372,7 +372,6 @@ class FittingSequence(object):
          by the specific sampler used
         """
         param_class = self.param_class
-        # run PSO
         mcmc_class = Sampler(likelihoodModule=self.likelihoodModule)
         kwargs_temp = self._updateManager.parameter_state
         mean_start = param_class.kwargs2args(**kwargs_temp)
@@ -424,7 +423,7 @@ class FittingSequence(object):
                 mean_start,
                 sigma_start,
                 mpi=self._mpi,
-                threadCount=threadCount,
+                threadCount=None,
                 progress=progress,
                 initpos=initpos,
                 backend_filename=backend_filename,
@@ -439,20 +438,23 @@ class FittingSequence(object):
         self,
         num_chains,
         maxiter,
-        tolerance=50,
+        tolerance=0.01,
         sigma_scale=1,
-        rng_int=0,
+        rng_seed=None,
     ):
         """Uses Optax L-BFGS gradient descent to find best-fit parameters.
 
         :param num_chains: int, number of minimization chains to run
         :param maxiter: int, maximum number of iterations during gradient descent
             process
-        :param tolerance: float, if np.abs(logL) < tol, the gradient descent is stopped
+        :param tolerance: float, if |logL[i] - logL[i-1]| < tol three times in a row, the gradient descent is stopped
         :param sigma_scale: scales the standard deviation of the prior distribution
-        :param rng_int: int, used to generate random initial starting point from the
-            prior distribution
+        :param rng_seed: int, used to generate random initial starting point from the
+            prior distribution. If None, a random seed will be used.
         """
+        if rng_seed is None:
+            rng_seed = int(np.random.uniform(0, 1) * 1000000)
+
         param_class = self.param_class
         likelihood_module = self.likelihoodModule
 
@@ -480,8 +482,8 @@ class FittingSequence(object):
         )
 
         # Runs the minimizer
-        final_params = minimizer.run(
-            num_chains=num_chains, tol=tolerance, rng_int=rng_int
+        (final_params) = minimizer.run(
+            num_chains=num_chains, tol=tolerance, rng_seed=rng_seed
         )
 
         # Print results
@@ -492,7 +494,12 @@ class FittingSequence(object):
         return kwargs_result
 
     def pso(
-        self, n_particles, n_iterations, sigma_scale=1, print_key="PSO", threadCount=1
+        self,
+        n_particles,
+        n_iterations,
+        sigma_scale=1,
+        print_key="PSO",
+        threadCount=None,
     ):
         """Particle Swarm Optimization.
 
@@ -502,14 +509,13 @@ class FittingSequence(object):
             width in the initial settings
         :param print_key: string, printed text when executing this routine
         :param threadCount: number of CPU threads. If MPI option is set, threadCount=1
+        :param rng_seed: int, seed used for randomness in PSO. If None, a random seed is
+            generated.
         :return: result of the best fit, the PSO chain of the best fit parameter after
             each iteration [lnlikelihood, parameters, velocities], list of parameters in
             same order as in chain
         """
-        if threadCount != 1:
-            raise ValueError(
-                "threadCount argument for PSO must be set to 1 in jaxtronomy"
-            )
+
         param_class = self.param_class
         kwargs_temp = self._updateManager.parameter_state
         init_pos = param_class.kwargs2args(**kwargs_temp)
