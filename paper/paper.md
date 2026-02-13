@@ -57,7 +57,7 @@ bibliography: paper.bib
 
 Gravitational lensing is a phenomenon where light bends around massive objects, resulting in distorted images seen by an observer. Studying graviationally lensed objects can give us key insights into cosmology and astrophysics, such as constraints on the expansion rate of the universe and dark matter models.
 
-Thus, we introduce `JAXtronomy`, a re-implementation of the gravitational lensing software package `lenstronomy`[^1] [@Birrer:2018; @Birrer:2021] using`JAX`[^2]. `JAX` is a Python library that uses an accelerated linear algebra (XLA) compiler to improve the performance of computing software. Our core design principle of `JAXtronomy` is to maintain an identical API to that of `lenstronomy`.
+Thus, we introduce `JAXtronomy`, a re-implementation of the gravitational lensing software package `lenstronomy`[^1] [@Birrer:2018; @Birrer:2021] using `JAX`[^2]. `JAX` is a Python library that uses an accelerated linear algebra (XLA) compiler to improve the performance of computing software. Our core design principle of `JAXtronomy` is to maintain an identical API to that of `lenstronomy`.
 
 The main `JAX` features utilized in `JAXtronomy` are just-in-time-compilation, which can lead to significant reductions in execution time, and automatic differentiation, which allows for the implementation of gradient-based algorithms that were previously impossible. Additionally, `JAX` allows code to be run on GPUs or parallelized across CPU cores, further boosting the performance of `JAXtronomy`.
 
@@ -152,7 +152,7 @@ In the following table, we compare `JAXtronomy`'s PSO performance to that of `le
 | GPU                    | 8x           | 7x            | 27x           | 46x           |
 
 
-Additionally, using `JAX`'s autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax`[^5] library [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information. Due to the random nature of the PSO, we do not present a concrete comparison between `lenstronomy` and `JAXtronomy` for how long it takes to find best-fit parameters. However, we note that `JAXtronomy` can find a good fit within one minute, while `lenstronomy` can take hours.
+Additionally, using `JAX`'s autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax`[^5] library [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information. Due to the stochastic nature of the PSO, we do not present a concrete comparison between `lenstronomy`'s PSO and `JAXtronomy`'s minimizer for the time it takes to find best-fit parameters.
 
 [^5]: https://github.com/google-deepmind/optax
 
