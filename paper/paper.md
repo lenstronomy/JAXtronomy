@@ -109,7 +109,7 @@ Each entry in the table indicates how much faster `JAXtronomy` is compared to `l
 | SIS                      | 1.4x             | 3.3x               | 2.0x               |
 | TNFW                     | 2.4x             | 5.8x               | 7.5x               |
 
-For small enough grid sizes, `JAXtronomy` computes deflection angles slower than `lenstronomy` when using certain deflector profiles. This is because function call overheads are significantly higher in JAX than in standard Python, so computations that are already fast in Python can end up slower in JAX. In these cases, the benefit of using JAX is to have automatic differentiation for lens modeling.
+`JAXtronomy` computes deflection angles slower than `lenstronomy` when using computationally simple deflector profiles on small enough grids. This is because function call overheads are significantly higher in JAX than in standard Python, so computations that are already fast in Python can end up slower in JAX. However, these deflector profiles have higher gains from parallelization.
 
 ## Flux calculations
 
