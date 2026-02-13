@@ -68,7 +68,7 @@ The main `JAX` features utilized in `JAXtronomy` are just-in-time-compilation, w
 
 `lenstronomy` has been widely applied to numerous science cases, with more than 200 publications making use of the software, and has an increasing number of dependent packages relying on features of `lenstronomy`. For instance, science cases directly involving `lenstronomy` include galaxy evolution studies using strong lensing [@Shajib:2021; @DINOS1; @DINOS2] and detailed lens modeling for measuring the Hubble constant using time-delay cosmography by the TDCOSMO collaboration [@TDCOSMO1; @TDCOSMO3; @TDCOSMO4; @TDCOSMO5; @TDCOSMO9; @TDCOSMO18; @TDCOSMO20; @TDCOSMO2025].
 
-Examples of packages dependent on `lenstronomy` for general-purpose lensing computations and image modelling include the `dolphin` package [@Shajib:2025] for automated lens modeling, the `galight` package [@Ding:2020] for galaxy morphology measurements, `SLSim` (Khadka et al, 2025, in prep) for simulating large populations of strong lenses, `pyHalo` [@Gilman:2020] and `mejiro` [@Wedig:2025] for simulating strong lenses with dark matter substructure, and `PALTAS` [@Wagner-Carena:2023] for neural network inference tasks.
+Examples of packages dependent on `lenstronomy` for general-purpose lensing computations and image modelling include the `dolphin` package [@Shajib:2025] for automated lens modeling, the `galight` package [@Ding:2020] for galaxy morphology measurements, `SLSim` (Khadka et al, 2026, in prep) for simulating large populations of strong lenses, `pyHalo` [@Gilman:2020] and `mejiro` [@Wedig:2025] for simulating strong lenses with dark matter substructure, and `PALTAS` [@Wagner-Carena:2023] for neural network inference tasks.
 
 In many of these applications, computational constraints are the key limiting factor for strong gravitational lensing science. For example, increased data quality and number of lenses to analyze makes lens modeling a computational bottleneck, and expensive ray-tracing through tens of thousands of dark matter substructures limit the amount of images that can be simulated, especially for the training of neural networks and simulation-based inferences. These ever-increasing computational costs have lead to the development of several JAX-accelerated and GPU-accelerated strong-lensing packages, such as `gigalens` [@Gu:2022], `herculens` [@Galan:2022], `paltax` [@Wagner-Carena:2024], `GLaD` [@Wang:2025], `caustics`[^3] [@Stone:2024] and Google Research's `jaxstronomy`[^4].
 
@@ -77,7 +77,7 @@ In many of these applications, computational constraints are the key limiting fa
 
 ## Why JAXtronomy?
 
-`JAXtronomy` inherits a wide range of features from `lenstronomy` that are not offered by any of the aforementioned JAX-accelerated or GPU-accelerated software. Such features include `lenstronomy`'s linear amplitude solver, which reduces the number of sampled parameters during lens modeling, as well as a variety of log likelihood functions and optional punishment terms to improve robustness during fitting. Furthermore, `JAXtronomy` aims to maintain an identical API to `lenstronomy` so that packages dependent on `lenstronomy` can transition seamlessly to `JAXtronomy`.
+`JAXtronomy` inherits a wide range of features from `lenstronomy` that are not offered by any of the aforementioned JAX-accelerated or GPU-accelerated software. Such features include `lenstronomy`'s linear amplitude solver, which reduces the number of sampled parameters during lens modeling, as well as a variety of log likelihood functions and optional punishment terms to improve robustness during fitting. `JAXtronomy` aims to maintain an identical API to `lenstronomy` so that packages dependent on `lenstronomy` can transition seamlessly to `JAXtronomy`.
 
 # Improvements over lenstronomy in image simulation
 
@@ -138,29 +138,18 @@ However, FFT convolution using `JAX` on GPU is significantly faster than `scipy`
 
 The process of lens modelling involves finding best-fit parameters describing a lensed system from real data. In `lenstronomy`, this typically involves a Particle Swarm Optimizer (PSO) [@Kennedy:1995] for optimization and Monte Carlo Markov Chains for posterior sampling. `JAXtronomy` retains these lens modelling algorithms from `lenstronomy` while benefitting from the increased performance outlined above.
 
-In the following table, we compare `JAXtronomy`'s PSO performance to that of `lenstronomy` when modeling a lens with an elliptical power-law (EPL) mass profile, Sersic light profile, and a quadruply-imaged point source. The image is simulated using a 100x100 grid and FFT convolved using a PSF kernel with a size of 13 pixels. These benchmarks were performed using the same hardware as in the previous section.
+In the following table, we compare `JAXtronomy`'s PSO performance to that of `lenstronomy` when modeling a lens with a singular isothermal ellipsoid (SIE) mass profile, Sersic-ellipse source and lens light profile, and a quadruply-imaged point source. The image is simulated using a 100x100 grid and FFT convolved using a PSF kernel with a size of 13 pixels. These benchmarks were performed using the same hardware as in the previous section.
 
-| Device       | 64 Particles | 128 Particles | 256 Particles | 512 Particles |
-| :----------: | :----------: | :-----------: | :-----------: | :-----------: |
-| 1 CPU core   | 4x           | 4x            | 5x            | 5x            |
-| 2 CPU cores  | 6x           | 7x            | 9x            | 8x            |
-| 4 CPU cores  | 11x          | 11x           | 17x           | 15x           |
-| 8 CPU cores  | 14x          | 17x           | 24x           | 30x           |
-| 16 CPU cores | 16x          | 21x           | 33x           | 38x           |
-| 32 CPU cores | 16x          | 18x           | 30x           | 34x           |
-| GPU          | 5x           | 6x            | 9x            | 11x           |
-
-The following table shows the same comparison but with the EPL mass profile replaced by a singular isothermal ellipsoid (SIE).
-
-| Device       | 64 Particles | 128 Particles | 256 Particles | 512 Particles |
-| :----------: | :----------: | :-----------: | :-----------: | :-----------: |
-| 1 CPU core   | 3x           | 3x            | 3x            | 4x            |
-| 2 CPU cores  | 5x           | 6x            | 6x            | 7x            |
-| 4 CPU cores  | 8x           | 12x           | 11x           | 12x           |
-| 8 CPU cores  | 11x          | 17x           | 17x           | 24x           |
-| 16 CPU cores | 13x          | 20x           | 22x           | 29x           |
-| 32 CPU cores | 13x          | 20x           | 20x           | 29x           |
-| GPU          | 8x           | 7x            | 27x           | 46x           |
+| Device                 | 64 Particles | 128 Particles | 256 Particles | 512 Particles |
+| :--------------------: | :----------: | :-----------: | :-----------: | :-----------: |
+| lenstronomy (baseline) | 59s          | 138s          | 245s          | 555s          |
+| 1 CPU core             | 3x           | 3x            | 3x            | 4x            |
+| 2 CPU cores            | 5x           | 6x            | 6x            | 7x            |
+| 4 CPU cores            | 8x           | 12x           | 11x           | 12x           |
+| 8 CPU cores            | 11x          | 17x           | 17x           | 24x           |
+| 16 CPU cores           | 13x          | 20x           | 22x           | 29x           |
+| 32 CPU cores           | 13x          | 20x           | 20x           | 29x           |
+| GPU                    | 8x           | 7x            | 27x           | 46x           |
 
 
 Additionally, using `JAX`'s autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax`[^5] library [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information. Due to the random nature of the PSO, we do not present a concrete comparison between `lenstronomy` and `JAXtronomy` for how long it takes to find best-fit parameters. However, we note that `JAXtronomy` can find a good fit within one minute, while `lenstronomy` can take hours.
