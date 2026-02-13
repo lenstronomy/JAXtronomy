@@ -482,7 +482,7 @@ class FittingSequence(object):
         )
 
         # Runs the minimizer
-        (final_params) = minimizer.run(
+        final_params = minimizer.run(
             num_chains=num_chains, tol=tolerance, rng_seed=rng_seed
         )
 
