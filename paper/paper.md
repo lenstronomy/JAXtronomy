@@ -55,9 +55,11 @@ bibliography: paper.bib
 
 # Summary
 
-`JAXtronomy` is a re-implementation of the gravitational lensing software package `lenstronomy`[^1] [@Birrer:2018; @Birrer:2021] using `JAX`[^2], a Python library that uses an accelerated linear algebra (XLA) compiler to improve the performance of computing software. Our core design principle of `JAXtronomy` is to maintain an identical API to that of `lenstronomy`.
+Gravitational lensing is a phenomenon where light bends around massive objects, resulting in distorted images seen by an observer. Studying graviationally lensed objects can give us key insights into cosmology and astrophysics, such as constraints on the expansion rate of the universe and dark matter models.
 
-The main `JAX` features utilized in `JAXtronomy` are just-in-time-compilation, which can lead to significant reductions in execution time, and automatic differentiation, which allows for the implementation of gradient-based algorithms that were previously impossible. Additionally, `JAX` allows code to be run on GPUs, further boosting the performance of `JAXtronomy`.
+Thus, we introduce `JAXtronomy`, a re-implementation of the gravitational lensing software package `lenstronomy`[^1] [@Birrer:2018; @Birrer:2021] using`JAX`[^2]. `JAX` is a Python library that uses an accelerated linear algebra (XLA) compiler to improve the performance of computing software. Our core design principle of `JAXtronomy` is to maintain an identical API to that of `lenstronomy`.
+
+The main `JAX` features utilized in `JAXtronomy` are just-in-time-compilation, which can lead to significant reductions in execution time, and automatic differentiation, which allows for the implementation of gradient-based algorithms that were previously impossible. Additionally, `JAX` allows code to be run on GPUs or parallelized across CPU cores, further boosting the performance of `JAXtronomy`.
 
 [^1]: https://github.com/lenstronomy/lenstronomy
 [^2]: https://github.com/jax-ml/jax
@@ -66,13 +68,16 @@ The main `JAX` features utilized in `JAXtronomy` are just-in-time-compilation, w
 
 `lenstronomy` has been widely applied to numerous science cases, with more than 200 publications making use of the software, and has an increasing number of dependent packages relying on features of `lenstronomy`. For instance, science cases directly involving `lenstronomy` include galaxy evolution studies using strong lensing [@Shajib:2021; @DINOS1; @DINOS2] and detailed lens modeling for measuring the Hubble constant using time-delay cosmography by the TDCOSMO collaboration [@TDCOSMO1; @TDCOSMO3; @TDCOSMO4; @TDCOSMO5; @TDCOSMO9; @TDCOSMO18; @TDCOSMO20; @TDCOSMO2025].
 
-Examples of packages dependent on `lenstronomy` for general-purpose lensing computations and image modelling include the `dolphin` package [@Shajib:2025] for automated lens modeling, the `galight` package [@Ding:2020] for galaxy morphology measurements, `SLSim` (Khadka et al, 2025, in prep) for simulating large populations of strong lenses, `pyHalo` [@Gilman:2020] and `mejiro` [@Wedig:2025] for simulating strong lenses with dark matter substructure, and `PALTAS` [@Wagner-Carena:2023] for neural network inference tasks.
+Examples of packages dependent on `lenstronomy` for general-purpose lensing computations and image modelling include the `dolphin` package [@Shajib:2025] for automated lens modeling, the `galight` package [@Ding:2020] for galaxy morphology measurements, `SLSim` (Khadka et al, 2026, in prep) for simulating large populations of strong lenses, `pyHalo` [@Gilman:2020] and `mejiro` [@Wedig:2025] for simulating strong lenses with dark matter substructure, and `PALTAS` [@Wagner-Carena:2023] for neural network inference tasks.
 
-In many of these applications, computational constraints are the key limiting factor for strong gravitational lensing science. For example, increased data quality and number of lenses to analyze makes lens modeling a computational bottleneck, and expensive ray-tracing through tens of thousands of dark matter substructures limit the amount of images that can be simulated, especially for the training of neural networks and simulation-based inferences.
+In many of these applications, computational constraints are the key limiting factor for strong gravitational lensing science. For example, increased data quality and number of lenses to analyze makes lens modeling a computational bottleneck, and expensive ray-tracing through tens of thousands of dark matter substructures limit the amount of images that can be simulated, especially for the training of neural networks and simulation-based inferences. These ever-increasing computational costs have lead to the development of several JAX-accelerated and GPU-accelerated strong-lensing packages, such as `gigalens` [@Gu:2022], `herculens` [@Galan:2022], `paltax` [@Wagner-Carena:2024], `GLaD` [@Wang:2025], `caustics`[^3] [@Stone:2024] and Google Research's `jaxstronomy`[^4].
 
-These ever-increasing computational costs have lead to the development of several JAX-accelerated strong-lensing packages, such as `gigalens` [@Gu:2022], `herculens` [@Galan:2022], `paltax` [@Wagner-Carena:2024], `GLaD` [@Wang:2025], and Google Research's `jaxstronomy`[^3]. Such packages have been directly inspired by `lenstronomy` and/or support specific use cases. With `JAXtronomy`, we aim to support a wide range of features offered by `lenstronomy` while maintaining an identical API so that packages dependent on `lenstronomy` can transition seamlessly to `JAXtronomy`.
+[^3]: https://github.com/Ciela-Institute/caustics
+[^4]: https://github.com/google-research/google-research/tree/master/jaxstronomy
 
-[^3]: https://github.com/google-research/google-research/tree/master/jaxstronomy
+## Why JAXtronomy?
+
+`JAXtronomy` inherits a wide range of features from `lenstronomy` that are not offered by any of the aforementioned JAX-accelerated or GPU-accelerated software. Such features include `lenstronomy`'s linear amplitude solver, which reduces the number of sampled parameters during lens modeling, as well as a variety of log likelihood functions and optional punishment terms to improve robustness during fitting. `JAXtronomy` aims to maintain an identical API to `lenstronomy` so that packages dependent on `lenstronomy` can transition seamlessly to `JAXtronomy`.
 
 # Improvements over lenstronomy in image simulation
 
@@ -82,10 +87,11 @@ In the following sections, we outline the improvements in performance that `JAXt
 
 ## Deflection angle calculations
 
-Each entry in the table indicates how much faster `JAXtronomy` is compared to `lenstronomy` at computing deflection angles for the corresponding deflector profile and grid size. Those profiles which are already computationally inexpensive for `lenstronomy` are excluded from this table. Some comparisons vary significantly with values of function arguments, so a range is given rather than a number.
+Each entry in the table indicates how much faster `JAXtronomy` is compared to `lenstronomy` at computing deflection angles for the corresponding deflector profile and grid size. Some comparisons vary significantly with values of function arguments, so a range is given rather than a number.
 
 | Deflector Profile        | 60x60 grid (cpu) | 180x180 grid (cpu) | 180x180 grid (gpu) |
 | :----------------------: | :--------------: | :----------------: | :----------------: |
+| CONVERGENCE              | 0.4x             | 1.1x               | 0.5x               |
 | CSE                      | 1.6x             | 2.6x               | 2.6x               |
 | EPL                      | 5.1x - 15x       | 9.2x - 17x         | 37x - 120x         |
 | EPL (jax) vs EPL_NUMBA   | 1.4x             | 3.0x               | 13x                |
@@ -94,23 +100,33 @@ Each entry in the table indicates how much faster `JAXtronomy` is compared to `l
 | HERNQUIST_ELLIPSE_CSE    | 3.8x             | 5.4x               | 40x                |
 | MULTIPOLE                | 0.9x             | 1.0x               | 8.3x - 14x         |
 | MULTIPOLE_ELL            | 1.5x - 2.1x      | 2.0x - 2.8x        | 70x                |
+| NIE/SIE                  | 0.5x             | 0.5x               | 2.0x               |
 | NFW                      | 1.6x             | 3.3x               | 4.5x               |
 | NFW_ELLIPSE_CSE          | 4.1x             | 6.7x               | 31x                |
+| PJAFFE                   | 1.0x             | 1.2x               | 2.8x               |
+| PJAFFE_ELLIPSE_POTENTIAL | 1.4x             | 1.6x               | 3.1x               |
+| SHEAR                    | 0.7x             | 2.0x               | 0.9x               |
+| SIS                      | 1.4x             | 3.3x               | 2.0x               |
 | TNFW                     | 2.4x             | 5.8x               | 7.5x               |
+
+`JAXtronomy` computes deflection angles slower than `lenstronomy` when using computationally simple deflector profiles on small enough grids. This is because function call overheads are significantly higher in JAX than in standard Python, so computations that are already fast in Python can end up slower in JAX. However, these deflector profiles have higher gains from parallelization.
 
 ## Flux calculations
 
-An analogous table for the different light profiles is shown below.
+An analogous table for the different light profiles is shown below. The MULTI_GAUSSIAN and MULTI_GAUSSIAN_ELLIPSE profiles include five GAUSSIAN and GAUSSIAN_ELLIPSE components, respectively, highlighting JAX's improved performance in sequential computations.
 
-| Light Profile            | 60x60 grid (cpu) | 180x180 grid (cpu) | 180x180 grid (gpu) |
-| :----------------------: | :--------------: | :----------------: | :----------------: |
-| CORE_SERSIC              | 2.0x             | 6.7x               | 4.2x               |
-| GAUSSIAN                 | 1.0x             | 2.5x               | 1.3x               |
-| GAUSSIAN_ELLIPSE         | 1.5x             | 3.6x               | 2.0x               |
-| SERSIC                   | 1.0x             | 1.7x               | 3.9x               |
-| SERSIC_ELLIPSE           | 1.9x             | 5.7x               | 3.2x               |
-| SHAPELETS (n_max=6)      | 6.2x             | 3.4x               | 15x                |
-| SHAPELETS (n_max=10)     | 6.0x             | 4.5x               | 17x                |
+| Light Profile          | 60x60 grid (cpu) | 180x180 grid (cpu) | 180x180 grid (gpu) |
+| :--------------------: | :--------------: | :----------------: | :----------------: |
+| CORE_SERSIC            | 2.0x             | 6.7x               | 4.2x               |
+| GAUSSIAN               | 1.0x             | 2.5x               | 1.3x               |
+| GAUSSIAN_ELLIPSE       | 1.5x             | 3.6x               | 2.0x               |
+| MULTI_GAUSSIAN         | 3.7x             | 11x                | 7.8x               |
+| MULTI_GAUSSIAN_ELLIPSE | 4.0x             | 13x                | 6.9x               |
+| SERSIC                 | 1.0x             | 1.7x               | 3.9x               |
+| SERSIC_ELLIPSE         | 1.9x             | 5.7x               | 3.2x               |
+| SERSIC_ELLIPSE_Q_PHI   | 1.7x             | 5.5x               | 3.3x               |
+| SHAPELETS (n_max=6)    | 6.2x             | 3.4x               | 15x                |
+| SHAPELETS (n_max=10)   | 6.0x             | 4.5x               | 17x                |
 
 ## FFT Convolution
 
@@ -120,10 +136,24 @@ However, FFT convolution using `JAX` on GPU is significantly faster than `scipy`
 
 # Improvements over lenstronomy in lens modelling
 
-The process of lens modelling involves finding best-fit parameters describing a lensed system from real data. In `lenstronomy`, this typically involves a Particle Swarm Optimizer (PSO) [@Kennedy:1995] for optimization and Monte Carlo Markov Chains for posterior sampling.
+The process of lens modelling involves finding best-fit parameters describing a lensed system from real data. In `lenstronomy`, this typically involves a Particle Swarm Optimizer (PSO) [@Kennedy:1995] for optimization and Monte Carlo Markov Chains for posterior sampling. `JAXtronomy` retains these lens modelling algorithms from `lenstronomy` while benefitting from the increased performance outlined above.
 
-`JAXtronomy` retains all of the lens modelling algorithms from `lenstronomy` while benefitting from the increased performance outlined above. Additionally, using `JAX`'s autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax`[^4] library [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information.
+In the following table, we compare `JAXtronomy`'s PSO performance to that of `lenstronomy` when modeling a lens with a singular isothermal ellipsoid (SIE) mass profile, Sersic-ellipse source and lens light profile, and a quadruply-imaged point source. The image is simulated using a 100x100 grid and FFT convolved using a PSF kernel with a size of 13 pixels. These benchmarks were performed using the same hardware as in the previous section.
 
-[^4]: https://github.com/google-deepmind/optax
+| Device                 | 64 Particles | 128 Particles | 256 Particles | 512 Particles |
+| :--------------------: | :----------: | :-----------: | :-----------: | :-----------: |
+| lenstronomy (baseline) | 59s          | 138s          | 245s          | 555s          |
+| 1 CPU core             | 3x           | 3x            | 3x            | 4x            |
+| 2 CPU cores            | 5x           | 6x            | 6x            | 7x            |
+| 4 CPU cores            | 8x           | 12x           | 11x           | 12x           |
+| 8 CPU cores            | 11x          | 17x           | 17x           | 24x           |
+| 16 CPU cores           | 13x          | 20x           | 22x           | 29x           |
+| 32 CPU cores           | 13x          | 20x           | 20x           | 29x           |
+| GPU                    | 8x           | 7x            | 27x           | 46x           |
+
+
+Additionally, using `JAX`'s autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax`[^5] library [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information. Due to the random nature of the PSO, we do not present a concrete comparison between `lenstronomy` and `JAXtronomy` for how long it takes to find best-fit parameters. However, we note that `JAXtronomy` can find a good fit within one minute, while `lenstronomy` can take hours.
+
+[^5]: https://github.com/google-deepmind/optax
 
 # References
