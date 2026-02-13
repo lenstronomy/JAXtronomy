@@ -11,7 +11,6 @@ import jaxtronomy.Util.param_util as param_util
 from jaxtronomy.LensModel.Profiles.spp import SPP
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
-
 __all__ = ["EPL", "EPLMajorAxis", "EPLQPhi"]
 
 
