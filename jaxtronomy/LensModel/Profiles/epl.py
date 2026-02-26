@@ -3,7 +3,10 @@ __author__ = "ntessore"
 from functools import partial
 from jax import config, custom_jvp, jvp, jit, lax, numpy as jnp, tree_util
 
-from jaxtronomy._runtime_config import configure_jax_precision_for_runtime, is_macos_metal_backend
+from jaxtronomy._runtime_config import (
+    configure_jax_precision_for_runtime,
+    is_macos_metal_backend,
+)
 
 configure_jax_precision_for_runtime()
 
@@ -87,7 +90,9 @@ class EPL(LensProfileBase):
         self._t_static = t
         self._q_static = q
         self._phi_G_static = phi
-        self._metal_safe = bool(is_macos_metal_backend() if metal_safe is None else metal_safe)
+        self._metal_safe = bool(
+            is_macos_metal_backend() if metal_safe is None else metal_safe
+        )
         self._metal_series_niter = int(max(40, min(int(metal_series_niter), 400)))
 
     # --------------------------------------------------------------------------------
@@ -455,10 +460,14 @@ class EPLMajorAxis(LensProfileBase):
         phi = jnp.arctan2(zz_y, zz_x)
 
         omega_r, omega_i = EPLMajorAxis._omega_real_series(phi, t, q, n_iter)
-        scale = (2.0 * b) / (1.0 + q) * jnp.nan_to_num(
-            (b / R) ** t * R / b,
-            posinf=1.0e10,
-            neginf=-1.0e10,
+        scale = (
+            (2.0 * b)
+            / (1.0 + q)
+            * jnp.nan_to_num(
+                (b / R) ** t * R / b,
+                posinf=1.0e10,
+                neginf=-1.0e10,
+            )
         )
         alpha_x = jnp.nan_to_num(scale * omega_r, posinf=1.0e10, neginf=-1.0e10)
         alpha_y = jnp.nan_to_num(scale * omega_i, posinf=1.0e10, neginf=-1.0e10)

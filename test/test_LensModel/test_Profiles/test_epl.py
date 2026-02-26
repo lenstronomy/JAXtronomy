@@ -141,7 +141,9 @@ class TestEPL(object):
             y = rng.uniform(-3.0, 3.0, size=64)
 
             f_x, f_y = profile_metal.derivatives(x, y, theta_E, gamma, e1, e2)
-            f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, theta_E, gamma, e1, e2)
+            f_x_ref, f_y_ref = self.profile_ref.derivatives(
+                x, y, theta_E, gamma, e1, e2
+            )
             npt.assert_allclose(f_x, f_x_ref, atol=2e-5, rtol=2e-5)
             npt.assert_allclose(f_y, f_y_ref, atol=2e-5, rtol=2e-5)
 
@@ -157,9 +159,7 @@ class TestEPL(object):
             x = rng.uniform(-2.5, 2.5, size=48)
             y = rng.uniform(-2.5, 2.5, size=48)
 
-            f_xx, f_xy, f_yx, f_yy = profile_metal.hessian(
-                x, y, theta_E, gamma, e1, e2
-            )
+            f_xx, f_xy, f_yx, f_yy = profile_metal.hessian(x, y, theta_E, gamma, e1, e2)
             f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
                 x, y, theta_E, gamma, e1, e2
             )

@@ -3,6 +3,7 @@ from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
 from jax import jit, numpy as jnp
 
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
+
 configure_jax_precision_for_runtime()
 
 __all__ = ["Null"]

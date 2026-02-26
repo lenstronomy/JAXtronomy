@@ -7,6 +7,7 @@ from jaxtronomy.LensModel.profile_list_base import lens_class
 import copy
 from functools import partial
 from jax import config, debug, jit, numpy as jnp
+
 configure_jax_precision_for_runtime()
 
 

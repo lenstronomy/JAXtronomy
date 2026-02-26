@@ -6,6 +6,7 @@ from jax import jit, lax, numpy as jnp
 from jaxtronomy.LensModel.profile_list_base import ProfileListBase, _select_kwargs
 from functools import partial
 import numpy as np
+
 configure_jax_precision_for_runtime()
 
 __all__ = ["SinglePlaneBulk"]

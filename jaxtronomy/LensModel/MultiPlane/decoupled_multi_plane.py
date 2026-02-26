@@ -3,6 +3,7 @@ __author__ = "dangilman"
 from functools import partial
 from jax import config, jit
 from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
+
 configure_jax_precision_for_runtime()
 
 from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane

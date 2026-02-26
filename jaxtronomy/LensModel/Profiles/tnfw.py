@@ -8,6 +8,7 @@ from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 from jaxtronomy.LensModel.Profiles.nfw import NFW
 from functools import partial
+
 configure_jax_precision_for_runtime()
 
 __all__ = ["TNFW"]

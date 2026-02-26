@@ -2,6 +2,7 @@ __author__ = "lynevdv"
 
 from jax import config, jit, numpy as jnp, lax
 from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
+
 configure_jax_precision_for_runtime()
 
 import jaxtronomy.Util.param_util as param_util

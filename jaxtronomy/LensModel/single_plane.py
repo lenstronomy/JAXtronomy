@@ -5,6 +5,7 @@ from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
 from jax import jit, numpy as jnp
 from jaxtronomy.LensModel.profile_list_base import ProfileListBase
 from functools import partial
+
 configure_jax_precision_for_runtime()
 
 __all__ = ["SinglePlane"]

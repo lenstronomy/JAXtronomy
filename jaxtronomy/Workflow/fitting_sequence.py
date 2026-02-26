@@ -17,6 +17,7 @@ import copy
 import jax
 import numpy as np
 import lenstronomy.Util.analysis_util as analysis_util
+
 configure_jax_precision_for_runtime()
 
 

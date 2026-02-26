@@ -121,7 +121,9 @@ def _median_rel_delta(a: np.ndarray, b: np.ndarray) -> float:
 def test_epl_gpu_cpu_parity():
     accel_platform = _probe_accelerator_platform()
     if accel_platform is None:
-        pytest.skip("No JAX accelerator backend detected for GPU-vs-CPU EPL parity test.")
+        pytest.skip(
+            "No JAX accelerator backend detected for GPU-vs-CPU EPL parity test."
+        )
 
     cpu = _run_epl_payload("cpu")
     # Leave backend selection unset so JAX picks the platform-native accelerator
@@ -132,11 +134,19 @@ def test_epl_gpu_cpu_parity():
     assert str(cpu["device_platform"]).lower() == "cpu"
     gpu_platform = str(gpu["device_platform"]).strip().lower()
     if gpu_platform == "cpu":
-        pytest.skip("Default JAX runtime resolved to CPU; no runnable GPU backend selected.")
+        pytest.skip(
+            "Default JAX runtime resolved to CPU; no runnable GPU backend selected."
+        )
     assert gpu_platform != "cpu"
 
-    arrays_cpu = {k: np.asarray(cpu[k], dtype=np.float64) for k in ("function", "fx", "fy", "fxx", "fxy", "fyx", "fyy")}
-    arrays_gpu = {k: np.asarray(gpu[k], dtype=np.float64) for k in ("function", "fx", "fy", "fxx", "fxy", "fyx", "fyy")}
+    arrays_cpu = {
+        k: np.asarray(cpu[k], dtype=np.float64)
+        for k in ("function", "fx", "fy", "fxx", "fxy", "fyx", "fyy")
+    }
+    arrays_gpu = {
+        k: np.asarray(gpu[k], dtype=np.float64)
+        for k in ("function", "fx", "fy", "fxx", "fxy", "fyx", "fyy")
+    }
 
     thresholds = {
         "function": 2.0e-3,
@@ -156,5 +166,9 @@ def test_epl_gpu_cpu_parity():
         )
 
     # Symmetry sanity checks on both paths.
-    np.testing.assert_allclose(arrays_cpu["fxy"], arrays_cpu["fyx"], atol=1e-6, rtol=1e-6)
-    np.testing.assert_allclose(arrays_gpu["fxy"], arrays_gpu["fyx"], atol=2e-5, rtol=2e-5)
+    np.testing.assert_allclose(
+        arrays_cpu["fxy"], arrays_cpu["fyx"], atol=1e-6, rtol=1e-6
+    )
+    np.testing.assert_allclose(
+        arrays_gpu["fxy"], arrays_gpu["fyx"], atol=2e-5, rtol=2e-5
+    )

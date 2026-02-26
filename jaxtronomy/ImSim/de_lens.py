@@ -3,6 +3,7 @@ __author__ = "sibirrer"
 from functools import partial
 from jax import config, jit, numpy as jnp
 from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
+
 configure_jax_precision_for_runtime()
 
 import numpy as np

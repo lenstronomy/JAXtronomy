@@ -7,6 +7,7 @@ import jax.numpy as jnp
 from jaxtronomy.Util import param_util
 from jaxtronomy.Util import util
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
+
 configure_jax_precision_for_runtime()
 
 __all__ = [

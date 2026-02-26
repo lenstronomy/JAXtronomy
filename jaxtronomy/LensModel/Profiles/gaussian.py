@@ -9,6 +9,7 @@ import numpy as np
 
 from jaxtronomy.LensModel.Profiles.gaussian_potential import GaussianPotential
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
+
 configure_jax_precision_for_runtime()
 
 __all__ = ["Gaussian"]
