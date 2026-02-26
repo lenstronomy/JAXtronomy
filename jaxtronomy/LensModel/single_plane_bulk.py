@@ -1,12 +1,12 @@
 __author__ = "sibirrer"
 
 import jax
+from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
 from jax import jit, lax, numpy as jnp
 from jaxtronomy.LensModel.profile_list_base import ProfileListBase, _select_kwargs
 from functools import partial
 import numpy as np
-
-jax.config.update("jax_enable_x64", True)
+configure_jax_precision_for_runtime()
 
 __all__ = ["SinglePlaneBulk"]
 

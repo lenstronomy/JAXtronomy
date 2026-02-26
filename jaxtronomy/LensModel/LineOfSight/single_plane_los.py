@@ -1,13 +1,13 @@
 __author__ = ["nataliehogg", "pierrefleury", "danjohnson98"]
 
 from jaxtronomy.LensModel.single_plane import SinglePlane
+from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
 from jaxtronomy.LensModel.profile_list_base import lens_class
 
 import copy
 from functools import partial
 from jax import config, debug, jit, numpy as jnp
-
-config.update("jax_enable_x64", True)  # 64-bit floats
+configure_jax_precision_for_runtime()
 
 
 __all__ = ["SinglePlaneLOS"]

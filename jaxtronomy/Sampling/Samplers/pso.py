@@ -59,6 +59,10 @@ class ParticleSwarmOptimizer(PSO_lenstronomy):
         position = [particle.position for particle in swarm]
 
         position = np.array(position)
+        low = np.asarray(self.low, dtype=float)
+        high = np.asarray(self.high, dtype=float)
+        position = np.nan_to_num(position, nan=0.0, posinf=1.0e6, neginf=-1.0e6)
+        position = np.clip(position, low, high)
         ln_probability = np.array(self.logL_func(position))
 
         for i, particle in enumerate(swarm):

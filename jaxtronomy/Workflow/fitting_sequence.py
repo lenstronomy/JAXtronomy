@@ -1,5 +1,5 @@
 from jaxtronomy.Sampling.likelihood import LikelihoodModule
-from jaxtronomy.Sampling.Samplers.optax import OptaxMinimizer
+from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
 from jaxtronomy.Sampling.sampler import Sampler
 
 # Import SingeBandMultiModel from lenstronomy for PsfFitting
@@ -17,8 +17,7 @@ import copy
 import jax
 import numpy as np
 import lenstronomy.Util.analysis_util as analysis_util
-
-jax.config.update("jax_enable_x64", True)
+configure_jax_precision_for_runtime()
 
 
 __all__ = ["FittingSequence"]
@@ -470,6 +469,16 @@ class FittingSequence(object):
 
         kwargs_upper = self._updateManager._upper_kwargs
         args_upper = param_class.kwargs2args(*kwargs_upper)
+
+        # Initialize the solver class lazily so non-optax installs can still run
+        # non-optax workflows.
+        try:
+            from jaxtronomy.Sampling.Samplers.optax import OptaxMinimizer
+        except Exception as exc:
+            raise RuntimeError(
+                "optax minimizer requested but optional dependencies are missing. "
+                "Install extras: `pip install 'jaxtronomy[optax]'`."
+            ) from exc
 
         # Initialize the solver class
         minimizer = OptaxMinimizer(

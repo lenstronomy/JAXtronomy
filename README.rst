@@ -51,9 +51,27 @@ Then, install ``JAXtronomy`` with ::
   
   pip install jaxtronomy
 
-By default, JAX will still use CPU for computations. To change this, run the following line of code immediately after importing JAX ::
+By default, JAX will still use CPU for computations. On Linux+CUDA, to change this run the following line of code immediately after importing JAX ::
 
   jax.config.update("jax_platform_name", "gpu")
+
+**macOS (Metal)**
+
+To install macOS Metal support without changing Linux/CUDA users, install ::
+
+  pip install -U "jaxtronomy[metal]"
+
+The ``[metal]`` extra only adds ``jax-metal`` on Darwin.
+
+On macOS with JAX Metal installed, ``JAXtronomy`` supports GPU acceleration on
+the Metal backend. The compatibility logic for Metal is macOS-specific; Linux
+and CUDA code paths are unchanged.
+
+On macOS, leave ``jax_platform_name`` unset so JAX selects Metal automatically.
+
+By default, ``JAXtronomy`` enables ``jax_enable_x64`` on non-Metal backends and
+disables it only when running on Metal. You can override this with
+``JAXTRONOMY_ENABLE_X64`` (accepted values: ``1/0/true/false/on/off/auto``).
 
 **CPU**
 
@@ -69,6 +87,20 @@ indicating the number CPU devices to use. For example, to use 16 CPU cores, this
 **Example notebook**:
 `An example notebook <https://github.com/lenstronomy/JAXtronomy/blob/main/notebooks/modeling_a_simple_Einstein_ring.ipynb>`_ has been made available, which
 showcases the features and improvements in JAXtronomy.
+
+**macOS validation commands**
+
+To run the full test suite on your default backend (Metal when available) ::
+
+  pytest -q
+
+To run the full test suite on CPU as a baseline ::
+
+  JAX_PLATFORM_NAME=cpu pytest -q
+
+To run explicit Metal-vs-CPU parity checks for EPL ::
+
+  pytest -q test/test_LensModel/test_Profiles/test_epl_gpu_cpu_parity.py
 
 Performance comparison between JAXtronomy and lenstronomy
 ---------------------------------------------------------
@@ -266,8 +298,6 @@ In short,
 **Reporting issues, seeking support, and feature requests**
 
 - Submit a Github issue
-
-
 
 
 

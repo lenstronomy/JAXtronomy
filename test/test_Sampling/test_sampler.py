@@ -230,6 +230,10 @@ class TestSampler(object):
         expected = np.array([-3, 0, 5, 12])
         npt.assert_allclose(expected, logL, atol=1e-16, rtol=1e-16)
 
+        new_logL_func = prepare_logL_func(backend="metal", logL_func=logL_func)
+        logL = new_logL_func(x)
+        npt.assert_allclose(expected, logL, atol=1e-16, rtol=1e-16)
+
         new_logL_func = prepare_logL_func(backend="cpu", logL_func=logL_func)
         logL = new_logL_func(x)
         npt.assert_allclose(expected, logL, atol=1e-16, rtol=1e-16)

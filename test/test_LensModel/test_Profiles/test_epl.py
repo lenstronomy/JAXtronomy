@@ -1,5 +1,11 @@
 __author__ = "sibirrer"
 
+import os
+
+# Keep this parity module backend-stable: Metal backend legalization currently
+# rejects several x64/int paths used by the legacy EPL reference tests.
+os.environ.setdefault("JAX_PLATFORM_NAME", "cpu")
+
 from lenstronomy.LensModel.Profiles.epl import EPL as EPL_ref
 from lenstronomy.LensModel.Profiles.epl import EPLMajorAxis as EPLMajorAxis_ref
 from lenstronomy.LensModel.Profiles.epl import EPLQPhi as EPLQPhi_ref
@@ -121,6 +127,47 @@ class TestEPL(object):
         npt.assert_allclose(f_xy, f_xy_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_yy, f_yy_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_xy, f_yx, atol=1e-12, rtol=1e-12)
+
+    def test_derivatives_metal_real_series_parity_randomized(self):
+        profile_metal = EPL(metal_safe=True, metal_series_niter=120)
+        rng = np.random.default_rng(1234)
+
+        for _ in range(16):
+            theta_E = float(rng.uniform(0.3, 2.5))
+            gamma = float(rng.uniform(1.6, 2.4))
+            e1 = float(rng.uniform(-0.35, 0.35))
+            e2 = float(rng.uniform(-0.35, 0.35))
+            x = rng.uniform(-3.0, 3.0, size=64)
+            y = rng.uniform(-3.0, 3.0, size=64)
+
+            f_x, f_y = profile_metal.derivatives(x, y, theta_E, gamma, e1, e2)
+            f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, theta_E, gamma, e1, e2)
+            npt.assert_allclose(f_x, f_x_ref, atol=2e-5, rtol=2e-5)
+            npt.assert_allclose(f_y, f_y_ref, atol=2e-5, rtol=2e-5)
+
+    def test_hessian_metal_real_series_parity_randomized(self):
+        profile_metal = EPL(metal_safe=True, metal_series_niter=120)
+        rng = np.random.default_rng(5678)
+
+        for _ in range(12):
+            theta_E = float(rng.uniform(0.3, 2.5))
+            gamma = float(rng.uniform(1.6, 2.4))
+            e1 = float(rng.uniform(-0.35, 0.35))
+            e2 = float(rng.uniform(-0.35, 0.35))
+            x = rng.uniform(-2.5, 2.5, size=48)
+            y = rng.uniform(-2.5, 2.5, size=48)
+
+            f_xx, f_xy, f_yx, f_yy = profile_metal.hessian(
+                x, y, theta_E, gamma, e1, e2
+            )
+            f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
+                x, y, theta_E, gamma, e1, e2
+            )
+            npt.assert_allclose(f_xx, f_xx_ref, atol=8e-5, rtol=8e-5)
+            npt.assert_allclose(f_xy, f_xy_ref, atol=8e-5, rtol=8e-5)
+            npt.assert_allclose(f_yy, f_yy_ref, atol=8e-5, rtol=8e-5)
+            npt.assert_allclose(f_xy, f_yx, atol=1e-12, rtol=1e-12)
+            npt.assert_allclose(f_xy_ref, f_yx_ref, atol=1e-12, rtol=1e-12)
 
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])

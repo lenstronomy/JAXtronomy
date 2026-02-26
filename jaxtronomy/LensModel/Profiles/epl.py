@@ -3,7 +3,9 @@ __author__ = "ntessore"
 from functools import partial
 from jax import config, custom_jvp, jvp, jit, lax, numpy as jnp, tree_util
 
-config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
+from jaxtronomy._runtime_config import configure_jax_precision_for_runtime, is_macos_metal_backend
+
+configure_jax_precision_for_runtime()
 
 from jaxtronomy.Util.hyp2f1_util import hyp2f1_lopez_temme_8 as hyp2f1
 import jaxtronomy.Util.util as util
@@ -70,12 +72,23 @@ class EPL(LensProfileBase):
 
     # These static self variables are not used until self.set_static is called
     # However these need to be here for the JAX to correctly keep track of them
-    def __init__(self, b=0, t=0, q=0, phi=0, static=False):
+    def __init__(
+        self,
+        b=0,
+        t=0,
+        q=0,
+        phi=0,
+        static=False,
+        metal_safe=None,
+        metal_series_niter=120,
+    ):
         self._static = static
         self._b_static = b
         self._t_static = t
         self._q_static = q
         self._phi_G_static = phi
+        self._metal_safe = bool(is_macos_metal_backend() if metal_safe is None else metal_safe)
+        self._metal_series_niter = int(max(40, min(int(metal_series_niter), 400)))
 
     # --------------------------------------------------------------------------------
     # The following two methods are required to allow the JAX compiler to recognize
@@ -84,7 +97,11 @@ class EPL(LensProfileBase):
     # changes to a new value (but there's no need to recompile if it changes to a previous value)
     def _tree_flatten(self):
         children = (self._b_static, self._t_static, self._q_static, self._phi_G_static)
-        aux_data = {"static": self._static}
+        aux_data = {
+            "static": self._static,
+            "metal_safe": self._metal_safe,
+            "metal_series_niter": self._metal_series_niter,
+        }
         return (children, aux_data)
 
     @classmethod
@@ -169,6 +186,8 @@ class EPL(LensProfileBase):
         :param center_y: profile center
         :return: lensing potential
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         b, t, q, phi_G = self.param_conv(theta_E, gamma, e1, e2)
         # shift
         x_ = x - center_x
@@ -176,7 +195,17 @@ class EPL(LensProfileBase):
         # rotate
         x__, y__ = util.rotate(x_, y_, phi_G)
         # evaluate
-        f_ = EPLMajorAxis.function(x__, y__, b, t, q)
+        if self._metal_safe:
+            f_ = EPLMajorAxis.function_real_series(
+                x__,
+                y__,
+                b,
+                t,
+                q,
+                self._metal_series_niter,
+            )
+        else:
+            f_ = EPLMajorAxis.function(x__, y__, b, t, q)
         # rotate back
         return f_
 
@@ -194,6 +223,8 @@ class EPL(LensProfileBase):
         :param center_y: profile center
         :return: alpha_x, alpha_y
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         b, t, q, phi_G = self.param_conv(theta_E, gamma, e1, e2)
         # shift
         x_ = x - center_x
@@ -201,7 +232,17 @@ class EPL(LensProfileBase):
         # rotate
         x__, y__ = util.rotate(x_, y_, phi_G)
         # evaluate
-        f__x, f__y = EPLMajorAxis.derivatives(x__, y__, b, t, q)
+        if self._metal_safe:
+            f__x, f__y = EPLMajorAxis.derivatives_real_series(
+                x__,
+                y__,
+                b,
+                t,
+                q,
+                self._metal_series_niter,
+            )
+        else:
+            f__x, f__y = EPLMajorAxis.derivatives(x__, y__, b, t, q)
         # rotate back
         f_x, f_y = util.rotate(f__x, f__y, -phi_G)
         return f_x, f_y
@@ -221,6 +262,8 @@ class EPL(LensProfileBase):
         :return: f_xx, f_xy, f_yx, f_yy
         """
 
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         b, t, q, phi_G = self.param_conv(theta_E, gamma, e1, e2)
         # shift
         x_ = x - center_x
@@ -228,7 +271,17 @@ class EPL(LensProfileBase):
         # rotate
         x__, y__ = util.rotate(x_, y_, phi_G)
         # evaluate
-        f__xx, f__xy, f__yx, f__yy = EPLMajorAxis.hessian(x__, y__, b, t, q)
+        if self._metal_safe:
+            f__xx, f__xy, f__yx, f__yy = EPLMajorAxis.hessian_real_series(
+                x__,
+                y__,
+                b,
+                t,
+                q,
+                self._metal_series_niter,
+            )
+        else:
+            f__xx, f__xy, f__yx, f__yy = EPLMajorAxis.hessian(x__, y__, b, t, q)
         # rotate back
         kappa = 1.0 / 2 * (f__xx + f__yy)
         gamma1__ = 1.0 / 2 * (f__xx - f__yy)
@@ -349,6 +402,103 @@ class EPLMajorAxis(LensProfileBase):
         return jvp(EPLMajorAxis._hyp2f1_for_autodiff, primals[1:3], tangents[1:3])
 
     @staticmethod
+    @partial(jit, static_argnums=(3,))
+    def _omega_real_series(phi, t, q, n_iter):
+        """Real-valued omega-series recurrence used for Metal compatibility.
+
+        The series converges faster for ``q`` closer to 1 and ``t`` closer
+        to 1.  Extreme axis ratios (``q < 0.3``) or steep slopes may need
+        a higher ``n_iter`` for adequate precision.
+        """
+        phi = jnp.asarray(phi, dtype=float)
+        n_steps = int(max(40, min(int(n_iter), 400)))
+
+        f = (1.0 - q) / (1.0 + q)
+        fact_r = -f * jnp.cos(2.0 * phi)
+        fact_i = -f * jnp.sin(2.0 * phi)
+
+        omega_r = jnp.cos(phi)
+        omega_i = jnp.sin(phi)
+        sum_r = jnp.zeros_like(phi)
+        sum_i = jnp.zeros_like(phi)
+
+        def body_fun(i, val):
+            sum_r_, sum_i_, omega_r_, omega_i_ = val
+            sum_r_ = sum_r_ + omega_r_
+            sum_i_ = sum_i_ + omega_i_
+
+            n = jnp.asarray(i + 1, dtype=phi.dtype)
+            coeff = (2.0 * n - (2.0 - t)) / (2.0 * n + (2.0 - t))
+            mult_r = coeff * fact_r
+            mult_i = coeff * fact_i
+            next_r = omega_r_ * mult_r - omega_i_ * mult_i
+            next_i = omega_r_ * mult_i + omega_i_ * mult_r
+            return sum_r_, sum_i_, next_r, next_i
+
+        sum_r, sum_i, omega_r, omega_i = lax.fori_loop(
+            0,
+            n_steps - 1,
+            body_fun,
+            (sum_r, sum_i, omega_r, omega_i),
+        )
+        return sum_r + omega_r, sum_i + omega_i
+
+    @staticmethod
+    @partial(jit, static_argnums=(5,))
+    def derivatives_real_series(x, y, b, t, q, n_iter=120):
+        """Metal-safe real-valued derivatives without complex ops."""
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+        zz_x = q * x
+        zz_y = y
+        R = jnp.maximum(jnp.hypot(zz_x, zz_y), 1.0e-9)
+        phi = jnp.arctan2(zz_y, zz_x)
+
+        omega_r, omega_i = EPLMajorAxis._omega_real_series(phi, t, q, n_iter)
+        scale = (2.0 * b) / (1.0 + q) * jnp.nan_to_num(
+            (b / R) ** t * R / b,
+            posinf=1.0e10,
+            neginf=-1.0e10,
+        )
+        alpha_x = jnp.nan_to_num(scale * omega_r, posinf=1.0e10, neginf=-1.0e10)
+        alpha_y = jnp.nan_to_num(scale * omega_i, posinf=1.0e10, neginf=-1.0e10)
+        return alpha_x, alpha_y
+
+    @staticmethod
+    @partial(jit, static_argnums=(5,))
+    def function_real_series(x, y, b, t, q, n_iter=120):
+        """Metal-safe lensing potential using real-series derivatives."""
+        alpha_x, alpha_y = EPLMajorAxis.derivatives_real_series(x, y, b, t, q, n_iter)
+        return (x * alpha_x + y * alpha_y) / (2 - t)
+
+    @staticmethod
+    @partial(jit, static_argnums=(5,))
+    def hessian_real_series(x, y, b, t, q, n_iter=120):
+        """Metal-safe hessian using real-series derivatives."""
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+        R = jnp.maximum(jnp.hypot(q * x, y), 1.0e-8)
+        r = jnp.maximum(jnp.hypot(x, y), 1.0e-8)
+
+        cos, sin = x / r, y / r
+        cos2, sin2 = cos * cos * 2 - 1, sin * cos * 2
+
+        kappa = (2 - t) / 2 * (b / R) ** t
+        kappa = jnp.nan_to_num(kappa, posinf=1.0e10, neginf=-1.0e10)
+
+        alpha_x, alpha_y = EPLMajorAxis.derivatives_real_series(x, y, b, t, q, n_iter)
+
+        gamma_1 = (1 - t) * (alpha_x * cos - alpha_y * sin) / r - kappa * cos2
+        gamma_2 = (1 - t) * (alpha_y * cos + alpha_x * sin) / r - kappa * sin2
+        gamma_1 = jnp.nan_to_num(gamma_1, posinf=1.0e10, neginf=-1.0e10)
+        gamma_2 = jnp.nan_to_num(gamma_2, posinf=1.0e10, neginf=-1.0e10)
+
+        f_xx = kappa + gamma_1
+        f_yy = kappa - gamma_1
+        f_xy = gamma_2
+        return f_xx, f_xy, f_xy, f_yy
+
+    @staticmethod
     @jit
     def function(x, y, b, t, q):
         """Returns the lensing potential.
@@ -393,8 +543,8 @@ class EPLMajorAxis(LensProfileBase):
         alpha = 2 / (1 + q) * (b / R) ** t * R_omega
 
         # return real and imaginary part
-        alpha_real = jnp.nan_to_num(alpha.real, posinf=10**10, neginf=-(10**10))
-        alpha_imag = jnp.nan_to_num(alpha.imag, posinf=10**10, neginf=-(10**10))
+        alpha_real = jnp.nan_to_num(alpha.real, posinf=1.0e10, neginf=-1.0e10)
+        alpha_imag = jnp.nan_to_num(alpha.imag, posinf=1.0e10, neginf=-1.0e10)
 
         return alpha_real, alpha_imag
 
@@ -421,7 +571,7 @@ class EPLMajorAxis(LensProfileBase):
 
         # convergence, eq. (2)
         kappa = (2 - t) / 2 * (b / R) ** t
-        kappa = jnp.nan_to_num(kappa, posinf=10**10, neginf=-(10**10))
+        kappa = jnp.nan_to_num(kappa, posinf=1.0e10, neginf=-1.0e10)
 
         # deflection via method
         alpha_x, alpha_y = EPLMajorAxis.derivatives(x, y, b, t, q)
@@ -429,8 +579,8 @@ class EPLMajorAxis(LensProfileBase):
         # shear, eq. (17), corrected version from arXiv/corrigendum
         gamma_1 = (1 - t) * (alpha_x * cos - alpha_y * sin) / r - kappa * cos2
         gamma_2 = (1 - t) * (alpha_y * cos + alpha_x * sin) / r - kappa * sin2
-        gamma_1 = jnp.nan_to_num(gamma_1, posinf=10**10, neginf=-(10**10))
-        gamma_2 = jnp.nan_to_num(gamma_2, posinf=10**10, neginf=-(10**10))
+        gamma_1 = jnp.nan_to_num(gamma_1, posinf=1.0e10, neginf=-1.0e10)
+        gamma_2 = jnp.nan_to_num(gamma_2, posinf=1.0e10, neginf=-1.0e10)
 
         # second derivatives from convergence and shear
         f_xx = kappa + gamma_1

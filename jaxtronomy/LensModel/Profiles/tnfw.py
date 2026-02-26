@@ -4,11 +4,11 @@ __author__ = "sibirrer"
 # the potential therefore is its integral
 
 from jax import config, jit, numpy as jnp, vmap
+from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 from jaxtronomy.LensModel.Profiles.nfw import NFW
 from functools import partial
-
-config.update("jax_enable_x64", True)
+configure_jax_precision_for_runtime()
 
 __all__ = ["TNFW"]
 
