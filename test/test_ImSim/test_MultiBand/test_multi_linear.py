@@ -141,7 +141,8 @@ class TestImageModel(object):
         )
 
     def test_init(self):
-        npt.assert_raises(ValueError,
+        npt.assert_raises(
+            ValueError,
             MultiLinear,
             self.multi_band_list,
             self.kwargs_model,
@@ -149,10 +150,18 @@ class TestImageModel(object):
             compute_bool=[True, False, False],
         )
         assert self.imageModel.num_bands == self.imageModel_ref.num_bands
-        assert self.imageModel.num_response_list == self.imageModel_ref.num_response_list
-        assert self.imageModel.num_data_evaluate == self.imageModel_ref.num_data_evaluate
-        num_param_linear = self.imageModel.num_param_linear(self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
-        num_param_linear_ref = self.imageModel_ref.num_param_linear(self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
+        assert (
+            self.imageModel.num_response_list == self.imageModel_ref.num_response_list
+        )
+        assert (
+            self.imageModel.num_data_evaluate == self.imageModel_ref.num_data_evaluate
+        )
+        num_param_linear = self.imageModel.num_param_linear(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        num_param_linear_ref = self.imageModel_ref.num_param_linear(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
         assert num_param_linear == num_param_linear_ref
 
     def test_image_linear_solve(self):
@@ -209,7 +218,6 @@ class TestImageModel(object):
         assert len(residuals) == len(residuals_ref)
         for i in range(len(residuals)):
             npt.assert_allclose(residuals[i], residuals_ref[i], atol=1e-5, rtol=1e-5)
-            
 
     def test_likelihood_data_given_model(self):
         logL, param = self.imageModel.likelihood_data_given_model(
@@ -237,10 +245,12 @@ class TestImageModel(object):
                 npt.assert_allclose(param[i], param_ref[i], atol=1e-6, rtol=1e-6)
 
     def test_update_linear_kwargs(self):
-        num_param_linear = self.imageModel.num_param_linear(self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps)
+        num_param_linear = self.imageModel.num_param_linear(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
         param = np.ones(int(num_param_linear)) * 10
         kwargs = self.imageModel.update_linear_kwargs(
-            [param*2, param],
+            [param * 2, param],
             0,
             self.kwargs_lens,
             self.kwargs_source,
@@ -248,7 +258,7 @@ class TestImageModel(object):
             self.kwargs_ps,
         )
         kwargs_ref = self.imageModel_ref.update_linear_kwargs(
-            [param*2, param],
+            [param * 2, param],
             0,
             self.kwargs_lens,
             self.kwargs_source,
@@ -256,6 +266,7 @@ class TestImageModel(object):
             self.kwargs_ps,
         )
         assert kwargs_ref == kwargs
+
 
 if __name__ == "__main__":
     pytest.main()
