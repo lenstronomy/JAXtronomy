@@ -18,7 +18,7 @@ class MultiDataBase(object):
         if compute_bool is None:
             compute_bool = [True] * self._num_bands
         else:
-            if not len(compute_bool) == self._num_bands:
+            if len(compute_bool) != self._num_bands:
                 raise ValueError(
                     "compute_bool statement has not the same range as number of bands available!"
                 )
@@ -79,7 +79,7 @@ class MultiDataBase(object):
 
         :param model_list: list of models
         :param error_map_list: list of error maps
-        :return: jax array (not a list) of residuals
+        :return: list of residuals
         """
         residual_list = []
         if error_map_list is None:
