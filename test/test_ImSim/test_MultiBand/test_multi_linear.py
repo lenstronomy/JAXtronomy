@@ -219,6 +219,12 @@ class TestImageModel(object):
         for i in range(len(residuals)):
             npt.assert_allclose(residuals[i], residuals_ref[i], atol=1e-5, rtol=1e-5)
 
+        residuals = self.imageModel.reduced_residuals(model, None)
+        residuals_ref = self.imageModel_ref.reduced_residuals(model_ref, None)
+        assert len(residuals) == len(residuals_ref)
+        for i in range(len(residuals)):
+            npt.assert_allclose(residuals[i], residuals_ref[i], atol=1e-5, rtol=1e-5)
+
     def test_likelihood_data_given_model(self):
         logL, param = self.imageModel.likelihood_data_given_model(
             self.kwargs_lens,
