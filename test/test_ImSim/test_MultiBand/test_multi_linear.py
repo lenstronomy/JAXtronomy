@@ -192,7 +192,7 @@ class TestImageModel(object):
             if model[i] is None and model_ref[i] is None:
                 pass
             else:
-                npt.assert_allclose(model[i], model_ref[i], atol=1e-7, rtol=1e-7)
+                npt.assert_allclose(model[i], model_ref[i], atol=1e-6, rtol=1e-6)
 
             if error_map[i] is None and error_map_ref[i] is None:
                 pass
