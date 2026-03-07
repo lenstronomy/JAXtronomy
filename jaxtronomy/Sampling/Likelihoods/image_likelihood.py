@@ -25,7 +25,7 @@ class ImageLikelihood(object):
         :param multi_band_list: list of imaging band configurations [[kwargs_data, kwargs_psf, kwargs_numerics],[...], ...]
         :param multi_band_type: string, can be "single-band" only in jaxtronomy. "multi-linear" and "joint-liner" not supported yet
         :param kwargs_model: dict containing model option keyword arguments. See arguments to class_creator.create_class_instances() for options.
-        :param bands_compute: Should be None. Only relevant for joint-linear and multi-linear, which are not supported in jaxtronomy.
+        :param bands_compute: bool list to indicate which band to be included in the modeling, only relevant for joint-linear and multi-linear.
             For single-band, the band index is zero by default.
         :param image_likelihood_mask_list: list of boolean 2d arrays of size of images marking the pixels to be
             evaluated in the likelihood
@@ -79,7 +79,7 @@ class ImageLikelihood(object):
         :param kwargs_extinction: extinction parameter keyword argument list according
             to LightModel module
         :return: log likelihood of the data given the model, linear parameter inversion
-            list (None in jaxtronomy)
+            list
         """
         logL, param = self.imSim.likelihood_data_given_model(
             kwargs_lens,
