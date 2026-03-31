@@ -103,7 +103,7 @@ Each entry in the table indicates how much faster `JAXtronomy` is compared to `l
 | SIS                      | 1.4x             | 3.3x               | 2.0x               |
 | TNFW                     | 2.4x             | 5.8x               | 7.5x               |
 
-Due to JAX's higher function call overheads compared to standard Python, slowdowns can occur when using computationally simple deflector profiles. These deflector profiles benefit most from the parallelization that JAX offers.
+Due to `JAX`'s higher function call overheads compared to standard Python, slowdowns can occur when using computationally simple deflector profiles. These deflector profiles benefit most from the parallelization that `JAX` offers.
 
 ## Flux calculations
 
@@ -147,5 +147,9 @@ In the following table, we compare `JAXtronomy`'s PSO performance to that of `le
 
 
 Additionally, using `JAX`'s autodifferentiation, we have implemented the L-BFGS gradient descent algorithm from the `Optax` library [@DeepMind:2020] for optimization. This is a significant improvement over `lenstronomy`'s PSO, which does not have access to gradient information. Due to the stochastic nature of the PSO, we do not present a concrete comparison between `lenstronomy`'s PSO and `JAXtronomy`'s minimizer for the time it takes to find best-fit parameters.
+
+# Acknowledgements
+
+AH and SB are supported by DoE Grant DE-SC0026113, NASA Grants JWST-GO-07184 and 22-ROMAN22-0072. Major software dependencies of `JAXtronomy` not previously mentioned include `numpy` [@numpy], `scipy` [@scipy], and `numpyro` [@numpyro1; @numpyro2].
 
 # References
