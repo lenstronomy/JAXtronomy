@@ -150,6 +150,6 @@ Additionally, using `JAX`'s autodifferentiation, we have implemented the L-BFGS 
 
 # Acknowledgements
 
-AH and SB are supported by DoE Grant DE-SC0026113, NASA Grants JWST-GO-07184 and 22-ROMAN22-0072. Major software dependencies of `JAXtronomy` not previously mentioned include `numpy` [@numpy], `scipy` [@scipy], and `numpyro` [@numpyro1, @numpyro2].
+AH and SB are supported by DoE Grant DE-SC0026113, NASA Grants JWST-GO-07184 and 22-ROMAN22-0072. Major software dependencies of `JAXtronomy` not previously mentioned include `numpy` [@numpy], `scipy` [@scipy], and `numpyro` [@numpyro1; @numpyro2].
 
 # References
