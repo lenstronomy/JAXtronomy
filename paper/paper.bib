@@ -1,4 +1,4 @@
-@article{Birrer:2018,
+@ARTICLE{Birrer:2018,
 title = {lenstronomy: Multi-purpose gravitational lens modelling software package},
 journal = {Physics of the Dark Universe},
 volume = {22},
@@ -7,12 +7,12 @@ year = {2018},
 issn = {2212-6864},
 doi = {10.1016/j.dark.2018.11.002},
 url = {https://www.sciencedirect.com/science/article/pii/S2212686418301869},
-author = {Simon Birrer and Adam Amara},
+author = {{Birrer}, Simon and {Amara}, Adam},
 keywords = {Gravitational lensing, Software, Image simulations},
 abstract = {We present lenstronomy, a multi-purpose open-source gravitational lens modelling pythonpackage. lenstronomy is able to reconstruct the lens mass and surface brightness distributions of strong lensing systems using forward modelling. lenstronomy supports a wide range of analytic lens and light models in arbitrary combination. The software is also able to reconstruct complex extended sources (Birrer et. al 2015) as well as being able to model point sources. We designed lenstronomy to be stable, flexible and numerically accurate, with a clear user interface that could be deployed across different platforms. Throughout its development, we have actively used lenstronomy to make several measurements including deriving constraints on dark matter properties in strong lenses, measuring the expansion history of the universe with time-delay cosmography, measuring cosmic shear with Einstein rings and decomposing quasar and host galaxy light. The software is distributed under the MIT license. The documentation, starter guide, example notebooks, source code and installation guidelines can be found at https://lenstronomy.readthedocs.io.}
 }
 
-@article{Birrer:2021,
+@ARTICLE{Birrer:2021,
 doi = {10.3847/1538-4357/ac1108},
 url = {https://dx.doi.org/10.3847/1538-4357/ac1108},
 year = {2021},
@@ -21,10 +21,18 @@ publisher = {The American Astronomical Society},
 volume = {919},
 number = {1},
 pages = {38},
-author = {Birrer, Simon},
+author = {{Birrer}, Simon},
 title = {Gravitational Lensing Formalism in a Curved Arc Basis: A Continuous Description of Observables and Degeneracies from the Weak to the Strong Lensing Regime},
 journal = {The Astrophysical Journal},
 abstract = {Gravitationally lensed curved arcs provide a wealth of information about the underlying lensing distortions. Extracting precise lensing information from extended sources is a key component in many studies aiming to answer fundamental questions about the universe. To maintain accuracy with increased precision, it is of vital importance to characterize and understand the impact of degeneracies inherent in lensing observables. In this work, we present a formalism to describe the gravitational lensing distortion effects resulting in curved extended arcs based on the eigenvectors and eigenvalues of the local lensing Jacobian and their directional differentials. We identify a nonlocal and nonlinear extended deflector basis that inherits these local properties. Our parameterization is tightly linked to observable features in extended sources and allows one to accurately extract the lensing information of extended images without imposing an explicit global deflector model. We quantify what degeneracies can be broken based on specific assumptions about the local lensing nature and assumed intrinsic source shape. Our formalism is applicable from the weak linear regime to the semi-linear regime and all the way up to the highly nonlinear regime of highly magnified arcs of multiple images. The methodology and implementation presented in this work provides a framework to assessing systematics, to guide inference efforts in the right choices in complexity based on the data at hand, and to quantify the lensing information extracted in a model-independent way (https://github.com/sibirrer/curved_arcs).}
+}
+
+@software{JAX,
+  author = {James Bradbury and Roy Frostig and Peter Hawkins and Matthew James Johnson and Chris Leary and Dougal Maclaurin and George Necula and Adam Paszke and Jake Vander{P}las and Skye Wanderman-{M}ilne and Qiao Zhang},
+  title = {{JAX}: composable transformations of {P}ython+{N}um{P}y programs},
+  url = {http://github.com/jax-ml/jax},
+  version = {0.3.13},
+  year = {2018},
 }
 
 @ARTICLE{Shajib:2021,
@@ -45,10 +53,8 @@ archivePrefix = {arXiv},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
-
-
 @ARTICLE{DINOS1,
-       author = {{Tan}, Chin Yi and {Shajib}, Anowar J. and {Birrer}, Simon and {Sonnenfeld}, Alessandro and {Treu}, Tommaso and {Wells}, Patrick and {Williams}, Devon and {Buckley-Geer}, Elizabeth J. and {Drlica-Wagner}, Alex and {Frieman}, Joshua},
+       author = {{Tan}, Chin Yi and {Shajib}, Anowar J. and {Birrer}, Simon and {Sonnenfeld}, Alessandro and {Treu}, Tommaso and {Wells}, Patrick and {Williams}, Devon M. and {Buckley-Geer}, Elizabeth J. and {Drlica-Wagner}, Alex and {Frieman}, Joshua},
         title = "{Project Dinos I: A joint lensing-dynamics constraint on the deviation from the power law in the mass profile of massive ellipticals}",
       journal = {Monthly Notices of the Royal Astronomical Society},
      keywords = {gravitational lensing: strong, galaxies: elliptical and lenticular, cD, Astrophysics - Astrophysics of Galaxies},
@@ -83,18 +89,22 @@ archivePrefix = {arXiv},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
-#TODO: Replace with journal BibTeX
-@misc{Shajib:2025,
-    author = "Shajib, Anowar J. and Nihal, Nafis Sadik and Tan, Chin Yi and Sahu, Vedant and Birrer, Simon and Treu, Tommaso and Frieman, Joshua",
-    title = "{dolphin: A fully automated forward modeling pipeline powered by artificial intelligence for galaxy-scale strong lenses}",
-    eprint = "2503.22657",
-    archivePrefix = "arXiv",
-    primaryClass = "astro-ph.IM",
-    month = "3",
-    year = "2025"
+@ARTICLE{Shajib:2025,
+  doi = {10.3847/1538-4357/adf95c},
+  url = {https://doi.org/10.3847/1538-4357/adf95c},
+  year = {2025},
+  month = {oct},
+  publisher = {The American Astronomical Society},
+  volume = {992},
+  number = {1},
+  pages = {40},
+  author = {{Shajib}, Anowar J. and {Nihal}, Nafis Sadik and {Tan}, Chin Yi and {Sahu}, Vedant and {Birrer}, Simon and {Treu}, Tommaso and {Frieman}, Joshua},
+  title = {dolphin: A Fully Automated Forward-modeling Pipeline Powered by Artificial Intelligence for Galaxy-scale Strong Lenses},
+  journal = {The Astrophysical Journal},
+  abstract = {Strong gravitational lensing is a powerful tool for probing the internal structure and evolution of galaxies, the nature of dark matter, and the expansion history of the Universe, among many other scientific applications. For almost all of these science cases, modeling the lensing mass distribution is essential. For that, forward modeling of imaging data to the pixel level is the standard method used for galaxy-scale lenses. However, the traditional workflow of forward lens modeling necessitates a significant amount of human investigator time, requiring iterative tweaking and tuning of the model settings through trial and error. An automated lens-modeling pipeline can substantially reduce the need for human investigator time. In this paper, we present dolphin, an automated lens-modeling pipeline that combines artificial intelligence with the traditional forward-modeling framework to enable full automation of the modeling workflow. dolphin uses a neural network model to perform visual recognition of the strong lens components, then autonomously sets up a lens model with appropriate complexity and fits the model with the modeling engine, lenstronomy. Thanks to the versatility of lenstronomy, dolphin can autonomously model both galaxy–galaxy and galaxy–quasar strong lenses.}
 }
 
-@article{Ding:2020,
+@ARTICLE{Ding:2020,
    author = {{Ding}, Xuheng and {Silverman}, John and {Treu}, Tommaso and {Schulze}, Andreas and {Schramm}, Malte and {Birrer}, Simon and {Park}, Daeseong and {Jahnke}, Knud and {Bennert}, Vardha N. and {Kartaltepe}, Jeyhan S. and {Koekemoer}, Anton M. and {Malkan}, Matthew A. and {Sanders}, David},
     title = "{The Mass Relations between Supermassive Black Holes and Their Host Galaxies at 1 < z < 2 HST-WFC3}",
   journal = {The Astrophysical Journal},
@@ -113,8 +123,8 @@ archivePrefix = {arXiv},
   adsnote = {Provided by the SAO/NASA Astrophysics Data System}
   }
 
-  @article{TDCOSMO1,
-	author = {{Millon, M.} and {Galan, A.} and {Courbin, F.} and {Treu, T.} and {Suyu, S. H.} and {Ding, X.} and {Birrer, S.} and {Chen, G. C.-F.} and {Shajib, A. J.} and {Sluse, D.} and {Wong, K. C.} and {Agnello, A.} and {Auger, M. W.} and {Buckley-Geer, E. J.} and {Chan, J. H. H.} and {Collett, T.} and {Fassnacht, C. D.} and {Hilbert, S.} and {Koopmans, L. V. E.} and {Motta, V.} and {Mukherjee, S.} and {Rusu, C. E.} and {Sonnenfeld, A.} and {Spiniello, C.} and {Van de Vyvere, L.}},
+  @ARTICLE{TDCOSMO1,
+	author = {{Millon}, Martin and {Galan}, Aymeric and {Courbin}, Frédéric and {Treu}, Tommaso and {Suyu}, Sherry H. and {Ding}, Xuheng and {Birrer}, Simon and {Chen}, G. C.-F. and {Shajib}, Anowar J. and {Sluse}, Dominique and {Wong}, Kenneth C. and {Agnello}, A. and {Auger}, M. W. and {Buckley-Geer}, Elizabeth J. and {Chan}, J. H. H. and {Collett}, T. and {Fassnacht}, Christopher D. and {Hilbert}, S. and {Koopmans}, Léon V. E. and {Motta}, Veronica and {Mukherjee}, S. and {Rusu}, Cristian E. and {Sonnenfeld}, Alessandro and {Spiniello}, Chiara and {Van de Vyvere}, Lyne},
 	title = {TDCOSMO - I. An exploration of systematic uncertainties in the inference of H0 from time-delay cosmography},
 	DOI= "10.1051/0004-6361/201937351",
 	url= "https://doi.org/10.1051/0004-6361/201937351",
@@ -124,8 +134,8 @@ archivePrefix = {arXiv},
 	pages = "A101",
 }
 
-@article{TDCOSMO3,
-	author = {{Gilman, D.} and {Birrer, S.} and {Treu, T.}},
+@ARTICLE{TDCOSMO3,
+	author = {{Gilman}, Daniel and {Birrer}, Simon and {Treu}, Tommaso},
 	title = {TDCOSMO - III. Dark matter substructure meets dark energy. The effects of (sub)halos on strong-lensing measurements of H0
 },
 	DOI= "10.1051/0004-6361/202038829",
@@ -136,8 +146,8 @@ archivePrefix = {arXiv},
 	pages = "A194",
 }
 
-@article{TDCOSMO4,
-	author = {{Birrer, S.} and {Shajib, A. J.} and {Galan, A.} and {Millon, M.} and {Treu, T.} and {Agnello, A.} and {Auger, M.} and {Chen, G. C.-F.} and {Christensen, L.} and {Collett, T.} and {Courbin, F.} and {Fassnacht, C. D.} and {Koopmans, L. V. E.} and {Marshall, P. J.} and {Park, J.-W.} and {Rusu, C. E.} and {Sluse, D.} and {Spiniello, C.} and {Suyu, S. H.} and {Wagner-Carena, S.} and {Wong, K. C.} and {Barnabè, M.} and {Bolton, A. S.} and {Czoske, O.} and {Ding, X.} and {Frieman, J. A.} and {Van de Vyvere, L.}},
+@ARTICLE{TDCOSMO4,
+	author = {{Birrer}, Simon and {Shajib}, Anowar J. and {Galan}, Aymeric and {Millon}, Martin and {Treu}, Tommaso and {Agnello}, A. and {Auger}, M. and {Chen}, G. C.-F. and {Christensen}, L. and {Collett}, T. and {Courbin}, Frédéric and {Fassnacht}, Christopher D. and {Koopmans}, Léon V. E. and {Marshall}, P. J. and {Park}, J.-W. and {Rusu}, Cristian E. and {Sluse}, Dominique and {Spiniello}, Chiara and {Suyu}, Sherry H. and {Wagner-Carena}, Sebastian and {Wong}, Kenneth C. and {Barnabè}, M. and {Bolton}, A. S. and {Czoske}, O. and {Ding}, Xuheng and {Frieman}, Joshua A. and {Van de Vyvere}, Lyne},
 	title = {TDCOSMO - IV. Hierarchical time-delay cosmography – joint inference of the Hubble constant and galaxy density profiles⋆},
 	DOI= "10.1051/0004-6361/202038861",
 	url= "https://doi.org/10.1051/0004-6361/202038861",
@@ -147,8 +157,8 @@ archivePrefix = {arXiv},
 	pages = "A165",
 }
 
-@article{TDCOSMO5,
-	author = {{Birrer, Simon} and {Treu, Tommaso}},
+@ARTICLE{TDCOSMO5,
+	author = {{Birrer}, Simon and {Treu}, Tommaso},
 	title = {TDCOSMO - V. Strategies for precise and accurate measurements of the Hubble constant with strong lensing},
 	DOI= "10.1051/0004-6361/202039179",
 	url= "https://doi.org/10.1051/0004-6361/202039179",
@@ -159,7 +169,7 @@ archivePrefix = {arXiv},
 }
 
 @ARTICLE{TDCOSMO9,
-       author = {{Shajib}, A.~J. and {Wong}, K.~C. and {Birrer}, S. and {Suyu}, S.~H. and {Treu}, T. and {Buckley-Geer}, E.~J. and {Lin}, H. and {Rusu}, C.~E. and {Poh}, J. and {Palmese}, A. and {Agnello}, A. and {Auger-Williams}, M.~W. and {Galan}, A. and {Schuldt}, S. and {Sluse}, D. and {Courbin}, F. and {Frieman}, J. and {Millon}, M.},
+       author = {{Shajib}, Anowar J. and {Wong}, Kenneth C. and {Birrer}, Simon and {Suyu}, Sherry H. and {Treu}, Tommaso and {Buckley-Geer}, Elizabeth J. and {Lin}, H. and {Rusu}, Cristian E. and {Poh}, J. and {Palmese}, A. and {Agnello}, A. and {Auger-Williams}, M. W. and {Galan}, Aymeric and {Schuldt}, S. and {Sluse}, Dominique and {Courbin}, Frédéric and {Frieman}, J. and {Millon}, Martin},
         title = "{TDCOSMO. IX. Systematic comparison between lens modelling software programs: Time-delay prediction for WGD 2038{\ensuremath{-}}4008}",
       journal = {Astronomy & Astrophysics},
      keywords = {gravitational lensing: strong, methods: data analysis, galaxies: elliptical and lenticular, cD, distance scale, Astrophysics - Cosmology and Nongalactic Astrophysics},
@@ -176,8 +186,8 @@ archivePrefix = {arXiv},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
-@article{TDCOSMO18,
-  author = {Schmidt, Thomas and Treu, Tommaso and Birrer, Simon and Millon, Martin and Sluse, Dominique and Galan, Aymeric and Shajib, Anowar and Lemon, Cameron and Dux, Frédéric and Courbin, Frédéric},
+@ARTICLE{TDCOSMO18,
+  author = {{Schmidt}, Thomas and {Treu}, Tommaso and {Birrer}, Simon and {Millon}, Martin and {Sluse}, Dominique and {Galan}, Aymeric and {Shajib}, Anowar J. and {Lemon}, Cameron and {Dux}, Frédéric and {Courbin}, Frédéric},
   year = {2025},
   month = {07},
   pages = {},
@@ -186,28 +196,30 @@ archivePrefix = {arXiv},
   doi = {10.1051/0004-6361/202449984}
 }
 
-@misc{williams2025tdcosmoxxwfi20334723quadruplyimaged,
-      title={TDCOSMO: XX. WFI2033--4723, the First Quadruply-Imaged Quasar Modeled with JWST Imaging}, 
-      author={D. M. Williams and T. Treu and S. Birrer and A. J. Shajib and K. C. Wong and T. Morishita and T. Schmidt and M. Stiavelli},
-      year={2025},
-      eprint={2503.00099},
-      archivePrefix={arXiv},
-      primaryClass={astro-ph.CO},
-      url={https://arxiv.org/abs/2503.00099}, 
+@ARTICLE{TDCOSMO20,
+	author = {{Williams}, Devon M. and {Treu}, Tommaso and {Birrer}, Simon and {Shajib}, Anowar J. and {Wong}, Kenneth C. and {Morishita}, Takahiro and {Schmidt}, Thomas and {Stiavelli}, Massimo},
+	title = {TDCOSMO - XX. WFI2033–4723, the first quadruply imaged quasar modeled with JWST imaging},
+	DOI= "10.1051/0004-6361/202554359",
+	url= "https://doi.org/10.1051/0004-6361/202554359",
+	journal = {Astronomy & Astrophysics},
+	year = 2025,
+	volume = 703,
+	pages = "A118",
 }
 
-@misc{TDCOSMO2025,
-      title={TDCOSMO 2025: Cosmological constraints from strong lensing time delays}, 
-      author={TDCOSMO Collaboration and Simon Birrer and Elizabeth J. Buckley-Geer and Michele Cappellari and Frédéric Courbin and Frédéric Dux and Christopher D. Fassnacht and Joshua A. Frieman and Aymeric Galan and Daniel Gilman and Xiang-Yu Huang and Shawn Knabel and Danial Langeroodi and Huan Lin and Martin Millon and Takahiro Morishita and Veronica Motta and Pritom Mozumdar and Eric Paic and Anowar J. Shajib and William Sheu and Dominique Sluse and Alessandro Sonnenfeld and Chiara Spiniello and Massimo Stiavelli and Sherry H. Suyu and Chin Yi Tan and Tommaso Treu and Lyne Van de Vyvere and Han Wang and Patrick Wells and Devon M. Williams and Kenneth C. Wong},
-      year={2025},
-      eprint={2506.03023},
-      archivePrefix={arXiv},
-      primaryClass={astro-ph.CO},
-      url={https://arxiv.org/abs/2506.03023}, 
+@ARTICLE{TDCOSMO2025,
+	author = {{Birrer}, Simon and {Buckley-Geer}, Elizabeth J. and {Cappellari}, Michele and {Courbin}, Frédéric and {Dux}, Frédéric and {Fassnacht}, Christopher D. and {Frieman}, Joshua A. and {Galan}, Aymeric and {Gilman}, Daniel and {Huang}, Xiang-Yu and {Knabel}, Shawn and {Langeroodi}, Danial and {Lin}, Huan and {Millon}, Martin and {Morishita}, Takahiro and {Motta}, Veronica and {Mozumdar}, Pritom and {Paic}, Eric and {Shajib}, Anowar J. and {Sheu}, William and {Sluse}, Dominique and {Sonnenfeld}, Alessandro and {Spiniello}, Chiara and {Stiavelli}, Massimo and {Suyu}, Sherry H. and {Tan}, Chin Yi and {Treu}, Tommaso and {Van de Vyvere}, Lyne and {Wang}, Han and {Wells}, Patrick and {Williams}, Devon M. and {Wong}, Kenneth C.},
+	title = {TDCOSMO 2025: Cosmological constraints from strong lensing time delays},
+	DOI= "10.1051/0004-6361/202555801",
+	url= "https://doi.org/10.1051/0004-6361/202555801",
+	journal = {Astronomy & Astrophysics},
+	year = 2025,
+	volume = 704,
+	pages = "A63",
 }
 
-@article{Gilman:2020,
-    author = {Gilman, Daniel and Birrer, Simon and Nierenberg, Anna and Treu, Tommaso and Du, Xiaolong and Benson, Andrew},
+@ARTICLE{Gilman:2019,
+    author = {{Gilman}, Daniel and {Birrer}, Simon and {Nierenberg}, Anna and {Treu}, Tommaso and {Du}, Xiaolong and {Benson}, Andrew},
     title = {Warm dark matter chills out: constraints on the halo mass function and the free-streaming length of dark matter with eight quadruple-image strong gravitational lenses},
     journal = {Monthly Notices of the Royal Astronomical Society},
     volume = {491},
@@ -222,38 +234,38 @@ archivePrefix = {arXiv},
     eprint = {https://academic.oup.com/mnras/article-pdf/491/4/6077/31628836/stz3480.pdf},
 }
 
-@article{Wedig:2025,
-doi = {10.3847/1538-4357/adc24f},
-url = {https://dx.doi.org/10.3847/1538-4357/adc24f},
-year = {2025},
-month = {jun},
-publisher = {The American Astronomical Society},
-volume = {986},
-number = {1},
-pages = {42},
-author = {Wedig, Bryce and Daylan, Tansu and Birrer, Simon and Cyr-Racine, Francis-Yan and Dvorkin, Cora and Finkbeiner, Douglas P. and Huang, Alan and Huang, Xiaosheng and Karthik, Rahul and Khadka, Narayan and Natarajan, Priyamvada and Nierenberg, Anna M. and Peter, Annika H. G. and Pierel, Justin D. R. and Tang, Xianzhe TZ and Wechsler, Risa H.},
-title = {The Roman View of Strong Gravitational Lenses},
-journal = {The Astrophysical Journal},
-abstract = {Galaxy–galaxy strong gravitational lenses can constrain dark matter models and the Lambda cold dark matter cosmological paradigm at subgalactic scales. Currently, there is a dearth of images of these rare systems with high signal-to-noise ratio (SNR) and angular resolution. The Nancy Grace Roman Space Telescope (hereafter Roman), scheduled for launch in late 2026, will play a transformative role in strong-lensing science with its planned wide-field surveys. With its remarkable 0.281 square degree field of view and diffraction-limited angular resolution of ~01, Roman is uniquely suited to characterizing dark matter substructure from a robust population of strong lenses. We present a yield simulation of detectable strong lenses in Roman’s planned High Latitude Wide Area Survey (HLWAS). We simulate a population of galaxy–galaxy strong lenses across cosmic time with cold dark matter subhalo populations, select those detectable in the HLWAS, and generate simulated images accounting for realistic Wide Field Instrument detector effects. For a fiducial case of single 146 s exposures, we predict around 160,000 detectable strong lenses in the HLWAS, of which about 500 will have sufficient SNR to be amenable to detailed substructure characterization. We investigate the effect of variation of the point-spread function across Roman’s field of view on detecting individual subhalos and the suppression of the subhalo mass function at low masses. Our simulation products are available to support strong-lens science with Roman, such as training neural networks and validating dark matter substructure analysis pipelines.}
+@ARTICLE{Wedig:2025,
+  doi = {10.3847/1538-4357/adc24f},
+  url = {https://dx.doi.org/10.3847/1538-4357/adc24f},
+  year = {2025},
+  month = {jun},
+  publisher = {The American Astronomical Society},
+  volume = {986},
+  number = {1},
+  pages = {42},
+  author = {Wedig, Bryce and Daylan, Tansu and Birrer, Simon and Cyr-Racine, Francis-Yan and Dvorkin, Cora and Finkbeiner, Douglas P. and Huang, Alan and Huang, Xiaosheng and Karthik, Rahul and Khadka, Narayan and Natarajan, Priyamvada and Nierenberg, Anna M. and Peter, Annika H. G. and Pierel, Justin D. R. and Tang, Xianzhe TZ and Wechsler, Risa H.},
+  title = {The Roman View of Strong Gravitational Lenses},
+  journal = {The Astrophysical Journal},
+  abstract = {Galaxy–galaxy strong gravitational lenses can constrain dark matter models and the Lambda cold dark matter cosmological paradigm at subgalactic scales. Currently, there is a dearth of images of these rare systems with high signal-to-noise ratio (SNR) and angular resolution. The Nancy Grace Roman Space Telescope (hereafter Roman), scheduled for launch in late 2026, will play a transformative role in strong-lensing science with its planned wide-field surveys. With its remarkable 0.281 square degree field of view and diffraction-limited angular resolution of ~01, Roman is uniquely suited to characterizing dark matter substructure from a robust population of strong lenses. We present a yield simulation of detectable strong lenses in Roman’s planned High Latitude Wide Area Survey (HLWAS). We simulate a population of galaxy–galaxy strong lenses across cosmic time with cold dark matter subhalo populations, select those detectable in the HLWAS, and generate simulated images accounting for realistic Wide Field Instrument detector effects. For a fiducial case of single 146 s exposures, we predict around 160,000 detectable strong lenses in the HLWAS, of which about 500 will have sufficient SNR to be amenable to detailed substructure characterization. We investigate the effect of variation of the point-spread function across Roman’s field of view on detecting individual subhalos and the suppression of the subhalo mass function at low masses. Our simulation products are available to support strong-lens science with Roman, such as training neural networks and validating dark matter substructure analysis pipelines.}
 }
 
-@article{Gu:2022,
-doi = {10.3847/1538-4357/ac6de4},
-url = {https://dx.doi.org/10.3847/1538-4357/ac6de4},
-year = {2022},
-month = {aug},
-publisher = {The American Astronomical Society},
-volume = {935},
-number = {1},
-pages = {49},
-author = {Gu, A. and Huang, X. and Sheu, W. and Aldering, G. and Bolton, A. S. and Boone, K. and Dey, A. and Filipp, A. and Jullo, E. and Perlmutter, S. and Rubin, D. and Schlafly, E. F. and Schlegel, D. J. and Shu, Y. and Suyu, S. H.},
-title = {GIGA-Lens: Fast Bayesian Inference for Strong Gravitational Lens Modeling},
-journal = {The Astrophysical Journal},
-abstract = {We present GIGA-Lens: a gradient-informed, GPU-accelerated Bayesian framework for modeling strong gravitational lensing systems, implemented in TensorFlow and JAX. The three components, optimization using multistart gradient descent, posterior covariance estimation with variational inference, and sampling via Hamiltonian Monte Carlo, all take advantage of gradient information through automatic differentiation and massive parallelization on graphics processing units (GPUs). We test our pipeline on a large set of simulated systems and demonstrate in detail its high level of performance. The average time to model a single system on four Nvidia A100 GPUs is 105 s. The robustness, speed, and scalability offered by this framework make it possible to model the large number of strong lenses found in current surveys and present a very promising prospect for the modeling of  lensing systems expected to be discovered in the era of the Vera C. Rubin Observatory, Euclid, and the Nancy Grace Roman Space Telescope.}
+@ARTICLE{Gu:2022,
+  doi = {10.3847/1538-4357/ac6de4},
+  url = {https://dx.doi.org/10.3847/1538-4357/ac6de4},
+  year = {2022},
+  month = {aug},
+  publisher = {The American Astronomical Society},
+  volume = {935},
+  number = {1},
+  pages = {49},
+  author = {Gu, A. and Huang, Xiaosheng and Sheu, W. and Aldering, G. and Bolton, A. S. and Boone, K. and Dey, A. and Filipp, A. and Jullo, E. and Perlmutter, S. and Rubin, D. and Schlafly, E. F. and Schlegel, D. J. and Shu, Y. and Suyu, Sherry H.},
+  title = {GIGA-Lens: Fast Bayesian Inference for Strong Gravitational Lens Modeling},
+  journal = {The Astrophysical Journal},
+  abstract = {We present GIGA-Lens: a gradient-informed, GPU-accelerated Bayesian framework for modeling strong gravitational lensing systems, implemented in TensorFlow and JAX. The three components, optimization using multistart gradient descent, posterior covariance estimation with variational inference, and sampling via Hamiltonian Monte Carlo, all take advantage of gradient information through automatic differentiation and massive parallelization on graphics processing units (GPUs). We test our pipeline on a large set of simulated systems and demonstrate in detail its high level of performance. The average time to model a single system on four Nvidia A100 GPUs is 105 s. The robustness, speed, and scalability offered by this framework make it possible to model the large number of strong lenses found in current surveys and present a very promising prospect for the modeling of  lensing systems expected to be discovered in the era of the Vera C. Rubin Observatory, Euclid, and the Nancy Grace Roman Space Telescope.}
 }
 
-@article{Galan:2022,
-       author = {{Galan}, A. and {Vernardos}, G. and {Peel}, A. and {Courbin}, F. and {Starck}, J. -L.},
+@ARTICLE{Galan:2022,
+       author = {{Vernardos}, Georgios and {Peel}, Austin and {Courbin}, Frédéric and {Starck}, Jean-Luc},
         title = "{Using wavelets to capture deviations from smoothness in galaxy-scale strong lenses}",
       journal = {Astronomy & Astrophysics},
      keywords = {galaxies: structure, dark matter, methods: data analysis, gravitation, gravitational lensing: strong, Astrophysics - Instrumentation and Methods for Astrophysics, Astrophysics - Cosmology and Nongalactic Astrophysics, Astrophysics - Astrophysics of Galaxies},
@@ -270,7 +282,7 @@ archivePrefix = {arXiv},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
-@article{Wagner-Carena:2023,
+@ARTICLE{Wagner-Carena:2023,
   doi = {10.3847/1538-4357/aca525},
   url = {https://dx.doi.org/10.3847/1538-4357/aca525},
   year = {2023},
@@ -285,7 +297,7 @@ archivePrefix = {arXiv},
   abstract = {Constraining the distribution of small-scale structure in our universe allows us to probe alternatives to the cold dark matter paradigm. Strong gravitational lensing offers a unique window into small dark matter halos (&lt;1010  M ⊙) because these halos impart a gravitational lensing signal even if they do not host luminous galaxies. We create large data sets of strong lensing images with realistic low-mass halos, Hubble Space Telescope (HST) observational effects, and galaxy light from HST’s COSMOS field. Using a simulation-based inference pipeline, we train a neural posterior estimator of the subhalo mass function (SHMF) and place constraints on populations of lenses generated using a separate set of galaxy sources. We find that by combining our network with a hierarchical inference framework, we can both reliably infer the SHMF across a variety of configurations and scale efficiently to populations with hundreds of lenses. By conducting precise inference on large and complex simulated data sets, our method lays a foundation for extracting dark matter constraints from the next generation of wide-field optical imaging surveys.}
 }
 
-@article{Wagner-Carena:2024,
+@ARTICLE{Wagner-Carena:2024,
   doi = {10.3847/1538-4357/ad6e70},
   url = {https://dx.doi.org/10.3847/1538-4357/ad6e70},
   year = {2024},
@@ -300,17 +312,18 @@ archivePrefix = {arXiv},
   abstract = {Strong gravitational lenses are a singular probe of the Universe’s small-scale structure—they are sensitive to the gravitational effects of low-mass (&lt;1010 M ⊙) halos even without a luminous counterpart. Recent strong-lensing analyses of dark matter structure rely on simulation-based inference (SBI). Modern SBI methods, which leverage neural networks as density estimators, have shown promise in extracting the halo-population signal. However, it is unclear whether the constraints from these models are limited by the methodology or the data. In this study, we introduce an accelerator-optimized simulation pipeline that can generate lens images with realistic subhalo populations in milliseconds. Leveraging this simulator, we identify the main limitation of our fiducial SBI analysis: training set size. We then adopt a sequential neural posterior estimation (SNPE) approach, allowing us to refine the training distribution to align with the observed data. Using only one-fifth as many mock Hubble Space Telescope images, SNPE matches the constraints on the low-mass halo population produced by our best nonsequential model. Our experiments suggest that an over 3 order-of-magnitude increase in training set size and GPU hours would be required to achieve an equivalent result without sequential methods. While the full potential of the existing lens sample remains to be explored, the notable improvement in constraining power enabled by our sequential approach highlights that current constraints are limited primarily by methodology and not the data itself. Moreover, our results emphasize the need to treat training set generation and model optimization as interconnected stages of any cosmological analysis using SBI.}
 }
 
-@misc{Wang:2025,
-      title={GPU-Accelerated Gravitational Lensing & Dynamical (GLaD) Modeling for Cosmology and Galaxies}, 
-      author={Han Wang and Sherry H. Suyu and Aymeric Galan and Aleksi Halkola and Michele Cappellari and Anowar J. Shajib and Miha Cernetic},
-      year={2025},
-      eprint={2504.01302},
-      archivePrefix={arXiv},
-      primaryClass={astro-ph.CO},
-      url={https://arxiv.org/abs/2504.01302}, 
+@ARTICLE{Wang:2025,
+	author = {{Wang}, Han and {Suyu}, Sherry H. and {Galan}, Aymeric and {Halkola}, Aleksi and {Cappellari}, Michele and {Shajib}, Anowar J. and {Cernetic}, Miha},
+	title = {GPU-Accelerated Gravitational Lensing and Dynamical (GLaD) modeling for cosmology and galaxies},
+	DOI= "10.1051/0004-6361/202554861",
+	url= "https://doi.org/10.1051/0004-6361/202554861",
+	journal = {Astronomy & Astrophysics},
+	year = 2025,
+	volume = 701,
+	pages = "A280",
 }
 
-@article{Stone:2024,
+@ARTICLE{Stone:2024,
   doi = {10.21105/joss.07081},
   url = {https://doi.org/10.21105/joss.07081},
   year = {2024},
@@ -321,6 +334,13 @@ archivePrefix = {arXiv},
   author = {Stone, Connor and Adam, Alexandre and Coogan, Adam and Yantovski-Barth, M. J. and Filipp, Andreas and Setiawan, Landung and Core, Cordero and Legin, Ronan and Wilson, Charles and Barco, Gabriel Missael and Hezaveh, Yashar and Perreault-Levasseur, Laurence},
   title = {Caustics: A Python Package for Accelerated Strong Gravitational Lensing Simulations},
   journal = {Journal of Open Source Software}
+}
+
+@software{jaxstronomy,
+  author = {{Google Research}},
+  title = {jaxstronomy: JAX-based tools for astronomical inference},
+  year = {2023},
+  url = {https://github.com/google-research/google-research/tree/master/jaxstronomy}
 }
 
 @INPROCEEDINGS{Kennedy:1995,
@@ -337,7 +357,7 @@ archivePrefix = {arXiv},
 
 @software{DeepMind:2020,
   title = {The {D}eep{M}ind {JAX} {E}cosystem},
-  author = {DeepMind and Babuschkin, Igor and Baumli, Kate and Bell, Alison and Bhupatiraju, Surya and Bruce, Jake and Buchlovsky, Peter and Budden, David and Cai, Trevor and Clark, Aidan and Danihelka, Ivo and Dedieu, Antoine and Fantacci, Claudio and Godwin, Jonathan and Jones, Chris and Hemsley, Ross and Hennigan, Tom and Hessel, Matteo and Hou, Shaobo and Kapturowski, Steven and Keck, Thomas and Kemaev, Iurii and King, Michael and Kunesch, Markus and Martens, Lena and Merzic, Hamza and Mikulik, Vladimir and Norman, Tamara and Papamakarios, George and Quan, John and Ring, Roman and Ruiz, Francisco and Sanchez, Alvaro and Sartran, Laurent and Schneider, Rosalia and Sezener, Eren and Spencer, Stephen and Srinivasan, Srivatsan and Stanojevi\'{c}, Milo\v{s} and Stokowiec, Wojciech and Wang, Luyu and Zhou, Guangyao and Viola, Fabio},
+  author = {Babuschkin, Igor and Baumli, Kate and Bell, Alison and Bhupatiraju, Surya and Bruce, Jake and Buchlovsky, Peter and Budden, David and Cai, Trevor and Clark, Aidan and Danihelka, Ivo and Dedieu, Antoine and Fantacci, Claudio and Godwin, Jonathan and Jones, Chris and Hemsley, Ross and Hennigan, Tom and Hessel, Matteo and Hou, Shaobo and Kapturowski, Steven and Keck, Thomas and Kemaev, Iurii and King, Michael and Kunesch, Markus and Martens, Lena and Merzic, Hamza and Mikulik, Vladimir and Norman, Tamara and Papamakarios, George and Quan, John and Ring, Roman and Ruiz, Francisco and Sanchez, Alvaro and Sartran, Laurent and Schneider, Rosalia and Sezener, Eren and Spencer, Stephen and Srinivasan, Srivatsan and Stanojevi\'{c}, Milo\v{s} and Stokowiec, Wojciech and Wang, Luyu and Zhou, Guangyao and Viola, Fabio},
   url = {http://github.com/google-deepmind},
   year = {2020},
 }
