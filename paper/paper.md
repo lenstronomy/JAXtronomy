@@ -103,7 +103,7 @@ Each entry in the table indicates how much faster `JAXtronomy` is compared to `l
 | SIS                      | 1.4x             | 3.3x               | 2.0x               |
 | TNFW                     | 2.4x             | 5.8x               | 7.5x               |
 
-Due to JAX's higher function call overheads compared to standard Python, slowdowns can occur when using computationally simple deflector profiles. These deflector profiles benefit most from the parallelization that JAX offers.
+Due to `JAX`'s higher function call overheads compared to standard Python, slowdowns can occur when using computationally simple deflector profiles. These deflector profiles benefit most from the parallelization that `JAX` offers.
 
 ## Flux calculations
 
@@ -150,6 +150,6 @@ Additionally, using `JAX`'s autodifferentiation, we have implemented the L-BFGS 
 
 # Acknowledgements
 
-AH and SB are supported by DoE Grant DE-SC0026113, NASA Grants JWST-GO-07184 and 22-ROMAN22-0072. Major software dependencies of JAXtronomy not previously mentioned include `numpy` [@numpy], `scipy` [@scipy], and `numpyro` [@numpyro1, @numpyro2].
+AH and SB are supported by DoE Grant DE-SC0026113, NASA Grants JWST-GO-07184 and 22-ROMAN22-0072. Major software dependencies of `JAXtronomy` not previously mentioned include `numpy` [@numpy], `scipy` [@scipy], and `numpyro` [@numpyro1, @numpyro2].
 
 # References
