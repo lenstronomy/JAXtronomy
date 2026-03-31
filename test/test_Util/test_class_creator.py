@@ -196,7 +196,7 @@ class TestClassCreator(object):
 
     def test_create_im_sim(self):
         kwargs_model = {
-            "lens_model_list": ["SIS"],
+            "lens_model_list": ["SIS", "SIE"],
             "source_light_model_list": ["SERSIC"],
             "lens_light_model_list": ["SERSIC"],
             "point_source_model_list": ["LENSED_POSITION"],
@@ -231,6 +231,20 @@ class TestClassCreator(object):
             band_index=0,
         )
         assert multi_band.LensModel.lens_model_list[0] == "SIS"
+        assert multi_band.LensModel.lens_model_list[1] == "SIE"
+
+        multi_band_list = [[kwargs_data, kwargs_psf, {}], [kwargs_data, kwargs_psf, {}]]
+        multi_band_type = "multi-linear"
+        multi_band = class_creator.create_im_sim(
+            multi_band_list,
+            multi_band_type,
+            kwargs_model,
+            bands_compute=None,
+            image_likelihood_mask_list=None,
+        )
+        assert multi_band._imageModel_list[0].LensModel.lens_model_list[0] == "SIS"
+        assert multi_band._imageModel_list[0].LensModel.lens_model_list[1] == "SIE"
+        assert len(multi_band._imageModel_list) == 2
 
 
 class TestRaise(unittest.TestCase):

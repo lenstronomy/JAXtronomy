@@ -356,7 +356,7 @@ def create_im_sim(
     image_likelihood_mask_list=None,
     band_index=0,
     kwargs_pixelbased=None,
-    linear_solver=False,
+    linear_solver=True,
 ):
     """
 
@@ -376,7 +376,18 @@ def create_im_sim(
     :return: MultiBand class instance
     """
 
-    if multi_band_type == "single-band":
+    if multi_band_type == "multi-linear":
+        from jaxtronomy.ImSim.MultiBand.multi_linear import MultiLinear
+
+        multiband = MultiLinear(
+            multi_band_list,
+            kwargs_model,
+            compute_bool=bands_compute,
+            likelihood_mask_list=image_likelihood_mask_list,
+            linear_solver=linear_solver,
+        )
+
+    elif multi_band_type == "single-band":
         from jaxtronomy.ImSim.MultiBand.single_band_multi_model import (
             SingleBandMultiModel,
         )

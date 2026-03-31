@@ -362,12 +362,14 @@ class TestLikelihoodModule(object):
             kwargs_model=self.kwargs_model,
             param_class=self.param_class,
             check_bounds=True,
+            source_position_likelihood=False,
         )
         Likelihood_ref = LikelihoodModule_ref(
             kwargs_data_joint=self.kwargs_data_joint,
             kwargs_model=self.kwargs_model,
             param_class=self.param_class,
             check_bounds=True,
+            source_position_likelihood=False,
         )
 
         assert Likelihood.logL(args) == 0
