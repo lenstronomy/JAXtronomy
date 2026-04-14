@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 requires = [
-    "lenstronomy>=1.13.5",
+    "lenstronomy==1.13.6",
     "numpy>=2.0.0",
     "jax>=0.7.0",
     "numpyro>=0.19.0",
@@ -19,7 +19,7 @@ readme = open("README.rst").read()
 
 setup(
     name="jaxtronomy",
-    version="0.1.2",
+    version="0.1.3",
     python_requires=">=3.11",
     url="https://github.com/lenstronomy/JAXtronomy",
     author="jaxtronomy developers",
