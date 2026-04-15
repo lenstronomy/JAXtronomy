@@ -27,6 +27,8 @@ _JAXXED_MODELS = [
     "PJAFFE",
     "PJAFFE_ELLIPSE_POTENTIAL",
     "SHEAR",
+    "SHEAR_GAMMA_PSI",
+    "SHEAR_REDUCED",
     "SIE",
     "SIS",
     "SPP",
