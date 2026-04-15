@@ -687,14 +687,14 @@ def lens_class(
         from jaxtronomy.LensModel.Profiles.shear import Shear
 
         return Shear(**profile_kwargs)
-    # elif lens_type == "SHEAR_GAMMA_PSI":
-    #     from lenstronomy.LensModel.Profiles.shear import ShearGammaPsi
+    elif lens_type == "SHEAR_GAMMA_PSI":
+        from jaxtronomy.LensModel.Profiles.shear import ShearGammaPsi
 
-    #     return ShearGammaPsi(**profile_kwargs)
-    # elif lens_type == "SHEAR_REDUCED":
-    #     from lenstronomy.LensModel.Profiles.shear import ShearReduced
+        return ShearGammaPsi(**profile_kwargs)
+    elif lens_type == "SHEAR_REDUCED":
+        from jaxtronomy.LensModel.Profiles.shear import ShearReduced
 
-    #     return ShearReduced(**profile_kwargs)
+        return ShearReduced(**profile_kwargs)
     elif lens_type == "SIE":
         from jaxtronomy.LensModel.Profiles.sie import SIE
 
