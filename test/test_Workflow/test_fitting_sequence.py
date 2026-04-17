@@ -319,6 +319,7 @@ class TestFittingSequence(object):
         }
         fitting_list.append(["PSO", kwargs_pso])
 
+        # check that an error is raised when threadCount is higher than the number of detectable JAX devices
         npt.assert_raises(ValueError, fittingSequence.fit_sequence, fitting_list)
         kwargs_pso.pop("threadCount")
 
@@ -879,6 +880,8 @@ class TestFittingSequence(object):
         kwargs_dypolychord2["kwargs_run"]["resume_dyn_run"] = True
         kwargs_dypolychord2["prior_type"] = "gaussian"
         fitting_list.append(["dyPolyChord", kwargs_dypolychord2])
+
+        # resume_dyn_run feature doesn't work
         npt.assert_raises(ValueError, fittingSequence.fit_sequence, fitting_list)
 
         kwargs_dypolychord2["kwargs_run"]["resume_dyn_run"] = False
@@ -932,6 +935,9 @@ class TestFittingSequence(object):
             kwargs_likelihood,
             kwargs_params,
         )
+
+        # check that an error is raised when the number of parameters have changed but
+        # init_samples is the same as before, and re_use_samples is set to True
         npt.assert_raises(ValueError, fittingSequence.fit_sequence, fitting_list)
         kwargs_mcmc["init_samples"] = None
 

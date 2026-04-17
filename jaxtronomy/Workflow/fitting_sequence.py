@@ -437,7 +437,7 @@ class FittingSequence(object):
                 mean_start,
                 sigma_start,
                 mpi=self._mpi,
-                threadCount=None,
+                threadCount=threadCount,
                 progress=progress,
                 initpos=initpos,
                 backend_filename=backend_filename,
@@ -513,7 +513,7 @@ class FittingSequence(object):
         n_iterations,
         sigma_scale=1,
         print_key="PSO",
-        threadCount=None,
+        threadCount=1,
     ):
         """Particle Swarm Optimization.
 
