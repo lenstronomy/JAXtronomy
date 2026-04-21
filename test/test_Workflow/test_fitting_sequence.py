@@ -282,6 +282,19 @@ class TestFittingSequence(object):
             np.sum(self.psf_class.kernel_point_source), 1, decimal=6
         )
 
+    def test_init(self):
+        kwargs_constraints = copy.deepcopy(self.kwargs_constraints)
+        kwargs_constraints['solver_type'] = "PROFILE_SHEAR"
+        npt.assert_raises(
+            NotImplementedError,
+            FittingSequence,
+            self.kwargs_data_joint,
+            self.kwargs_model,
+            kwargs_constraints,
+            self.kwargs_likelihood,
+            self.kwargs_params,
+        )
+
     def test_fitting_sequence(self):
         fittingSequence = FittingSequence(
             self.kwargs_data_joint,
