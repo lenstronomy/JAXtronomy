@@ -1,8 +1,10 @@
-from jax import jit, numpy as jnp, tree_util
+import jax
+from jax import jit, lax, numpy as jnp, tree_util
 from jax.scipy import signal
 import numpy as np
 
 from jaxtronomy.LightModel.Profiles.gaussian import Gaussian
+from jaxtronomy._runtime_config import is_macos_metal_backend
 from lenstronomy.Util import kernel_util
 from jaxtronomy.Util import image_util, util
 from functools import partial
@@ -23,11 +25,15 @@ class PixelKernelConvolution(object):
         :param convolution_type: string, 'fft', 'grid', mode of 2d convolution
         """
         self._kernel = kernel
+        # JAX-on-Metal currently fails to legalize MHLO FFT in some builds.
+        # Use spatial convolution for 'fft*' modes on Metal.
+        self._use_metal_spatial = bool(is_macos_metal_backend())
         if convolution_type not in ["fft", "grid"]:
             if convolution_type == "fft_static":
-                self.fftconvolve_static = jit(
-                    partial(signal.fftconvolve, in2=kernel, mode="same")
-                )
+                if not self._use_metal_spatial:
+                    self.fftconvolve_static = jit(
+                        partial(signal.fftconvolve, in2=kernel, mode="same")
+                    )
             else:
                 raise ValueError(
                     "convolution_type %s not supported!" % convolution_type
@@ -41,12 +47,17 @@ class PixelKernelConvolution(object):
     # changes to a new value (but there's no need to recompile if it changes to a previous value)
     def _tree_flatten(self):
         children = (self._kernel,)
-        aux_data = {"convolution_type": self.convolution_type}
+        aux_data = {
+            "convolution_type": self.convolution_type,
+            "_use_metal_spatial": self._use_metal_spatial,
+        }
         return (children, aux_data)
 
     @classmethod
     def _tree_unflatten(cls, aux_data, children):
-        return cls(*children, **aux_data)
+        obj = cls(*children, convolution_type=aux_data["convolution_type"])
+        obj._use_metal_spatial = bool(aux_data.get("_use_metal_spatial", False))
+        return obj
 
     # ---------------------------------------------------------------------------------
 
@@ -78,12 +89,36 @@ class PixelKernelConvolution(object):
         :return: fft convolution
         """
         if self.convolution_type == "fft":
-            image_conv = signal.fftconvolve(image, self._kernel, mode="same")
+            if self._use_metal_spatial:
+                image_conv = self._spatial_convolution_same(image, self._kernel)
+            else:
+                image_conv = signal.fftconvolve(image, self._kernel, mode="same")
         elif self.convolution_type == "fft_static":
-            image_conv = self.fftconvolve_static(image)
+            if self._use_metal_spatial:
+                image_conv = self._spatial_convolution_same(image, self._kernel)
+            else:
+                image_conv = self.fftconvolve_static(image)
         else:
             image_conv = signal.convolve2d(image, self._kernel, mode="same")
         return image_conv
+
+    @staticmethod
+    @jit
+    def _spatial_convolution_same(image, kernel):
+        """Metal-safe 2D convolution via real-valued spatial kernel."""
+        image = jnp.asarray(image, dtype=float)
+        kernel = jnp.asarray(kernel, dtype=float)
+        lhs = image[jnp.newaxis, jnp.newaxis, :, :]
+        # lax.conv_general_dilated performs cross-correlation; flip kernel for convolution.
+        rhs = jnp.flip(kernel, axis=(0, 1))[jnp.newaxis, jnp.newaxis, :, :]
+        out = lax.conv_general_dilated(
+            lhs=lhs,
+            rhs=rhs,
+            window_strides=(1, 1),
+            padding="SAME",
+            dimension_numbers=("NCHW", "OIHW", "NCHW"),
+        )
+        return out[0, 0, :, :]
 
     @jit
     def re_size_convolve(self, image_low_res, image_high_res=None):

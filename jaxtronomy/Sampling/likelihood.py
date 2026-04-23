@@ -2,8 +2,9 @@ __author__ = "sibirrer"
 
 from functools import partial
 import jax
+from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
 
-jax.config.update("jax_enable_x64", True)
+configure_jax_precision_for_runtime()
 from jax import jit, lax, numpy as jnp
 import numpy as np
 

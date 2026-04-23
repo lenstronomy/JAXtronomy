@@ -1,13 +1,14 @@
 __author__ = "sibirrer"
 
 from jax import config, jit, lax, tree_util
+from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
 import jax.numpy as jnp
 
 from jaxtronomy.Util import param_util
 from jaxtronomy.Util import util
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
-config.update("jax_enable_x64", True)
+configure_jax_precision_for_runtime()
 
 __all__ = [
     "CSE",

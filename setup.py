@@ -14,6 +14,10 @@ requires = [
     "nautilus-sampler>=0.7",
     "emcee>=3.0.0",
 ]
+extras_require = {
+    # macOS-only Metal plugin for JAX GPU acceleration.
+    "metal": ['jax-metal; platform_system=="Darwin"'],
+}
 tests_require = ["pytest"]
 readme = open("README.rst").read()
 
@@ -28,6 +32,7 @@ setup(
     packages=find_packages(),
     license="BSD-3",
     install_requires=requires,
+    extras_require=extras_require,
     tests_require=tests_require,
     keywords="jaxtronomy",
     classifiers=[

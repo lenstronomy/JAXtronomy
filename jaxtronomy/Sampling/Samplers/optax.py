@@ -1,8 +1,9 @@
 __author__ = "ahuang314"
 
 import jax
+from jaxtronomy._runtime_config import configure_jax_precision_for_runtime
 
-jax.config.update("jax_enable_x64", True)
+configure_jax_precision_for_runtime()
 from jax import jit, numpy as jnp
 from functools import partial
 import optax

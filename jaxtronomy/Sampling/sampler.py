@@ -54,7 +54,9 @@ class Sampler(Sampler_lenstronomy):
         if mpi:
             raise ValueError("mpi must be False in JAXtronomy")
 
-        backend = jax.default_backend()
+        backend_raw = str(jax.default_backend()).strip().lower()
+        backend = _normalize_backend_label(backend_raw)
+        is_metal = backend_raw == "metal"
         if backend == "cpu":
             num_devices = jax.device_count()
             if n_particles % num_devices != 0:
@@ -72,11 +74,27 @@ class Sampler(Sampler_lenstronomy):
         else:
             lower_start = np.maximum(lower_start, self.lower_limit)
             upper_start = np.minimum(upper_start, self.upper_limit)
+        if is_metal:
+            lower_start = np.asarray(lower_start, dtype=float)
+            upper_start = np.asarray(upper_start, dtype=float)
+            lower_start = np.where(np.isfinite(lower_start), lower_start, -1.0e6)
+            upper_start = np.where(np.isfinite(upper_start), upper_start, 1.0e6)
+            invalid = upper_start <= lower_start
+            if np.any(invalid):
+                upper_start[invalid] = lower_start[invalid] + 1.0e-6
 
         pso = ParticleSwarmOptimizer(logL_func, lower_start, upper_start, n_particles)
 
         if init_pos is None:
             init_pos = (upper_start - lower_start) / 2 + lower_start
+        if is_metal:
+            init_pos = np.asarray(init_pos, dtype=float)
+            init_pos = np.where(
+                np.isfinite(init_pos),
+                init_pos,
+                0.5 * (np.asarray(lower_start) + np.asarray(upper_start)),
+            )
+            init_pos = np.clip(init_pos, lower_start, upper_start)
 
         pso.set_global_best(init_pos, [0] * len(init_pos), self.chain.logL(init_pos))
 
@@ -155,7 +173,7 @@ class Sampler(Sampler_lenstronomy):
         if backend_filename is not None:
             raise ValueError("backend_filename not supported in JAXtronomy")
 
-        backend = jax.default_backend()
+        backend = _normalize_backend_label(str(jax.default_backend()).strip().lower())
         if backend == "cpu":
             num_devices = jax.device_count()
             if n_walkers % (2 * num_devices) != 0:
@@ -195,6 +213,15 @@ class Sampler(Sampler_lenstronomy):
         return flat_samples, dist
 
 
+def _normalize_backend_label(backend):
+    value = str(backend).strip().lower()
+    if value in {"metal", "cuda", "rocm", "gpu", "tpu"}:
+        return "gpu"
+    if value in {"cpu", "host"}:
+        return "cpu"
+    return value
+
+
 def prepare_logL_func(backend, logL_func):
     """Parallelizes the logL function for CPU backend, and vectorizes the logL function
     for GPU backend.
@@ -205,6 +232,8 @@ def prepare_logL_func(backend, logL_func):
     :returns: a callable function that takes a set of position vectors and returns a set
         of log likelihoods.
     """
+    backend = _normalize_backend_label(backend)
+
     if backend == "cpu":
 
         mapped_func = partial(lax.map, logL_func)
@@ -226,6 +255,6 @@ def prepare_logL_func(backend, logL_func):
             return np.array(result).flatten()
 
     else:
-        raise ValueError("backend must be either 'cpu' or 'gpu'")
+        raise ValueError("backend must resolve to either 'cpu' or 'gpu'")
 
     return new_logL_func

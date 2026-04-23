@@ -4,14 +4,22 @@ import numpy as np
 import numpy.testing as npt
 
 # --------------------------------------------------------------------------
-# Remove these lines when numpyro gets updated for JAX v0.7.0 compatibility
+# Remove this block once older numpyro/JAX compatibility patching is obsolete.
 import jax.experimental.pjit
-from jax.extend.core.primitives import jit_p
 
-jax.experimental.pjit.pjit_p = jit_p
+try:
+    from jax.extend.core.primitives import jit_p
+
+    jax.experimental.pjit.pjit_p = jit_p
+except Exception:
+    # Newer JAX versions do not expose this symbol at this location.
+    pass
 # --------------------------------------------------------------------------
-from numpyro.infer.util import unconstrain_fn
 import pytest
+
+pytest.importorskip("optax")
+pytest.importorskip("numpyro")
+from numpyro.infer.util import unconstrain_fn
 
 from jaxtronomy.Sampling.Samplers.optax import OptaxMinimizer
 
