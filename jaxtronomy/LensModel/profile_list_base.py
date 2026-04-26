@@ -481,10 +481,10 @@ def lens_class(
     #     )
 
     #     return ElliSLICE(**profile_kwargs)
-    # elif lens_type == "FLEXION":
-    #     from lenstronomy.LensModel.Profiles.flexion import Flexion
+    elif lens_type == "FLEXION":
+        from jaxtronomy.LensModel.Profiles.flexion import Flexion
 
-    #     return Flexion(**profile_kwargs)
+        return Flexion(**profile_kwargs)
     # elif lens_type == "FLEXIONFG":
     #     from lenstronomy.LensModel.Profiles.flexionfg import Flexionfg
 
