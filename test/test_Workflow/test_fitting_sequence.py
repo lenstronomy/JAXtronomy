@@ -284,7 +284,7 @@ class TestFittingSequence(object):
 
     def test_init(self):
         kwargs_constraints = copy.deepcopy(self.kwargs_constraints)
-        kwargs_constraints['solver_type'] = "PROFILE_SHEAR"
+        kwargs_constraints["solver_type"] = "PROFILE_SHEAR"
         npt.assert_raises(
             NotImplementedError,
             FittingSequence,

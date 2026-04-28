@@ -37,9 +37,11 @@ class Sampler(Sampler_lenstronomy):
             starting particles
         :param upper_start: numpy array, upper end parameter of the values of the
             starting particles
-        :param threadCount: number of threads in the computation, only relevant for CPU parallelization
+        :param threadCount: number of threads in the computation, only relevant for CPU
+            parallelization
         :param init_pos: numpy array, position of the initial best guess model
-        :param mpi: bool, if True, makes instance of MPIPool to allow for MPI execution (must be False in JAXtronomy)
+        :param mpi: bool, if True, makes instance of MPIPool to allow for MPI execution
+            (must be False in JAXtronomy)
         :param print_key: string, prints the process name in the progress bar (optional)
         :param verbose: suppress or turn on print statements
         :return: kwargs_result (of best fit), [lnlikelihood of samples, positions of
@@ -51,7 +53,9 @@ class Sampler(Sampler_lenstronomy):
                 f"To ensure that the correct number of devices is recognized by JAX, an environment variable must be set; see JAX or JAXtronomy documentation."
             )
         if mpi:
-            raise ValueError("mpi must be False in JAXtronomy since parallelization is done through JAX")
+            raise ValueError(
+                "mpi must be False in JAXtronomy since parallelization is done through JAX"
+            )
 
         backend = jax.default_backend()
         if backend == "cpu":
@@ -60,7 +64,9 @@ class Sampler(Sampler_lenstronomy):
                     f"PSO particle count {n_particles} must be divisible by threadCount for parallelization. "
                     f"threadCount has been set to {threadCount}."
                 )
-        logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL, threadCount=threadCount)
+        logL_func = prepare_logL_func(
+            backend=backend, logL_func=self.chain.logL, threadCount=threadCount
+        )
 
         if lower_start is None or upper_start is None:
             lower_start, upper_start = np.array(self.lower_limit), np.array(
@@ -143,7 +149,9 @@ class Sampler(Sampler_lenstronomy):
         :rtype: numpy 2d array, numpy 1d array
         """
         if mpi:
-            raise ValueError("mpi must be False in JAXtronomy, since parallelization is done through JAX")
+            raise ValueError(
+                "mpi must be False in JAXtronomy, since parallelization is done through JAX"
+            )
         if threadCount > len(jax.devices()):
             raise ValueError(
                 f"Supplied threadCount {threadCount} is greater than {len(jax.devices())}, the number of devices detectable by JAX.\n"
@@ -161,7 +169,9 @@ class Sampler(Sampler_lenstronomy):
                     f"Number of MCMC walkers {n_walkers} must be divisible by two times threadCount for parallelization. "
                     f"threadCount has been set to {threadCount}."
                 )
-        logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL, threadCount=threadCount)
+        logL_func = prepare_logL_func(
+            backend=backend, logL_func=self.chain.logL, threadCount=threadCount
+        )
 
         import emcee
 
@@ -195,13 +205,14 @@ class Sampler(Sampler_lenstronomy):
 
 def prepare_logL_func(backend, logL_func, threadCount):
     """Parallelizes the logL function for CPU backend, and vectorizes the logL function
-    for GPU backend. Only the first threadCount cores will be used for CPU parallelization.
-    TPU support has not been implemented.
+    for GPU backend. Only the first threadCount cores will be used for CPU
+    parallelization. TPU support has not been implemented.
 
     :param backend: string, must be 'cpu' or 'gpu'.
     :param logL_func: callable function that takes a position vector and returns a log
         likelihood.
-    :param threadCount: number of threads in the computation, only relevant for CPU parallelization
+    :param threadCount: number of threads in the computation, only relevant for CPU
+        parallelization
     :returns: a callable function that takes a set of position vectors and returns a set
         of log likelihoods.
     """
