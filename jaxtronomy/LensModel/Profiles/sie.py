@@ -4,7 +4,6 @@ from jaxtronomy.LensModel.Profiles.nie import NIE
 from jaxtronomy.LensModel.Profiles.epl import EPL
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
-
 __all__ = ["SIE"]
 
 NIE_INSTANCE = NIE()

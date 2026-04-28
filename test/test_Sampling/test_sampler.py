@@ -141,12 +141,18 @@ class TestSampler(object):
 
         assert len(result) == 16
 
+        # check that an error is raised when mpi is true
         npt.assert_raises(
             ValueError, self.sampler.pso, n_particles, n_iterations, mpi=True
         )
+
+        # check that an error is raised when threadCount is higher than the number of detectable JAX devices
         npt.assert_raises(
             ValueError, self.sampler.pso, n_particles, n_iterations, threadCount=2
         )
+
+        # check that an error is raised when the number of particles is not divisible by the number of CPU devices
+        # for parallelization
         npt.assert_raises(ValueError, self.sampler.pso, 1.5, n_iterations)
 
     def test_mcmc_emcee(self):
@@ -165,6 +171,7 @@ class TestSampler(object):
         assert len(samples) == n_walkers * n_run
         assert len(dist) == len(samples)
 
+        # check that an error is raised when mpi is true
         npt.assert_raises(
             ValueError,
             self.sampler.mcmc_emcee,
@@ -175,6 +182,8 @@ class TestSampler(object):
             sigma_start,
             mpi=True,
         )
+
+        # check that an error is raised when threadCount is higher than the number of detectable JAX devices
         npt.assert_raises(
             ValueError,
             self.sampler.mcmc_emcee,
@@ -185,6 +194,8 @@ class TestSampler(object):
             sigma_start,
             threadCount=2,
         )
+
+        # starting from backend is not supported
         npt.assert_raises(
             ValueError,
             self.sampler.mcmc_emcee,
@@ -205,6 +216,9 @@ class TestSampler(object):
             sigma_start,
             backend_filename="sjd",
         )
+
+        # check that an error is raised when the number of MCMC walkers is not divisible by
+        # two times the number of CPU devices for parallelization
         npt.assert_raises(
             ValueError,
             self.sampler.mcmc_emcee,
@@ -217,20 +231,28 @@ class TestSampler(object):
 
     def test_prepare_logL_func(self):
         npt.assert_raises(
-            ValueError, prepare_logL_func, "fake_backend", self.Likelihood.logL
+            ValueError,
+            prepare_logL_func,
+            "fake_backend",
+            self.Likelihood.logL,
+            threadCount=1,
         )
 
         def logL_func(args):
             return args**2 - 4
 
-        new_logL_func = prepare_logL_func(backend="gpu", logL_func=logL_func)
+        new_logL_func = prepare_logL_func(
+            backend="gpu", logL_func=logL_func, threadCount=1
+        )
 
         x = np.array([[1, 2], [3, 4]])
         logL = new_logL_func(x)
         expected = np.array([-3, 0, 5, 12])
         npt.assert_allclose(expected, logL, atol=1e-16, rtol=1e-16)
 
-        new_logL_func = prepare_logL_func(backend="cpu", logL_func=logL_func)
+        new_logL_func = prepare_logL_func(
+            backend="cpu", logL_func=logL_func, threadCount=1
+        )
         logL = new_logL_func(x)
         npt.assert_allclose(expected, logL, atol=1e-16, rtol=1e-16)
 

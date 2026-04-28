@@ -13,6 +13,7 @@ _JAXXED_MODELS = [
     "EPL_MULTIPOLE_M3M4_ELL",
     "EPL_MULTIPOLE_M3M4",
     "EPL_Q_PHI",
+    "FLEXION",
     "GAUSSIAN",
     "GAUSSIAN_POTENTIAL",
     "HERNQUIST",
@@ -27,6 +28,8 @@ _JAXXED_MODELS = [
     "PJAFFE",
     "PJAFFE_ELLIPSE_POTENTIAL",
     "SHEAR",
+    "SHEAR_GAMMA_PSI",
+    "SHEAR_REDUCED",
     "SIE",
     "SIS",
     "SPP",
@@ -479,10 +482,10 @@ def lens_class(
     #     )
 
     #     return ElliSLICE(**profile_kwargs)
-    # elif lens_type == "FLEXION":
-    #     from lenstronomy.LensModel.Profiles.flexion import Flexion
+    elif lens_type == "FLEXION":
+        from jaxtronomy.LensModel.Profiles.flexion import Flexion
 
-    #     return Flexion(**profile_kwargs)
+        return Flexion(**profile_kwargs)
     # elif lens_type == "FLEXIONFG":
     #     from lenstronomy.LensModel.Profiles.flexionfg import Flexionfg
 
@@ -685,14 +688,14 @@ def lens_class(
         from jaxtronomy.LensModel.Profiles.shear import Shear
 
         return Shear(**profile_kwargs)
-    # elif lens_type == "SHEAR_GAMMA_PSI":
-    #     from lenstronomy.LensModel.Profiles.shear import ShearGammaPsi
+    elif lens_type == "SHEAR_GAMMA_PSI":
+        from jaxtronomy.LensModel.Profiles.shear import ShearGammaPsi
 
-    #     return ShearGammaPsi(**profile_kwargs)
-    # elif lens_type == "SHEAR_REDUCED":
-    #     from lenstronomy.LensModel.Profiles.shear import ShearReduced
+        return ShearGammaPsi(**profile_kwargs)
+    elif lens_type == "SHEAR_REDUCED":
+        from jaxtronomy.LensModel.Profiles.shear import ShearReduced
 
-    #     return ShearReduced(**profile_kwargs)
+        return ShearReduced(**profile_kwargs)
     elif lens_type == "SIE":
         from jaxtronomy.LensModel.Profiles.sie import SIE
 

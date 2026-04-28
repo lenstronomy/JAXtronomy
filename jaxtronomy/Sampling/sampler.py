@@ -22,7 +22,7 @@ class Sampler(Sampler_lenstronomy):
         n_iterations,
         lower_start=None,
         upper_start=None,
-        threadCount=None,
+        threadCount=1,
         init_pos=None,
         mpi=False,
         print_key="PSO",
@@ -37,32 +37,36 @@ class Sampler(Sampler_lenstronomy):
             starting particles
         :param upper_start: numpy array, upper end parameter of the values of the
             starting particles
-        :param threadCount: number of threads in the computation (only applied if
-            mpi=False)
+        :param threadCount: number of threads in the computation, only relevant for CPU
+            parallelization
         :param init_pos: numpy array, position of the initial best guess model
         :param mpi: bool, if True, makes instance of MPIPool to allow for MPI execution
+            (must be False in JAXtronomy)
         :param print_key: string, prints the process name in the progress bar (optional)
         :param verbose: suppress or turn on print statements
         :return: kwargs_result (of best fit), [lnlikelihood of samples, positions of
             samples, velocity of samples])
         """
-
-        if threadCount is not None:
+        if threadCount > len(jax.devices()):
             raise ValueError(
-                "PSO threadCount must be None. In JAXtronomy, parallelization across CPU cores is done automatically."
+                f"Supplied threadCount {threadCount} is greater than {len(jax.devices())}, the number of devices detectable by JAX.\n"
+                f"To ensure that the correct number of devices is recognized by JAX, an environment variable must be set; see JAX or JAXtronomy documentation."
             )
         if mpi:
-            raise ValueError("mpi must be False in JAXtronomy")
+            raise ValueError(
+                "mpi must be False in JAXtronomy since parallelization is done through JAX"
+            )
 
         backend = jax.default_backend()
         if backend == "cpu":
-            num_devices = jax.device_count()
-            if n_particles % num_devices != 0:
+            if n_particles % threadCount != 0:
                 raise ValueError(
-                    f"PSO particle count {n_particles} must be divisible by the number of CPU devices for parallelization. "
-                    f"There are {num_devices} cpu devices currently recognized by JAX."
+                    f"PSO particle count {n_particles} must be divisible by threadCount for parallelization. "
+                    f"threadCount has been set to {threadCount}."
                 )
-        logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
+        logL_func = prepare_logL_func(
+            backend=backend, logL_func=self.chain.logL, threadCount=threadCount
+        )
 
         if lower_start is None or upper_start is None:
             lower_start, upper_start = np.array(self.lower_limit), np.array(
@@ -110,7 +114,7 @@ class Sampler(Sampler_lenstronomy):
         sigma_start,
         mpi=False,
         progress=False,
-        threadCount=None,
+        threadCount=1,
         initpos=None,
         backend_filename=None,
         start_from_backend=False,
@@ -128,11 +132,11 @@ class Sampler(Sampler_lenstronomy):
         :type mean_start: numpy array of length the number of parameters
         :param sigma_start: spread of the parameter values (uncorrelated in each dimension) of the initialising sample
         :type sigma_start: numpy array of length the number of parameters
-        :param mpi: if True, initializes an MPIPool to allow for MPI execution of the sampler
+        :param mpi: if True, initializes an MPIPool to allow for MPI execution of the sampler. Must be False in JAXtronomy
         :type mpi: bool
         :param progress: if True, prints the progress bar
         :type progress: bool
-        :param threadCount: number of threats in multi-processing (not applicable for MPI)
+        :param threadCount: number of threads used for computation, only relevant for CPU parallelization
         :type threadCount: integer
         :param initpos: initial walker position to start sampling (optional)
         :type initpos: numpy array of size num param x num walkser
@@ -145,10 +149,13 @@ class Sampler(Sampler_lenstronomy):
         :rtype: numpy 2d array, numpy 1d array
         """
         if mpi:
-            raise ValueError("mpi must be False in JAXtronomy")
-        if threadCount is not None:
             raise ValueError(
-                "MCMC threadCount must be set to None in JAXtronomy, since parallelization is done automatically."
+                "mpi must be False in JAXtronomy, since parallelization is done through JAX"
+            )
+        if threadCount > len(jax.devices()):
+            raise ValueError(
+                f"Supplied threadCount {threadCount} is greater than {len(jax.devices())}, the number of devices detectable by JAX.\n"
+                f"To ensure that the correct number of devices is recognized by JAX, an environment variable must be set; see JAX or JAXtronomy documentation."
             )
         if start_from_backend:
             raise ValueError("start_from_backend must be False in JAXtronomy")
@@ -157,13 +164,14 @@ class Sampler(Sampler_lenstronomy):
 
         backend = jax.default_backend()
         if backend == "cpu":
-            num_devices = jax.device_count()
-            if n_walkers % (2 * num_devices) != 0:
+            if n_walkers % (2 * threadCount) != 0:
                 raise ValueError(
-                    f"Number of MCMC walkers {n_walkers} must be divisible by two times the number of CPU devices for parallelization. "
-                    f"There are {num_devices} cpu devices currently recognized by JAX."
+                    f"Number of MCMC walkers {n_walkers} must be divisible by two times threadCount for parallelization. "
+                    f"threadCount has been set to {threadCount}."
                 )
-        logL_func = prepare_logL_func(backend=backend, logL_func=self.chain.logL)
+        logL_func = prepare_logL_func(
+            backend=backend, logL_func=self.chain.logL, threadCount=threadCount
+        )
 
         import emcee
 
@@ -195,26 +203,29 @@ class Sampler(Sampler_lenstronomy):
         return flat_samples, dist
 
 
-def prepare_logL_func(backend, logL_func):
+def prepare_logL_func(backend, logL_func, threadCount):
     """Parallelizes the logL function for CPU backend, and vectorizes the logL function
-    for GPU backend.
+    for GPU backend. Only the first threadCount cores will be used for CPU
+    parallelization. TPU support has not been implemented.
 
     :param backend: string, must be 'cpu' or 'gpu'.
     :param logL_func: callable function that takes a position vector and returns a log
         likelihood.
+    :param threadCount: number of threads in the computation, only relevant for CPU
+        parallelization
     :returns: a callable function that takes a set of position vectors and returns a set
         of log likelihoods.
     """
     if backend == "cpu":
+        devices = jax.devices()[0:threadCount]
 
         mapped_func = partial(lax.map, logL_func)
-        pmapped_func = jax.pmap(mapped_func, devices=jax.devices())
-        num_devices = jax.device_count()
+        pmapped_func = jax.pmap(mapped_func, devices=devices)
 
         def new_logL_func(args):
             args = np.array(args)
             old_shape = args.shape
-            new_shape = (num_devices, int(old_shape[0] / num_devices), old_shape[-1])
+            new_shape = (threadCount, int(old_shape[0] / threadCount), old_shape[-1])
             result = pmapped_func(args.reshape(new_shape))
             return np.array(result).flatten()
 
