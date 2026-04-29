@@ -6,6 +6,8 @@ from jaxtronomy.LensModel.MultiPlane.multi_plane import MultiPlane
 
 from lenstronomy.Cosmo.lens_cosmo import LensCosmo
 from lenstronomy.Util import constants as const
+from lenstronomy.Util.cosmo_util import get_astropy_cosmology
+from astropy.cosmology import default_cosmology
 
 from functools import partial
 from jax import jit
@@ -38,6 +40,7 @@ class LensModel(object):
         kwargs_multiplane_model=None,
         distance_ratio_sampling=False,
         cosmology_sampling=False,
+        cosmology_model="FlatLambdaCDM",
     ):
         """
 
@@ -68,6 +71,7 @@ class LensModel(object):
             distance ratios to update T_ij value in multi-lens plane computation. Not supported in JAXtronomy.
         :param cosmology_sampling: bool, if True, will use sampled cosmology
             to update T_ij value in multi-lens plane computation. Not supported in JAXtronomy.
+        :param cosmology_model: str, name of the cosmology model to be used. Default is 'FlatLambdaCDM'.
         """
         if cosmology_sampling:
             raise ValueError("Cosmology sampling not supported in JAXtronomy")
@@ -88,11 +92,13 @@ class LensModel(object):
             profile_kwargs_list = [{} for _ in range(len(lens_model_list))]
         self.profile_kwargs_list = profile_kwargs_list
 
-        if cosmo is None:
-            from astropy.cosmology import default_cosmology
-
+        if cosmo is None and cosmology_model == "FlatLambdaCDM":
             cosmo = default_cosmology.get()
+        elif cosmo is None and cosmology_model != "FlatLambdaCDM":
+            cosmo = get_astropy_cosmology(cosmology_model=cosmology_model)
+
         self.cosmo = cosmo
+        self.cosmology_model = cosmology_model
 
         # Are there line-of-sight corrections?
         permitted_los_models = ["LOS", "LOS_MINIMAL"]
