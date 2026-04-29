@@ -73,6 +73,8 @@ class FittingSequence(object):
         self.multi_band_type = kwargs_data_joint.get("multi_band_type", "single-band")
         self._verbose = verbose
         self._mpi = mpi
+
+        kwargs_constraints["_jax"] = True
         self._updateManager = MultiBandUpdateManager(
             kwargs_model,
             kwargs_constraints,
