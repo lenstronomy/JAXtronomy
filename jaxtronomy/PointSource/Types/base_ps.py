@@ -43,7 +43,11 @@ class PSBase(object):
         # Only need to create a new LensModel class if the point source has a redshift
         # that is different than in the initial LensModel class
         # The behavior should be the same as in lenstronomy's LensModel.change_source_redshift()
-        if lens_model is not None and redshift != lens_model.z_source and redshift is not None:
+        if (
+            lens_model is not None
+            and redshift != lens_model.z_source
+            and redshift is not None
+        ):
             new_init_kwargs = deepcopy(lens_model.init_kwargs)
             new_init_kwargs["z_source"] = redshift
             self._lens_model = LensModel(**new_init_kwargs)
