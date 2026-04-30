@@ -400,6 +400,7 @@ class TestPointSource3(TestPointSource):
 
         self.kwargs_lens = [kwargs_epl, kwargs_sis]
 
+
 # Same tests as before but this time with set index_lens_model_list and point_source_frame_list
 # Different setup method but inherits all the tests from above
 class TestPointSourcewithFrames(TestPointSource):
