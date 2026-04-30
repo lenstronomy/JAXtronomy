@@ -331,6 +331,76 @@ class TestPointSource2(TestPointSource):
         self.kwargs_lens = [kwargs_epl, kwargs_sis]
 
 
+# Same tests as before but this time with MultiPlane lens model and
+# the redshift_list is set to None when initializing the PointSource class
+# So the ray shooting should be done using z_source
+# Different setup method but inherits all the tests from above
+class TestPointSource3(TestPointSource):
+    def setup_method(self):
+
+        lens_model_list = ["EPL", "SIS"]
+        point_source_type_list = ["LENSED_POSITION", "UNLENSED", "LENSED_POSITION"]
+
+        lensmodel = LensModel(
+            lens_model_list=lens_model_list,
+            lens_redshift_list=[0.6, 0.8],
+            multi_plane=True,
+            z_source=1.1,
+            z_source_convention=1.1,
+        )
+        self.ps = PointSource(
+            point_source_type_list=point_source_type_list,
+            lens_model=lensmodel,
+            fixed_magnification_list=[False, False, True],
+        )
+
+        lensmodel_ref = LensModel_ref(
+            lens_model_list=lens_model_list,
+            lens_redshift_list=[0.6, 0.8],
+            multi_plane=True,
+            z_source=1.1,
+            z_source_convention=1.1,
+        )
+        self.ps_ref = PointSource_ref(
+            point_source_type_list=point_source_type_list,
+            lens_model=lensmodel_ref,
+            fixed_magnification_list=[False, False, True],
+        )
+
+        kwargs_ps1 = {
+            "ra_image": [0.1, 0.3, -0.298],
+            "dec_image": [-0.3, 0.2, 0.1293],
+            "point_amp": [1.3, 1.4, 0.2387],
+        }
+
+        kwargs_ps2 = {
+            "ra_image": [0.5, 0.1, 0.2198, 1.38234],
+            "dec_image": [-0.31, 0.232, -0.23487, 0.2347],
+            "point_amp": [1.3534, 1.4345, 0.434, 2.3429],
+        }
+
+        kwargs_ps3 = {
+            "ra_image": [0.4321, 0.233, 0.345],
+            "dec_image": [-0.123, 0.243, 0.389],
+            "source_amp": 1.5,
+        }
+        self.kwargs_ps = [kwargs_ps1, kwargs_ps2, kwargs_ps3]
+
+        kwargs_epl = {
+            "theta_E": 1.3,
+            "gamma": 1.7,
+            "e1": 0.13,
+            "e2": 0.01,
+        }
+        kwargs_sis = {
+            "theta_E": 1.5,
+            "center_x": -0.11,
+            "center_y": -0.03,
+        }
+
+        self.kwargs_lens = [kwargs_epl, kwargs_sis]
+
+
 # Same tests as before but this time with set index_lens_model_list and point_source_frame_list
 # Different setup method but inherits all the tests from above
 class TestPointSourcewithFrames(TestPointSource):

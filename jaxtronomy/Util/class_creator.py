@@ -30,6 +30,8 @@ def create_class_instances(
     lens_profile_kwargs_list=None,
     multi_plane=False,
     distance_ratio_sampling=False,
+    cosmology_sampling=False,
+    cosmology_model="FlatLambdaCDM",
     observed_convention_index=None,
     source_light_model_list=None,
     source_light_profile_kwargs_list=None,
@@ -76,6 +78,8 @@ def create_class_instances(
         profile will be initialized using default settings.
     :param multi_plane: bool, if True, computes the lensing quantities in multi-plane mode
     :param distance_ratio_sampling: bool, if True, samples the distance ratios in multi-lens-plane
+    :param cosmology_sampling: bool, if True, samples the cosmology in multi-lens-plane
+    :param cosmology_model: string, name of the cosmology model to be used in the multi-lens-plane mode
     :param observed_convention_index:
     :param source_light_model_list: list of strings indicating the type of source light models
     :param source_light_profile_kwargs_list: list of dicts, keyword arguments used to initialize source light
@@ -173,6 +177,8 @@ def create_class_instances(
         multi_plane=multi_plane,
         cosmo=cosmo,
         distance_ratio_sampling=distance_ratio_sampling,
+        cosmology_sampling=cosmology_sampling,
+        cosmology_model=cosmology_model,
         observed_convention_index=observed_convention_index_i,
         profile_kwargs_list=lens_profile_kwargs_list,
         decouple_multi_plane=decouple_multi_plane,

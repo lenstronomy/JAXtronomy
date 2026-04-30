@@ -19,7 +19,7 @@ class TestMultiPlane(object):
         z_source = 3.5
         lens_model_list = ["NFW", "NIE", "NFW", "NFW", "NFW"]
         redshift_list = [0.5, 1.1, 1.1, 1.5, 1.3]
-        cosmo = FlatwCDM(H0=70, Om0=0.3, w0=-0.8)
+        cosmo = FlatwCDM(H0=70, Om0=0.3, w0=-1)
         self.multiplane = MultiPlane(
             z_source=z_source,
             lens_model_list=lens_model_list,
@@ -28,8 +28,9 @@ class TestMultiPlane(object):
             cosmo_interp=True,
             distance_ratio_sampling=False,
             z_lens_convention=0.5,
-            cosmo=cosmo,
+            cosmo=None,
             cosmology_sampling=False,
+            cosmology_model="FlatwCDM",
         )
 
         self.multiplane_ref = MultiPlane_ref(

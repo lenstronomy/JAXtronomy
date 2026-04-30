@@ -63,9 +63,9 @@ class FittingSequence(object):
         :param verbose: bool, if True prints temporary results and indicators of the fitting process
         """
         solver_type = kwargs_constraints.get("solver_type", None)
-        if solver_type is not None:
+        if solver_type is not None and solver_type != "NONE":
             raise NotImplementedError(
-                "JAXtronomy has not implemented any solvers, so solver_type must be set to None."
+                "JAXtronomy has not implemented any solvers, so solver_type must be set to None or 'NONE'."
             )
 
         self.kwargs_data_joint = kwargs_data_joint
@@ -73,6 +73,8 @@ class FittingSequence(object):
         self.multi_band_type = kwargs_data_joint.get("multi_band_type", "single-band")
         self._verbose = verbose
         self._mpi = mpi
+
+        kwargs_constraints["_jax"] = True
         self._updateManager = MultiBandUpdateManager(
             kwargs_model,
             kwargs_constraints,

@@ -177,6 +177,8 @@ class TestLensModel(object):
             lens_redshift_list=[z_lens, 0.7, 0.9],
             z_lens=z_lens,
             z_source=z_source,
+            cosmo=None,
+            cosmology_model="FlatLambdaCDM",
         )
         lensModel_ref = LensModel_ref(
             lens_model_list=["SIS", "SIS", "SIS"],
@@ -184,6 +186,8 @@ class TestLensModel(object):
             lens_redshift_list=[z_lens, 0.7, 0.9],
             z_lens=z_lens,
             z_source=z_source,
+            cosmo=None,
+            cosmology_model="FlatLambdaCDM",
         )
         kwargs = [
             {"theta_E": 1.1, "center_x": 0.0, "center_y": 0.0},
@@ -233,6 +237,8 @@ class TestLensModel(object):
             lens_redshift_list=[z_lens],
             z_lens=z_lens,
             z_source=z_source,
+            cosmo=None,
+            cosmology_model="FlatwCDM",
         )
         lensModel_ref = LensModel_ref(
             lens_model_list=["SIS"],
@@ -240,6 +246,8 @@ class TestLensModel(object):
             lens_redshift_list=[z_lens],
             z_lens=z_lens,
             z_source=z_source,
+            cosmo=None,
+            cosmology_model="FlatwCDM",
         )
         kwargs = [{"theta_E": 1.0, "center_x": 0.0, "center_y": 0.0}]
         fermat_pot = lensModel.fermat_potential(x_image, y_image, kwargs)
