@@ -103,7 +103,6 @@ class ImageNoise(object):
         :param model: model (same as data but without noise)
         :return: estimate of the noise per pixel based on the model flux
         """
-
         if self._noise_map is not None:
             return self._noise_map**2
         else:

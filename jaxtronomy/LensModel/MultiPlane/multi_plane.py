@@ -731,7 +731,6 @@ class LensedLocation(object):
         :param multiplane_instance: instance of the MultiPlaneBase class
         :param observed_convention_index: list of lens model indexes to be modelled in the observed plane
         """
-
         self._multiplane = multiplane_instance
 
         if len(observed_convention_index) == 1:

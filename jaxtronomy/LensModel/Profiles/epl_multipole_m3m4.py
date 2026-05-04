@@ -95,7 +95,6 @@ class EPL_MULTIPOLE_M3M4_ELL(LensProfileBase):
         :param center_y: center of the profile
         :return: the keyword arguments for the joint profile
         """
-
         phi, q = param_util.ellipticity2phi_q(e1, e2)
         kwargs_epl = {
             "theta_E": theta_E,
@@ -410,7 +409,6 @@ class EPL_MULTIPOLE_M3M4(LensProfileBase):
         :param center_y: center of the profile
         :return: the keyword arguments for the joint profile
         """
-
         phi, q = param_util.ellipticity2phi_q(e1, e2)
         rescale_am = theta_E / jnp.sqrt(q)
         kwargs_epl = {

@@ -96,7 +96,6 @@ class SinglePlaneLOS(SinglePlane):
         :return: a list of kwargs corresponding to the lens and a list of kwargs
             corresponding to the LOS effects
         """
-
         kwargs_los = copy.deepcopy(kwargs[self._index_los])
         # if 'LOS_MINIMAL' is at play, we set Gamma_os = Gamma_los
         # and Gamma_ds = Gamma_od
@@ -130,7 +129,6 @@ class SinglePlaneLOS(SinglePlane):
         :type k: None, int, or tuple of ints
         :return: fermat potential in arcsec**2 as a list
         """
-
         kwargs_main, kwargs_los = self.split_lens_los(kwargs_lens)
 
         # the amplification matrices
@@ -229,7 +227,6 @@ class SinglePlaneLOS(SinglePlane):
         :type k: None, int, or tuple of ints
         :return: deflection angles in units of arcsec
         """
-
         kwargs_main, kwargs_los = self.split_lens_los(kwargs)
 
         # Angular position where the ray hits the deflector's plane
@@ -285,7 +282,6 @@ class SinglePlaneLOS(SinglePlane):
         :type k: None, int, or tuple of ints
         :return: f_xx, f_xy, f_yx, f_yy components
         """
-
         kwargs_main, kwargs_los = self.split_lens_los(kwargs)
 
         # Angular position where the ray hits the deflector's plane
@@ -346,7 +342,6 @@ class SinglePlaneLOS(SinglePlane):
         :type k: None, int, or tuple of ints
         :return: mass (in angular units, modulo epsilon_crit)
         """
-
         print("Note: The computation of the 3d mass ignores the LOS corrections.")
 
         kwargs_main, kwargs_los = self.split_lens_los(kwargs)
@@ -391,7 +386,6 @@ class SinglePlaneLOS(SinglePlane):
         :type k: None, int, or tuple of ints
         :return: mass density at radius r (in angular units, modulo epsilon_crit)
         """
-
         print("Note: The computation of the density ignores the LOS corrections.")
 
         kwargs_main, kwargs_los = self.split_lens_los(kwargs)
@@ -415,7 +409,6 @@ class SinglePlaneLOS(SinglePlane):
         :type k: None, int, or tuple of ints
         :return: lensing potential in units of arcsec^2
         """
-
         debug.print(
             "Note: The computation of the potential ignores the LOS corrections.\
               In the presence of LOS corrections, a lensing system does not always\

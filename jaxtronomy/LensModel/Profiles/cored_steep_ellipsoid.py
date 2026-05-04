@@ -221,7 +221,6 @@ class CSEMajorAxis(LensProfileBase):
         :param q: axis ratio
         :return: lensing potential
         """
-
         # potential calculation
         psi = jnp.sqrt(q**2 * (s**2 + x**2) + y**2)
         Phi = (psi + s) ** 2 + (1 - q**2) * x**2
@@ -240,7 +239,6 @@ class CSEMajorAxis(LensProfileBase):
         :param q: axis ratio
         :return: deflection in x- and y-direction
         """
-
         psi = jnp.sqrt(q**2 * (s**2 + x**2) + y**2)
         Phi = (psi + s) ** 2 + (1 - q**2) * x**2
         f_x = q * x * (psi + q**2 * s) / (s * psi * Phi)
@@ -260,7 +258,6 @@ class CSEMajorAxis(LensProfileBase):
         :param q: axis ratio
         :return: hessian elements f_xx, f_xy, f_yx, f_yy
         """
-
         # equations 21-23 in Oguri 2021
         psi = jnp.sqrt(q**2 * (s**2 + x**2) + y**2)
         Phi = (psi + s) ** 2 + (1 - q**2) * x**2
@@ -295,7 +292,6 @@ class CSEMajorAxis(LensProfileBase):
 
 class CSEMajorAxisSet(LensProfileBase):
     """A set of CSE profiles along a joint center and axis."""
-
     def __init__(self):
         super(CSEMajorAxisSet, self).__init__()
 
@@ -493,7 +489,6 @@ class CSEProductAvg(LensProfileBase):
 
 class CSEProductAvgSet(LensProfileBase):
     """A set of CSE profiles along a joint center and axis."""
-
     def __init__(self):
         super(CSEProductAvgSet, self).__init__()
 

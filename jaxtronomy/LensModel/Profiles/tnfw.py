@@ -104,7 +104,6 @@ class TNFW(LensProfileBase):
         :param center_y: center of halo (in angular units)
         :return: Hessian matrix of function d^2f/dx^2, d^f/dy^2, d^2/dxdy
         """
-
         rho0_input = TNFW.alpha2rho0(alpha_Rs=alpha_Rs, Rs=Rs)
         x_ = jnp.array(x - center_x, dtype=float)
         y_ = jnp.array(y - center_y, dtype=float)
@@ -171,7 +170,6 @@ class TNFW(LensProfileBase):
         :param r_trunc: truncation radius (angular units)
         :return: mass enclosed 2d projected cylinder
         """
-
         x = R / Rs
         x = jnp.maximum(x, TNFW._s)
         tau = r_trunc / Rs
@@ -190,7 +188,6 @@ class TNFW(LensProfileBase):
         :param r_trunc: truncation radius (angular units)
         :return: M(<r)
         """
-
         x = r / Rs
         x = jnp.maximum(x, TNFW._s)
         func = (
@@ -299,7 +296,6 @@ class TNFW(LensProfileBase):
         :param x: r/Rs
         :return:
         """
-
         x = jnp.maximum(x, TNFW._s)
         result = jnp.where(
             x < 1, (1 - x**2) ** -0.5 * jnp.arctanh((1 - x**2) ** 0.5), x

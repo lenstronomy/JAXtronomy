@@ -50,7 +50,6 @@ class OptaxMinimizer:
             is stopped
         :param rng_seed: int, used to draw initial parameters from the prior distribution
         """
-
         init_param_list = self._draw_init_params(
             num_chains=num_chains, rng_seed=rng_seed
         )
@@ -136,7 +135,6 @@ class OptaxMinimizer:
 
         :param args_unconstrained: array of args in the unconstrained space
         """
-
         # Convert uncontrained space parameters to constrained space
         args_constrained = constrain_fn(
             self._numpyro_model,
@@ -153,5 +151,4 @@ class OptaxMinimizer:
 
         This function does not actually do anything.
         """
-
         numpyro.sample("args", self.dist)

@@ -134,9 +134,10 @@ def hyp2f1_continuation(a, b, c, z, nmax=50):
 
 @partial(jit, static_argnums=4)
 def hyp2f1_lopez_temme_8(a, b, c, z, nmax=75):
-    """
-    Equation 8 from J.L. Lopez and N.M. Temme, “New series expansions of the
-    Gauss hypergeometric function”, Adv Comput Math 39, 349-365 (2013).
+    """Equation 8 from J.L.
+
+    Lopez and N.M. Temme, “New series expansions of the Gauss hypergeometric function”,
+    Adv Comput Math 39, 349-365 (2013).
     https://link.springer.com/content/pdf/10.1007/s10444-012-9283-y.pdf"
 
     This series expansion converges whenever Re(z) < 1, and does not have any

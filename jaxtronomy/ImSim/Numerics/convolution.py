@@ -140,7 +140,6 @@ class SubgridKernelConvolution(object):
         :param image: 2d array (high resoluton image) to be convolved and re-sized
         :return: convolved image
         """
-
         image_high_res_conv = self._high_res_conv.convolution2d(image)
         image_resized_conv = image_util.re_size(
             image_high_res_conv, self._supersampling_factor
@@ -220,7 +219,6 @@ class GaussianConvolution(object):
         :param image: 2d numpy array, image to be convolved
         :return: convolved image, 2d numpy array
         """
-
         # Pads the image before convolution. This is equivalent to performing scipy.ndimage.gaussian_filter
         # with mode "nearest"
         image = jnp.pad(image, pad_width=self._pad_width, mode="edge")
@@ -259,7 +257,6 @@ class GaussianConvolution(object):
             scipy.ndimage.gaussian_filter
         :return: pixel kernel centered
         """
-
         if num_pix % 2 == 0:
             raise ValueError("num_pix must be an odd integer")
         if num_pix < 3:

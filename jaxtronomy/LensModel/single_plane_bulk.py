@@ -28,7 +28,6 @@ class SinglePlaneBulk(ProfileListBase):
         :param unique_lens_model_list: a list of the unique lens models that will be used to perform ray shooting.
         :param profile_kwargs_list: list of dictionaries, keyword arguments used to intiialize different lens model profiles
         """
-
         self.unique_lens_model_list = unique_lens_model_list
         if isinstance(profile_kwargs_list, list):
             profile_kwargs_list += [{}]

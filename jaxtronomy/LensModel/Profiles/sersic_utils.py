@@ -45,7 +45,6 @@ class SersicUtil(object):
         :param n: Sersic index
         :param Re: the desired half light radius
         """
-
         bn = self.b_n(n)
         k = bn * Re ** (-1.0 / n)
         return k, bn
@@ -58,7 +57,6 @@ class SersicUtil(object):
         :param n: Sersic index
         :param k: normalization of the sersic profile
         """
-
         bn = self.b_n(n)
         Re = (bn / k) ** n
         return Re
@@ -91,7 +89,6 @@ class SersicUtil(object):
         :param center_y: center y of sersic
         :return: distance from center of Sersic
         """
-
         if self._sersic_major_axis:
             phi_G, q = param_util.ellipticity2phi_q(e1, e2)
             x_shift = x - center_x
@@ -258,7 +255,6 @@ class SersicUtil(object):
         :param max_R_frac: maximum window outside which the mass is zeroed, in units of R_sersic (float)
         :return: kernel of the Sersic surface brightness at R
         """
-
         R_ = self._R_stable(R)
         R_sersic_ = self._R_stable(R_sersic)
         bn = self.b_n(n_sersic)

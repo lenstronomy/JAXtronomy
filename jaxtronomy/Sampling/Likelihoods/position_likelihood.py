@@ -114,7 +114,6 @@ class PositionLikelihood(object):
         :param verbose: bool
         :return: log likelihood of the optional likelihoods being computed
         """
-
         logL = 0
 
         # TODO: Cosmology sampling not in jaxtronomy yet
@@ -242,7 +241,6 @@ class PositionLikelihood(object):
         :return: log likelihood of the model predicted image positions given the
             data/measured image positions.
         """
-
         ra_image_list, dec_image_list = self._pointSource.image_position(
             kwargs_ps=kwargs_ps, kwargs_lens=kwargs_lens, original_position=True
         )
