@@ -8,6 +8,7 @@ from lenstronomy.Util import sampling_util
 from functools import partial
 import jax
 from jax import lax
+import warnings
 
 __all__ = ["Sampler"]
 
@@ -60,10 +61,13 @@ class Sampler(Sampler_lenstronomy):
         backend = jax.default_backend()
         if backend == "cpu":
             if n_particles % threadCount != 0:
-                raise ValueError(
+                new_n_particles = int(((n_particles // threadCount) + 1) * threadCount)
+                warnings.warn(
                     f"PSO particle count {n_particles} must be divisible by threadCount for parallelization. "
-                    f"threadCount has been set to {threadCount}."
+                    f"n_particles will automatically be set to {new_n_particles}."
                 )
+                n_particles = new_n_particles
+                
         logL_func = prepare_logL_func(
             backend=backend, logL_func=self.chain.logL, threadCount=threadCount
         )
@@ -165,10 +169,13 @@ class Sampler(Sampler_lenstronomy):
         backend = jax.default_backend()
         if backend == "cpu":
             if n_walkers % (2 * threadCount) != 0:
-                raise ValueError(
+                new_n_walkers = int(((n_walkers // (2 * threadCount)) + 1) * (2 * threadCount))
+                warnings.warn(
                     f"Number of MCMC walkers {n_walkers} must be divisible by two times threadCount for parallelization. "
-                    f"threadCount has been set to {threadCount}."
+                    f"The number of walkers will automatically be set to {new_n_walkers}."
                 )
+                n_walkers = new_n_walkers
+
         logL_func = prepare_logL_func(
             backend=backend, logL_func=self.chain.logL, threadCount=threadCount
         )

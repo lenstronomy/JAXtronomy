@@ -151,9 +151,9 @@ class TestSampler(object):
             ValueError, self.sampler.pso, n_particles, n_iterations, threadCount=2
         )
 
-        # check that an error is raised when the number of particles is not divisible by the number of CPU devices
+        # check that a warning is raised when the number of particles is not divisible by the number of CPU devices
         # for parallelization
-        npt.assert_raises(ValueError, self.sampler.pso, 1.5, n_iterations)
+        npt.assert_warns(UserWarning, self.sampler.pso, 1.5, n_iterations)
 
     def test_mcmc_emcee(self):
         n_walkers = 36
@@ -217,12 +217,12 @@ class TestSampler(object):
             backend_filename="sjd",
         )
 
-        # check that an error is raised when the number of MCMC walkers is not divisible by
+        # check that a warning is raised when the number of MCMC walkers is not divisible by
         # two times the number of CPU devices for parallelization
-        npt.assert_raises(
-            ValueError,
+        npt.assert_warns(
+            UserWarning,
             self.sampler.mcmc_emcee,
-            1.5,
+            30.5,
             n_run,
             n_burn,
             mean_start,
