@@ -206,7 +206,9 @@ class TestShapeletSet(object):
 
         n_max = -1
         amp = []
-        result = self.shapeletset_static_off.function(x, y, amp, n_max, beta, center_x, center_y)
+        result = self.shapeletset_static_off.function(
+            x, y, amp, n_max, beta, center_x, center_y
+        )
         result_ref = self.shapeletset_ref.function(
             x, y, amp, n_max, beta, center_x, center_y
         )
@@ -267,7 +269,9 @@ class TestShapeletSet(object):
 
         n_max = -1
         amp = []
-        result = self.shapeletset_static_off.function_split(x, y, amp, n_max, beta, center_x, center_y)
+        result = self.shapeletset_static_off.function_split(
+            x, y, amp, n_max, beta, center_x, center_y
+        )
         result_ref = self.shapeletset_ref.function_split(
             x, y, amp, n_max, beta, center_x, center_y
         )
