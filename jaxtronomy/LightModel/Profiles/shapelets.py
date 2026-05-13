@@ -356,6 +356,11 @@ class ShapeletSetStatic(object):
         x_shape = x.shape
         x = jnp.atleast_1d(x)
         f_ = jnp.zeros_like(x)
+
+        # It is possible to initialize the class with n_max = -1, effectively turning off the Shapelets
+        if self.num_param == 0:
+            return f_
+        
         amp = jnp.array(amp)
 
         phi_x, phi_y = self.shapelets.pre_calc(
@@ -397,6 +402,9 @@ class ShapeletSetStatic(object):
                 f"Length of amplitude array {len(amp)} not consistent with n_max {self.n_max} given at initialization. The length of amplitude array should be {self.num_param}"
             )
         f_ = []
+        # It is possible to initialize the class with n_max = -1, effectively turning off the Shapelets
+        if self.num_param == 0:
+            return f_
 
         phi_x, phi_y = self.shapelets.pre_calc(
             x, y, beta, self.n_max, center_x, center_y
