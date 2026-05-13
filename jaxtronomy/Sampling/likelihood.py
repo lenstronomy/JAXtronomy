@@ -304,7 +304,7 @@ class LikelihoodModule(object):
         :returns: log likelihood of the data given the model (natural logarithm)
         """
         # extract parameters
-        kwargs_return = self.param.args2kwargs(args, jax=True)
+        kwargs_return = self.param.args2kwargs(args)
 
         if self._check_bounds is True:
             penalty, bound_hit = self.check_bounds(
