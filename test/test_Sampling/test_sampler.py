@@ -125,6 +125,7 @@ class TestSampler(object):
             kwargs_data_joint=kwargs_data_joint,
             kwargs_model=kwargs_model,
             param_class=self.param_class,
+            _jax=True,
             **kwargs_likelihood
         )
         self.sampler = Sampler(likelihoodModule=self.Likelihood)
