@@ -360,7 +360,7 @@ class ShapeletSetStatic(object):
         # It is possible to initialize the class with n_max = -1, effectively turning off the Shapelets
         if self.num_param == 0:
             return f_
-        
+
         amp = jnp.array(amp)
 
         phi_x, phi_y = self.shapelets.pre_calc(
