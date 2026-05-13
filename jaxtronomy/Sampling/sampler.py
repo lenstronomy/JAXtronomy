@@ -67,7 +67,7 @@ class Sampler(Sampler_lenstronomy):
                     f"n_particles will automatically be set to {new_n_particles}."
                 )
                 n_particles = new_n_particles
-                
+
         logL_func = prepare_logL_func(
             backend=backend, logL_func=self.chain.logL, threadCount=threadCount
         )
@@ -169,7 +169,9 @@ class Sampler(Sampler_lenstronomy):
         backend = jax.default_backend()
         if backend == "cpu":
             if n_walkers % (2 * threadCount) != 0:
-                new_n_walkers = int(((n_walkers // (2 * threadCount)) + 1) * (2 * threadCount))
+                new_n_walkers = int(
+                    ((n_walkers // (2 * threadCount)) + 1) * (2 * threadCount)
+                )
                 warnings.warn(
                     f"Number of MCMC walkers {n_walkers} must be divisible by two times threadCount for parallelization. "
                     f"The number of walkers will automatically be set to {new_n_walkers}."
