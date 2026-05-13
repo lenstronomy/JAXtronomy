@@ -120,12 +120,11 @@ class TestSampler(object):
             "source_position_tolerance": None,
             "source_position_sigma": 0.001,
         }
-        self.param_class = Param(kwargs_model, **kwargs_constraints)
+        self.param_class = Param(kwargs_model, _jax=True, **kwargs_constraints)
         self.Likelihood = LikelihoodModule(
             kwargs_data_joint=kwargs_data_joint,
             kwargs_model=kwargs_model,
             param_class=self.param_class,
-            _jax=True,
             **kwargs_likelihood
         )
         self.sampler = Sampler(likelihoodModule=self.Likelihood)
