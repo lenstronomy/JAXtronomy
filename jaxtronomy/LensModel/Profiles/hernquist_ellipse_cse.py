@@ -54,7 +54,7 @@ A_LIST = jnp.array(
         2.314934e-02,
         3.992313e-01,
     ],
-    dtype=float
+    dtype=float,
 )
 S_LIST = jnp.array(
     [
@@ -100,7 +100,7 @@ S_LIST = jnp.array(
         2.834717e03,
         5.931328e04,
     ],
-    dtype=float
+    dtype=float,
 )
 
 

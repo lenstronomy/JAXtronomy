@@ -59,7 +59,7 @@ HIGH_ACCURACY_S = jnp.array(
         2.143057e03,
         1.935749e03,
     ],
-    dtype=float
+    dtype=float,
 )
 HIGH_ACCURACY_A = jnp.array(
     [
@@ -108,7 +108,7 @@ HIGH_ACCURACY_A = jnp.array(
         9.743682e02,
         1.775124e03,
     ],
-    dtype=float
+    dtype=float,
 )
 
 # Table 3 in Oguri 2021
@@ -131,7 +131,7 @@ LOW_ACCURACY_A = jnp.array(
         2.576763e02,
         1.422619e03,
     ],
-    dtype=float
+    dtype=float,
 )
 LOW_ACCURACY_S = jnp.array(
     [
@@ -152,7 +152,7 @@ LOW_ACCURACY_S = jnp.array(
         1.842613e02,
         8.206569e02,
     ],
-    dtype=float
+    dtype=float,
 )
 
 

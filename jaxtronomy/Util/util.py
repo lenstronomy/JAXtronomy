@@ -123,10 +123,11 @@ def sigma2fwhm(sigma):
     fwhm = sigma * (2 * jnp.sqrt(2 * jnp.log(2)))
     return fwhm
 
+
 @jit
 def shift_center(x, y, center_x=0, center_y=0):
-    """Converts the x and y coordinates to JAX arrays and shifts them so that
-    the origin is at the center.
+    """Converts the x and y coordinates to JAX arrays and shifts them so that the origin
+    is at the center.
 
     :param x: x coordinate
     :param y: y coordinate

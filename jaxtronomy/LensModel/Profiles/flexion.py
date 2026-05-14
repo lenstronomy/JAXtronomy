@@ -30,11 +30,7 @@ class Flexion(LensProfileBase):
     @jit
     def function(x, y, g1, g2, g3, g4, ra_0=0, dec_0=0):
         x, y = shift_center(x, y, ra_0, dec_0)
-        f_ = (
-            1.0
-            / 6
-            * (g1 * x**3 + 3 * g2 * x**2 * y + 3 * g3 * x * y**2 + g4 * y**3)
-        )
+        f_ = 1.0 / 6 * (g1 * x**3 + 3 * g2 * x**2 * y + 3 * g3 * x * y**2 + g4 * y**3)
         return f_
 
     @staticmethod

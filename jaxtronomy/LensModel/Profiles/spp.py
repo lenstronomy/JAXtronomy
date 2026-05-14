@@ -94,9 +94,7 @@ class SPP(LensProfileBase):
             * (a / E**2) ** (eta / 2 - 1)
             * ((eta / 2 - 1) * (2 * x**2 - 2 * y**2) / a)
         )
-        gamma2 = (
-            4 * x * y * (1.0 / 2 - 1 / eta) * (a / E**2) ** (eta / 2 - 2) / E**2
-        )
+        gamma2 = 4 * x * y * (1.0 / 2 - 1 / eta) * (a / E**2) ** (eta / 2 - 2) / E**2
 
         f_xx = kappa + gamma1
         f_yy = kappa - gamma1

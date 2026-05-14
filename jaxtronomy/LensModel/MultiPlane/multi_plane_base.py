@@ -361,7 +361,7 @@ class MultiPlaneBase(ProfileListBase):
                 "You can do T_z_stop = MultiPlaneBase.compute_source_distance(z_stop) and "
                 "_, T_ij_end = MultiPlaneBase.transverse_distance_start_stop(0, z_stop)."
             )
-        
+
         alpha_x = jnp.asarray(theta_x, dtype=float)
         alpha_y = jnp.asarray(theta_y, dtype=float)
         dt_grav = jnp.zeros_like(alpha_x)

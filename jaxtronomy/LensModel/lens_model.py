@@ -665,7 +665,7 @@ class LensModel(object):
         """
         x = jnp.asarray(x, dtype=float)
         y = jnp.asarray(y, dtype=float)
-        
+
         alpha_ra_pp, alpha_dec_pp = self.alpha(x + diff / 2, y + diff / 2, kwargs, k=k)
         alpha_ra_pn, alpha_dec_pn = self.alpha(x + diff / 2, y - diff / 2, kwargs, k=k)
 

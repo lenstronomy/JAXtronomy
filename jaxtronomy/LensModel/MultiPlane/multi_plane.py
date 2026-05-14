@@ -564,7 +564,7 @@ class MultiPlane(object):
 
         theta_x = jnp.asarray(theta_x, dtype=float)
         theta_y = jnp.asarray(theta_y, dtype=float)
-        
+
         alpha_ra, alpha_dec = self.alpha(
             theta_x, theta_y, kwargs_lens, check_convention=False
         )
