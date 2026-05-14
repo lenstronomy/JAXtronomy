@@ -118,9 +118,7 @@ def transform_e1e2_product_average(x, y, e1, e2, center_x, center_y):
     x, y = shift_center(x, y, center_x, center_y)
 
     norm = jnp.maximum(jnp.sqrt(jnp.abs(1 - e1**2 - e2**2)), 0.000001)
-    x = ((1 - e1) * x - e2 * y) / norm
-    y = (-e2 * x + (1 + e1) * y) / norm
-    return x, y
+    return ((1 - e1) * x - e2 * y) / norm, (-e2 * x + (1 + e1) * y) / norm
 
 
 @jit
