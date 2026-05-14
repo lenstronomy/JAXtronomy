@@ -166,7 +166,7 @@ class TestLikelihoodModule(object):
         }
 
         self.param_class = Param(
-            self.kwargs_model, linear_solver=False, num_point_source_list=[2]
+            self.kwargs_model, linear_solver=False, num_point_source_list=[2], _jax=True
         )
         self.imageModel = ImageModel(
             data_class,
