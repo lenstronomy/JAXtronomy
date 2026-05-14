@@ -85,6 +85,7 @@ def test_sigma2fwhm():
     fwhm_ref = util_ref.sigma2fwhm(sigma)
     npt.assert_array_almost_equal(fwhm, fwhm_ref, decimal=8)
 
+
 def test_shift_center():
     x = [1, 3, 4, 6]
     y = [3, 40, 5, 2]
@@ -97,6 +98,7 @@ def test_shift_center():
 
     npt.assert_equal(np.array(new_x), [-2, 0, 1, 3])
     npt.assert_equal(np.array(new_y), [-3, 34, -1, -4])
+
 
 if __name__ == "__main__":
     pytest.main()
