@@ -26,8 +26,7 @@ class Convergence(LensProfileBase):
         :param kappa: (external) convergence
         :return: lensing potential
         """
-        x, y = shift_center(x, y, ra_0, dec_0)
-        theta, phi = param_util.cart2polar(x, y)
+        theta, phi = param_util.cart2polar(x, y, ra_0, dec_0)
         f_ = 1.0 / 2 * kappa * theta**2
         return f_
 
