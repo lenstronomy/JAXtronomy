@@ -2,6 +2,7 @@ from jax import jit, tree_util
 import jax.numpy as jnp
 from jaxtronomy.LensModel.Profiles.nie import NIE
 from jaxtronomy.LensModel.Profiles.epl import EPL
+from jaxtronomy.Util.util import shift_center
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
 __all__ = ["SIE"]
@@ -221,9 +222,8 @@ class SIE(LensProfileBase):
         :param center_y:
         :return:
         """
-        x_ = x - center_x
-        y_ = y - center_y
-        r = jnp.sqrt(x_**2 + y_**2)
+        x, y = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x**2 + y**2)
         mass_3d = self.mass_3d(r, rho0)
         pot = mass_3d / r
         return pot
@@ -269,9 +269,8 @@ class SIE(LensProfileBase):
         :param center_y:
         :return:
         """
-        x_ = x - center_x
-        y_ = y - center_y
-        r = jnp.sqrt(x_**2 + y_**2)
+        x, y = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x**2 + y**2)
         sigma = jnp.pi * rho0 / r
         return sigma
 

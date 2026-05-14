@@ -202,11 +202,11 @@ class MultiPlaneBase(ProfileListBase):
                 "T_ij_end must be provided in jaxtronomy. You can use the class function \n"
                 "MultiPlaneBase.transverse_distance_start_stop(z_start, z_stop) to compute T_ij_end."
             )
-        x = jnp.array(x, dtype=float)
-        y = jnp.array(y, dtype=float)
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
 
-        alpha_x = jnp.array(alpha_x)
-        alpha_y = jnp.array(alpha_y)
+        alpha_x = jnp.asarray(alpha_x, dtype=float)
+        alpha_y = jnp.asarray(alpha_y, dtype=float)
 
         # z_lens_last = z_start
         for i, idex in enumerate(self._sorted_redshift_index):
@@ -361,13 +361,13 @@ class MultiPlaneBase(ProfileListBase):
                 "You can do T_z_stop = MultiPlaneBase.compute_source_distance(z_stop) and "
                 "_, T_ij_end = MultiPlaneBase.transverse_distance_start_stop(0, z_stop)."
             )
-
-        dt_grav = jnp.zeros_like(theta_x, dtype=float)
-        dt_geo = jnp.zeros_like(theta_x, dtype=float)
-        x = jnp.zeros_like(theta_x, dtype=float)
-        y = jnp.zeros_like(theta_y, dtype=float)
-        alpha_x = jnp.array(theta_x, dtype=float)
-        alpha_y = jnp.array(theta_y, dtype=float)
+        
+        alpha_x = jnp.asarray(theta_x, dtype=float)
+        alpha_y = jnp.asarray(theta_y, dtype=float)
+        dt_grav = jnp.zeros_like(alpha_x)
+        dt_geo = jnp.zeros_like(alpha_x)
+        x = jnp.zeros_like(alpha_x)
+        y = jnp.zeros_like(alpha_y)
 
         for i, index in enumerate(self._sorted_redshift_index):
             z_lens = self._lens_redshift_list[index]
@@ -440,6 +440,9 @@ class MultiPlaneBase(ProfileListBase):
         :param index: index of the lens model in sorted redshfit convention
         :return: gravitational delay in units of days as seen at z=0
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         theta_x, theta_y = self._co_moving2angle(x, y, index)
         k = self._sorted_redshift_index[index]
         potential = self.func_list[k].function(theta_x, theta_y, **kwargs_lens[k])

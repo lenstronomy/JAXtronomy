@@ -3,7 +3,7 @@ __author__ = "sibirrer"
 from jax import jit, tree_util
 import jax.numpy as jnp
 
-from jaxtronomy.Util import util
+from jaxtronomy.Util.util import shift_center, rotate
 from jaxtronomy.LensModel.Profiles.nfw import NFW
 from jaxtronomy.LensModel.Profiles.cored_steep_ellipsoid import CSEProductAvgSet
 import jaxtronomy.Util.param_util as param_util
@@ -12,7 +12,7 @@ from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 __all__ = ["NFW_ELLIPSE_CSE"]
 
 # Table 1 in Oguri 2021
-HIGH_ACCURACY_S = jnp.asarray(
+HIGH_ACCURACY_S = jnp.array(
     [
         1.082411e-06,
         8.786566e-06,
@@ -58,9 +58,10 @@ HIGH_ACCURACY_S = jnp.asarray(
         7.760206e02,
         2.143057e03,
         1.935749e03,
-    ]
+    ],
+    dtype=float
 )
-HIGH_ACCURACY_A = jnp.asarray(
+HIGH_ACCURACY_A = jnp.array(
     [
         1.648988e-18,
         6.274458e-16,
@@ -106,11 +107,12 @@ HIGH_ACCURACY_A = jnp.asarray(
         5.401335e02,
         9.743682e02,
         1.775124e03,
-    ]
+    ],
+    dtype=float
 )
 
 # Table 3 in Oguri 2021
-LOW_ACCURACY_A = jnp.asarray(
+LOW_ACCURACY_A = jnp.array(
     [
         1.434960e-16,
         5.232413e-14,
@@ -128,9 +130,10 @@ LOW_ACCURACY_A = jnp.asarray(
         6.340984e01,
         2.576763e02,
         1.422619e03,
-    ]
+    ],
+    dtype=float
 )
-LOW_ACCURACY_S = jnp.asarray(
+LOW_ACCURACY_S = jnp.array(
     [
         4.041628e-06,
         3.086267e-05,
@@ -148,7 +151,8 @@ LOW_ACCURACY_S = jnp.asarray(
         4.627701e01,
         1.842613e02,
         8.206569e02,
-    ]
+    ],
+    dtype=float
 )
 
 
@@ -226,19 +230,18 @@ class NFW_ELLIPSE_CSE(LensProfileBase):
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
         # shift
-        x_ = x - center_x
-        y_ = y - center_y
+        x, y = shift_center(x, y, center_x, center_y)
         # rotate
-        x__, y__ = util.rotate(x_, y_, phi_q)
+        x, y = rotate(x, y, phi_q)
 
         # potential calculation
         if self.high_accuracy:
             f_ = CSEProductAvgSet.function(
-                x__ / Rs, y__ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
+                x / Rs, y / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
             )
         else:
             f_ = CSEProductAvgSet.function(
-                x__ / Rs, y__ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
+                x / Rs, y / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
             )
 
         const = self._normalization(alpha_Rs, Rs, q)
@@ -261,21 +264,20 @@ class NFW_ELLIPSE_CSE(LensProfileBase):
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
         # shift
-        x_ = x - center_x
-        y_ = y - center_y
+        x, y = shift_center(x, y, center_x, center_y)
         # rotate
-        x__, y__ = util.rotate(x_, y_, phi_q)
+        x, y = rotate(x, y, phi_q)
         if self.high_accuracy:
             f__x, f__y = CSEProductAvgSet.derivatives(
-                x__ / Rs, y__ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
+                x / Rs, y / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
             )
         else:
             f__x, f__y = CSEProductAvgSet.derivatives(
-                x__ / Rs, y__ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
+                x / Rs, y / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
             )
 
         # rotate deflections back
-        f_x, f_y = util.rotate(f__x, f__y, -phi_q)
+        f_x, f_y = rotate(f__x, f__y, -phi_q)
         const = self._normalization(alpha_Rs, Rs, q) / Rs
         return const * f_x, const * f_y
 
@@ -297,17 +299,16 @@ class NFW_ELLIPSE_CSE(LensProfileBase):
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
         # shift
-        x_ = x - center_x
-        y_ = y - center_y
+        x, y = shift_center(x, y, center_x, center_y)
         # rotate
-        x__, y__ = util.rotate(x_, y_, phi_q)
+        x, y = rotate(x, y, phi_q)
         if self.high_accuracy:
             f__xx, f__xy, f__yx, f__yy = CSEProductAvgSet.hessian(
-                x__ / Rs, y__ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
+                x / Rs, y / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
             )
         else:
             f__xx, f__xy, f__yx, f__yy = CSEProductAvgSet.hessian(
-                x__ / Rs, y__ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
+                x / Rs, y / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
             )
 
         # rotate back

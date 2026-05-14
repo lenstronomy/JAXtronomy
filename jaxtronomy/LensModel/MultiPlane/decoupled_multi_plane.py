@@ -1,7 +1,7 @@
 __author__ = "dangilman"
 
 from functools import partial
-from jax import config, jit
+from jax import config, jit, numpy as jnp
 
 config.update("jax_enable_x64", True)
 
@@ -141,6 +141,9 @@ class MultiPlaneDecoupled(MultiPlane):
         :param kwargs_lens: keyword arguments for the main deflector
         :return: coordinates on the source plane
         """
+        theta_x = jnp.asarray(theta_x, dtype=float)
+        theta_y = jnp.asarray(theta_y, dtype=float)
+
         coordinates = (theta_x, theta_y)
         # here we use an interpolation function to compute the comoving coordinates of the light rays
         # where they hit the main lens plane at redshift z = z_main
@@ -190,6 +193,9 @@ class MultiPlaneDecoupled(MultiPlane):
         :param kwargs_lens: lens model kwargs
         :return: deflection angles in x and y directions
         """
+        theta_x = jnp.asarray(theta_x, dtype=float)
+        theta_y = jnp.asarray(theta_y, dtype=float)
+
         beta_x, beta_y = self.ray_shooting(
             theta_x,
             theta_y,
@@ -215,6 +221,9 @@ class MultiPlaneDecoupled(MultiPlane):
         :param diff: numerical differential step (float)
         :return: f_xx, f_xy, f_yx, f_yy
         """
+        theta_x = jnp.asarray(theta_x, dtype=float)
+        theta_y = jnp.asarray(theta_y, dtype=float)
+        
         alpha_ra, alpha_dec = self.alpha(
             theta_x,
             theta_y,

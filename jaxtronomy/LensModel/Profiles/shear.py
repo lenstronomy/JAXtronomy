@@ -1,7 +1,8 @@
 __author__ = "sibirrer"
 
-import jaxtronomy.Util.param_util as param_util
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
+import jaxtronomy.Util.param_util as param_util
+from jaxtronomy.Util.util import shift_center
 from jaxtronomy.LensModel.Profiles.convergence import Convergence
 import jax.numpy as jnp
 from jax import jit
@@ -29,9 +30,8 @@ class Shear(LensProfileBase):
         :param dec_0: y/dec position where shear deflection is 0
         :return: lensing potential
         """
-        x_ = x - ra_0
-        y_ = y - dec_0
-        f_ = 1 / 2.0 * (gamma1 * x_ * x_ + 2 * gamma2 * x_ * y_ - gamma1 * y_ * y_)
+        x, y = shift_center(x, y, ra_0, dec_0)
+        f_ = 1 / 2.0 * (gamma1 * x * x + 2 * gamma2 * x * y - gamma1 * y * y)
         return f_
 
     @staticmethod
@@ -47,10 +47,9 @@ class Shear(LensProfileBase):
         :param dec_0: y/dec position where shear deflection is 0
         :return: deflection angles
         """
-        x_ = x - ra_0
-        y_ = y - dec_0
-        f_x = gamma1 * x_ + gamma2 * y_
-        f_y = +gamma2 * x_ - gamma1 * y_
+        x, y = shift_center(x, y, ra_0, dec_0)
+        f_x = gamma1 * x + gamma2 * y
+        f_y = +gamma2 * x - gamma1 * y
         return f_x, f_y
 
     @staticmethod
@@ -112,7 +111,7 @@ class ShearGammaPsi(LensProfileBase):
         :return:
         """
         # change to polar coordinate
-        r, phi = param_util.cart2polar(x - ra_0, y - dec_0)
+        r, phi = param_util.cart2polar(x, y, ra_0, dec_0)
         f_ = 1.0 / 2 * gamma_ext * r**2 * jnp.cos(2 * (phi - psi_ext))
         return f_
 

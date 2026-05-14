@@ -3,6 +3,7 @@ import jax.numpy as jnp
 import jax.scipy.special as special
 
 from jaxtronomy.Util import param_util
+from jaxtronomy.Util.util import shift_center
 
 __all__ = ["SersicUtil"]
 
@@ -94,19 +95,18 @@ class SersicUtil(object):
 
         if self._sersic_major_axis:
             phi_G, q = param_util.ellipticity2phi_q(e1, e2)
-            x_shift = x - center_x
-            y_shift = y - center_y
+            x, y = shift_center(x, y, center_x, center_y)
             cos_phi = jnp.cos(phi_G)
             sin_phi = jnp.sin(phi_G)
-            xt1 = cos_phi * x_shift + sin_phi * y_shift
-            xt2 = -sin_phi * x_shift + cos_phi * y_shift
+            xt1 = cos_phi * x + sin_phi * y
+            xt2 = -sin_phi * x + cos_phi * y
             xt2difq2 = xt2 / (q * q)
             r = jnp.sqrt(xt1 * xt1 + xt2 * xt2difq2)
         else:
-            x_, y_ = param_util.transform_e1e2_product_average(
+            x, y = param_util.transform_e1e2_product_average(
                 x, y, e1, e2, center_x, center_y
             )
-            r = jnp.sqrt(x_**2 + y_**2)
+            r = jnp.sqrt(x**2 + y**2)
         return r
 
     @jit
@@ -119,9 +119,8 @@ class SersicUtil(object):
         :param center_y: position of the center of the source
         :return: transformed normalized radius coordinate
         """
-        x_ = x - center_x
-        y_ = y - center_y
-        r = jnp.sqrt(x_**2 + y_**2)
+        x, y = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x**2 + y**2)
         r = jnp.where(r < self._smoothing, self._smoothing, r)
         x_reduced = (r / r_eff) ** (1.0 / n_sersic)
         return x_reduced
@@ -180,9 +179,8 @@ class SersicUtil(object):
         :return: derivative of deflection angle w.r.t radius
         """
         _dr = 0.00001
-        x_ = x - center_x
-        y_ = y - center_y
-        r = jnp.sqrt(x_**2 + y_**2)
+        x, y = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x**2 + y**2)
         alpha = self.alpha_abs(r, 0, n_sersic, r_eff, k_eff)
         alpha_dr = self.alpha_abs(r + _dr, 0, n_sersic, r_eff, k_eff)
         d_alpha_dr = (alpha_dr - alpha) / _dr

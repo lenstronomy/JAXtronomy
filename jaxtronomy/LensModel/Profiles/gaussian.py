@@ -2,10 +2,11 @@ __author__ = "sibirrer"
 # this file contains a class to make a gaussian
 
 import jax
-from jax import jit, lax, numpy as jnp, tree_util
+from jax import jit, lax, numpy as jnp
 import jax.scipy.special
 import numpy as np
 
+from jaxtronomy.Util.util import shift_center
 from jaxtronomy.LensModel.Profiles.gaussian_potential import GaussianPotential
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
@@ -38,9 +39,8 @@ class Gaussian(LensProfileBase):
         :param center_x: x position of the center of the lens
         :param center_y: y position of the center of the lens
         """
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
-        r = jnp.sqrt(x_**2 + y_**2)
+        x, y = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x**2 + y**2)
         sigma_x, sigma_y = sigma, sigma
         c = 1.0 / (2 * sigma_x * sigma_y)
         num_int = Gaussian._num_integral(r, c)
@@ -63,7 +63,7 @@ class Gaussian(LensProfileBase):
         :param c: float, 1/2sigma^2
         :return: Array with the same shape as r containing the result for each integral
         """
-        r = jnp.array(r)
+        r = jnp.asarray(r, dtype=float)
         r_shape = r.shape
         r = jnp.ravel(r)
 
@@ -101,12 +101,11 @@ class Gaussian(LensProfileBase):
         :param center_x: x position of the center of the lens
         :param center_y: y position of the center of the lens
         """
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
-        R = jnp.sqrt(x_**2 + y_**2)
+        x, y = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x**2 + y**2)
         R = jnp.where(R <= Gaussian.ds, Gaussian.ds, R)
         alpha = Gaussian.alpha_abs(R, amp, sigma)
-        return alpha / R * x_, alpha / R * y_
+        return alpha / R * x, alpha / R * y
 
     @staticmethod
     @jit
@@ -120,17 +119,16 @@ class Gaussian(LensProfileBase):
         :param center_x: x position of the center of the lens
         :param center_y: y position of the center of the lens
         """
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
-        r = jnp.sqrt(x_**2 + y_**2)
+        x, y = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x**2 + y**2)
         sigma_x, sigma_y = sigma, sigma
         r = jnp.where(r < Gaussian.ds, Gaussian.ds, r)
         d_alpha_dr = -Gaussian.d_alpha_dr(r, amp, sigma_x, sigma_y)
         alpha = Gaussian.alpha_abs(r, amp, sigma)
 
-        f_xx = -(d_alpha_dr / r + alpha / r**2) * x_**2 / r + alpha / r
-        f_yy = -(d_alpha_dr / r + alpha / r**2) * y_**2 / r + alpha / r
-        f_xy = -(d_alpha_dr / r + alpha / r**2) * x_ * y_ / r
+        f_xx = -(d_alpha_dr / r + alpha / r**2) * x**2 / r + alpha / r
+        f_yy = -(d_alpha_dr / r + alpha / r**2) * y**2 / r + alpha / r
+        f_xy = -(d_alpha_dr / r + alpha / r**2) * x * y / r
         return f_xx, f_xy, f_xy, f_yy
 
     @staticmethod

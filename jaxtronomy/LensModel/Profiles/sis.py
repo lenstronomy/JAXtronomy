@@ -1,7 +1,7 @@
 __author__ = "sibirrer"
 
-from functools import partial
 from jax import config, jit, numpy as jnp
+from jaxtronomy.Util.util import shift_center
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
 config.update("jax_enable_x64", True)  # 64-bit floats
@@ -28,22 +28,20 @@ class SIS(LensProfileBase):
     @staticmethod
     @jit
     def function(x, y, theta_E, center_x=0, center_y=0):
-        x_shift = x - center_x
-        y_shift = y - center_y
-        f_ = theta_E * jnp.sqrt(x_shift * x_shift + y_shift * y_shift)
+        x, y = shift_center(x, y, center_x, center_y)
+        f_ = theta_E * jnp.sqrt(x**2 + y**2)
         return f_
 
     @staticmethod
     @jit
     def derivatives(x, y, theta_E, center_x=0, center_y=0):
         """Returns df/dx and df/dy of the function."""
-        x_shift = x - center_x
-        y_shift = y - center_y
-        R = jnp.sqrt(x_shift * x_shift + y_shift * y_shift)
+        x, y = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x**2 + y**2)
         R = jnp.where(R < SIS._epsilon, SIS._epsilon, R)
         a = theta_E / jnp.maximum(R, SIS._epsilon)
-        f_x = a * x_shift
-        f_y = a * y_shift
+        f_x = a * x
+        f_y = a * y
         return f_x, f_y
 
     @staticmethod
@@ -51,14 +49,13 @@ class SIS(LensProfileBase):
     def hessian(x, y, theta_E, center_x=0, center_y=0):
         """Returns Hessian matrix of function d^2f/dx^2, d^2/dxdy, d^2/dydx,
         d^f/dy^2."""
-        x_shift = x - center_x
-        y_shift = y - center_y
-        R = (x_shift * x_shift + y_shift * y_shift) ** (3.0 / 2)
+        x, y = shift_center(x, y, center_x, center_y)
+        R = (x**2 + y**2) ** (3.0 / 2)
         R = jnp.where(R < SIS._epsilon, SIS._epsilon, R)
         prefac = theta_E / jnp.maximum(SIS._epsilon, R)
-        f_xx = y_shift * y_shift * prefac
-        f_yy = x_shift * x_shift * prefac
-        f_xy = -x_shift * y_shift * prefac
+        f_xx = y * y * prefac
+        f_yy = x * x * prefac
+        f_xy = -x * y * prefac
         return f_xx, f_xy, f_xy, f_yy
 
     @staticmethod

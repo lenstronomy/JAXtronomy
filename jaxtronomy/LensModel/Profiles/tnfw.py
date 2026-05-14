@@ -3,10 +3,10 @@ __author__ = "sibirrer"
 # this file contains a class to compute the truncated Navaro-Frank-White function (Baltz et al 2009)in mass/kappa space
 # the potential therefore is its integral
 
-from jax import config, jit, numpy as jnp, vmap
+from jax import config, jit, numpy as jnp
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 from jaxtronomy.LensModel.Profiles.nfw import NFW
-from functools import partial
+from jaxtronomy.Util.util import shift_center
 
 config.update("jax_enable_x64", True)
 
@@ -59,9 +59,8 @@ class TNFW(LensProfileBase):
         :return: lensing potential
         """
         rho0_input = TNFW.alpha2rho0(alpha_Rs=alpha_Rs, Rs=Rs)
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
-        R = jnp.sqrt(x_**2 + y_**2)
+        x, y = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x**2 + y**2)
         R = jnp.maximum(R, TNFW._s * Rs)
         f_ = TNFW.tnfw_potential(R, Rs, rho0_input, r_trunc)
 
@@ -83,11 +82,10 @@ class TNFW(LensProfileBase):
         :return: deflection angle in x, deflection angle in y
         """
         rho0_input = TNFW.alpha2rho0(alpha_Rs=alpha_Rs, Rs=Rs)
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
-        R = jnp.sqrt(x_**2 + y_**2)
+        x, y = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x**2 + y**2)
         R = jnp.maximum(R, TNFW._s * Rs)
-        f_x, f_y = TNFW.tnfw_alpha(R, Rs, rho0_input, r_trunc, x_, y_)
+        f_x, f_y = TNFW.tnfw_alpha(R, Rs, rho0_input, r_trunc, x, y)
         return f_x, f_y
 
     @staticmethod
@@ -106,13 +104,12 @@ class TNFW(LensProfileBase):
         """
 
         rho0_input = TNFW.alpha2rho0(alpha_Rs=alpha_Rs, Rs=Rs)
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
-        R = jnp.sqrt(x_**2 + y_**2)
+        x, y = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x**2 + y**2)
         R = jnp.maximum(R, TNFW._s * Rs)
 
-        kappa = TNFW.density_2d(x_, y_, Rs, rho0_input, r_trunc)
-        gamma1, gamma2 = TNFW.tnfw_gamma(R, Rs, rho0_input, r_trunc, x_, y_)
+        kappa = TNFW.density_2d(x, y, Rs, rho0_input, r_trunc)
+        gamma1, gamma2 = TNFW.tnfw_gamma(R, Rs, rho0_input, r_trunc, x, y)
         f_xx = kappa + gamma1
         f_yy = kappa - gamma1
         f_xy = gamma2
@@ -152,9 +149,8 @@ class TNFW(LensProfileBase):
         :type r_trunc: float > 0
         :return: Epsilon(R) projected density at radius R
         """
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
-        R = jnp.sqrt(x_**2 + y_**2)
+        x, y = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x**2 + y**2)
         x = R / Rs
         tau = r_trunc / Rs
         Fx = TNFW._F(x, tau)
