@@ -202,8 +202,8 @@ class Hernquist(LensProfileBase):
         X = r / Rs
         f = jnp.where(X == 1, 1.0 / 3, (1 - Hernquist._F(X)) / (X**2 - 1))
         alpha_r = 2 * sigma0 * Rs * f * X
-        f_x = alpha_r * x / r
-        f_y = alpha_r * y / r
+        f_x = alpha_r * x_ / r
+        f_y = alpha_r * y_ / r
         return f_x, f_y
 
     @staticmethod
