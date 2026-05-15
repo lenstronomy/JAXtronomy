@@ -31,7 +31,9 @@ class TestSIE_NIE(object):
         theta_E = 1.0
         e1, e2 = 0.1, -0.3
         f_x, f_y = self.sie.derivatives(x, y, theta_E, e1, e2, **self.center_kwargs)
-        f_x_ref, f_y_ref = self.sie_ref.derivatives(x, y, theta_E, e1, e2, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.sie_ref.derivatives(
+            x, y, theta_E, e1, e2, **self.center_kwargs
+        )
         npt.assert_almost_equal(f_x, f_x_ref, decimal=8)
         npt.assert_almost_equal(f_y, f_y_ref, decimal=8)
 
@@ -40,7 +42,9 @@ class TestSIE_NIE(object):
         y = np.array([2, 0.7, -2.1])
         theta_E = 1.0
         e1, e2 = 0.1, -0.3
-        f_xx, f_xy, f_yx, f_yy = self.sie.hessian(x, y, theta_E, e1, e2, **self.center_kwargs)
+        f_xx, f_xy, f_yx, f_yy = self.sie.hessian(
+            x, y, theta_E, e1, e2, **self.center_kwargs
+        )
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.sie_ref.hessian(
             x, y, theta_E, e1, e2, **self.center_kwargs
         )
@@ -120,7 +124,7 @@ class TestSIE_EPL(object):
     def setup_method(self):
         self.sie = SIE(NIE=False)
         self.sie_ref = SIE_ref(NIE=False)
-        self.center_kwargs = {'center_x': -3.1, "center_y": 0.7}
+        self.center_kwargs = {"center_x": -3.1, "center_y": 0.7}
 
     def test_function(self):
         x = np.array([1, -3.1, 2.7])
@@ -137,7 +141,9 @@ class TestSIE_EPL(object):
         theta_E = 1.0
         e1, e2 = 0.1, -0.3
         f_x, f_y = self.sie.derivatives(x, y, theta_E, e1, e2, **self.center_kwargs)
-        f_x_ref, f_y_ref = self.sie_ref.derivatives(x, y, theta_E, e1, e2, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.sie_ref.derivatives(
+            x, y, theta_E, e1, e2, **self.center_kwargs
+        )
         npt.assert_almost_equal(f_x, f_x_ref, decimal=8)
         npt.assert_almost_equal(f_y, f_y_ref, decimal=8)
 
@@ -146,7 +152,9 @@ class TestSIE_EPL(object):
         y = np.array([2, 0.7, -2.1])
         theta_E = 1.0
         e1, e2 = 0.1, -0.3
-        f_xx, f_xy, f_yx, f_yy = self.sie.hessian(x, y, theta_E, e1, e2, **self.center_kwargs)
+        f_xx, f_xy, f_yx, f_yy = self.sie.hessian(
+            x, y, theta_E, e1, e2, **self.center_kwargs
+        )
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.sie_ref.hessian(
             x, y, theta_E, e1, e2, **self.center_kwargs
         )

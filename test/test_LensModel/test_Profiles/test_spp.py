@@ -43,7 +43,9 @@ class TestSPP(object):
         theta_E = 1.3
         gamma = 1.9
 
-        f_x_ref, f_y_ref = self.SPP_ref.derivatives(x, y, theta_E, gamma, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.SPP_ref.derivatives(
+            x, y, theta_E, gamma, **self.center_kwargs
+        )
         f_x, f_y = SPP.derivatives(x, y, theta_E, gamma, **self.center_kwargs)
         npt.assert_array_almost_equal(f_x, f_x_ref, decimal=8)
         npt.assert_array_almost_equal(f_y, f_y_ref, decimal=8)
@@ -57,7 +59,9 @@ class TestSPP(object):
 
         x = np.array([2, 3, 4])
         y = np.array([1, 1, 1])
-        f_x_ref, f_y_ref = self.SPP_ref.derivatives(x, y, theta_E, gamma, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.SPP_ref.derivatives(
+            x, y, theta_E, gamma, **self.center_kwargs
+        )
         f_x, f_y = SPP.derivatives(x, y, theta_E, gamma, **self.center_kwargs)
         npt.assert_array_almost_equal(f_x, f_x_ref, decimal=8)
         npt.assert_array_almost_equal(f_y, f_y_ref, decimal=8)

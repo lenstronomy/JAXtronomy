@@ -83,8 +83,12 @@ class TestHernquistEllipseCSE(object):
         y = 4.2
         rho0 = 2.1
         Rs = 3
-        density_2d = HernquistEllipseCSE.density_2d(x, y, rho0, Rs, center_x=0.3, center_y=0.4)
-        density_2d_ref = self.hernquist_cse_ref.density_2d(x, y, rho0, Rs, center_x=0.3, center_y=0.4)
+        density_2d = HernquistEllipseCSE.density_2d(
+            x, y, rho0, Rs, center_x=0.3, center_y=0.4
+        )
+        density_2d_ref = self.hernquist_cse_ref.density_2d(
+            x, y, rho0, Rs, center_x=0.3, center_y=0.4
+        )
         npt.assert_almost_equal(density_2d, density_2d_ref, decimal=8)
 
     def test_mass_2d(self):

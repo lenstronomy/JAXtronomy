@@ -45,7 +45,9 @@ class TestHernquist(object):
         y = np.array([2])
         Rs = 1.0
         sigma0 = 0.5
-        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, sigma0, Rs, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.profile_ref.derivatives(
+            x, y, sigma0, Rs, **self.center_kwargs
+        )
         f_x, f_y = Hernquist.derivatives(x, y, sigma0, Rs, **self.center_kwargs)
         npt.assert_array_almost_equal(f_x_ref, f_x, decimal=8)
         npt.assert_array_almost_equal(f_y_ref, f_y, decimal=8)
@@ -61,7 +63,9 @@ class TestHernquist(object):
 
         x = np.array([2, 3, 4])
         y = np.array([1, 1, 1])
-        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, sigma0, Rs, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.profile_ref.derivatives(
+            x, y, sigma0, Rs, **self.center_kwargs
+        )
         f_x, f_y = Hernquist.derivatives(x, y, sigma0, Rs, **self.center_kwargs)
         npt.assert_array_almost_equal(f_x_ref, f_x, decimal=8)
         npt.assert_array_almost_equal(f_y_ref, f_y, decimal=8)
@@ -74,7 +78,9 @@ class TestHernquist(object):
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
             x, y, sigma0, Rs, **self.center_kwargs
         )
-        f_xx, f_xy, f_yx, f_yy = Hernquist.hessian(x, y, sigma0, Rs, **self.center_kwargs)
+        f_xx, f_xy, f_yx, f_yy = Hernquist.hessian(
+            x, y, sigma0, Rs, **self.center_kwargs
+        )
         npt.assert_array_almost_equal(f_xx_ref, f_xx, decimal=8)
         npt.assert_array_almost_equal(f_xy_ref, f_xy, decimal=8)
         npt.assert_array_almost_equal(f_yx_ref, f_yx, decimal=8)
@@ -97,7 +103,9 @@ class TestHernquist(object):
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
             x, y, sigma0, Rs, **self.center_kwargs
         )
-        f_xx, f_xy, f_yx, f_yy = Hernquist.hessian(x, y, sigma0, Rs, **self.center_kwargs)
+        f_xx, f_xy, f_yx, f_yy = Hernquist.hessian(
+            x, y, sigma0, Rs, **self.center_kwargs
+        )
         npt.assert_array_almost_equal(f_xx_ref, f_xx, decimal=8)
         npt.assert_array_almost_equal(f_xy_ref, f_xy, decimal=8)
         npt.assert_array_almost_equal(f_yx_ref, f_yx, decimal=8)

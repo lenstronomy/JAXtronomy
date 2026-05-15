@@ -143,7 +143,9 @@ class TestShearReduced(object):
         y = np.array([2, 1, 1])
         gamma1, gamma2 = 0.1, 0.5
         values = ShearReduced.function(x, y, gamma1, gamma2, **self.center_kwargs)
-        values_ref = self.shearreduced_ref.function(x, y, gamma1, gamma2, **self.center_kwargs)
+        values_ref = self.shearreduced_ref.function(
+            x, y, gamma1, gamma2, **self.center_kwargs
+        )
         npt.assert_array_almost_equal(values, values_ref, decimal=12)
 
     def test_derivatives(self):
@@ -151,7 +153,9 @@ class TestShearReduced(object):
         y = np.array([2, 1, 1])
         gamma1, gamma2 = 0.2, 0.4
         values = ShearReduced.derivatives(x, y, gamma1, gamma2, **self.center_kwargs)
-        values_ref = self.shearreduced_ref.derivatives(x, y, gamma1, gamma2, **self.center_kwargs)
+        values_ref = self.shearreduced_ref.derivatives(
+            x, y, gamma1, gamma2, **self.center_kwargs
+        )
         npt.assert_array_almost_equal(values, values_ref, decimal=12)
 
     def test_hessian(self):
@@ -159,7 +163,9 @@ class TestShearReduced(object):
         y = np.array([2, 1, 1])
         gamma1, gamma2 = 0.1, 0.3
         values = ShearReduced.hessian(x, y, gamma1, gamma2, **self.center_kwargs)
-        values_ref = self.shearreduced_ref.hessian(x, y, gamma1, gamma2, **self.center_kwargs)
+        values_ref = self.shearreduced_ref.hessian(
+            x, y, gamma1, gamma2, **self.center_kwargs
+        )
         npt.assert_array_almost_equal(values, values_ref, decimal=12)
 
 

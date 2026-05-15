@@ -50,7 +50,9 @@ class TestGaussian(object):
         y = np.array([2])
         amp = 1.3
         sigma = 0.5
-        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, amp, sigma, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.profile_ref.derivatives(
+            x, y, amp, sigma, **self.center_kwargs
+        )
         f_x, f_y = self.profile.derivatives(x, y, amp, sigma, **self.center_kwargs)
         npt.assert_array_almost_equal(f_x_ref, f_x, decimal=6)
         npt.assert_array_almost_equal(f_y_ref, f_y, decimal=6)
@@ -66,7 +68,9 @@ class TestGaussian(object):
 
         x = np.array([2, 3, 4])
         y = np.array([1, 1, 1])
-        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, amp, sigma, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.profile_ref.derivatives(
+            x, y, amp, sigma, **self.center_kwargs
+        )
         f_x, f_y = self.profile.derivatives(x, y, amp, sigma, **self.center_kwargs)
         npt.assert_array_almost_equal(f_x_ref, f_x, decimal=6)
         npt.assert_array_almost_equal(f_y_ref, f_y, decimal=6)
@@ -79,7 +83,9 @@ class TestGaussian(object):
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
             x, y, amp, sigma, **self.center_kwargs
         )
-        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, amp, sigma, **self.center_kwargs)
+        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(
+            x, y, amp, sigma, **self.center_kwargs
+        )
         npt.assert_array_almost_equal(f_xx_ref, f_xx, decimal=6)
         npt.assert_array_almost_equal(f_xy_ref, f_xy, decimal=6)
         npt.assert_array_almost_equal(f_yx_ref, f_yx, decimal=6)
@@ -101,7 +107,9 @@ class TestGaussian(object):
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
             x, y, amp, sigma, **self.center_kwargs
         )
-        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, amp, sigma, **self.center_kwargs)
+        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(
+            x, y, amp, sigma, **self.center_kwargs
+        )
         npt.assert_array_almost_equal(f_xx_ref, f_xx, decimal=6)
         npt.assert_array_almost_equal(f_xy_ref, f_xy, decimal=6)
         npt.assert_array_almost_equal(f_yx_ref, f_yx, decimal=6)
@@ -121,7 +129,9 @@ class TestGaussian(object):
         amp = 1.7
         sigma = 0.4
         density = self.profile.density_2d(x, y, amp, sigma, **self.center_kwargs)
-        density_ref = self.profile_ref.density_2d(x, y, amp, sigma, **self.center_kwargs)
+        density_ref = self.profile_ref.density_2d(
+            x, y, amp, sigma, **self.center_kwargs
+        )
         npt.assert_array_almost_equal(density_ref, density, decimal=6)
 
     def test_mass2d(self):

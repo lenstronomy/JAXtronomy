@@ -155,7 +155,9 @@ class TestNFW(object):
             ]
         )
         y_array = np.zeros_like(x_array)
-        f_x_ref, f_y_ref = self.nfw_ref.derivatives(x_array, y_array, Rs, alpha_Rs, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.nfw_ref.derivatives(
+            x_array, y_array, Rs, alpha_Rs, **self.center_kwargs
+        )
         f_x, f_y = NFW.derivatives(x_array, y_array, Rs, alpha_Rs, **self.center_kwargs)
 
         npt.assert_array_almost_equal(f_x_ref, f_x, decimal=8)

@@ -34,14 +34,18 @@ class TestTNFW(object):
         Rs = 2.4
         alpha_Rs = 1.5
         r_trunc = 1.2
-        values_ref = self.tnfw_ref.function(x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs)
+        values_ref = self.tnfw_ref.function(
+            x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs
+        )
         values = TNFW.function(x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs)
         npt.assert_allclose(values_ref, values, atol=1e-12, rtol=1e-12)
 
         Rs = 4
         alpha_Rs = 0.5
         r_trunc = 8
-        values_ref = self.tnfw_ref.function(x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs)
+        values_ref = self.tnfw_ref.function(
+            x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs
+        )
         values = TNFW.function(x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs)
         npt.assert_allclose(values_ref, values, atol=1e-12, rtol=1e-12)
 
@@ -61,7 +65,9 @@ class TestTNFW(object):
         Rs = 2.4
         alpha_Rs = 1.5
         r_trunc = 1.2
-        f_x_ref, f_y_ref = self.tnfw_ref.derivatives(x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.tnfw_ref.derivatives(
+            x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs
+        )
         f_x, f_y = TNFW.derivatives(x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs)
         npt.assert_allclose(f_x_ref, f_x, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y_ref, f_y, atol=1e-12, rtol=1e-12)
@@ -69,7 +75,9 @@ class TestTNFW(object):
         Rs = 4
         alpha_Rs = 0.5
         r_trunc = 8
-        f_x_ref, f_y_ref = self.tnfw_ref.derivatives(x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.tnfw_ref.derivatives(
+            x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs
+        )
         f_x, f_y = TNFW.derivatives(x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs)
         npt.assert_allclose(f_x_ref, f_x, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y_ref, f_y, atol=1e-12, rtol=1e-12)
@@ -97,7 +105,9 @@ class TestTNFW(object):
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.tnfw_ref.hessian(
             x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs
         )
-        f_xx, f_xy, f_yx, f_yy = TNFW.hessian(x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs)
+        f_xx, f_xy, f_yx, f_yy = TNFW.hessian(
+            x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs
+        )
         npt.assert_allclose(f_xx_ref, f_xx, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_xy_ref, f_xy, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_yx_ref, f_yx, atol=1e-12, rtol=1e-12)
@@ -109,7 +119,9 @@ class TestTNFW(object):
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.tnfw_ref.hessian(
             x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs
         )
-        f_xx, f_xy, f_yx, f_yy = TNFW.hessian(x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs)
+        f_xx, f_xy, f_yx, f_yy = TNFW.hessian(
+            x, y, Rs, alpha_Rs, r_trunc, **self.center_kwargs
+        )
         npt.assert_allclose(f_xx_ref, f_xx, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_xy_ref, f_xy, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_yx_ref, f_yx, atol=1e-12, rtol=1e-12)
@@ -153,7 +165,9 @@ class TestTNFW(object):
         Rs = 4
         rho0 = 1.1
         r_trunc = 8
-        density_ref = self.tnfw_ref.density_2d(x, y, Rs, rho0, r_trunc, **self.center_kwargs)
+        density_ref = self.tnfw_ref.density_2d(
+            x, y, Rs, rho0, r_trunc, **self.center_kwargs
+        )
         density = TNFW.density_2d(x, y, Rs, rho0, r_trunc, **self.center_kwargs)
         npt.assert_allclose(density, density_ref, atol=1e-12, rtol=1e-12)
 

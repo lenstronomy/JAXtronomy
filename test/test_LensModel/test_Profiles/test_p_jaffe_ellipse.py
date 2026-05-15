@@ -109,9 +109,7 @@ class TestP_JAFFW(object):
         Ra, Rs = 0.5, 0.8
         q, phi_G = 0.8, 0
         e1, e2 = param_util.phi_q2_ellipticity(phi_G, q)
-        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(
-            x, y, sigma0, Ra, Rs, e1, e2
-        )
+        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, sigma0, Ra, Rs, e1, e2)
         e1, e2 = param_util_ref.phi_q2_ellipticity(phi_G, q)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
             x, y, sigma0, Ra, Rs, e1, e2
