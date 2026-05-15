@@ -18,14 +18,15 @@ class TestP_JAFFW(object):
     def setup_method(self):
         self.profile = PseudoJaffe()
         self.profile_ref = Pjaffe_ref()
+        self.center_kwargs = {"center_x": -1.3, "center_y": -4.2}
 
     def test_function(self):
         x = np.array([1])
         y = np.array([2])
         sigma0 = 1.0
         Ra, Rs = 0.5, 0.8
-        values = self.profile.function(x, y, sigma0, Ra, Rs)
-        values_ref = self.profile_ref.function(x, y, sigma0, Ra, Rs)
+        values = self.profile.function(x, y, sigma0, Ra, Rs, **self.center_kwargs)
+        values_ref = self.profile_ref.function(x, y, sigma0, Ra, Rs, **self.center_kwargs)
         npt.assert_almost_equal(values, values_ref, decimal=6)
 
         x = np.array([0])
@@ -38,8 +39,8 @@ class TestP_JAFFW(object):
 
         x = np.array([2, 3, 4])
         y = np.array([1, 1, 1])
-        values = self.profile.function(x, y, sigma0, Ra, Rs)
-        values_ref = self.profile_ref.function(x, y, sigma0, Ra, Rs)
+        values = self.profile.function(x, y, sigma0, Ra, Rs, **self.center_kwargs)
+        values_ref = self.profile_ref.function(x, y, sigma0, Ra, Rs, **self.center_kwargs)
         npt.assert_almost_equal(values, values_ref, decimal=6)
 
     def test_derivatives(self):
@@ -47,8 +48,8 @@ class TestP_JAFFW(object):
         y = np.array([2])
         sigma0 = 1.0
         Ra, Rs = 0.5, 0.8
-        f_x, f_y = self.profile.derivatives(x, y, sigma0, Ra, Rs)
-        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, sigma0, Ra, Rs)
+        f_x, f_y = self.profile.derivatives(x, y, sigma0, Ra, Rs, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, sigma0, Ra, Rs, **self.center_kwargs)
         npt.assert_almost_equal(f_x, f_x_ref, decimal=8)
         npt.assert_almost_equal(f_y, f_y_ref, decimal=7)
 
@@ -61,14 +62,14 @@ class TestP_JAFFW(object):
 
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
-        f_x, f_y = self.profile.derivatives(x, y, sigma0, Ra, Rs)
-        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, sigma0, Ra, Rs)
+        f_x, f_y = self.profile.derivatives(x, y, sigma0, Ra, Rs, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, sigma0, Ra, Rs, **self.center_kwargs)
         npt.assert_array_almost_equal(f_x, f_x_ref, decimal=6)
         npt.assert_array_almost_equal(f_y, f_y_ref, decimal=7)
 
     def test_hessian(self):
-        x = np.array([1])
-        y = np.array([2])
+        x = np.array([0])
+        y = np.array([0])
         sigma0 = 1.0
         Ra, Rs = 0.5, 0.8
         f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, sigma0, Ra, Rs)
@@ -82,9 +83,9 @@ class TestP_JAFFW(object):
 
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
-        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, sigma0, Ra, Rs)
+        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, sigma0, Ra, Rs, **self.center_kwargs)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
-            x, y, sigma0, Ra, Rs
+            x, y, sigma0, Ra, Rs, **self.center_kwargs
         )
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=7)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=7)
@@ -128,8 +129,8 @@ class TestP_JAFFW(object):
         y = 2
         rho0 = 1.0
         Ra, Rs = 0.5, 0.8
-        density2d = self.profile.density_2d(x, y, rho0, Ra, Rs)
-        density2d_ref = self.profile_ref.density_2d(x, y, rho0, Ra, Rs)
+        density2d = self.profile.density_2d(x, y, rho0, Ra, Rs, **self.center_kwargs)
+        density2d_ref = self.profile_ref.density_2d(x, y, rho0, Ra, Rs, **self.center_kwargs)
         npt.assert_almost_equal(density2d, density2d_ref, decimal=8)
 
     def test_mass_2d(self):

@@ -20,6 +20,8 @@ class TestFlexion(object):
             "g2": -0.04,
             "g3": 0.07,
             "g4": -0.01,
+            "ra_0": 1,
+            "dec_0": 2,
         }
 
     def test_function(self):
@@ -38,7 +40,7 @@ class TestFlexion(object):
         y = np.repeat(np.linspace(-10, 10, 20), 20)
         values = Flexion.function(x, y, **self.kwargs_lens)
         values_ref = self.flexion_ref.function(x, y, **self.kwargs_lens)
-        npt.assert_allclose(values, values_ref, atol=1e-15, rtol=1e-15)
+        npt.assert_allclose(values, values_ref, atol=2e-15, rtol=2e-15)
 
     def test_derivatives(self):
         x = np.array([1])

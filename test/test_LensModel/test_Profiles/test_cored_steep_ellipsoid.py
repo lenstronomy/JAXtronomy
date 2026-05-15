@@ -31,18 +31,18 @@ class TestCSE_product_avg(object):
         npt.assert_raises(ValueError, CSE, axis="not_available")
 
     def test_function(self):
-        kwargs = {"a": 2, "s": 1, "e1": 0.1, "e2": -0.3, "center_x": 0, "center_y": 0}
+        kwargs = {"a": 2, "s": 1, "e1": 0.1, "e2": -0.3, "center_x": 2, "center_y": 3}
 
-        x = np.array([1.0, 2.0])
+        x = np.array([1.0, 0])
         y = np.array([2.0, 0])
         f_ = self.CSE.function(x, y, **kwargs)
         f_ref = self.CSE_ref.function(x, y, **kwargs)
         npt.assert_array_almost_equal(f_, f_ref, decimal=8)
 
     def test_derivatives(self):
-        kwargs = {"a": 2, "s": 1, "e1": 0.0, "e2": 0.0, "center_x": 0, "center_y": 0}
+        kwargs = {"a": 2, "s": 1, "e1": 0.3, "e2": 0.1, "center_x": 2, "center_y": 3}
 
-        x = np.array([1.0, 2.0])
+        x = np.array([1.0, 0])
         y = np.array([2.0, 0])
         f_x, f_y = self.CSE.derivatives(x, y, **kwargs)
         f_x_ref, f_y_ref = self.CSE_ref.derivatives(x, y, **kwargs)
@@ -50,10 +50,10 @@ class TestCSE_product_avg(object):
         npt.assert_almost_equal(f_y, f_y_ref, decimal=8)
 
     def test_hessian(self):
-        kwargs = {"a": 2, "s": 1, "e1": 0.0, "e2": 0.0, "center_x": 0, "center_y": 0}
+        kwargs = {"a": 2, "s": 1, "e1": 0.2, "e2": 0.1, "center_x": 2, "center_y": 3}
 
-        x = np.array([1.0, 2.0])
-        y = np.array([2.3, 0.5])
+        x = np.array([1.0, 0])
+        y = np.array([2.3, 0])
         f_xx, f_xy, f_yx, f_yy = self.CSE.hessian(x, y, **kwargs)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.CSE_ref.hessian(x, y, **kwargs)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=8)
@@ -76,7 +76,7 @@ class TestCSE_product_avg_set(object):
             "q": 0.3,
         }
 
-        x = np.array([1.0, 2.0])
+        x = np.array([1.0, 0])
         y = np.array([2.0, 0])
         f_ = CSEProductAvgSet.function(x, y, **kwargs)
         f_ref = self.CSEProductAvgSet_ref.function(x, y, **kwargs)
@@ -89,7 +89,7 @@ class TestCSE_product_avg_set(object):
             "q": 0.3,
         }
 
-        x = np.array([1.0, 2.0])
+        x = np.array([1.0, 0])
         y = np.array([2.0, 0])
         f_x, f_y = CSEProductAvgSet.derivatives(x, y, **kwargs)
         f_x_ref, f_y_ref = self.CSEProductAvgSet_ref.derivatives(x, y, **kwargs)
@@ -103,8 +103,8 @@ class TestCSE_product_avg_set(object):
             "q": 0.3,
         }
 
-        x = np.array([1.0, 2.0])
-        y = np.array([2.3, 0.5])
+        x = np.array([1.0, 0])
+        y = np.array([2.3, 0])
         f_xx, f_xy, f_yx, f_yy = CSEProductAvgSet.hessian(x, y, **kwargs)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.CSEProductAvgSet_ref.hessian(
             x, y, **kwargs
@@ -126,7 +126,7 @@ class TestCSE_major(object):
     def test_function(self):
         kwargs = {"a": 2, "s": 1, "e1": 0.1, "e2": -0.3, "center_x": 0, "center_y": 0}
 
-        x = np.array([1.0, 2.0])
+        x = np.array([1.0, 0])
         y = np.array([2.0, 0])
         f_ = self.CSE.function(x, y, **kwargs)
         f_ref = self.CSE_ref.function(x, y, **kwargs)
@@ -135,7 +135,7 @@ class TestCSE_major(object):
     def test_derivatives(self):
         kwargs = {"a": 2, "s": 1, "e1": 0.0, "e2": 0.0, "center_x": 0, "center_y": 0}
 
-        x = np.array([1.0, 2.0])
+        x = np.array([1.0, 0])
         y = np.array([2.0, 0])
         f_x, f_y = self.CSE.derivatives(x, y, **kwargs)
         f_x_ref, f_y_ref = self.CSE_ref.derivatives(x, y, **kwargs)
@@ -145,8 +145,8 @@ class TestCSE_major(object):
     def test_hessian(self):
         kwargs = {"a": 2, "s": 1, "e1": 0.0, "e2": 0.0, "center_x": 0, "center_y": 0}
 
-        x = np.array([1.0, 2.0])
-        y = np.array([2.3, 0.5])
+        x = np.array([1.0, 0])
+        y = np.array([2.3, 0])
         f_xx, f_xy, f_yx, f_yy = self.CSE.hessian(x, y, **kwargs)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.CSE_ref.hessian(x, y, **kwargs)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=8)
@@ -169,7 +169,7 @@ class TestCSE_major_set(object):
             "q": 0.3,
         }
 
-        x = np.array([1.0, 2.0])
+        x = np.array([1.0, 0])
         y = np.array([2.0, 0])
         f_ = CSEMajorAxisSet.function(x, y, **kwargs)
         f_ref = self.CSEMajorAxisSet_ref.function(x, y, **kwargs)
@@ -182,7 +182,7 @@ class TestCSE_major_set(object):
             "q": 0.3,
         }
 
-        x = np.array([1.0, 2.0])
+        x = np.array([1.0, 0])
         y = np.array([2.0, 0])
         f_x, f_y = CSEMajorAxisSet.derivatives(x, y, **kwargs)
         f_x_ref, f_y_ref = self.CSEMajorAxisSet_ref.derivatives(x, y, **kwargs)
@@ -196,9 +196,7 @@ class TestCSE_major_set(object):
             "q": 0.3,
         }
 
-        # NOTE: If x and y are made to be integers, the tests fails due to a bug with lenstronomy.
-        #       Change the test when the bug in lenstronomy is fixed
-        x = np.array([1.0, 2.0])
+        x = np.array([1.0, 0])
         y = np.array([2.0, 0])
         f_xx, f_xy, f_yx, f_yy = CSEMajorAxisSet.hessian(x, y, **kwargs)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.CSEMajorAxisSet_ref.hessian(
