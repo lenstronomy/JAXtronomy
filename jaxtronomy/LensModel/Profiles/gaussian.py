@@ -126,9 +126,9 @@ class Gaussian(LensProfileBase):
         d_alpha_dr = -Gaussian.d_alpha_dr(r, amp, sigma_x, sigma_y)
         alpha = Gaussian.alpha_abs(r, amp, sigma)
 
-        f_xx = -(d_alpha_dr / r + alpha / r**2) * x**2 / r + alpha / r
-        f_yy = -(d_alpha_dr / r + alpha / r**2) * y**2 / r + alpha / r
-        f_xy = -(d_alpha_dr / r + alpha / r**2) * x * y / r
+        f_xx = -(d_alpha_dr / r + alpha / r**2) * x_**2 / r + alpha / r
+        f_yy = -(d_alpha_dr / r + alpha / r**2) * y_**2 / r + alpha / r
+        f_xy = -(d_alpha_dr / r + alpha / r**2) * x_ * y_ / r
         return f_xx, f_xy, f_xy, f_yy
 
     @staticmethod
