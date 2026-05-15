@@ -103,7 +103,7 @@ class NFW(LensProfileBase):
         Rs = jnp.where(Rs < 0.0000001, 0.0000001, Rs)
         x_, y_ = shift_center(x, y, center_x, center_y)
         R = jnp.sqrt(x_**2 + y_**2)
-        f_x, f_y = NFW.nfw_alpha(R, Rs, rho0_ijnput, x, y)
+        f_x, f_y = NFW.nfw_alpha(R, Rs, rho0_ijnput, x_, y_)
         return f_x, f_y
 
     @staticmethod
@@ -124,7 +124,7 @@ class NFW(LensProfileBase):
         x_, y_ = shift_center(x, y, center_x, center_y)
         R = jnp.sqrt(x_**2 + y_**2)
         kappa = NFW.density_2d(R, 0, Rs, rho0_ijnput)
-        gamma1, gamma2 = NFW.nfw_gamma(R, Rs, rho0_ijnput, x, y)
+        gamma1, gamma2 = NFW.nfw_gamma(R, Rs, rho0_ijnput, x_, y_)
         f_xx = kappa + gamma1
         f_yy = kappa - gamma1
         f_xy = gamma2
