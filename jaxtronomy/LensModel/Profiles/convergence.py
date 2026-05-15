@@ -40,9 +40,9 @@ class Convergence(LensProfileBase):
         :param kappa: (external) convergence
         :return: deflection angles (first order derivatives)
         """
-        x, y = shift_center(x, y, ra_0, dec_0)
-        f_x = kappa * x
-        f_y = kappa * y
+        x_, y_ = shift_center(x, y, ra_0, dec_0)
+        f_x = kappa * x_
+        f_y = kappa * y_
         return f_x, f_y
 
     @staticmethod

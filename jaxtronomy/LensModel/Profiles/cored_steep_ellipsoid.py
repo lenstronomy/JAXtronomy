@@ -1,13 +1,11 @@
 __author__ = "sibirrer"
 
-from jax import config, jit, lax, tree_util
+from jax import jit, lax, tree_util
 import jax.numpy as jnp
 
 from jaxtronomy.Util import param_util
 from jaxtronomy.Util.util import rotate, shift_center
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
-
-config.update("jax_enable_x64", True)
 
 __all__ = [
     "CSE",
@@ -93,16 +91,15 @@ class CSE(LensProfileBase):
         :return: lensing potential
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
 
         # potential calculation
         case = jnp.where(self.axis == "major", 0, 1)
         func = [CSEMajorAxis.function, CSEProductAvg.function]
 
-        f_ = lax.switch(case, func, x, y, a, s, q)
+        f_ = lax.switch(case, func, x_, y_, a, s, q)
 
         return f_
 
@@ -121,15 +118,14 @@ class CSE(LensProfileBase):
         :return: deflection in x- and y-direction
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
 
         case = jnp.where(self.axis == "major", 0, 1)
         func = [CSEMajorAxis.derivatives, CSEProductAvg.derivatives]
 
-        f_x, f_y = lax.switch(case, func, x, y, a, s, q)
+        f_x, f_y = lax.switch(case, func, x_, y_, a, s, q)
 
         # rotate deflections back
         f_x, f_y = rotate(f_x, f_y, -phi_q)
@@ -150,15 +146,14 @@ class CSE(LensProfileBase):
         :return: hessian elements f_xx, f_xy, f_yx, f_yy
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
 
         case = jnp.where(self.axis == "major", 0, 1)
         func = [CSEMajorAxis.hessian, CSEProductAvg.hessian]
 
-        f__xx, f__xy, _, f__yy = lax.switch(case, func, x, y, a, s, q)
+        f__xx, f__xy, _, f__yy = lax.switch(case, func, x_, y_, a, s, q)
 
         # rotate back
         kappa = 1.0 / 2 * (f__xx + f__yy)

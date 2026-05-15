@@ -229,19 +229,18 @@ class NFW_ELLIPSE_CSE(LensProfileBase):
         :return: lensing potential
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
 
         # potential calculation
         if self.high_accuracy:
             f_ = CSEProductAvgSet.function(
-                x / Rs, y / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
+                x_ / Rs, y_ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
             )
         else:
             f_ = CSEProductAvgSet.function(
-                x / Rs, y / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
+                x_ / Rs, y_ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
             )
 
         const = self._normalization(alpha_Rs, Rs, q)
@@ -263,17 +262,16 @@ class NFW_ELLIPSE_CSE(LensProfileBase):
         :return: deflection in x-direction, deflection in y-direction
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
         if self.high_accuracy:
             f__x, f__y = CSEProductAvgSet.derivatives(
-                x / Rs, y / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
+                x_ / Rs, y_ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
             )
         else:
             f__x, f__y = CSEProductAvgSet.derivatives(
-                x / Rs, y / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
+                x_ / Rs, y_ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
             )
 
         # rotate deflections back
@@ -298,17 +296,16 @@ class NFW_ELLIPSE_CSE(LensProfileBase):
         :return: d^2f/dx^2, d^2/dxdy, d^2/dydx, d^f/dy^2
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
         if self.high_accuracy:
             f__xx, f__xy, f__yx, f__yy = CSEProductAvgSet.hessian(
-                x / Rs, y / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
+                x_ / Rs, y_ / Rs, HIGH_ACCURACY_A, HIGH_ACCURACY_S, q
             )
         else:
             f__xx, f__xy, f__yx, f__yy = CSEProductAvgSet.hessian(
-                x / Rs, y / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
+                x_ / Rs, y_ / Rs, LOW_ACCURACY_A, LOW_ACCURACY_S, q
             )
 
         # rotate back

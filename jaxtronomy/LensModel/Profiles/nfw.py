@@ -80,8 +80,8 @@ class NFW(LensProfileBase):
         """
         rho0_input = NFW.alpha2rho0(alpha_Rs=alpha_Rs, Rs=Rs)
         Rs = jnp.where(Rs < 0.0000001, 0.0000001, Rs)
-        x, y = shift_center(x, y, center_x, center_y)
-        R = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x_**2 + y_**2)
         f_ = NFW.nfw_potential(R, Rs, rho0_input)
         return f_
 
@@ -101,8 +101,8 @@ class NFW(LensProfileBase):
         """
         rho0_ijnput = NFW.alpha2rho0(alpha_Rs=alpha_Rs, Rs=Rs)
         Rs = jnp.where(Rs < 0.0000001, 0.0000001, Rs)
-        x, y = shift_center(x, y, center_x, center_y)
-        R = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x_**2 + y_**2)
         f_x, f_y = NFW.nfw_alpha(R, Rs, rho0_ijnput, x, y)
         return f_x, f_y
 
@@ -121,8 +121,8 @@ class NFW(LensProfileBase):
         """
         rho0_ijnput = NFW.alpha2rho0(alpha_Rs=alpha_Rs, Rs=Rs)
         Rs = jnp.where(Rs < 0.0000001, 0.0000001, Rs)
-        x, y = shift_center(x, y, center_x, center_y)
-        R = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x_**2 + y_**2)
         kappa = NFW.density_2d(R, 0, Rs, rho0_ijnput)
         gamma1, gamma2 = NFW.nfw_gamma(R, Rs, rho0_ijnput, x, y)
         f_xx = kappa + gamma1
@@ -175,8 +175,8 @@ class NFW(LensProfileBase):
         :param center_y: y-centroid position
         :return: Epsilon(R) projected density at radius R
         """
-        x, y = shift_center(x, y, center_x, center_y)
-        R = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x_**2 + y_**2)
         x = R / Rs
         Fx = NFW.F(x)
         return 2 * rho0 * Rs * Fx

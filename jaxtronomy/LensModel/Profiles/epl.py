@@ -169,12 +169,11 @@ class EPL(LensProfileBase):
         :return: lensing potential
         """
         b, t, q, phi_G = self.param_conv(theta_E, gamma, e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_G)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_G)
         # evaluate
-        f_ = EPLMajorAxis.function(x, y, b, t, q)
+        f_ = EPLMajorAxis.function(x_, y_, b, t, q)
         # rotate back
         return f_
 
@@ -193,12 +192,11 @@ class EPL(LensProfileBase):
         :return: alpha_x, alpha_y
         """
         b, t, q, phi_G = self.param_conv(theta_E, gamma, e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_G)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_G)
         # evaluate
-        f__x, f__y = EPLMajorAxis.derivatives(x, y, b, t, q)
+        f__x, f__y = EPLMajorAxis.derivatives(x_, y_, b, t, q)
         # rotate back
         f_x, f_y = rotate(f__x, f__y, -phi_G)
         return f_x, f_y
@@ -219,12 +217,11 @@ class EPL(LensProfileBase):
         """
 
         b, t, q, phi_G = self.param_conv(theta_E, gamma, e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_G)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_G)
         # evaluate
-        f__xx, f__xy, f__yx, f__yy = EPLMajorAxis.hessian(x, y, b, t, q)
+        f__xx, f__xy, f__yx, f__yy = EPLMajorAxis.hessian(x_, y_, b, t, q)
         # rotate back
         kappa = 1.0 / 2 * (f__xx + f__yy)
         gamma1__ = 1.0 / 2 * (f__xx - f__yy)

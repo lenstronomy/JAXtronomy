@@ -137,13 +137,12 @@ class HernquistEllipseCSE(LensProfileBase):
     def function(x, y, sigma0, Rs, e1, e2, center_x=0, center_y=0):
         """Returns double integral of NFW profile."""
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
 
         # potential calculation
-        f_ = CSEMajorAxisSet.function(x / Rs, y / Rs, A_LIST, S_LIST, q)
+        f_ = CSEMajorAxisSet.function(x_ / Rs, y_ / Rs, A_LIST, S_LIST, q)
         const = HernquistEllipseCSE._normalization(sigma0, Rs, q)
         return const * f_
 
@@ -152,11 +151,10 @@ class HernquistEllipseCSE(LensProfileBase):
     def derivatives(x, y, sigma0, Rs, e1, e2, center_x=0, center_y=0):
         """Returns df/dx and df/dy of the function (integral of NFW)"""
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_q)
-        f__x, f__y = CSEMajorAxisSet.derivatives(x / Rs, y / Rs, A_LIST, S_LIST, q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
+        f__x, f__y = CSEMajorAxisSet.derivatives(x_ / Rs, y_ / Rs, A_LIST, S_LIST, q)
 
         # rotate deflections back
         f_x, f_y = rotate(f__x, f__y, -phi_q)
@@ -169,12 +167,11 @@ class HernquistEllipseCSE(LensProfileBase):
         """Returns Hessian matrix of function d^2f/dx^2, d^2/dxdy, d^2/dydx,
         d^f/dy^2."""
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x, y = shift_center(x, y, center_x, center_y)
-        # rotate
-        x, y = rotate(x, y, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
         f__xx, f__xy, __, f__yy = CSEMajorAxisSet.hessian(
-            x / Rs, y / Rs, A_LIST, S_LIST, q
+            x_ / Rs, y_ / Rs, A_LIST, S_LIST, q
         )
 
         # rotate back

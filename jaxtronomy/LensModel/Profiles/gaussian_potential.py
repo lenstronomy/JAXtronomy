@@ -41,9 +41,9 @@ class GaussianPotential(LensProfileBase):
         :param center_x: x position of the center of the lens
         :param center_y: y position of the center of the lens
         """
-        x, y = shift_center(x, y, center_x, center_y)
+        x_, y_ = shift_center(x, y, center_x, center_y)
         c = amp / (2 * jnp.pi * sigma_x * sigma_y)
-        exponent = -((x / sigma_x) ** 2 + (y / sigma_y) ** 2) / 2.0
+        exponent = -((x_ / sigma_x) ** 2 + (y_ / sigma_y) ** 2) / 2.0
         return c * jnp.exp(exponent)
 
     @staticmethod

@@ -30,8 +30,8 @@ class Shear(LensProfileBase):
         :param dec_0: y/dec position where shear deflection is 0
         :return: lensing potential
         """
-        x, y = shift_center(x, y, ra_0, dec_0)
-        f_ = 1 / 2.0 * (gamma1 * x * x + 2 * gamma2 * x * y - gamma1 * y * y)
+        x_, y_ = shift_center(x, y, ra_0, dec_0)
+        f_ = 1 / 2.0 * (gamma1 * x_ * x_ + 2 * gamma2 * x_ * y_ - gamma1 * y_ * y_)
         return f_
 
     @staticmethod
@@ -47,9 +47,9 @@ class Shear(LensProfileBase):
         :param dec_0: y/dec position where shear deflection is 0
         :return: deflection angles
         """
-        x, y = shift_center(x, y, ra_0, dec_0)
-        f_x = gamma1 * x + gamma2 * y
-        f_y = +gamma2 * x - gamma1 * y
+        x_, y_ = shift_center(x, y, ra_0, dec_0)
+        f_x = gamma1 * x_ + gamma2 * y_
+        f_y = gamma2 * x_ - gamma1 * y_
         return f_x, f_y
 
     @staticmethod

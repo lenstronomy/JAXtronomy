@@ -44,12 +44,12 @@ class SPP(LensProfileBase):
         """
         gamma = SPP._gamma_limit(gamma)
 
-        x, y = shift_center(x, y, center_x, center_y)
+        x_, y_ = shift_center(x, y, center_x, center_y)
         E = theta_E / ((3.0 - gamma) / 2.0) ** (1.0 / (1.0 - gamma))
         # E = phi_E_spp
         eta = -gamma + 3
 
-        p2 = x**2 + y**2
+        p2 = x_**2 + y_**2
         s2 = 0.0  # softening
         return 2 * E**2 / eta**2 * ((p2 + s2) / E**2) ** (eta / 2)
 
@@ -58,15 +58,15 @@ class SPP(LensProfileBase):
     def derivatives(x, y, theta_E, gamma, center_x=0.0, center_y=0.0):
         gamma = SPP._gamma_limit(gamma)
 
-        x, y = shift_center(x, y, center_x, center_y)
+        x_, y_ = shift_center(x, y, center_x, center_y)
 
-        r2 = x**2 + y**2
+        r2 = x_**2 + y_**2
         a = jnp.maximum(r2, 0.000001)
         r = jnp.sqrt(a)
         alpha = theta_E * (r2 / theta_E**2) ** (1 - gamma / 2.0)
         fac = alpha / r
-        f_x = fac * x
-        f_y = fac * y
+        f_x = fac * x_
+        f_y = fac * y_
         return f_x, f_y
 
     @staticmethod
@@ -74,27 +74,27 @@ class SPP(LensProfileBase):
     def hessian(x, y, theta_E, gamma, center_x=0.0, center_y=0.0):
         gamma = SPP._gamma_limit(gamma)
 
-        x, y = shift_center(x, y, center_x, center_y)
+        x_, y_ = shift_center(x, y, center_x, center_y)
         E = theta_E / ((3.0 - gamma) / 2.0) ** (1.0 / (1.0 - gamma))
         # E = phi_E_spp
         eta = -gamma + 3.0
 
-        P2 = x**2 + y**2
+        P2 = x_**2 + y_**2
         a = jnp.where(P2 < 0.000001, 0.000001, P2)
 
         kappa = (
             1.0
             / eta
             * (a / E**2) ** (eta / 2 - 1)
-            * ((eta - 2) * (x**2 + y**2) / a + (1 + 1))
+            * ((eta - 2) * (x_**2 + y_**2) / a + (1 + 1))
         )
         gamma1 = (
             1.0
             / eta
             * (a / E**2) ** (eta / 2 - 1)
-            * ((eta / 2 - 1) * (2 * x**2 - 2 * y**2) / a)
+            * ((eta / 2 - 1) * (2 * x_**2 - 2 * y_**2) / a)
         )
-        gamma2 = 4 * x * y * (1.0 / 2 - 1 / eta) * (a / E**2) ** (eta / 2 - 2) / E**2
+        gamma2 = 4 * x_ * y_ * (1.0 / 2 - 1 / eta) * (a / E**2) ** (eta / 2 - 2) / E**2
 
         f_xx = kappa + gamma1
         f_yy = kappa - gamma1
@@ -218,8 +218,8 @@ class SPP(LensProfileBase):
         :param center_y:
         :return:
         """
-        x, y = shift_center(x, y, center_x, center_y)
-        r = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x_**2 + y_**2)
         mass_3d = SPP.mass_3d(r, rho0, gamma)
         pot = mass_3d / r
         return pot
@@ -261,8 +261,8 @@ class SPP(LensProfileBase):
         :param center_y:
         :return:
         """
-        x, y = shift_center(x, y, center_x, center_y)
-        r = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x_**2 + y_**2)
         sigma = (
             jnp.sqrt(jnp.pi)
             * special.gamma(1.0 / 2 * (-1 + gamma))

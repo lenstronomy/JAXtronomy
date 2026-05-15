@@ -93,8 +93,8 @@ class PseudoJaffe(LensProfileBase):
         :return: projected density
         """
         Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
-        x, y = shift_center(x, y, center_x, center_y)
-        r = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x_**2 + y_**2)
         sigma0 = PseudoJaffe.rho2sigma(rho0, Ra, Rs)
         sigma = (
             sigma0
@@ -224,8 +224,8 @@ class PseudoJaffe(LensProfileBase):
         :return: lensing potential
         """
         Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
-        x, y = shift_center(x, y, center_x, center_y)
-        r = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x_**2 + y_**2)
         f_ = (
             -2
             * sigma0
@@ -257,8 +257,8 @@ class PseudoJaffe(LensProfileBase):
         :return: f_x, f_y
         """
         Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
-        x, y = shift_center(x, y, center_x, center_y)
-        r = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x_**2 + y_**2)
         r = jnp.where(r < PseudoJaffe._s, PseudoJaffe._s, r)
 
         # There is a 0/0 here if Ra = Rs which can be avoided by taking the limit as Ra -> Rs
@@ -269,8 +269,8 @@ class PseudoJaffe(LensProfileBase):
         factor = jnp.where(Ra == Rs, factor2, factor1)
 
         alpha_r = 2 * sigma0 * Ra * Rs * factor
-        f_x = alpha_r * x / r
-        f_y = alpha_r * y / r
+        f_x = alpha_r * x_ / r
+        f_y = alpha_r * y_ / r
         return f_x, f_y
 
     @staticmethod
@@ -289,8 +289,8 @@ class PseudoJaffe(LensProfileBase):
         :return: f_xx, f_xy, f_yx, f_yy
         """
         Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
-        x, y = shift_center(x, y, center_x, center_y)
-        r = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x_**2 + y_**2)
         r = jnp.where(r < PseudoJaffe._s, PseudoJaffe._s, r)
         gamma = (
             sigma0
@@ -313,8 +313,8 @@ class PseudoJaffe(LensProfileBase):
             / (Rs - Ra)
             * (1 / jnp.sqrt(Ra**2 + r**2) - 1 / jnp.sqrt(Rs**2 + r**2))
         )
-        sin_2phi = -2 * x * y / r**2
-        cos_2phi = (y**2 - x**2) / r**2
+        sin_2phi = -2 * x_ * y_ / r**2
+        cos_2phi = (y_**2 - x_**2) / r**2
         gamma1 = cos_2phi * gamma
         gamma2 = sin_2phi * gamma
 

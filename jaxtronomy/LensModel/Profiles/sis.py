@@ -28,20 +28,20 @@ class SIS(LensProfileBase):
     @staticmethod
     @jit
     def function(x, y, theta_E, center_x=0, center_y=0):
-        x, y = shift_center(x, y, center_x, center_y)
-        f_ = theta_E * jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        f_ = theta_E * jnp.sqrt(x_**2 + y_**2)
         return f_
 
     @staticmethod
     @jit
     def derivatives(x, y, theta_E, center_x=0, center_y=0):
         """Returns df/dx and df/dy of the function."""
-        x, y = shift_center(x, y, center_x, center_y)
-        R = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x_**2 + y_**2)
         R = jnp.where(R < SIS._epsilon, SIS._epsilon, R)
         a = theta_E / jnp.maximum(R, SIS._epsilon)
-        f_x = a * x
-        f_y = a * y
+        f_x = a * x_
+        f_y = a * y_
         return f_x, f_y
 
     @staticmethod
@@ -49,13 +49,13 @@ class SIS(LensProfileBase):
     def hessian(x, y, theta_E, center_x=0, center_y=0):
         """Returns Hessian matrix of function d^2f/dx^2, d^2/dxdy, d^2/dydx,
         d^f/dy^2."""
-        x, y = shift_center(x, y, center_x, center_y)
-        R = (x**2 + y**2) ** (3.0 / 2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        R = (x_**2 + y_**2) ** (3.0 / 2)
         R = jnp.where(R < SIS._epsilon, SIS._epsilon, R)
         prefac = theta_E / jnp.maximum(SIS._epsilon, R)
-        f_xx = y * y * prefac
-        f_yy = x * x * prefac
-        f_xy = -x * y * prefac
+        f_xx = y_ * y_ * prefac
+        f_yy = x_ * x_ * prefac
+        f_xy = -x_ * y_ * prefac
         return f_xx, f_xy, f_xy, f_yy
 
     @staticmethod
@@ -134,8 +134,7 @@ class SIS(LensProfileBase):
         :param center_y:
         :return:
         """
-        x_ = x - center_x
-        y_ = y - center_y
+        x_, y_ = shift_center(x, y, center_x, center_y)
         r = jnp.sqrt(x_**2 + y_**2)
         mass_3d = SIS.mass_3d(r, rho0)
         pot = mass_3d / r
@@ -174,8 +173,7 @@ class SIS(LensProfileBase):
         :param center_y:
         :return:
         """
-        x_ = x - center_x
-        y_ = y - center_y
+        x_, y_ = shift_center(x, y, center_x, center_y)
         r = jnp.sqrt(x_**2 + y_**2)
         sigma = jnp.pi * rho0 / r
         return sigma

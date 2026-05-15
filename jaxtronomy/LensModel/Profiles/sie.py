@@ -222,8 +222,8 @@ class SIE(LensProfileBase):
         :param center_y:
         :return:
         """
-        x, y = shift_center(x, y, center_x, center_y)
-        r = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x_**2 + y_**2)
         mass_3d = self.mass_3d(r, rho0)
         pot = mass_3d / r
         return pot
@@ -269,8 +269,8 @@ class SIE(LensProfileBase):
         :param center_y:
         :return:
         """
-        x, y = shift_center(x, y, center_x, center_y)
-        r = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x_**2 + y_**2)
         sigma = jnp.pi * rho0 / r
         return sigma
 

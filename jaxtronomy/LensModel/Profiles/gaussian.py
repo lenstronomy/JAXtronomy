@@ -39,8 +39,8 @@ class Gaussian(LensProfileBase):
         :param center_x: x position of the center of the lens
         :param center_y: y position of the center of the lens
         """
-        x, y = shift_center(x, y, center_x, center_y)
-        r = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x_**2 + y_**2)
         sigma_x, sigma_y = sigma, sigma
         c = 1.0 / (2 * sigma_x * sigma_y)
         num_int = Gaussian._num_integral(r, c)
@@ -101,11 +101,11 @@ class Gaussian(LensProfileBase):
         :param center_x: x position of the center of the lens
         :param center_y: y position of the center of the lens
         """
-        x, y = shift_center(x, y, center_x, center_y)
-        R = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        R = jnp.sqrt(x_**2 + y_**2)
         R = jnp.where(R <= Gaussian.ds, Gaussian.ds, R)
         alpha = Gaussian.alpha_abs(R, amp, sigma)
-        return alpha / R * x, alpha / R * y
+        return alpha / R * x_, alpha / R * y_
 
     @staticmethod
     @jit
@@ -119,8 +119,8 @@ class Gaussian(LensProfileBase):
         :param center_x: x position of the center of the lens
         :param center_y: y position of the center of the lens
         """
-        x, y = shift_center(x, y, center_x, center_y)
-        r = jnp.sqrt(x**2 + y**2)
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        r = jnp.sqrt(x_**2 + y_**2)
         sigma_x, sigma_y = sigma, sigma
         r = jnp.where(r < Gaussian.ds, Gaussian.ds, r)
         d_alpha_dr = -Gaussian.d_alpha_dr(r, amp, sigma_x, sigma_y)
