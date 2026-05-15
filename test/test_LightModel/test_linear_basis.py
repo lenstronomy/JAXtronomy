@@ -1,7 +1,3 @@
-import jax
-
-jax.config.update("jax_enable_x64", True)
-
 import numpy as np, numpy.testing as npt
 
 from jaxtronomy.LightModel.linear_basis import LinearBasis

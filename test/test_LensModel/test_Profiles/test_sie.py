@@ -3,7 +3,6 @@ __author__ = "sibirrer"
 import numpy as np
 import numpy.testing as npt
 import pytest
-import jaxtronomy.Util.param_util as param_util
 from jaxtronomy.LensModel.Profiles.sie import SIE
 from lenstronomy.LensModel.Profiles.sie import SIE as SIE_ref
 

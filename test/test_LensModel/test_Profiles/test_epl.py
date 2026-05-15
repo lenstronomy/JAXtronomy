@@ -8,9 +8,6 @@ from jaxtronomy.LensModel.Profiles.epl import EPL, EPLMajorAxis, EPLQPhi
 import numpy as np
 import numpy.testing as npt
 import pytest
-import jax
-
-jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 import jax.numpy as jnp
 
 

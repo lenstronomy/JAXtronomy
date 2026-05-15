@@ -1,9 +1,6 @@
 import numpy.testing as npt
 import pytest
 import numpy as np
-import jax
-
-jax.config.update("jax_enable_x64", True)
 
 from jaxtronomy.ImSim.MultiBand.multi_linear import MultiLinear
 from lenstronomy.ImSim.MultiBand.multi_linear import MultiLinear as MultiLinear_ref

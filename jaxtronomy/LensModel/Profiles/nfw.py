@@ -2,13 +2,11 @@ __author__ = "sibirrer"
 
 # this file contains a class to compute the Navaro-Frenk-White profile
 
-from jax import config, jit
+from jax import jit
 import jax.numpy as jnp
 
 from jaxtronomy.Util.util import shift_center
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
-
-config.update("jax_enable_x64", True)
 
 __all__ = ["NFW"]
 

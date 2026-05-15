@@ -1,8 +1,6 @@
 __author__ = "dangilman"
 
-from jax import config, jit, numpy as jnp
-
-config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
+from jax import jit, numpy as jnp
 
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 import jaxtronomy.Util.param_util as param_util

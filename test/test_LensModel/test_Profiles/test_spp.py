@@ -7,7 +7,6 @@ import numpy as np
 import numpy.testing as npt
 import pytest
 
-
 class TestSPP(object):
     """Tests the Gaussian methods."""
 

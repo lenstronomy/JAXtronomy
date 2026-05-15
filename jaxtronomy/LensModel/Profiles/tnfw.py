@@ -3,12 +3,10 @@ __author__ = "sibirrer"
 # this file contains a class to compute the truncated Navaro-Frank-White function (Baltz et al 2009)in mass/kappa space
 # the potential therefore is its integral
 
-from jax import config, jit, numpy as jnp
+from jax import jit, numpy as jnp
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 from jaxtronomy.LensModel.Profiles.nfw import NFW
 from jaxtronomy.Util.util import shift_center
-
-config.update("jax_enable_x64", True)
 
 __all__ = ["TNFW"]
 

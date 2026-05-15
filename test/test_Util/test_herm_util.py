@@ -1,11 +1,8 @@
 import pytest
-
-import jax
 import numpy as np, numpy.testing as npt
 from numpy.polynomial.hermite import hermval as hermval_ref
 from scipy.special import eval_hermite as eval_hermite_ref
 
-jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent witsh numpy
 from jaxtronomy.Util.herm_util import eval_hermite, hermval
 
 A_TOL = 1e-10

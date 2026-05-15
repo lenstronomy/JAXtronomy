@@ -1,7 +1,3 @@
-from jax import config
-
-config.update("jax_enable_x64", True)
-
 import numpy.testing as npt
 import numpy as np
 import pytest

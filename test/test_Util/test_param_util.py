@@ -1,13 +1,8 @@
 import numpy as np
 import pytest
 import numpy.testing as npt
-from lenstronomy.Util import util
 import jaxtronomy.Util.param_util as param_util
 import lenstronomy.Util.param_util as param_util_ref
-import jax
-
-jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
-import jax.numpy as jnp
 
 
 def test_cart2polar():

@@ -1,7 +1,6 @@
 __author__ = "sibirrer"
 # this file contains a class to make a gaussian
 
-import jax
 from jax import jit, lax, numpy as jnp
 import jax.scipy.special
 import numpy as np
@@ -9,8 +8,6 @@ import numpy as np
 from jaxtronomy.Util.util import shift_center
 from jaxtronomy.LensModel.Profiles.gaussian_potential import GaussianPotential
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
-
-jax.config.update("jax_enable_x64", True)
 
 __all__ = ["Gaussian"]
 

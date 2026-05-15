@@ -3,12 +3,9 @@ __author__ = "sibirrer"
 import lenstronomy.Util.util as util_ref
 import jaxtronomy.Util.util as util
 
-import jax
 import numpy as np
 import pytest
 import numpy.testing as npt
-
-jax.config.update("jax_enable_x64", True)
 
 
 def test_array2image():

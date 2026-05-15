@@ -1,10 +1,8 @@
 __author__ = "sibirrer"
 
-from jax import config, jit, numpy as jnp
+from jax import jit, numpy as jnp
 from jaxtronomy.Util.util import shift_center
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
-
-config.update("jax_enable_x64", True)  # 64-bit floats
 
 __all__ = ["SIS"]
 

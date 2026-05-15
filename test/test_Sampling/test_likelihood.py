@@ -1,6 +1,6 @@
 __author__ = "sibirrer"
 
-from jax import config, numpy as jnp, grad, jit
+from jax import numpy as jnp, grad, jit
 import pytest
 import numpy as np
 import numpy.testing as npt
@@ -23,8 +23,6 @@ from jaxtronomy.LightModel.light_model_base import (
 from jaxtronomy.LensModel.lens_model import LensModel
 from jaxtronomy.LightModel.light_model import LightModel
 from jaxtronomy.Sampling.likelihood import ImageLikelihood
-
-config.update("jax_enable_x64", True)
 
 
 class TestLikelihoodModule(object):

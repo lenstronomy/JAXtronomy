@@ -1,11 +1,8 @@
 import lenstronomy.Util.kernel_util as kernel_util_ref
 import jaxtronomy.Util.kernel_util as kernel_util
 
-from jax import config
 import numpy as np, numpy.testing as npt
 import pytest
-
-config.update("jax_enable_x64", True)
 
 
 def test_estimate_amp():

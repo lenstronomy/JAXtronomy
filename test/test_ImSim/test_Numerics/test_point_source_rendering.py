@@ -6,13 +6,10 @@ from lenstronomy.Data.psf import PSF
 
 from jaxtronomy.ImSim.Numerics.point_source_rendering import PointSourceRendering
 
-from jax import config
 import numpy as np
 import numpy.testing as npt
 import pytest
 import unittest
-
-config.update("jax_enable_x64", True)
 
 
 class TestPointSourceRendering(object):

@@ -2,10 +2,6 @@ import numpy as np
 import pytest
 import numpy.testing as npt
 
-import jax
-
-jax.config.update("jax_enable_x64", True)
-
 from jaxtronomy.LightModel.Profiles.shapelets import (
     Shapelets,
     ShapeletSet,

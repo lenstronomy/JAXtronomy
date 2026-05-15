@@ -1,7 +1,4 @@
-import jax, jax.numpy as jnp
-
-jax.config.update("jax_enable_x64", True)
-
+import jax.numpy as jnp
 import pytest
 import copy
 import numpy as np

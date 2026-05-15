@@ -6,11 +6,6 @@ from lenstronomy.LensModel.Profiles.sis import SIS as SIS_ref
 import numpy as np
 import numpy.testing as npt
 import pytest
-import jax
-
-jax.config.update("jax_enable_x64", True)
-import jax.numpy as jnp
-
 
 class TestSIS(object):
     """Tests the Gaussian methods."""

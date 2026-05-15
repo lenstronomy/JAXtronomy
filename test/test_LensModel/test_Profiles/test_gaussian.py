@@ -1,6 +1,5 @@
 __author__ = "sibirrer"
 
-import jax
 import numpy as np
 import numpy.testing as npt
 import pytest
@@ -12,8 +11,6 @@ from lenstronomy.LensModel.Profiles.gaussian_potential import (
     GaussianPotential as GaussianPotential_ref,
 )
 from jaxtronomy.LensModel.Profiles.gaussian_potential import GaussianPotential
-
-jax.config.update("jax_enable_x64", True)
 
 
 class TestGaussian(object):

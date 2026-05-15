@@ -5,9 +5,7 @@ from jaxtronomy.LensModel.profile_list_base import lens_class
 
 import copy
 from functools import partial
-from jax import config, debug, jit, numpy as jnp
-
-config.update("jax_enable_x64", True)  # 64-bit floats
+from jax import debug, jit, numpy as jnp
 
 
 __all__ = ["SinglePlaneLOS"]

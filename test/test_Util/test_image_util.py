@@ -1,14 +1,11 @@
 __author__ = "sibirrer"
 
 import pytest
-from jax import config
 import numpy as np
 import numpy.testing as npt
 
 import lenstronomy.Util.image_util as image_util_ref
 import jaxtronomy.Util.image_util as image_util
-
-config.update("jax_enable_x64", True)
 
 
 def test_add_layer2image():
