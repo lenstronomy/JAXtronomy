@@ -6,7 +6,7 @@ import jaxtronomy.Util.util as util
 import numpy as np
 import pytest
 import numpy.testing as npt
-
+import jax.numpy as jnp
 
 def test_array2image():
     x = np.array([0, 1, 2, 5, 7, 3], dtype=float)
@@ -90,8 +90,8 @@ def test_shift_center():
     center_y = 6
 
     new_x, new_y = util.shift_center(x, y, center_x, center_y)
-    assert isinstance(new_x, jax.numpy.ndarray)
-    assert isinstance(new_y, jax.numpy.ndarray)
+    assert isinstance(new_x, jnp.ndarray)
+    assert isinstance(new_y, jnp.ndarray)
 
     npt.assert_equal(np.array(new_x), [-2, 0, 1, 3])
     npt.assert_equal(np.array(new_y), [-3, 34, -1, -4])
