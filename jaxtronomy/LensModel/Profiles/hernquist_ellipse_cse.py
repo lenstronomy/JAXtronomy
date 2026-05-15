@@ -2,7 +2,7 @@ from jax import jit
 import jax.numpy as jnp
 
 import jaxtronomy.Util.param_util as param_util
-from jaxtronomy.Util import util
+from jaxtronomy.Util.util import rotate, shift_center
 from jaxtronomy.LensModel.Profiles.cored_steep_ellipsoid import CSEMajorAxisSet
 from jaxtronomy.LensModel.Profiles.hernquist import Hernquist
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
@@ -10,7 +10,7 @@ from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 __all__ = ["HernquistEllipseCSE"]
 
 # Table 2 in Oguri 2021
-A_LIST = jnp.asarray(
+A_LIST = jnp.array(
     [
         9.200445e-18,
         2.184724e-16,
@@ -53,9 +53,10 @@ A_LIST = jnp.asarray(
         1.652553e-02,
         2.314934e-02,
         3.992313e-01,
-    ]
+    ],
+    dtype=float,
 )
-S_LIST = jnp.asarray(
+S_LIST = jnp.array(
     [
         1.199110e-06,
         3.751762e-06,
@@ -98,7 +99,8 @@ S_LIST = jnp.asarray(
         2.944679e04,
         2.834717e03,
         5.931328e04,
-    ]
+    ],
+    dtype=float,
 )
 
 
@@ -135,14 +137,12 @@ class HernquistEllipseCSE(LensProfileBase):
     def function(x, y, sigma0, Rs, e1, e2, center_x=0, center_y=0):
         """Returns double integral of NFW profile."""
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
 
         # potential calculation
-        f_ = CSEMajorAxisSet.function(x__ / Rs, y__ / Rs, A_LIST, S_LIST, q)
+        f_ = CSEMajorAxisSet.function(x_ / Rs, y_ / Rs, A_LIST, S_LIST, q)
         const = HernquistEllipseCSE._normalization(sigma0, Rs, q)
         return const * f_
 
@@ -151,15 +151,13 @@ class HernquistEllipseCSE(LensProfileBase):
     def derivatives(x, y, sigma0, Rs, e1, e2, center_x=0, center_y=0):
         """Returns df/dx and df/dy of the function (integral of NFW)"""
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_q)
-        f__x, f__y = CSEMajorAxisSet.derivatives(x__ / Rs, y__ / Rs, A_LIST, S_LIST, q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
+        f_x, f_y = CSEMajorAxisSet.derivatives(x_ / Rs, y_ / Rs, A_LIST, S_LIST, q)
 
         # rotate deflections back
-        f_x, f_y = util.rotate(f__x, f__y, -phi_q)
+        f_x, f_y = rotate(f_x, f_y, -phi_q)
         const = HernquistEllipseCSE._normalization(sigma0, Rs, q) / Rs
         return const * f_x, const * f_y
 
@@ -169,13 +167,11 @@ class HernquistEllipseCSE(LensProfileBase):
         """Returns Hessian matrix of function d^2f/dx^2, d^2/dxdy, d^2/dydx,
         d^f/dy^2."""
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
         f__xx, f__xy, __, f__yy = CSEMajorAxisSet.hessian(
-            x__ / Rs, y__ / Rs, A_LIST, S_LIST, q
+            x_ / Rs, y_ / Rs, A_LIST, S_LIST, q
         )
 
         # rotate back

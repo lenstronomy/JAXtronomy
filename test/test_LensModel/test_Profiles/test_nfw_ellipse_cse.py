@@ -22,7 +22,7 @@ class TestNFWELLIPSE(object):
     def test_function(self):
         x = np.linspace(0.01, 2, 10)
         y = np.zeros_like(x)
-        kwargs = {"alpha_Rs": 2, "Rs": 2, "center_x": 0, "center_y": 0}
+        kwargs = {"alpha_Rs": 2, "Rs": 2, "center_x": 0.01, "center_y": 0}
 
         f_ = self.high_accuracy.function(x, y, e1=0, e2=0, **kwargs)
         f_ref = self.high_accuracy_ref.function(x, y, e1=0, e2=0, **kwargs)
@@ -35,7 +35,7 @@ class TestNFWELLIPSE(object):
     def test_derivatives(self):
         x = np.linspace(0.01, 2, 10)
         y = np.zeros_like(x)
-        kwargs = {"alpha_Rs": 0.5, "Rs": 2, "center_x": 0, "center_y": 0}
+        kwargs = {"alpha_Rs": 0.5, "Rs": 2, "center_x": 0.01, "center_y": 0}
 
         f_x, f_y = self.high_accuracy.derivatives(x, y, e1=0, e2=0, **kwargs)
         f_x_ref, f_y_ref = self.high_accuracy_ref.derivatives(
@@ -52,7 +52,7 @@ class TestNFWELLIPSE(object):
     def test_hessian(self):
         x = np.linspace(0.01, 2, 10)
         y = np.zeros_like(x)
-        kwargs = {"alpha_Rs": 0.5, "Rs": 2, "center_x": 0, "center_y": 0}
+        kwargs = {"alpha_Rs": 0.5, "Rs": 2, "center_x": 0.01, "center_y": 0}
 
         f_xx, f_xy, f_yx, f_yy = self.high_accuracy.hessian(x, y, e1=0, e2=0, **kwargs)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.high_accuracy_ref.hessian(

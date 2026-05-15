@@ -14,11 +14,11 @@ class TestConvergence(object):
 
     def setup_method(self):
         self.convergence_ref = Convergence_ref()
-        self.kwargs_lens = {"kappa": 0.1}
+        self.kwargs_lens = {"kappa": 0.1, "ra_0": 0.5, "dec_0": 3}
 
     def test_function(self):
-        x = np.array([1])
-        y = np.array([0])
+        x = np.array([0.5])
+        y = np.array([3])
         values = Convergence.function(x, y, **self.kwargs_lens)
         values_ref = self.convergence_ref.function(x, y, **self.kwargs_lens)
         npt.assert_array_almost_equal(values, values_ref, decimal=7)
@@ -35,8 +35,8 @@ class TestConvergence(object):
         npt.assert_array_almost_equal(values, values_ref, decimal=7)
 
     def test_derivatives(self):
-        x = np.array([1])
-        y = np.array([2])
+        x = np.array([0.5])
+        y = np.array([3])
         f_x, f_y = Convergence.derivatives(x, y, **self.kwargs_lens)
         f_x_ref, f_y_ref = self.convergence_ref.derivatives(x, y, **self.kwargs_lens)
         npt.assert_almost_equal(f_x, f_x_ref, decimal=7)
@@ -50,8 +50,8 @@ class TestConvergence(object):
         npt.assert_almost_equal(f_y, f_y_ref, decimal=7)
 
     def test_hessian(self):
-        x = np.array([1])
-        y = np.array([2])
+        x = np.array([0.5])
+        y = np.array([3])
         f_xx, f_xy, f_yx, f_yy = Convergence.hessian(x, y, **self.kwargs_lens)
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.convergence_ref.hessian(
             x, y, **self.kwargs_lens

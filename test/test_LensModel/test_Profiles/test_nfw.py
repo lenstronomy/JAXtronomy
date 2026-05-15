@@ -13,6 +13,7 @@ class TestNFW(object):
 
     def setup_method(self):
         self.nfw_ref = NFW_ref()
+        self.center_kwargs = {"center_x": 0.3, "center_y": -0.2}
 
     def test_init(self):
         npt.assert_raises(Exception, NFW, interpol=True)
@@ -23,11 +24,11 @@ class TestNFW(object):
         Rs = 1.0
         rho0 = 1
         alpha_Rs_ref = self.nfw_ref.rho02alpha(rho0, Rs)
-        values_ref = self.nfw_ref.function(x, y, Rs, alpha_Rs_ref)
+        values_ref = self.nfw_ref.function(x, y, Rs, alpha_Rs_ref, **self.center_kwargs)
         alpha_Rs = NFW.rho02alpha(rho0, Rs)
-        values = NFW.function(x, y, Rs, alpha_Rs_ref)
+        values = NFW.function(x, y, Rs, alpha_Rs_ref, **self.center_kwargs)
         npt.assert_array_almost_equal(alpha_Rs_ref, alpha_Rs, decimal=8)
-        npt.assert_array_almost_equal(values_ref, values, decimal=5)
+        npt.assert_array_almost_equal(values_ref, values, decimal=8)
 
         x = np.array([0])
         y = np.array([0])
@@ -38,13 +39,13 @@ class TestNFW(object):
         values_ref = self.nfw_ref.function(x, y, Rs, alpha_Rs_ref)
         values = NFW.function(x, y, Rs, alpha_Rs_ref)
         npt.assert_array_almost_equal(alpha_Rs_ref, alpha_Rs, decimal=8)
-        npt.assert_array_almost_equal(values_ref, values, decimal=5)
+        npt.assert_array_almost_equal(values_ref, values, decimal=8)
 
         x = np.array([2, 3, 4])
         y = np.array([1, 1, 1])
-        values_ref = self.nfw_ref.function(x, y, Rs, alpha_Rs_ref)
-        values = NFW.function(x, y, Rs, alpha_Rs_ref)
-        npt.assert_array_almost_equal(values_ref, values, decimal=5)
+        values_ref = self.nfw_ref.function(x, y, Rs, alpha_Rs_ref, **self.center_kwargs)
+        values = NFW.function(x, y, Rs, alpha_Rs_ref, **self.center_kwargs)
+        npt.assert_array_almost_equal(values_ref, values, decimal=8)
 
     def test_derivatives(self):
         Rs = 0.1
@@ -154,15 +155,17 @@ class TestNFW(object):
             ]
         )
         y_array = np.zeros_like(x_array)
-        f_x_ref, f_y_ref = self.nfw_ref.derivatives(x_array, y_array, Rs, alpha_Rs)
-        f_x, f_y = NFW.derivatives(x_array, y_array, Rs, alpha_Rs)
+        f_x_ref, f_y_ref = self.nfw_ref.derivatives(
+            x_array, y_array, Rs, alpha_Rs, **self.center_kwargs
+        )
+        f_x, f_y = NFW.derivatives(x_array, y_array, Rs, alpha_Rs, **self.center_kwargs)
 
         npt.assert_array_almost_equal(f_x_ref, f_x, decimal=8)
         npt.assert_array_almost_equal(f_y_ref, f_y, decimal=8)
 
     def test_hessian(self):
-        x = np.array([1])
-        y = np.array([2])
+        x = np.array([0])
+        y = np.array([0])
         Rs = 1.0
         rho0 = 1
         alpha_Rs = NFW.rho02alpha(rho0, Rs)
@@ -178,9 +181,9 @@ class TestNFW(object):
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.nfw_ref.hessian(
-            x, y, Rs, alpha_Rs
+            x, y, Rs, alpha_Rs, **self.center_kwargs
         )
-        f_xx, f_xy, f_yx, f_yy = NFW.hessian(x, y, Rs, alpha_Rs)
+        f_xx, f_xy, f_yx, f_yy = NFW.hessian(x, y, Rs, alpha_Rs, **self.center_kwargs)
         npt.assert_array_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_array_almost_equal(f_xy, f_xy_ref, decimal=8)
         npt.assert_array_almost_equal(f_yx, f_yx_ref, decimal=8)

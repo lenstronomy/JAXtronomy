@@ -1,5 +1,6 @@
 import numpy as np
 from jax import jit, numpy as jnp
+from jaxtronomy.Util.util import shift_center
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
 __all__ = ["PseudoJaffe"]
@@ -92,8 +93,7 @@ class PseudoJaffe(LensProfileBase):
         :return: projected density
         """
         Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
+        x_, y_ = shift_center(x, y, center_x, center_y)
         r = jnp.sqrt(x_**2 + y_**2)
         sigma0 = PseudoJaffe.rho2sigma(rho0, Ra, Rs)
         sigma = (
@@ -224,8 +224,7 @@ class PseudoJaffe(LensProfileBase):
         :return: lensing potential
         """
         Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
+        x_, y_ = shift_center(x, y, center_x, center_y)
         r = jnp.sqrt(x_**2 + y_**2)
         f_ = (
             -2
@@ -258,8 +257,7 @@ class PseudoJaffe(LensProfileBase):
         :return: f_x, f_y
         """
         Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
+        x_, y_ = shift_center(x, y, center_x, center_y)
         r = jnp.sqrt(x_**2 + y_**2)
         r = jnp.where(r < PseudoJaffe._s, PseudoJaffe._s, r)
 
@@ -291,8 +289,7 @@ class PseudoJaffe(LensProfileBase):
         :return: f_xx, f_xy, f_yx, f_yy
         """
         Ra, Rs = PseudoJaffe._sort_ra_rs(Ra, Rs)
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
+        x_, y_ = shift_center(x, y, center_x, center_y)
         r = jnp.sqrt(x_**2 + y_**2)
         r = jnp.where(r < PseudoJaffe._s, PseudoJaffe._s, r)
         gamma = (

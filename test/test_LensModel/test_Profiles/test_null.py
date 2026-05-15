@@ -8,24 +8,25 @@ from jaxtronomy.LensModel.Profiles.null import Null
 class TestGaussian(object):
     def setup_method(self):
         self.profile = Null()
+        self.center_kwargs = {"center_x": 0.3, "center_y": 0.1}
 
     def test_function(self):
         x = np.tile(np.linspace(-5, 5, 20), 20)
         y = np.repeat(np.linspace(-5, 5, 20), 20)
-        values = self.profile.function(x, y)
+        values = self.profile.function(x, y, **self.center_kwargs)
         npt.assert_allclose(values, np.zeros_like(x), atol=1e-16)
 
     def test_derivatives(self):
         x = np.tile(np.linspace(-5, 5, 20), 20)
         y = np.repeat(np.linspace(-5, 5, 20), 20)
-        f_x, f_y = self.profile.derivatives(x, y)
+        f_x, f_y = self.profile.derivatives(x, y, **self.center_kwargs)
         npt.assert_allclose(f_x, np.zeros_like(x), atol=1e-16)
         npt.assert_allclose(f_y, np.zeros_like(x), atol=1e-16)
 
     def test_hessian(self):
         x = np.tile(np.linspace(-5, 5, 20), 20)
         y = np.repeat(np.linspace(-5, 5, 20), 20)
-        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y)
+        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, **self.center_kwargs)
         npt.assert_allclose(f_xx, np.zeros_like(x), atol=1e-16)
         npt.assert_allclose(f_xy, np.zeros_like(x), atol=1e-16)
         npt.assert_allclose(f_yx, np.zeros_like(x), atol=1e-16)

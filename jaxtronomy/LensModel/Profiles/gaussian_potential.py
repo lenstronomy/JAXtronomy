@@ -2,6 +2,7 @@ __author__ = "sibirrer"
 # this file contains a class to make a gaussian
 
 from jax import jit, numpy as jnp
+from jaxtronomy.Util.util import shift_center
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
 __all__ = ["GaussianPotential"]
@@ -40,10 +41,9 @@ class GaussianPotential(LensProfileBase):
         :param center_x: x position of the center of the lens
         :param center_y: y position of the center of the lens
         """
+        x_, y_ = shift_center(x, y, center_x, center_y)
         c = amp / (2 * jnp.pi * sigma_x * sigma_y)
-        delta_x = x - center_x
-        delta_y = y - center_y
-        exponent = -((delta_x / sigma_x) ** 2 + (delta_y / sigma_y) ** 2) / 2.0
+        exponent = -((x_ / sigma_x) ** 2 + (y_ / sigma_y) ** 2) / 2.0
         return c * jnp.exp(exponent)
 
     @staticmethod
@@ -59,6 +59,8 @@ class GaussianPotential(LensProfileBase):
         :param center_x: x position of the center of the lens
         :param center_y: y position of the center of the lens
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         f_ = GaussianPotential.function(x, y, amp, sigma_x, sigma_y, center_x, center_y)
         return f_ * (center_x - x) / sigma_x**2, f_ * (center_y - y) / sigma_y**2
 
@@ -75,6 +77,8 @@ class GaussianPotential(LensProfileBase):
         :param center_x: x position of the center of the lens
         :param center_y: y position of the center of the lens
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         f_ = GaussianPotential.function(x, y, amp, sigma_x, sigma_y, center_x, center_y)
         f_xx = f_ * ((-1.0 / sigma_x**2) + (center_x - x) ** 2 / sigma_x**4)
         f_yy = f_ * ((-1.0 / sigma_y**2) + (center_y - y) ** 2 / sigma_y**4)

@@ -1,5 +1,6 @@
 import jax.numpy as jnp
 from jax import jit
+from jaxtronomy.Util.util import shift_center
 
 
 @jit
@@ -17,8 +18,7 @@ def cart2polar(x, y, center_x=0, center_y=0):
     :type center_y: float
     :returns: array of same size with coords [r,phi]
     """
-    coord_shift_x = x - center_x
-    coord_shift_y = y - center_y
+    coord_shift_x, coord_shift_y = shift_center(x, y, center_x, center_y)
     r = jnp.sqrt(coord_shift_x**2 + coord_shift_y**2)
     phi = jnp.arctan2(coord_shift_y, coord_shift_x)
     return r, phi
@@ -38,6 +38,8 @@ def polar2cart(r, phi, center):
     :returns: array of same size with coords [x,y]
     :raises: AttributeError, KeyError
     """
+    r = jnp.asarray(r, dtype=float)
+    phi = jnp.asarray(phi, dtype=float)
     x = r * jnp.cos(phi)
     y = r * jnp.sin(phi)
     return x - center[0], y - center[1]
@@ -113,8 +115,7 @@ def transform_e1e2_product_average(x, y, e1, e2, center_x, center_y):
     :param center_y: center of distortion
     :return: distorted coordinates x', y'
     """
-    x_shift = x - center_x
-    y_shift = y - center_y
+    x_shift, y_shift = shift_center(x, y, center_x, center_y)
 
     norm = jnp.maximum(jnp.sqrt(jnp.abs(1 - e1**2 - e2**2)), 0.000001)
     x_ = ((1 - e1) * x_shift - e2 * y_shift) / norm
@@ -136,8 +137,7 @@ def transform_e1e2_square_average(x, y, e1, e2, center_x, center_y):
     :return: distorted coordinates x', y'
     """
     phi_g, q = ellipticity2phi_q(e1, e2)
-    x_shift = x - center_x
-    y_shift = y - center_y
+    x_shift, y_shift = shift_center(x, y, center_x, center_y)
     cos_phi = jnp.cos(phi_g)
     sin_phi = jnp.sin(phi_g)
     e = q2e(q)

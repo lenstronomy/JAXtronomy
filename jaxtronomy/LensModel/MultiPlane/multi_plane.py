@@ -250,10 +250,12 @@ class MultiPlane(object):
         self._check_raise(k=k)
         if check_convention and not self.ignore_observed_positions:
             kwargs_lens = self._convention(kwargs_lens)
-        x = jnp.zeros_like(theta_x, dtype=float)
-        y = jnp.zeros_like(theta_y, dtype=float)
-        alpha_x = jnp.array(theta_x)
-        alpha_y = jnp.array(theta_y)
+
+        alpha_x = jnp.asarray(theta_x, dtype=float)
+        alpha_y = jnp.asarray(theta_y, dtype=float)
+        x = jnp.zeros_like(alpha_x)
+        y = jnp.zeros_like(alpha_y)
+
         x, y, _, _ = self._multi_plane_base.ray_shooting_partial_comoving(
             x,
             y,
@@ -470,6 +472,9 @@ class MultiPlane(object):
             checks whether the positional conventions are satisfied.
         :return: travel time in unit of days
         """
+        theta_x = jnp.asarray(theta_x, dtype=float)
+        theta_y = jnp.asarray(theta_y, dtype=float)
+
         dt_geo, dt_grav = self.geo_shapiro_delay(
             theta_x, theta_y, kwargs_lens, check_convention=check_convention
         )
@@ -490,6 +495,10 @@ class MultiPlane(object):
         """
         if check_convention and not self.ignore_observed_positions:
             kwargs_lens = self._convention(kwargs_lens)
+
+        theta_x = jnp.asarray(theta_x, dtype=float)
+        theta_y = jnp.asarray(theta_y, dtype=float)
+
         return self._multi_plane_base.geo_shapiro_delay(
             theta_x,
             theta_y,
@@ -511,6 +520,10 @@ class MultiPlane(object):
         :return: deflection angles in x and y directions
         """
         self._check_raise(k=k)
+
+        theta_x = jnp.asarray(theta_x, dtype=float)
+        theta_y = jnp.asarray(theta_y, dtype=float)
+
         beta_x, beta_y = self.ray_shooting(
             theta_x, theta_y, kwargs_lens, check_convention=check_convention
         )
@@ -548,6 +561,9 @@ class MultiPlane(object):
         self._check_raise(k=k)
         if check_convention and not self.ignore_observed_positions:
             kwargs_lens = self._convention(kwargs_lens)
+
+        theta_x = jnp.asarray(theta_x, dtype=float)
+        theta_y = jnp.asarray(theta_y, dtype=float)
 
         alpha_ra, alpha_dec = self.alpha(
             theta_x, theta_y, kwargs_lens, check_convention=False

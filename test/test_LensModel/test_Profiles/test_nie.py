@@ -18,17 +18,18 @@ class TestNIE(object):
     def setup_method(self):
         self.nie = NIE()
         self.nie_ref = NIE_ref()
+        self.center_kwargs = {"center_x": 1, "center_y": 2}
 
     def test_function(self):
         y = np.array([1.0, 2])
-        x = np.array([0.0, 0.0])
+        x = np.array([2.0, 0.0])
         theta_E = 1.0
         e1 = 0.1
         e2 = 0.3
         s = 0.00001
 
-        f_ = self.nie.function(x, y, theta_E, e1, e2, s)
-        f_ref = self.nie_ref.function(x, y, theta_E, e1, e2, s)
+        f_ = self.nie.function(x, y, theta_E, e1, e2, s, **self.center_kwargs)
+        f_ref = self.nie_ref.function(x, y, theta_E, e1, e2, s, **self.center_kwargs)
         npt.assert_almost_equal(f_, f_ref, decimal=7)
 
     def test_derivatives(self):
@@ -39,8 +40,10 @@ class TestNIE(object):
         e2 = 0.3
         s = 0.00001
 
-        f_x, f_y = self.nie.derivatives(x, y, theta_E, e1, e2, s)
-        f_x_ref, f_y_ref = self.nie_ref.derivatives(x, y, theta_E, e1, e2, s)
+        f_x, f_y = self.nie.derivatives(x, y, theta_E, e1, e2, s, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.nie_ref.derivatives(
+            x, y, theta_E, e1, e2, s, **self.center_kwargs
+        )
         npt.assert_almost_equal(f_x, f_x_ref, decimal=7)
         npt.assert_almost_equal(f_y, f_y_ref, decimal=7)
 
@@ -52,9 +55,11 @@ class TestNIE(object):
         e2 = 0.3
         s = 0.00001
 
-        f_xx, f_xy, f_yx, f_yy = self.nie.hessian(x, y, theta_E, e1, e2, s)
+        f_xx, f_xy, f_yx, f_yy = self.nie.hessian(
+            x, y, theta_E, e1, e2, s, **self.center_kwargs
+        )
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.nie_ref.hessian(
-            x, y, theta_E, e1, e2, s
+            x, y, theta_E, e1, e2, s, **self.center_kwargs
         )
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=5)
         npt.assert_almost_equal(f_yy, f_yy_ref, decimal=5)
