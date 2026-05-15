@@ -18,9 +18,9 @@ def cart2polar(x, y, center_x=0, center_y=0):
     :type center_y: float
     :returns: array of same size with coords [r,phi]
     """
-    x, y = shift_center(x, y, center_x, center_y)
-    r = jnp.sqrt(x**2 + y**2)
-    phi = jnp.arctan2(y, x)
+    coord_shift_x, coord_shift_y = shift_center(x, y, center_x, center_y)
+    r = jnp.sqrt(coord_shift_x**2 + coord_shift_y**2)
+    phi = jnp.arctan2(coord_shift_y, coord_shift_x)
     return r, phi
 
 
@@ -115,10 +115,12 @@ def transform_e1e2_product_average(x, y, e1, e2, center_x, center_y):
     :param center_y: center of distortion
     :return: distorted coordinates x', y'
     """
-    x, y = shift_center(x, y, center_x, center_y)
+    x_shift, y_shift = shift_center(x, y, center_x, center_y)
 
     norm = jnp.maximum(jnp.sqrt(jnp.abs(1 - e1**2 - e2**2)), 0.000001)
-    return ((1 - e1) * x - e2 * y) / norm, (-e2 * x + (1 + e1) * y) / norm
+    x_ = ((1 - e1) * x_shift - e2 * y_shift) / norm
+    y_ = (-e2 * x_shift + (1 + e1) * y_shift) / norm
+    return x_, y_
 
 
 @jit
@@ -135,13 +137,13 @@ def transform_e1e2_square_average(x, y, e1, e2, center_x, center_y):
     :return: distorted coordinates x', y'
     """
     phi_g, q = ellipticity2phi_q(e1, e2)
-    x, y = shift_center(x, y, center_x, center_y)
+    x_shift, y_shift = shift_center(x, y, center_x, center_y)
     cos_phi = jnp.cos(phi_g)
     sin_phi = jnp.sin(phi_g)
     e = q2e(q)
-    x = (cos_phi * x + sin_phi * y) * jnp.sqrt(1 - e)
-    y = (-sin_phi * x + cos_phi * y) * jnp.sqrt(1 + e)
-    return x, y
+    x_ = (cos_phi * x_shift + sin_phi * y_shift) * jnp.sqrt(1 - e)
+    y_ = (-sin_phi * x_shift + cos_phi * y_shift) * jnp.sqrt(1 + e)
+    return x_, y_
 
 
 @jit
