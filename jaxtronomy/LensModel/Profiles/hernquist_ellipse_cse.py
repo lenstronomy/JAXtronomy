@@ -154,10 +154,10 @@ class HernquistEllipseCSE(LensProfileBase):
         # shift and rotate coordinates
         x_, y_ = shift_center(x, y, center_x, center_y)
         x_, y_ = rotate(x_, y_, phi_q)
-        f__x, f__y = CSEMajorAxisSet.derivatives(x_ / Rs, y_ / Rs, A_LIST, S_LIST, q)
+        f_x, f_y = CSEMajorAxisSet.derivatives(x_ / Rs, y_ / Rs, A_LIST, S_LIST, q)
 
         # rotate deflections back
-        f_x, f_y = rotate(f__x, f__y, -phi_q)
+        f_x, f_y = rotate(f_x, f_y, -phi_q)
         const = HernquistEllipseCSE._normalization(sigma0, Rs, q) / Rs
         return const * f_x, const * f_y
 
