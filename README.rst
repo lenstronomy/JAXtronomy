@@ -66,6 +66,13 @@ indicating the number CPU devices to use. For example, to use 16 CPU cores, this
 
   os.environ["XLA_FLAGS"] = "--xla_force_host_platform_device_count=16"
 
+**Default Behavior and Configuration Flags**
+
+By default, JAX uses 32 bit datatypes when performing computations. Users of JAXtronomy are highly recommended
+to overwrite this behavior and use 64 bit datatypes instead, since 32 bit simulations have not been well-tested.
+Typically, this can be done by setting an environment variable or a configuration flag before any JAX operations
+are performed. For details, see `JAX documentation on configuration flags <https://docs.jax.dev/en/latest/config_options.html>`_
+
 **Example notebook**:
 `An example notebook <https://github.com/lenstronomy/JAXtronomy/blob/main/notebooks/modeling_a_simple_Einstein_ring.ipynb>`_ has been made available, which
 showcases the features and improvements in JAXtronomy.
