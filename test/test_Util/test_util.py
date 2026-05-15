@@ -8,6 +8,7 @@ import pytest
 import numpy.testing as npt
 import jax.numpy as jnp
 
+
 def test_array2image():
     x = np.array([0, 1, 2, 5, 7, 3], dtype=float)
     npt.assert_raises(ValueError, util.array2image, x)

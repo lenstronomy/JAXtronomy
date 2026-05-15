@@ -17,7 +17,6 @@ import copy
 import numpy as np
 import lenstronomy.Util.analysis_util as analysis_util
 
-
 __all__ = ["FittingSequence"]
 
 

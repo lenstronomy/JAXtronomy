@@ -7,7 +7,6 @@ import copy
 from functools import partial
 from jax import debug, jit, numpy as jnp
 
-
 __all__ = ["SinglePlaneLOS"]
 
 
