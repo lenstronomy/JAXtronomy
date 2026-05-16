@@ -1,10 +1,8 @@
 from functools import partial
-from jax import config, debug, jit, lax, numpy as jnp, vmap
+from jax import debug, jit, numpy as jnp, vmap
 import warnings
 
 # from lenstronomy.Util.cosmo_util import get_astropy_cosmology
-
-config.update("jax_enable_x64", True)
 
 __all__ = ["PositionLikelihood"]
 

@@ -20,18 +20,18 @@ class TestHernquistEllipseCSE(object):
         test_init = HernquistEllipseCSE()
 
     def test_function(self):
-        x = np.linspace(0.01, 2, 10)
+        x = np.linspace(-2, 2, 10)
         y = np.zeros_like(x)
-        kwargs = {"sigma0": 2, "Rs": 2, "center_x": 0, "center_y": 0}
+        kwargs = {"sigma0": 2, "Rs": 2, "center_x": 0.2, "center_y": 0.3}
 
         f_ref = self.hernquist_cse_ref.function(x, y, e1=0, e2=0, **kwargs)
         f = HernquistEllipseCSE.function(x, y, e1=0, e2=0, **kwargs)
         npt.assert_array_almost_equal(f, f_ref, decimal=8)
 
     def test_derivatives(self):
-        x = np.linspace(0.01, 2, 10)
+        x = np.linspace(-2, 2, 10)
         y = np.zeros_like(x)
-        kwargs = {"sigma0": 0.5, "Rs": 2, "center_x": 0, "center_y": 0}
+        kwargs = {"sigma0": 0.5, "Rs": 2, "center_x": 0.2, "center_y": 0.3}
 
         f_x_ref, f_y_ref = self.hernquist_cse_ref.derivatives(
             x, y, e1=0, e2=0, **kwargs
@@ -41,9 +41,9 @@ class TestHernquistEllipseCSE(object):
         npt.assert_array_almost_equal(f_y, f_y_ref, decimal=8)
 
     def test_hessian(self):
-        x = np.linspace(0.01, 5, 30)
+        x = np.linspace(-5, 5, 30)
         y = np.zeros_like(x)
-        kwargs = {"sigma0": 0.5, "Rs": 2, "center_x": 0, "center_y": 0}
+        kwargs = {"sigma0": 0.5, "Rs": 2, "center_x": 0.2, "center_y": 0.3}
 
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.hernquist_cse_ref.hessian(
             x, y, e1=0, e2=0, **kwargs
@@ -83,8 +83,12 @@ class TestHernquistEllipseCSE(object):
         y = 4.2
         rho0 = 2.1
         Rs = 3
-        density_2d = HernquistEllipseCSE.density_2d(x, y, rho0, Rs)
-        density_2d_ref = self.hernquist_cse_ref.density_2d(x, y, rho0, Rs)
+        density_2d = HernquistEllipseCSE.density_2d(
+            x, y, rho0, Rs, center_x=0.3, center_y=0.4
+        )
+        density_2d_ref = self.hernquist_cse_ref.density_2d(
+            x, y, rho0, Rs, center_x=0.3, center_y=0.4
+        )
         npt.assert_almost_equal(density_2d, density_2d_ref, decimal=8)
 
     def test_mass_2d(self):

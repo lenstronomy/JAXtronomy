@@ -3,8 +3,8 @@ from setuptools import setup, find_packages
 requires = [
     "lenstronomy>=1.13.6",
     "numpy>=2.0.0",
-    "jax>=0.7.0,<0.10.0",
-    "numpyro>=0.19.0",
+    "jax>=0.10.0",
+    "numpyro>=0.21.0",
     "optax>=0.2.5",
     "tqdm",
     "scipy",

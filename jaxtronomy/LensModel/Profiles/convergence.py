@@ -1,6 +1,7 @@
 __author__ = "sibirrer"
 
 import jaxtronomy.Util.param_util as param_util
+from jaxtronomy.Util.util import shift_center
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 from jax import jit
 
@@ -25,7 +26,7 @@ class Convergence(LensProfileBase):
         :param kappa: (external) convergence
         :return: lensing potential
         """
-        theta, phi = param_util.cart2polar(x - ra_0, y - dec_0)
+        theta, phi = param_util.cart2polar(x, y, ra_0, dec_0)
         f_ = 1.0 / 2 * kappa * theta**2
         return f_
 
@@ -39,8 +40,7 @@ class Convergence(LensProfileBase):
         :param kappa: (external) convergence
         :return: deflection angles (first order derivatives)
         """
-        x_ = x - ra_0
-        y_ = y - dec_0
+        x_, y_ = shift_center(x, y, ra_0, dec_0)
         f_x = kappa * x_
         f_y = kappa * y_
         return f_x, f_y
@@ -59,7 +59,6 @@ class Convergence(LensProfileBase):
         """
         gamma1 = 0
         gamma2 = 0
-        kappa = kappa
         f_xx = kappa + gamma1
         f_yy = kappa - gamma1
         f_xy = gamma2

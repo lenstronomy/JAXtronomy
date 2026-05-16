@@ -2,9 +2,6 @@ __author__ = "dangilman"
 
 import copy
 
-from jax import config
-
-config.update("jax_enable_x64", True)
 import numpy.testing as npt
 from jaxtronomy.LensModel.lens_model import LensModel
 from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref

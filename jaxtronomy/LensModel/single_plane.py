@@ -1,11 +1,8 @@
 __author__ = "sibirrer"
 
-import jax
 from jax import jit, numpy as jnp
 from jaxtronomy.LensModel.profile_list_base import ProfileListBase
 from functools import partial
-
-jax.config.update("jax_enable_x64", True)
 
 __all__ = ["SinglePlane"]
 
@@ -52,6 +49,9 @@ class SinglePlane(ProfileListBase):
         :type k: None, int, or tuple of ints
         :return: source plane positions corresponding to (x, y) in the image plane
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         dx, dy = self.alpha(x, y, kwargs, k=k)
         return x - dx, y - dy
 
@@ -72,9 +72,15 @@ class SinglePlane(ProfileListBase):
         :return: fermat potential in arcsec**2 without geometry term (second part of Eqn
             1 in Suyu et al. 2013) as a list
         """
+        x_image = jnp.asarray(x_image, dtype=float)
+        y_image = jnp.asarray(y_image, dtype=float)
+
         potential = self.potential(x_image, y_image, kwargs_lens, k=k)
         if x_source is None or y_source is None:
             x_source, y_source = self.ray_shooting(x_image, y_image, kwargs_lens, k=k)
+        else:
+            x_source = jnp.asarray(x_source, dtype=float)
+            y_source = jnp.asarray(y_source, dtype=float)
         geometry = ((x_image - x_source) ** 2 + (y_image - y_source) ** 2) / 2.0
         return geometry - potential
 
@@ -92,8 +98,8 @@ class SinglePlane(ProfileListBase):
         :type k: None, int, or tuple of ints
         :return: lensing potential in units of arcsec^2
         """
-        x = jnp.array(x, dtype=float)
-        y = jnp.array(y, dtype=float)
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         if isinstance(k, int):
             return self.func_list[k].function(x, y, **kwargs[k])
         bool_list = self._bool_list(k)
@@ -117,8 +123,8 @@ class SinglePlane(ProfileListBase):
         :type k: None, int, or tuple of ints
         :return: deflection angles in units of arcsec
         """
-        x = jnp.array(x, dtype=float)
-        y = jnp.array(y, dtype=float)
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
 
         if isinstance(k, int):
             return self.func_list[k].derivatives(x, y, **kwargs[k])
@@ -146,8 +152,8 @@ class SinglePlane(ProfileListBase):
         :type k: None, int, or tuple of ints
         :return: f_xx, f_xy, f_yx, f_yy components
         """
-        x = jnp.array(x, dtype=float)
-        y = jnp.array(y, dtype=float)
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         if isinstance(k, int):
             f_xx, f_xy, f_yx, f_yy = self.func_list[k].hessian(x, y, **kwargs[k])
             return f_xx, f_xy, f_yx, f_yy

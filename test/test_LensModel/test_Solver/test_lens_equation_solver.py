@@ -1,6 +1,5 @@
 __author__ = "sibirrer"
 
-import jax
 import numpy.testing as npt
 import pytest
 from lenstronomy.LensModel.Solver.lens_equation_solver import (
@@ -12,8 +11,6 @@ from jaxtronomy.LensModel.Solver.lens_equation_solver import (
 )
 from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
 from jaxtronomy.LensModel.lens_model import LensModel
-
-jax.config.update("jax_enable_x64", True)
 
 # NOTE: The jaxtronomy solver sometimes finds more solutions than the
 #       lenstronomy solver for min_distance >= 0.05, not sure why

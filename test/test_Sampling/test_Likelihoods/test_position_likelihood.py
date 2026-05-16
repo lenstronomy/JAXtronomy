@@ -2,7 +2,6 @@ import pytest
 import numpy.testing as npt
 import numpy as np
 import copy
-from jax import config
 
 from jaxtronomy.Sampling.Likelihoods.position_likelihood import PositionLikelihood
 from jaxtronomy.PointSource.point_source import PointSource
@@ -14,8 +13,6 @@ from lenstronomy.Sampling.Likelihoods.position_likelihood import (
 )
 from lenstronomy.PointSource.point_source import PointSource as PointSource_ref
 from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
-
-config.update("jax_enable_x64", True)
 
 
 class TestPositionLikelihood(object):

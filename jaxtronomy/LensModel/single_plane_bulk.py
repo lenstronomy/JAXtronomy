@@ -1,12 +1,9 @@
 __author__ = "sibirrer"
 
-import jax
 from jax import jit, lax, numpy as jnp
 from jaxtronomy.LensModel.profile_list_base import ProfileListBase, _select_kwargs
 from functools import partial
 import numpy as np
-
-jax.config.update("jax_enable_x64", True)
 
 __all__ = ["SinglePlaneBulk"]
 
@@ -120,6 +117,8 @@ class SinglePlaneBulk(ProfileListBase):
         :param index_list: list of ints, maps each element in lens_model_list to the
             unique_lens_model_list that was provided at class initialization
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
 
         # This function is called iteratively by jax.lax.map to compute deflection angles for each deflector
         def body_fun(xs):

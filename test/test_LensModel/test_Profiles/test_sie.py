@@ -3,7 +3,6 @@ __author__ = "sibirrer"
 import numpy as np
 import numpy.testing as npt
 import pytest
-import jaxtronomy.Util.param_util as param_util
 from jaxtronomy.LensModel.Profiles.sie import SIE
 from lenstronomy.LensModel.Profiles.sie import SIE as SIE_ref
 
@@ -14,14 +13,15 @@ class TestSIE_NIE(object):
     def setup_method(self):
         self.sie = SIE(NIE=True)
         self.sie_ref = SIE_ref(NIE=True)
+        self.center_kwargs = {"center_x": -3.1, "center_y": 0.7}
 
     def test_function(self):
         x = np.array([1, -3.1, 2.7])
         y = np.array([2, 0.7, -2.1])
         theta_E = 1.0
         e1, e2 = 0.1, -0.3
-        f = self.sie.function(x, y, theta_E, e1, e2)
-        f_ref = self.sie_ref.function(x, y, theta_E, e1, e2)
+        f = self.sie.function(x, y, theta_E, e1, e2, **self.center_kwargs)
+        f_ref = self.sie_ref.function(x, y, theta_E, e1, e2, **self.center_kwargs)
         npt.assert_almost_equal(f, f_ref, decimal=8)
 
     def test_derivatives(self):
@@ -29,8 +29,10 @@ class TestSIE_NIE(object):
         y = np.array([2, 0.7, -2.1])
         theta_E = 1.0
         e1, e2 = 0.1, -0.3
-        f_x, f_y = self.sie.derivatives(x, y, theta_E, e1, e2)
-        f_x_ref, f_y_ref = self.sie_ref.derivatives(x, y, theta_E, e1, e2)
+        f_x, f_y = self.sie.derivatives(x, y, theta_E, e1, e2, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.sie_ref.derivatives(
+            x, y, theta_E, e1, e2, **self.center_kwargs
+        )
         npt.assert_almost_equal(f_x, f_x_ref, decimal=8)
         npt.assert_almost_equal(f_y, f_y_ref, decimal=8)
 
@@ -39,9 +41,11 @@ class TestSIE_NIE(object):
         y = np.array([2, 0.7, -2.1])
         theta_E = 1.0
         e1, e2 = 0.1, -0.3
-        f_xx, f_xy, f_yx, f_yy = self.sie.hessian(x, y, theta_E, e1, e2)
+        f_xx, f_xy, f_yx, f_yy = self.sie.hessian(
+            x, y, theta_E, e1, e2, **self.center_kwargs
+        )
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.sie_ref.hessian(
-            x, y, theta_E, e1, e2
+            x, y, theta_E, e1, e2, **self.center_kwargs
         )
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=5)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=5)
@@ -108,8 +112,8 @@ class TestSIE_NIE(object):
         x = np.array([1, -2.4, 2.7])
         y = np.array([2, 0.27, -3.1])
         rho0 = 1.00003234
-        density_ref = self.sie_ref.density_2d(x, y, rho0)
-        density = self.sie.density_2d(x, y, rho0)
+        density_ref = self.sie_ref.density_2d(x, y, rho0, **self.center_kwargs)
+        density = self.sie.density_2d(x, y, rho0, **self.center_kwargs)
         npt.assert_almost_equal(density, density_ref, decimal=8)
 
 
@@ -119,14 +123,15 @@ class TestSIE_EPL(object):
     def setup_method(self):
         self.sie = SIE(NIE=False)
         self.sie_ref = SIE_ref(NIE=False)
+        self.center_kwargs = {"center_x": -3.1, "center_y": 0.7}
 
     def test_function(self):
         x = np.array([1, -3.1, 2.7])
         y = np.array([2, 0.7, -2.1])
         theta_E = 1.0
         e1, e2 = 0.1, -0.3
-        f = self.sie.function(x, y, theta_E, e1, e2)
-        f_ref = self.sie_ref.function(x, y, theta_E, e1, e2)
+        f = self.sie.function(x, y, theta_E, e1, e2, **self.center_kwargs)
+        f_ref = self.sie_ref.function(x, y, theta_E, e1, e2, **self.center_kwargs)
         npt.assert_almost_equal(f, f_ref, decimal=8)
 
     def test_derivatives(self):
@@ -134,8 +139,10 @@ class TestSIE_EPL(object):
         y = np.array([2, 0.7, -2.1])
         theta_E = 1.0
         e1, e2 = 0.1, -0.3
-        f_x, f_y = self.sie.derivatives(x, y, theta_E, e1, e2)
-        f_x_ref, f_y_ref = self.sie_ref.derivatives(x, y, theta_E, e1, e2)
+        f_x, f_y = self.sie.derivatives(x, y, theta_E, e1, e2, **self.center_kwargs)
+        f_x_ref, f_y_ref = self.sie_ref.derivatives(
+            x, y, theta_E, e1, e2, **self.center_kwargs
+        )
         npt.assert_almost_equal(f_x, f_x_ref, decimal=8)
         npt.assert_almost_equal(f_y, f_y_ref, decimal=8)
 
@@ -144,9 +151,11 @@ class TestSIE_EPL(object):
         y = np.array([2, 0.7, -2.1])
         theta_E = 1.0
         e1, e2 = 0.1, -0.3
-        f_xx, f_xy, f_yx, f_yy = self.sie.hessian(x, y, theta_E, e1, e2)
+        f_xx, f_xy, f_yx, f_yy = self.sie.hessian(
+            x, y, theta_E, e1, e2, **self.center_kwargs
+        )
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.sie_ref.hessian(
-            x, y, theta_E, e1, e2
+            x, y, theta_E, e1, e2, **self.center_kwargs
         )
         npt.assert_almost_equal(f_xx, f_xx_ref, decimal=8)
         npt.assert_almost_equal(f_xy, f_xy_ref, decimal=8)

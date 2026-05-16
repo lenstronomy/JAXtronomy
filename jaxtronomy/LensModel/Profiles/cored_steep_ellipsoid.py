@@ -1,13 +1,11 @@
 __author__ = "sibirrer"
 
-from jax import config, jit, lax, tree_util
+from jax import jit, lax, tree_util
 import jax.numpy as jnp
 
 from jaxtronomy.Util import param_util
-from jaxtronomy.Util import util
+from jaxtronomy.Util.util import rotate, shift_center
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
-
-config.update("jax_enable_x64", True)
 
 __all__ = [
     "CSE",
@@ -93,17 +91,15 @@ class CSE(LensProfileBase):
         :return: lensing potential
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
 
         # potential calculation
         case = jnp.where(self.axis == "major", 0, 1)
         func = [CSEMajorAxis.function, CSEProductAvg.function]
 
-        f_ = lax.switch(case, func, x__, y__, a, s, q)
+        f_ = lax.switch(case, func, x_, y_, a, s, q)
 
         return f_
 
@@ -122,19 +118,17 @@ class CSE(LensProfileBase):
         :return: deflection in x- and y-direction
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
 
         case = jnp.where(self.axis == "major", 0, 1)
         func = [CSEMajorAxis.derivatives, CSEProductAvg.derivatives]
 
-        f__x, f__y = lax.switch(case, func, x__, y__, a, s, q)
+        f_x, f_y = lax.switch(case, func, x_, y_, a, s, q)
 
         # rotate deflections back
-        f_x, f_y = util.rotate(f__x, f__y, -phi_q)
+        f_x, f_y = rotate(f_x, f_y, -phi_q)
         return f_x, f_y
 
     @jit
@@ -152,16 +146,14 @@ class CSE(LensProfileBase):
         :return: hessian elements f_xx, f_xy, f_yx, f_yy
         """
         phi_q, q = param_util.ellipticity2phi_q(e1, e2)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_q)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_q)
 
         case = jnp.where(self.axis == "major", 0, 1)
         func = [CSEMajorAxis.hessian, CSEProductAvg.hessian]
 
-        f__xx, f__xy, _, f__yy = lax.switch(case, func, x__, y__, a, s, q)
+        f__xx, f__xy, _, f__yy = lax.switch(case, func, x_, y_, a, s, q)
 
         # rotate back
         kappa = 1.0 / 2 * (f__xx + f__yy)
@@ -221,6 +213,9 @@ class CSEMajorAxis(LensProfileBase):
         :param q: axis ratio
         :return: lensing potential
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         # potential calculation
         psi = jnp.sqrt(q**2 * (s**2 + x**2) + y**2)
         Phi = (psi + s) ** 2 + (1 - q**2) * x**2
@@ -239,6 +234,9 @@ class CSEMajorAxis(LensProfileBase):
         :param q: axis ratio
         :return: deflection in x- and y-direction
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         psi = jnp.sqrt(q**2 * (s**2 + x**2) + y**2)
         Phi = (psi + s) ** 2 + (1 - q**2) * x**2
         f_x = q * x * (psi + q**2 * s) / (s * psi * Phi)
@@ -258,6 +256,9 @@ class CSEMajorAxis(LensProfileBase):
         :param q: axis ratio
         :return: hessian elements f_xx, f_xy, f_yx, f_yy
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         # equations 21-23 in Oguri 2021
         psi = jnp.sqrt(q**2 * (s**2 + x**2) + y**2)
         Phi = (psi + s) ** 2 + (1 - q**2) * x**2
@@ -308,10 +309,10 @@ class CSEMajorAxisSet(LensProfileBase):
         :param q: axis ratio
         :return: lensing potential
         """
-        x = x.astype(float)
-        y = y.astype(float)
-        a_list = jnp.asarray(a_list)
-        s_list = jnp.asarray(s_list)
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+        a_list = jnp.asarray(a_list, dtype=float)
+        s_list = jnp.asarray(s_list, dtype=float)
         f_ = jnp.zeros_like(x)
 
         def body_fun(i, val):
@@ -336,10 +337,10 @@ class CSEMajorAxisSet(LensProfileBase):
         :param q: axis ratio
         :return: deflection in x- and y-direction
         """
-        x = x.astype(float)
-        y = y.astype(float)
-        a_list = jnp.asarray(a_list)
-        s_list = jnp.asarray(s_list)
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+        a_list = jnp.asarray(a_list, dtype=float)
+        s_list = jnp.asarray(s_list, dtype=float)
         f_x, f_y = jnp.zeros_like(x), jnp.zeros_like(y)
 
         def body_fun(i, val):
@@ -369,10 +370,10 @@ class CSEMajorAxisSet(LensProfileBase):
         :param q: axis ratio
         :return: hessian elements f_xx, f_xy, f_yx, f_yy
         """
-        x = x.astype(float)
-        y = y.astype(float)
-        a_list = jnp.asarray(a_list)
-        s_list = jnp.asarray(s_list)
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+        a_list = jnp.asarray(a_list, dtype=float)
+        s_list = jnp.asarray(s_list, dtype=float)
         f_xx, f_xy, f_yy = jnp.zeros_like(x), jnp.zeros_like(x), jnp.zeros_like(x)
 
         def body_fun(i, val):
@@ -452,6 +453,8 @@ class CSEProductAvg(LensProfileBase):
         :param q: axis ratio
         :return: lensing potential
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         x, y, a, s, q = CSEProductAvg._convert2prodavg(x, y, a, s, q)
         return CSEMajorAxis.function(x, y, a, s, q)
 
@@ -466,6 +469,8 @@ class CSEProductAvg(LensProfileBase):
         :param q: axis ratio
         :return: deflection in x- and y-direction
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         x, y, a, s, q = CSEProductAvg._convert2prodavg(x, y, a, s, q)
         af_x, af_y = CSEMajorAxis.derivatives(x, y, a, s, q)
         # extra sqrt(q) factor from taking derivative of transformed coordinate
@@ -482,6 +487,8 @@ class CSEProductAvg(LensProfileBase):
         :param q: axis ratio
         :return: hessian elements f_xx, f_xy, f_yx, f_yy
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         x, y, a, s, q = CSEProductAvg._convert2prodavg(x, y, a, s, q)
         af_xx, af_xy, af_xy, af_yy = CSEMajorAxis.hessian(x, y, a, s, q)
         # two sqrt(q) factors from taking derivatives of transformed coordinate
@@ -506,10 +513,10 @@ class CSEProductAvgSet(LensProfileBase):
         :param q: axis ratio
         :return: lensing potential
         """
-        x = x.astype(float)
-        y = y.astype(float)
-        a_list = jnp.asarray(a_list)
-        s_list = jnp.asarray(s_list)
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+        a_list = jnp.asarray(a_list, dtype=float)
+        s_list = jnp.asarray(s_list, dtype=float)
         f_ = jnp.zeros_like(x)
 
         def body_fun(i, val):
@@ -536,10 +543,10 @@ class CSEProductAvgSet(LensProfileBase):
         :param q: axis ratio
         :return: deflection in x- and y-direction
         """
-        x = x.astype(float)
-        y = y.astype(float)
-        a_list = jnp.asarray(a_list)
-        s_list = jnp.asarray(s_list)
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+        a_list = jnp.asarray(a_list, dtype=float)
+        s_list = jnp.asarray(s_list, dtype=float)
         f_x, f_y = jnp.zeros_like(x), jnp.zeros_like(y)
 
         def body_fun(i, val):
@@ -568,10 +575,10 @@ class CSEProductAvgSet(LensProfileBase):
         :param q: axis ratio
         :return: hessian elements f_xx, f_xy, f_yx, f_yy
         """
-        x = x.astype(float)
-        y = y.astype(float)
-        a_list = jnp.asarray(a_list)
-        s_list = jnp.asarray(s_list)
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+        a_list = jnp.asarray(a_list, dtype=float)
+        s_list = jnp.asarray(s_list, dtype=float)
         f_xx, f_xy, f_yy = jnp.zeros_like(x), jnp.zeros_like(x), jnp.zeros_like(x)
 
         def body_fun(i, val):

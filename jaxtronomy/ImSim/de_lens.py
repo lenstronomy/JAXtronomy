@@ -1,11 +1,7 @@
 __author__ = "sibirrer"
 
 from functools import partial
-from jax import config, jit, numpy as jnp
-
-config.update("jax_enable_x64", True)
-
-import numpy as np
+from jax import jit, numpy as jnp
 import sys
 
 EPSILON = sys.float_info.epsilon

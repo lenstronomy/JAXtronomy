@@ -2,7 +2,6 @@ from jaxtronomy.LensModel.Profiles.pseudo_jaffe import PseudoJaffe
 import jaxtronomy.Util.param_util as param_util
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 from jax import jit, numpy as jnp
-import numpy as np
 
 __all__ = ["PseudoJaffeEllipsePotential"]
 

@@ -1,7 +1,6 @@
-import jax
-from jax import jit
-import jax.numpy as jnp
+from jax import jit, numpy as jnp
 
+from jaxtronomy.Util.util import shift_center
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
 __all__ = ["Hernquist"]
@@ -84,8 +83,7 @@ class Hernquist(LensProfileBase):
         :param center_y: y-center of the profile
         :return: projected density
         """
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
+        x_, y_ = shift_center(x, y, center_x, center_y)
         r = jnp.sqrt(x_**2 + y_**2)
         X = r / Rs
         sigma0 = Hernquist.rho2sigma(rho0, Rs)
@@ -176,8 +174,7 @@ class Hernquist(LensProfileBase):
         :param center_y: y-center of the profile (units of angle)
         :return: lensing potential at (x,y)
         """
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
+        x_, y_ = shift_center(x, y, center_x, center_y)
         r = jnp.sqrt(x_**2 + y_**2)
         r = jnp.where(r < Hernquist._s, Hernquist._s, r)
         X = r / Rs
@@ -198,8 +195,7 @@ class Hernquist(LensProfileBase):
         :param center_y: y-center of the profile (units of angle)
         :return: derivative of function (deflection angles in x- and y-direction)
         """
-        x_ = jnp.array(x - center_x, dtype=float)
-        y_ = jnp.array(y - center_y, dtype=float)
+        x_, y_ = shift_center(x, y, center_x, center_y)
         r = jnp.sqrt(x_**2 + y_**2)
         r = jnp.maximum(r, Hernquist._s)
         X = r / Rs
@@ -223,6 +219,9 @@ class Hernquist(LensProfileBase):
         :param center_y: y-center of the profile (units of angle)
         :return: df/dxdx, df/dxdy, df/dydx, df/dydy
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         diff = Hernquist._diff
         alpha_ra_dx, alpha_dec_dx = Hernquist.derivatives(
             x + diff / 2, y, sigma0, Rs, center_x, center_y
@@ -306,8 +305,7 @@ class Hernquist(LensProfileBase):
         :param center_y: y-center of the profile (units of angle)
         :return: gravitational potential at projected radius
         """
-        x_ = x - center_x
-        y_ = y - center_y
+        x_, y_ = shift_center(x, y, center_x, center_y)
         r = jnp.sqrt(x_**2 + y_**2)
         M = Hernquist.mass_tot(rho0, Rs)
         pot = M / (r + Rs)

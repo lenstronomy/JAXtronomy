@@ -3,12 +3,10 @@ __author__ = "sibirrer"
 import lenstronomy.Util.util as util_ref
 import jaxtronomy.Util.util as util
 
-import jax
 import numpy as np
 import pytest
 import numpy.testing as npt
-
-jax.config.update("jax_enable_x64", True)
+import jax.numpy as jnp
 
 
 def test_array2image():
@@ -84,6 +82,20 @@ def test_sigma2fwhm():
     fwhm = util.sigma2fwhm(sigma)
     fwhm_ref = util_ref.sigma2fwhm(sigma)
     npt.assert_array_almost_equal(fwhm, fwhm_ref, decimal=8)
+
+
+def test_shift_center():
+    x = [1, 3, 4, 6]
+    y = [3, 40, 5, 2]
+    center_x = 3
+    center_y = 6
+
+    new_x, new_y = util.shift_center(x, y, center_x, center_y)
+    assert isinstance(new_x, jnp.ndarray)
+    assert isinstance(new_y, jnp.ndarray)
+
+    npt.assert_equal(np.array(new_x), [-2, 0, 1, 3])
+    npt.assert_equal(np.array(new_y), [-3, 34, -1, -4])
 
 
 if __name__ == "__main__":

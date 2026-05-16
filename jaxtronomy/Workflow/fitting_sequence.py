@@ -14,12 +14,8 @@ from lenstronomy.Sampling.Samplers.nautilus_sampler import NautilusSampler
 from lenstronomy.Sampling.Samplers.cobaya_sampler import CobayaSampler
 
 import copy
-import jax
 import numpy as np
 import lenstronomy.Util.analysis_util as analysis_util
-
-jax.config.update("jax_enable_x64", True)
-
 
 __all__ = ["FittingSequence"]
 

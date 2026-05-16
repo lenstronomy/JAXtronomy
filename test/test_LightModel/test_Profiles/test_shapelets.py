@@ -2,10 +2,6 @@ import numpy as np
 import pytest
 import numpy.testing as npt
 
-import jax
-
-jax.config.update("jax_enable_x64", True)
-
 from jaxtronomy.LightModel.Profiles.shapelets import (
     Shapelets,
     ShapeletSet,
@@ -190,6 +186,7 @@ class TestShapeletSet(object):
     def setup_method(self):
         self.shapeletset = ShapeletSet()
         self.shapeletset_ref = ShapeletSet_ref()
+        self.shapeletset_static_off = ShapeletSetStatic(n_max=-1)
         self.shapeletset_static4 = ShapeletSetStatic(n_max=4)
         self.shapeletset_static12 = ShapeletSetStatic(n_max=12)
 
@@ -202,6 +199,16 @@ class TestShapeletSet(object):
         beta = 3.287
         center_x = -0.7
         center_y = 1.7
+
+        n_max = -1
+        amp = []
+        result = self.shapeletset_static_off.function(
+            x, y, amp, n_max, beta, center_x, center_y
+        )
+        result_ref = self.shapeletset_ref.function(
+            x, y, amp, n_max, beta, center_x, center_y
+        )
+        npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
         n_max = 4
         num_param = int((n_max + 1) * (n_max + 2) / 2)
@@ -255,6 +262,16 @@ class TestShapeletSet(object):
         beta = 3.287
         center_x = -0.7
         center_y = 1.7
+
+        n_max = -1
+        amp = []
+        result = self.shapeletset_static_off.function_split(
+            x, y, amp, n_max, beta, center_x, center_y
+        )
+        result_ref = self.shapeletset_ref.function_split(
+            x, y, amp, n_max, beta, center_x, center_y
+        )
+        npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
         n_max = 4
         num_param = int((n_max + 1) * (n_max + 2) / 2)

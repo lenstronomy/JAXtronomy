@@ -1,12 +1,10 @@
 __author__ = "ntessore"
 
 from functools import partial
-from jax import config, custom_jvp, jvp, jit, lax, numpy as jnp, tree_util
-
-config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
+from jax import custom_jvp, jvp, jit, lax, numpy as jnp, tree_util
 
 from jaxtronomy.Util.hyp2f1_util import hyp2f1_lopez_temme_8 as hyp2f1
-import jaxtronomy.Util.util as util
+from jaxtronomy.Util.util import rotate, shift_center
 import jaxtronomy.Util.param_util as param_util
 from jaxtronomy.LensModel.Profiles.spp import SPP
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
@@ -169,13 +167,11 @@ class EPL(LensProfileBase):
         :return: lensing potential
         """
         b, t, q, phi_G = self.param_conv(theta_E, gamma, e1, e2)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_G)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_G)
         # evaluate
-        f_ = EPLMajorAxis.function(x__, y__, b, t, q)
+        f_ = EPLMajorAxis.function(x_, y_, b, t, q)
         # rotate back
         return f_
 
@@ -194,15 +190,13 @@ class EPL(LensProfileBase):
         :return: alpha_x, alpha_y
         """
         b, t, q, phi_G = self.param_conv(theta_E, gamma, e1, e2)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_G)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_G)
         # evaluate
-        f__x, f__y = EPLMajorAxis.derivatives(x__, y__, b, t, q)
+        f__x, f__y = EPLMajorAxis.derivatives(x_, y_, b, t, q)
         # rotate back
-        f_x, f_y = util.rotate(f__x, f__y, -phi_G)
+        f_x, f_y = rotate(f__x, f__y, -phi_G)
         return f_x, f_y
 
     @jit
@@ -220,13 +214,11 @@ class EPL(LensProfileBase):
         :return: f_xx, f_xy, f_yx, f_yy
         """
         b, t, q, phi_G = self.param_conv(theta_E, gamma, e1, e2)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_G)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_G)
         # evaluate
-        f__xx, f__xy, f__yx, f__yy = EPLMajorAxis.hessian(x__, y__, b, t, q)
+        f__xx, f__xy, f__yx, f__yy = EPLMajorAxis.hessian(x_, y_, b, t, q)
         # rotate back
         kappa = 1.0 / 2 * (f__xx + f__yy)
         gamma1__ = 1.0 / 2 * (f__xx - f__yy)
@@ -358,6 +350,8 @@ class EPLMajorAxis(LensProfileBase):
         :param q: axis ratio
         :return: lensing potential
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         # deflection from method
         alpha_x, alpha_y = EPLMajorAxis.derivatives(x, y, b, t, q)
 
@@ -378,6 +372,8 @@ class EPLMajorAxis(LensProfileBase):
         :param q: axis ratio
         :return: f_x, f_y
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         # elliptical radius, eq. (5)
         Z = q * x + y * 1j
         R = jnp.abs(Z)

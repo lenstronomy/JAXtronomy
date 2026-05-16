@@ -8,9 +8,6 @@ from jaxtronomy.LensModel.Profiles.epl import EPL, EPLMajorAxis, EPLQPhi
 import numpy as np
 import numpy.testing as npt
 import pytest
-import jax
-
-jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 import jax.numpy as jnp
 
 
@@ -19,6 +16,7 @@ class TestEPL(object):
     def setup_method(self):
         self.profile = EPL()
         self.profile_ref = EPL_ref()
+        self.center_kwargs = {"center_x": 1, "center_y": 2}
 
     def test_param_conv(self):
         theta_E = 12.3
@@ -81,14 +79,22 @@ class TestEPL(object):
         y = np.array([2])
         theta_E = 12.3
         gamma, e1, e2 = 1.7, 0.3, -0.2
-        values = self.profile.function(x, y, theta_E, gamma, e1, e2)
-        values_ref = self.profile_ref.function(x, y, theta_E, gamma, e1, e2)
+        values = self.profile.function(
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
+        )
+        values_ref = self.profile_ref.function(
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
+        )
         npt.assert_allclose(values, values_ref, atol=1e-12, rtol=1e-12)
 
         x = np.array([2, 3, 4])
         y = np.array([1, 1, 1])
-        values = self.profile.function(x, y, theta_E, gamma, e1, e2)
-        values_ref = self.profile_ref.function(x, y, theta_E, gamma, e1, e2)
+        values = self.profile.function(
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
+        )
+        values_ref = self.profile_ref.function(
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
+        )
         npt.assert_allclose(values, values_ref, atol=1e-12, rtol=1e-12)
 
     def test_derivatives(self):
@@ -96,15 +102,23 @@ class TestEPL(object):
         y = np.array([2])
         theta_E = 1.0
         gamma, e1, e2 = 1.7, -0.1, 0.2
-        f_x, f_y = self.profile.derivatives(x, y, theta_E, gamma, e1, e2)
-        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, theta_E, gamma, e1, e2)
+        f_x, f_y = self.profile.derivatives(
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
+        )
+        f_x_ref, f_y_ref = self.profile_ref.derivatives(
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
+        )
         npt.assert_allclose(f_x, f_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-12, rtol=1e-12)
 
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
-        f_x, f_y = self.profile.derivatives(x, y, theta_E, gamma, e1, e2)
-        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, theta_E, gamma, e1, e2)
+        f_x, f_y = self.profile.derivatives(
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
+        )
+        f_x_ref, f_y_ref = self.profile_ref.derivatives(
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
+        )
         npt.assert_allclose(f_x, f_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-12, rtol=1e-12)
 
@@ -113,9 +127,11 @@ class TestEPL(object):
         y = np.array([2])
         theta_E = 1.0
         gamma, e1, e2 = 2.2, 0.1, -0.4
-        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, theta_E, gamma, e1, e2)
+        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
+        )
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
-            x, y, theta_E, gamma, e1, e2
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
         )
         npt.assert_allclose(f_xx, f_xx_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_xy, f_xy_ref, atol=1e-12, rtol=1e-12)
@@ -124,9 +140,11 @@ class TestEPL(object):
 
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
-        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, theta_E, gamma, e1, e2)
+        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
+        )
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
-            x, y, theta_E, gamma, e1, e2
+            x, y, theta_E, gamma, e1, e2, **self.center_kwargs
         )
         npt.assert_allclose(f_xx, f_xx_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_xy, f_xy_ref, atol=1e-12, rtol=1e-12)
@@ -213,20 +231,29 @@ class TestEPLQPhi(object):
     def setup_method(self):
         self.profile = EPLQPhi()
         self.profile_ref = EPLQPhi_ref()
+        self.center_kwargs = {"center_x": 0.3, "center_y": 0.5}
 
     def test_function(self):
         x = np.array([1])
         y = np.array([2])
         theta_E = 12.3
         gamma, q, phi = 1.7, 0.3, -2.2
-        values = self.profile.function(x, y, theta_E, gamma, q, phi)
-        values_ref = self.profile_ref.function(x, y, theta_E, gamma, q, phi)
+        values = self.profile.function(
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
+        )
+        values_ref = self.profile_ref.function(
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
+        )
         npt.assert_allclose(values, values_ref, atol=1e-12, rtol=1e-12)
 
         x = np.array([2, 3, 4])
         y = np.array([1, 1, 1])
-        values = self.profile.function(x, y, theta_E, gamma, q, phi)
-        values_ref = self.profile_ref.function(x, y, theta_E, gamma, q, phi)
+        values = self.profile.function(
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
+        )
+        values_ref = self.profile_ref.function(
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
+        )
         npt.assert_allclose(values, values_ref, atol=1e-12, rtol=1e-12)
 
     def test_derivatives(self):
@@ -234,15 +261,23 @@ class TestEPLQPhi(object):
         y = np.array([2])
         theta_E = 1.0
         gamma, q, phi = 1.7, 0.7, 2.2
-        f_x, f_y = self.profile.derivatives(x, y, theta_E, gamma, q, phi)
-        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, theta_E, gamma, q, phi)
+        f_x, f_y = self.profile.derivatives(
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
+        )
+        f_x_ref, f_y_ref = self.profile_ref.derivatives(
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
+        )
         npt.assert_allclose(f_x, f_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-12, rtol=1e-12)
 
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
-        f_x, f_y = self.profile.derivatives(x, y, theta_E, gamma, q, phi)
-        f_x_ref, f_y_ref = self.profile_ref.derivatives(x, y, theta_E, gamma, q, phi)
+        f_x, f_y = self.profile.derivatives(
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
+        )
+        f_x_ref, f_y_ref = self.profile_ref.derivatives(
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
+        )
         npt.assert_allclose(f_x, f_x_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_y, f_y_ref, atol=1e-12, rtol=1e-12)
 
@@ -251,9 +286,11 @@ class TestEPLQPhi(object):
         y = np.array([2])
         theta_E = 1.0
         gamma, q, phi = 2.2, 0.4, 1.4
-        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, theta_E, gamma, q, phi)
+        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
+        )
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
-            x, y, theta_E, gamma, q, phi
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
         )
         npt.assert_allclose(f_xx, f_xx_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_xy, f_xy_ref, atol=1e-12, rtol=1e-12)
@@ -262,9 +299,11 @@ class TestEPLQPhi(object):
 
         x = np.array([1, 3, 4])
         y = np.array([2, 1, 1])
-        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(x, y, theta_E, gamma, q, phi)
+        f_xx, f_xy, f_yx, f_yy = self.profile.hessian(
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
+        )
         f_xx_ref, f_xy_ref, f_yx_ref, f_yy_ref = self.profile_ref.hessian(
-            x, y, theta_E, gamma, q, phi
+            x, y, theta_E, gamma, q, phi, **self.center_kwargs
         )
         npt.assert_allclose(f_xx, f_xx_ref, atol=1e-12, rtol=1e-12)
         npt.assert_allclose(f_xy, f_xy_ref, atol=1e-12, rtol=1e-12)

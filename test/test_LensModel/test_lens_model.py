@@ -9,10 +9,6 @@ from lenstronomy.LensModel.lens_model import LensModel as LensModel_ref
 from lenstronomy.Util.util import make_grid
 import unittest
 
-import jax
-
-jax.config.update("jax_enable_x64", True)  # 64-bit floats
-
 
 class TestLensModel(object):
     """Tests the source model routines."""

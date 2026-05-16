@@ -13,10 +13,6 @@ from jaxtronomy.LensModel.profile_list_base import _JAXXED_MODELS
 
 from astropy.cosmology import default_cosmology
 
-import jax
-
-jax.config.update("jax_enable_x64", True)  # 64-bit floats
-
 cosmo = default_cosmology.get()
 
 try:

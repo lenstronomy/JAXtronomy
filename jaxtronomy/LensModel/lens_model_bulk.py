@@ -2,7 +2,7 @@ from jaxtronomy.LensModel.single_plane_bulk import SinglePlaneBulk
 from jaxtronomy.LensModel.MultiPlane.multi_plane_bulk import MultiPlaneBulk
 
 from functools import partial
-from jax import jit
+from jax import jit, numpy as jnp
 
 __all__ = ["LensModelBulk"]
 
@@ -122,4 +122,7 @@ class LensModelBulk(object):
             MultiPlaneBulk.ray_shooting()
         :return: source plane positions corresponding to (x, y) in the image plane
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         return self.lens_model.ray_shooting(x, y, **ray_shooting_kwargs)

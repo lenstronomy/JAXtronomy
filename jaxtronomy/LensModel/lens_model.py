@@ -10,7 +10,7 @@ from lenstronomy.Util.cosmo_util import get_astropy_cosmology
 from astropy.cosmology import default_cosmology
 
 from functools import partial
-from jax import jit
+from jax import jit, numpy as jnp
 from warnings import warn
 
 __all__ = ["LensModel"]
@@ -247,6 +247,8 @@ class LensModel(object):
         :type k: None, int, or tuple of ints
         :return: source plane positions corresponding to (x, y) in the image plane
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         return self.lens_model.ray_shooting(x, y, kwargs, k=k)
 
     @partial(jit, static_argnums=(0))
@@ -267,6 +269,9 @@ class LensModel(object):
         :return: fermat potential in arcsec**2 without geometry term (second part of Eqn
             1 in Suyu et al. 2013) as a list
         """
+        x_image = jnp.asarray(x_image, dtype=float)
+        y_image = jnp.asarray(y_image, dtype=float)
+
         # For SinglePlane
         if hasattr(self.lens_model, "fermat_potential"):
             return self.lens_model.fermat_potential(
@@ -309,6 +314,9 @@ class LensModel(object):
         :param y_source: source position (optional), otherwise computed with ray-tracing
         :return: arrival time of image positions in units of days
         """
+        x_image = jnp.asarray(x_image, dtype=float)
+        y_image = jnp.asarray(y_image, dtype=float)
+
         if hasattr(self.lens_model, "arrival_time"):
             arrival_time = self.lens_model.arrival_time(x_image, y_image, kwargs_lens)
         else:
@@ -337,6 +345,9 @@ class LensModel(object):
         :type k: None, int, or tuple of ints
         :return: lensing potential in units of arcsec^2
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         return self.lens_model.potential(x, y, kwargs, k=k)
 
     @partial(jit, static_argnums=(0, 4))
@@ -357,6 +368,9 @@ class LensModel(object):
             potential is analytically known
         :return: deflection angles in units of arcsec
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         if diff is None:
             return self.lens_model.alpha(x, y, kwargs, k=k)
         elif self.multi_plane is False:
@@ -385,6 +399,9 @@ class LensModel(object):
             differentials are computed from a cross or a square of points around (x, y)
         :return: f_xx, f_xy, f_yx, f_yy components
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         if diff is None:
             return self.lens_model.hessian(x, y, kwargs, k=k)
         elif diff_method == "square":
@@ -415,6 +432,8 @@ class LensModel(object):
             differentials are computed from a cross or a square of points around (x, y)
         :return: lensing convergence
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
 
         f_xx, f_xy, f_yx, f_yy = self.hessian(
             x, y, kwargs, k=k, diff=diff, diff_method=diff_method
@@ -440,6 +459,9 @@ class LensModel(object):
          cross or a square of points around (x, y)
         :return: curl at position (x, y)
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         f_xx, f_xy, f_yx, f_yy = self.hessian(
             x, y, kwargs, k=k, diff=diff, diff_method=diff_method
         )
@@ -465,6 +487,8 @@ class LensModel(object):
          cross or a square of points around (x, y)
         :return: gamma1, gamma2
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
 
         f_xx, f_xy, f_yx, f_yy = self.hessian(
             x, y, kwargs, k=k, diff=diff, diff_method=diff_method
@@ -493,6 +517,8 @@ class LensModel(object):
          cross or a square of points around (x, y)
         :return: magnification
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
 
         f_xx, f_xy, f_yx, f_yy = self.hessian(
             x, y, kwargs, k=k, diff=diff, diff_method=diff_method
@@ -517,6 +543,9 @@ class LensModel(object):
             length of Hessian (optional)
         :return: f_xxx, f_xxy, f_xyy, f_yyy
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         if hessian_diff:
             hessian_diff_ = diff / 4
         else:
@@ -575,6 +604,9 @@ class LensModel(object):
         :param diff: finite differential length
         :return: f_x, f_y
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         phi_dx = self.lens_model.potential(x + diff / 2, y, kwargs=kwargs, k=k)
         phi_dy = self.lens_model.potential(x, y + diff / 2, kwargs=kwargs, k=k)
         phi_dx_ = self.lens_model.potential(x - diff / 2, y, kwargs=kwargs, k=k)
@@ -598,6 +630,9 @@ class LensModel(object):
             used to compute the differential)
         :return: f_xx, f_xy, f_yx, f_yy
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         alpha_ra_dx, alpha_dec_dx = self.alpha(x + diff / 2, y, kwargs, k=k)
         alpha_ra_dy, alpha_dec_dy = self.alpha(x, y + diff / 2, kwargs, k=k)
 
@@ -630,6 +665,9 @@ class LensModel(object):
             used to compute the differential
         :return: f_xx, f_xy, f_yx, f_yy
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
+
         alpha_ra_pp, alpha_dec_pp = self.alpha(x + diff / 2, y + diff / 2, kwargs, k=k)
         alpha_ra_pn, alpha_dec_pn = self.alpha(x + diff / 2, y - diff / 2, kwargs, k=k)
 

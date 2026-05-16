@@ -1,6 +1,5 @@
-from functools import partial
-from jax import jit, numpy as jnp
-
+from jax import jit
+from jaxtronomy.Util.util import shift_center
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
 __all__ = ["Flexion"]
@@ -30,8 +29,7 @@ class Flexion(LensProfileBase):
     @staticmethod
     @jit
     def function(x, y, g1, g2, g3, g4, ra_0=0, dec_0=0):
-        x_ = x - ra_0
-        y_ = y - dec_0
+        x_, y_ = shift_center(x, y, ra_0, dec_0)
         f_ = (
             1.0
             / 6
@@ -42,8 +40,7 @@ class Flexion(LensProfileBase):
     @staticmethod
     @jit
     def derivatives(x, y, g1, g2, g3, g4, ra_0=0, dec_0=0):
-        x_ = x - ra_0
-        y_ = y - dec_0
+        x_, y_ = shift_center(x, y, ra_0, dec_0)
         f_x = 1.0 / 2.0 * g1 * x_**2 + g2 * x_ * y_ + 1.0 / 2.0 * g3 * y_**2
         f_y = 1.0 / 2.0 * g2 * x_**2 + g3 * x_ * y_ + 1.0 / 2.0 * g4 * y_**2
         return f_x, f_y
@@ -51,8 +48,7 @@ class Flexion(LensProfileBase):
     @staticmethod
     @jit
     def hessian(x, y, g1, g2, g3, g4, ra_0=0, dec_0=0):
-        x_ = x - ra_0
-        y_ = y - dec_0
+        x_, y_ = shift_center(x, y, ra_0, dec_0)
         f_xx = g1 * x_ + g2 * y_
         f_yy = g3 * x_ + g4 * y_
         f_xy = g2 * x_ + g3 * y_

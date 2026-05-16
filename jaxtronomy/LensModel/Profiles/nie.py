@@ -2,7 +2,7 @@ __author__ = "sibirrer"
 
 from jax import jit, tree_util
 import jax.numpy as jnp
-import jaxtronomy.Util.util as util
+from jaxtronomy.Util.util import shift_center, rotate
 import jaxtronomy.Util.param_util as param_util
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
@@ -74,13 +74,11 @@ class NIE(LensProfileBase):
         :return: lensing potential
         """
         b, s, q, phi_G = self.param_conv(theta_E, e1, e2, s_scale)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_G)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_G)
         # evaluate
-        f_ = NIEMajorAxis.function(x__, y__, b, s, q)
+        f_ = NIEMajorAxis.function(x_, y_, b, s, q)
         # rotate back
         return f_
 
@@ -99,15 +97,13 @@ class NIE(LensProfileBase):
         :return: alpha_x, alpha_y
         """
         b, s, q, phi_G = self.param_conv(theta_E, e1, e2, s_scale)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_G)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_G)
         # evaluate
-        f__x, f__y = NIEMajorAxis.derivatives(x__, y__, b, s, q)
+        f__x, f__y = NIEMajorAxis.derivatives(x_, y_, b, s, q)
         # rotate back
-        f_x, f_y = util.rotate(f__x, f__y, -phi_G)
+        f_x, f_y = rotate(f__x, f__y, -phi_G)
         return f_x, f_y
 
     @jit
@@ -125,13 +121,11 @@ class NIE(LensProfileBase):
         :return: f_xx, f_xy, f_yx, f_yy
         """
         b, s, q, phi_G = self.param_conv(theta_E, e1, e2, s_scale)
-        # shift
-        x_ = x - center_x
-        y_ = y - center_y
-        # rotate
-        x__, y__ = util.rotate(x_, y_, phi_G)
+        # shift and rotate coordinates
+        x_, y_ = shift_center(x, y, center_x, center_y)
+        x_, y_ = rotate(x_, y_, phi_G)
         # evaluate
-        f__xx, f__xy, _, f__yy = NIEMajorAxis.hessian(x__, y__, b, s, q)
+        f__xx, f__xy, _, f__yy = NIEMajorAxis.hessian(x_, y_, b, s, q)
         # rotate back
         kappa = 1.0 / 2 * (f__xx + f__yy)
         gamma1__ = 1.0 / 2 * (f__xx - f__yy)
@@ -272,6 +266,8 @@ class NIEMajorAxis(LensProfileBase):
     @staticmethod
     @jit
     def function(x, y, b, s, q):
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         psi = NIEMajorAxis._psi(x, y, q, s)
         alpha_x, alpha_y = NIEMajorAxis.derivatives(x, y, b, s, q)
         f_ = (
@@ -285,6 +281,8 @@ class NIEMajorAxis(LensProfileBase):
     @jit
     def derivatives(x, y, b, s, q):
         """Returns df/dx and df/dy of the function."""
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         q = jnp.where(q >= 1, 0.99999999, q)
         psi = NIEMajorAxis._psi(x, y, q, s)
         f_x = (
@@ -302,6 +300,8 @@ class NIEMajorAxis(LensProfileBase):
     def hessian(x, y, b, s, q):
         """Returns Hessian matrix of function d^2f/dx^2, d^2/dxdy, d^2/dydx,
         d^f/dy^2."""
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         alpha_ra, alpha_dec = NIEMajorAxis.derivatives(x, y, b, s, q)
         diff = 0.0000000001
         alpha_ra_dx, alpha_dec_dx = NIEMajorAxis.derivatives(x + diff, y, b, s, q)
@@ -325,6 +325,8 @@ class NIEMajorAxis(LensProfileBase):
         :param q: axis ratio
         :return: convergence
         """
+        x = jnp.asarray(x, dtype=float)
+        y = jnp.asarray(y, dtype=float)
         kappa = b / 2.0 * (q**2 * (s**2 + x**2) + y**2) ** (-1.0 / 2)
         return kappa
 

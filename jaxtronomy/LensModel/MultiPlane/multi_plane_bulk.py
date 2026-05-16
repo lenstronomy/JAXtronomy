@@ -174,8 +174,8 @@ class MultiPlaneBulk(ProfileListBase):
             deflection angles to physical deflection angles
         :return: angles at the source plane
         """
-        alpha_x = jnp.array(alpha_x, dtype=float)
-        alpha_y = jnp.array(alpha_y, dtype=float)
+        alpha_x = jnp.asarray(alpha_x, dtype=float)
+        alpha_y = jnp.asarray(alpha_y, dtype=float)
         x = jnp.zeros_like(alpha_x)
         y = jnp.zeros_like(alpha_y)
 

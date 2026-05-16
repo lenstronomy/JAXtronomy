@@ -1,9 +1,6 @@
-import jax
 from jax import jit, numpy as jnp
 
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
-
-jax.config.update("jax_enable_x64", True)
 
 __all__ = ["Null"]
 
