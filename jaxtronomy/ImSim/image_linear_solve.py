@@ -1,10 +1,8 @@
 from functools import partial
 from jax import jit, numpy as jnp
-import numpy as np
 
 import jaxtronomy.ImSim.de_lens as de_lens
 from jaxtronomy.ImSim.image_model import ImageModel
-from jaxtronomy.Util import util
 from jaxtronomy.ImSim.Numerics.convolution import PixelKernelConvolution
 
 __all__ = ["ImageLinearFit"]

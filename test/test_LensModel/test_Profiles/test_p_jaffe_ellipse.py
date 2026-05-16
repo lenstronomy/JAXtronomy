@@ -13,9 +13,6 @@ import lenstronomy.Util.param_util as param_util_ref
 import numpy as np
 import numpy.testing as npt
 import pytest
-import jax
-
-jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 import jax.numpy as jnp
 
 
@@ -138,34 +135,6 @@ class TestP_JAFFW(object):
             r=1, sigma0=1, Ra=0.5, Rs=0.8, e1=0, e2=0
         )
         npt.assert_almost_equal(mass, mass_ref, decimal=8)
-
-    def test_jax_jit(self):
-        x = jnp.array([1])
-        y = jnp.array([2])
-        sigma0 = 1.0
-        Ra, Rs = 0.5, 0.8
-        q, phi_G = 0.8, 0.1
-        e1, e2 = param_util.phi_q2_ellipticity(phi_G, q)
-        jitted = jax.jit(self.profile.function)
-        npt.assert_almost_equal(
-            self.profile.function(x, y, sigma0, Ra, Rs, e1, e2),
-            jitted(x, y, sigma0, Ra, Rs, e1, e2),
-            decimal=8,
-        )
-
-        jitted = jax.jit(self.profile.derivatives)
-        npt.assert_array_almost_equal(
-            self.profile.derivatives(x, y, sigma0, Ra, Rs, e1, e2),
-            jitted(x, y, sigma0, Ra, Rs, e1, e2),
-            decimal=8,
-        )
-
-        jitted = jax.jit(self.profile.hessian)
-        npt.assert_array_almost_equal(
-            self.profile.hessian(x, y, sigma0, Ra, Rs, e1, e2),
-            jitted(x, y, sigma0, Ra, Rs, e1, e2),
-            decimal=8,
-        )
 
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 import copy
 from functools import partial
 from jax import jit, lax, numpy as jnp
-import numpy as np
 
 __all__ = ["PointSource"]
 

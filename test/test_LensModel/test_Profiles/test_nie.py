@@ -4,12 +4,9 @@ __author__ = "sibirrer"
 import numpy as np
 import numpy.testing as npt
 import pytest
-import jax
 from jaxtronomy.LensModel.Profiles.nie import NIE, NIEMajorAxis
 from lenstronomy.LensModel.Profiles.nie import NIE as NIE_ref
 from lenstronomy.LensModel.Profiles.nie import NIEMajorAxis as NIEMajorAxis_ref
-
-jax.config.update("jax_enable_x64", True)
 
 
 class TestNIE(object):

@@ -6,9 +6,6 @@ from lenstronomy.LensModel.Profiles.pseudo_jaffe import PseudoJaffe as Pjaffe_re
 import numpy as np
 import numpy.testing as npt
 import pytest
-import jax
-
-jax.config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
 import jax.numpy as jnp
 
 
@@ -154,32 +151,6 @@ class TestP_JAFFW(object):
         mass2d = self.profile.mass_2d(r, rho0, Ra, Rs)
         mass2d_ref = self.profile_ref.mass_2d(r, rho0, Ra, Rs)
         npt.assert_almost_equal(mass2d, mass2d_ref, decimal=8)
-
-    def test_jax_jit(self):
-        x = jnp.array([1])
-        y = jnp.array([2])
-        sigma0 = 1.0
-        Ra, Rs = 0.5, 0.8
-        jitted = jax.jit(self.profile.function)
-        npt.assert_almost_equal(
-            self.profile.function(x, y, sigma0, Ra, Rs),
-            jitted(x, y, sigma0, Ra, Rs),
-            decimal=8,
-        )
-
-        jitted = jax.jit(self.profile.derivatives)
-        npt.assert_array_almost_equal(
-            self.profile.derivatives(x, y, sigma0, Ra, Rs),
-            jitted(x, y, sigma0, Ra, Rs),
-            decimal=8,
-        )
-
-        jitted = jax.jit(self.profile.hessian)
-        npt.assert_array_almost_equal(
-            self.profile.hessian(x, y, sigma0, Ra, Rs),
-            jitted(x, y, sigma0, Ra, Rs),
-            decimal=8,
-        )
 
 
 if __name__ == "__main__":

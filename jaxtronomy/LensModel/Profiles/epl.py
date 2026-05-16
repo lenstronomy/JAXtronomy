@@ -1,9 +1,7 @@
 __author__ = "ntessore"
 
 from functools import partial
-from jax import config, custom_jvp, jvp, jit, lax, numpy as jnp, tree_util
-
-config.update("jax_enable_x64", True)  # 64-bit floats, consistent with numpy
+from jax import custom_jvp, jvp, jit, lax, numpy as jnp, tree_util
 
 from jaxtronomy.Util.hyp2f1_util import hyp2f1_lopez_temme_8 as hyp2f1
 from jaxtronomy.Util.util import rotate, shift_center

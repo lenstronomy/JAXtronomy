@@ -1,7 +1,3 @@
-from jax import config
-
-config.update("jax_enable_x64", True)
-
 from jaxtronomy.LensModel.Profiles.multipole import (
     Multipole,
     EllipticalMultipole,

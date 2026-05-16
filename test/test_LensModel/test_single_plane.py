@@ -1,9 +1,5 @@
 __author__ = "sibirrer"
 
-import jax
-
-jax.config.update("jax_enable_x64", True)  # 64-bit floats
-
 import numpy.testing as npt
 import pytest
 

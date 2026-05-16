@@ -1,14 +1,11 @@
 __author__ = "sibirrer"
 
-import jax
 import numpy as np
 import numpy.testing as npt
 import pytest
 
 from lenstronomy.LensModel.Profiles.hernquist import Hernquist as Hernquist_ref
 from jaxtronomy.LensModel.Profiles.hernquist import Hernquist
-
-jax.config.update("jax_enable_x64", True)
 
 
 class TestHernquist(object):

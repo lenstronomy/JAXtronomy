@@ -1,8 +1,6 @@
 __author__ = "ahuang314"
 
 import jax
-
-jax.config.update("jax_enable_x64", True)
 from jax import jit, numpy as jnp
 from functools import partial
 import optax

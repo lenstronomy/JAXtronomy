@@ -1,8 +1,5 @@
 __author__ = "sibirrer"
 
-from jax import config
-
-config.update("jax_enable_x64", True)
 import numpy as np
 import numpy.testing as npt
 from lenstronomy.ImSim import de_lens as de_lens_ref
