@@ -1,8 +1,8 @@
 __author__ = "Simon Birrer"
 """This file contains standard routines.
 
-TODO: Import jaxified versions of other lenstronomy.Util.util.py
-      functions (when necessary)
+TODO: Import jaxified versions of other lenstronomy.Util.util.py       functions (when
+necessary)
 """
 
 from functools import partial
