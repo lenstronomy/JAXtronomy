@@ -1,5 +1,4 @@
 import pytest
-import jax
 import numpy as np
 import numpy.testing as npt
 
@@ -21,8 +20,6 @@ from lenstronomy.ImSim.Numerics.numerics_subframe import (
 from lenstronomy.Data.pixel_grid import PixelGrid
 from lenstronomy.Data.psf import PSF
 from lenstronomy.LightModel.light_model import LightModel
-
-jax.config.update("jax_enable_x64", True)
 
 
 class TestNumericsSubFrame(object):
