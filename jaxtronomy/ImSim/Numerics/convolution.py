@@ -9,17 +9,13 @@ from functools import partial
 
 from lenstronomy.Util.package_util import exporter
 
-export, __all__ = exporter()
-
-
-@export
 class PixelKernelConvolution(object):
     """Class to compute convolutions for a given pixelized kernel (fft, grid)"""
 
-    def __init__(self, kernel, convolution_type="fft_static"):
+    def __init__(self, kernel=None, convolution_type="fft_static"):
         """
 
-        :param kernel: 2d array, convolution kernel
+        :param kernel: 2d array, convolution kernel, can also be supplied at runtime
         :param convolution_type: string, 'fft', 'grid', mode of 2d convolution
         """
         self._kernel = kernel
@@ -71,18 +67,20 @@ class PixelKernelConvolution(object):
         )
 
     @jit
-    def convolution2d(self, image):
+    def convolution2d(self, image, kernel=None):
         """
 
         :param image: 2d array (image) to be convolved
         :return: fft convolution
         """
+        if kernel is None:
+            kernel = self._kernel
         if self.convolution_type == "fft":
-            image_conv = signal.fftconvolve(image, self._kernel, mode="same")
+            image_conv = signal.fftconvolve(image, kernel, mode="same")
         elif self.convolution_type == "fft_static":
             image_conv = self.fftconvolve_static(image)
         else:
-            image_conv = signal.convolve2d(image, self._kernel, mode="same")
+            image_conv = signal.convolve2d(image, kernel, mode="same")
         return image_conv
 
     @jit
@@ -96,7 +94,6 @@ class PixelKernelConvolution(object):
         return self.convolution2d(image_low_res)
 
 
-@export
 class SubgridKernelConvolution(object):
     """Class to compute the convolution on a supersampled grid with partial convolution
     computed on the regular grid."""
