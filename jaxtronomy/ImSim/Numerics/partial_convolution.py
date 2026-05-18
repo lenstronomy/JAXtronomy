@@ -9,9 +9,10 @@ __all__ = ["PartialConvolution", "SubgridPartialConvolution"]
 
 
 class PartialConvolution(object):
-    """Class to convolve explicit pixels only. This class is the JAXtronomy version of
-    lenstronomy's NumbaConvolution class. Although the implementation differs significantly,
-    the end result is the same.
+    """Class to convolve explicit pixels only.
+
+    This class is the JAXtronomy version of lenstronomy's NumbaConvolution class.
+    Although the implementation differs significantly, the end result is the same.
     """
 
     def __init__(
@@ -50,9 +51,12 @@ class PartialConvolution(object):
 
 class SubgridPartialConvolution(object):
     """Class that inputs a supersampled grid and convolution kernel and computes the
-    response on the regular grid. This makes use of the regular PixelKernelConvolution class as
-    a loop through the different sub-pixel positions, mirroring the functionality of lenstronomy's
-    SubgridNumbaConvolution class."""
+    response on the regular grid.
+
+    This makes use of the regular PixelKernelConvolution class as a loop through the
+    different sub-pixel positions, mirroring the functionality of lenstronomy's
+    SubgridNumbaConvolution class.
+    """
 
     def __init__(
         self,
@@ -87,10 +91,7 @@ class SubgridPartialConvolution(object):
                     kernel = image_util.cut_edges(kernel, kernel_size)
                 self._kernel_ij.append(kernel)
 
-        self._conv = PixelKernelConvolution(
-            kernel=None,
-            convolution_type="fft"
-        )
+        self._conv = PixelKernelConvolution(kernel=None, convolution_type="fft")
 
     @partial(jit, static_argnums=0)
     def convolve2d(self, image_high_res):
@@ -103,8 +104,12 @@ class SubgridPartialConvolution(object):
         count = 0
         for i in range(self._supersampling_factor):
             for j in range(self._supersampling_factor):
-                image_select = self._partial_image(image_high_res, i, j) * self._compute_pixels
-                conv_image += self._conv.convolution2d(image_select, self._kernel_ij[count])
+                image_select = (
+                    self._partial_image(image_high_res, i, j) * self._compute_pixels
+                )
+                conv_image += self._conv.convolution2d(
+                    image_select, self._kernel_ij[count]
+                )
                 count += 1
         return conv_image * self._compute_pixels
 

@@ -9,6 +9,7 @@ from functools import partial
 
 from lenstronomy.Util.package_util import exporter
 
+
 class PixelKernelConvolution(object):
     """Class to compute convolutions for a given pixelized kernel (fft, grid)"""
 

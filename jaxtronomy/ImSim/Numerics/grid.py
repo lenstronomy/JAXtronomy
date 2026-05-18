@@ -73,7 +73,7 @@ class AdaptiveGrid(Coordinates1D):
         if not hasattr(self, "_x_high_res"):
             self._subpixel_coordinates()
         return self._x_high_res, self._y_high_res
-    
+
     def _subpixel_coordinates(self):
         """
 
@@ -130,7 +130,6 @@ class AdaptiveGrid(Coordinates1D):
     def _merge_low_high_res(self, low_res_values, supersampled_values):
         """Adds/overwrites the supersampled values on the image.
 
-
         :param low_res_values: 1d array of image with low resolution
         :param supersampled_values: values of the supersampled sub-pixels
         :return: 2d image
@@ -164,7 +163,6 @@ class AdaptiveGrid(Coordinates1D):
                 ].set(self._array2image_subset(selected))
                 count += 1
         return high_res
-
 
     @partial(jit, static_argnums=0)
     def _average_subgrid(self, subgrid_values):
