@@ -29,7 +29,6 @@ class MultiPlaneBulk(ProfileListBase):
         :param cosmo: instance of astropy cosmology. If None, an instance will be created based off of cosmology_model
         :param cosmology_model: string, used to initialize an instance of astropy cosmology if one was not already provided
         """
-
         self.unique_lens_model_list = unique_lens_model_list
         if isinstance(profile_kwargs_list, list):
             profile_kwargs_list += [{}]
@@ -221,7 +220,6 @@ class MultiPlaneBulk(ProfileListBase):
         :param lens_redshift_list: list of redshifts for each deflector
         :returns: same as the inputs but sorted by increasing redshift
         """
-
         lens_redshift_list = np.array(lens_redshift_list)
         sorted_indices = np.argsort(lens_redshift_list)
 
@@ -247,7 +245,6 @@ class MultiPlaneBulk(ProfileListBase):
             T_z_list: list of transverse comoving distances between z=0 to each deflector and z_source.
             reduced2physical_factor: list of conversion factors from reduced deflection angles to physical deflection angles.
         """
-
         # reduced2physical_factor calculation
         z_source_array = np.ones(lens_redshift_list.shape) * z_source
         reduced2physical_factor = cosmo_bkg.d_xy(0, z_source) / cosmo_bkg.d_xy(

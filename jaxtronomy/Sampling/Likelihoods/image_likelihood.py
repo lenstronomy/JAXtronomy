@@ -64,8 +64,9 @@ class ImageLikelihood(object):
         kwargs_extinction=None,
         **kwargs,
     ):
-        """Computes the log likelihood of the data given a model. The model kwargs are
-        used to simulate an image which is compared to the data image.
+        """Computes the log likelihood of the data given a model.
+
+        The model kwargs are used to simulate an image which is compared to the data image.
 
         :param kwargs_lens: lens model keyword argument list according to LensModel
             module

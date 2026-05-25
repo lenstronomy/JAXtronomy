@@ -119,7 +119,6 @@ class Shapelets(object):
         :param center_y: center in y
         :return: flux surface brightness at (x, y)
         """
-
         if self._precalc:
             return amp * x[n1] * y[n2]
 
@@ -146,8 +145,9 @@ class Shapelets(object):
 
     @partial(jit, static_argnums=(0, 1))
     def phi_n(self, n, x):
-        """Constructs the 1-dim basis function (formula (1) in Refregier et al. 2001)
+        """Constructs the 1-dim basis function (formula (1) in Refregier et al.
 
+        2001)
         :param n: The n'the basis function.
         :type n: int.
         :param x: 1-dim position (dimensionless)

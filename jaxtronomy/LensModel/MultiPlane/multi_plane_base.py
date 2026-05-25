@@ -118,7 +118,6 @@ class MultiPlaneBase(ProfileListBase):
     def set_ddts(self):
         """Computes time delay distance (in units of Mpc) from each lens redshift to the
         source."""
-
         self._D_dt_list = []
         for z_lens in self._lens_redshift_list:
             self._D_dt_list.append(
@@ -552,7 +551,6 @@ class MultiPlaneBase(ProfileListBase):
         :param z_start: starting redshift (lowest redshift)
         :return: boolean of condition
         """
-
         if inclusive:
             return z_lens >= z_start
         else:

@@ -78,7 +78,6 @@ class LOS(object):
         :param omega: the rotation
         :return: the distorted vector
         """
-
         x_ = (1 - kappa - gamma1) * x + (-gamma2 + omega) * y
         y_ = (1 - kappa + gamma1) * y - (gamma2 + omega) * x
 
@@ -110,7 +109,6 @@ class LOS(object):
         :param omega: the rotation
         :return: the Hessian left-multiplied by the distortion matrix
         """
-
         f__xx = (1 - kappa - gamma1) * f_xx + (-gamma2 + omega) * f_yx
         f__xy = (1 - kappa - gamma1) * f_xy + (-gamma2 + omega) * f_yy
         f__yx = -(gamma2 + omega) * f_xx + (1 - kappa + gamma1) * f_yx
@@ -144,7 +142,6 @@ class LOS(object):
         :param omega: the rotation
         :return: the Hessian right-multiplied by the distortion matrix
         """
-
         f__xx = (1 - kappa - gamma1) * f_xx - (gamma2 + omega) * f_xy
         f__xy = (-gamma2 + omega) * f_xx + (1 - kappa + gamma1) * f_xy
         f__yx = (1 - kappa - gamma1) * f_yx - (gamma2 + omega) * f_yy

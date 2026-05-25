@@ -355,8 +355,9 @@ class SingleBandMultiModel(ImageLinearFit, ImageModel):
         check_positive_flux=False,
         linear_solver=None,
     ):
-        """Computes the log likelihood of the data given a model. The model kwargs are
-        used to simulate an image which is compared to the data image.
+        """Computes the log likelihood of the data given a model.
+
+        The model kwargs are used to simulate an image which is compared to the data image.
 
         :param kwargs_lens: list of keyword arguments corresponding to the superposition
             of different lens profiles

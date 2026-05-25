@@ -43,7 +43,6 @@ def marginalisation_const(M_inv):
     :param M_inv: 2D covariance matrix
     :return: float
     """
-
     sign, log_det = jnp.linalg.slogdet(M_inv)
     result = jnp.where(sign == 0, -(10**15), sign * log_det / 2)
     return result

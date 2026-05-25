@@ -51,7 +51,6 @@ def add_layer2image_int(grid2d, x_pos, y_pos, kernel):
     :param kernel: the layer to be added to the image
     :return: image with added layer
     """
-
     n_row, n_col = jnp.shape(grid2d)
     k_rows, k_cols = jnp.shape(kernel)
 
