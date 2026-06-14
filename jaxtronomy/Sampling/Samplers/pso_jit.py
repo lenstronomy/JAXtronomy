@@ -2,6 +2,7 @@ import jax
 from jax import jit, lax, numpy as jnp
 import numpy as np
 from functools import partial
+from tqdm import tqdm
 
 __all__ = ["ParticleSwarmOptimizerJIT"]
 
@@ -89,7 +90,7 @@ class ParticleSwarmOptimizerJIT(object):
         NOTE: Currently does not return the global best logL, velocity, and position histories.
 
         :param max_iter: maximum iterations
-        :param verbose: if `True`, print a message every 10 iterations
+        :param verbose: if `True`, display a progress bar
         :param c1: cognitive weight
         :param c2: social weight
         :param p: float between 0 and 1, determines the percentage of particles to use to
@@ -112,7 +113,7 @@ class ParticleSwarmOptimizerJIT(object):
 
         init_swarm = self._init_swarm()
 
-        print("starting PSO optimization")
+        print("Starting PSO optimization")
         global_best_position, global_best_fitness = self.run_iterations(
             init_swarm,
             self.global_best_position,
@@ -165,7 +166,7 @@ class ParticleSwarmOptimizerJIT(object):
         :param early_stop_tolerance: float or None; if set, will terminate the PSO early
             if |2 * global_best_fitness| < early_stop_tolerance. This takes priority
             over the fitness and spatial convergence criteria.
-        :param verbose: if True, prints out the iteration number as the loop progresses
+        :param verbose: if True, displays a progress bar
         :type verbose: boolean
         """
         key = jax.random.PRNGKey(rng_seed)
@@ -187,6 +188,31 @@ class ParticleSwarmOptimizerJIT(object):
             personal_best_fitnesses,
             key,
         )
+
+        pbar_holder = {"bar": None}
+
+        def _update_progress_bar(i, max_iter):
+            i = int(i)
+            if i == 0 or pbar_holder["bar"] is None:
+                if pbar_holder["bar"] is not None:
+                    pbar_holder["bar"].close()
+                pbar_holder["bar"] = tqdm(total=int(max_iter))
+            pbar_holder["bar"].update(1)
+
+        def _finish_progress_bar(i, max_iter, best_fitness, best_position):
+            if pbar_holder["bar"] is not None:
+                pbar_holder["bar"].close()
+                pbar_holder["bar"] = None
+            i, max_iter = int(i), int(max_iter)
+            if i >= max_iter:
+                print("Max iteration reached! Stopping.")
+            else:
+                print("Converged after {} iterations!".format(i))
+            print(
+                "Best fit found: ",
+                float(best_fitness),
+                np.asarray(best_position),
+            )
 
         # define function to be computed at the start of every iteration
         # determines whether or not to continue the iterations
@@ -248,7 +274,7 @@ class ParticleSwarmOptimizerJIT(object):
             ) = carry
 
             if verbose:
-                jax.debug.print("iteration {i}", i=i)
+                jax.debug.callback(_update_progress_bar, i, max_iter)
 
             # find the current best particle
             best_particle_index = jnp.argmax(swarm_fitnesses)
@@ -333,6 +359,12 @@ class ParticleSwarmOptimizerJIT(object):
 
         # run the loop
         carry = lax.while_loop(continuing_criteria, update_swarm, init_carry)
+
+        # close out the progress bar and report convergence
+        if verbose:
+            jax.debug.callback(
+                _finish_progress_bar, carry[0], max_iter, carry[2], carry[1]
+            )
 
         # returns the global best position and global best fitness
         return carry[1], carry[2]
