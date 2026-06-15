@@ -192,31 +192,29 @@ class ParticleSwarmOptimizerJIT(object):
         pbar_holder = {"bar": None}
 
         def _update_progress_bar(i, max_iter):
-            i = int(i)
-            if i == 0 or pbar_holder["bar"] is None:
+            if int(i) == 0:
                 if pbar_holder["bar"] is not None:
                     pbar_holder["bar"].close()
                 pbar_holder["bar"] = tqdm(total=int(max_iter))
             pbar_holder["bar"].update(1)
 
-        def _finish_progress_bar(i, max_iter, best_fitness, best_position):
+        def _finish_progress_bar(i, converged, stop_early, best_fitness, best_position):
             if pbar_holder["bar"] is not None:
                 pbar_holder["bar"].close()
                 pbar_holder["bar"] = None
-            i, max_iter = int(i), int(max_iter)
-            if i >= max_iter:
-                print("Max iteration reached! Stopping.")
+            if bool(stop_early):
+                return
+            if bool(converged):
+                print("Converged after {} iterations!".format(int(i)))
+                print(
+                    "Best fit found: ",
+                    np.asarray(best_fitness),
+                    np.asarray(best_position),
+                )
             else:
-                print("Converged after {} iterations!".format(i))
-            print(
-                "Best fit found: ",
-                float(best_fitness),
-                np.asarray(best_position),
-            )
+                print("Max iteration reached! Stopping.")
 
-        # define function to be computed at the start of every iteration
-        # determines whether or not to continue the iterations
-        def continuing_criteria(carry):
+        def _exit_status(carry):
             (
                 i,
                 global_best_position,
@@ -234,7 +232,7 @@ class ParticleSwarmOptimizerJIT(object):
                     early_stop_tolerance, global_best_fitness
                 )
             else:
-                stop_early = False
+                stop_early = jnp.array(False)
 
             fit = self._converged_fit(
                 p=p,
@@ -251,6 +249,11 @@ class ParticleSwarmOptimizerJIT(object):
                 swarm_positions=swarm_positions,
             )
             converged = fit & space
+            return converged, stop_early
+
+        def continuing_criteria(carry):
+            i = carry[0]
+            converged, stop_early = _exit_status(carry)
 
             # continue if not converged yet and havent reached max iterations
             cont = jnp.logical_not(converged) & (i < max_iter)
@@ -274,7 +277,7 @@ class ParticleSwarmOptimizerJIT(object):
             ) = carry
 
             if verbose:
-                jax.debug.callback(_update_progress_bar, i, max_iter)
+                jax.debug.callback(_update_progress_bar, i, max_iter, ordered=True)
 
             # find the current best particle
             best_particle_index = jnp.argmax(swarm_fitnesses)
@@ -360,10 +363,16 @@ class ParticleSwarmOptimizerJIT(object):
         # run the loop
         carry = lax.while_loop(continuing_criteria, update_swarm, init_carry)
 
-        # close out the progress bar and report convergence
         if verbose:
+            converged, stop_early = _exit_status(carry)
             jax.debug.callback(
-                _finish_progress_bar, carry[0], max_iter, carry[2], carry[1]
+                _finish_progress_bar,
+                carry[0],
+                converged,
+                stop_early,
+                carry[2],
+                carry[1],
+                ordered=True,
             )
 
         # returns the global best position and global best fitness
