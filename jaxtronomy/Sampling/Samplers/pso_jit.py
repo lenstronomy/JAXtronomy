@@ -1,3 +1,5 @@
+import sys
+
 import jax
 from jax import jit, lax, numpy as jnp
 import numpy as np
@@ -113,7 +115,11 @@ class ParticleSwarmOptimizerJIT(object):
 
         init_swarm = self._init_swarm()
 
-        print("Starting PSO optimization")
+        # print to stderr (the stream tqdm writes to) and flush so the banner and
+        # the progress bar share one stream; otherwise consoles that render stdout
+        # and stderr separately show a blank line between them
+        print("Starting PSO optimization", file=sys.stderr, flush=True)
+        
         global_best_position, global_best_fitness = self.run_iterations(
             init_swarm,
             self.global_best_position,
@@ -205,14 +211,17 @@ class ParticleSwarmOptimizerJIT(object):
             if bool(stop_early):
                 return
             if bool(converged):
-                print("Converged after {} iterations!".format(int(i)))
+                print(
+                    "Converged after {} iterations!".format(int(i)), file=sys.stderr
+                )
                 print(
                     "Best fit found: ",
                     np.asarray(best_fitness),
                     np.asarray(best_position),
+                    file=sys.stderr,
                 )
             else:
-                print("Max iteration reached! Stopping.")
+                print("Max iteration reached! Stopping.", file=sys.stderr)
 
         def _exit_status(carry):
             (
