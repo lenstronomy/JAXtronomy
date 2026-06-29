@@ -115,10 +115,10 @@ class ParticleSwarmOptimizerJIT(object):
 
         init_swarm = self._init_swarm()
 
-        # print to stderr (the stream tqdm writes to) and flush so the banner and
-        # the progress bar share one stream; otherwise consoles that render stdout
-        # and stderr separately show a blank line between them
-        print("Starting PSO optimization", file=sys.stderr, flush=True)
+        # use tqdm.write so the banner coordinates with any active progress bar
+        # (the inner PSO bar or a caller's outer bar): tqdm clears the bar, prints
+        # the message on its own line, and redraws the bar below it
+        tqdm.write("Starting PSO optimization", file=sys.stderr)
         
         global_best_position, global_best_fitness = self.run_iterations(
             init_swarm,
