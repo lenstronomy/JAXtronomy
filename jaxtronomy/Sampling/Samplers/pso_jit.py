@@ -205,23 +205,26 @@ class ParticleSwarmOptimizerJIT(object):
             pbar_holder["bar"].update(1)
 
         def _finish_progress_bar(i, converged, stop_early, best_fitness, best_position):
+            if bool(stop_early):
+                message = None
+            elif bool(converged):
+                message = "Converged after {} iterations!\nBest fit found:  {} {}".format(
+                    int(i),
+                    np.asarray(best_fitness),
+                    np.asarray(best_position),
+                )
+            else:
+                message = "Max iteration reached! Stopping."
+
+            if message is not None:
+                if pbar_holder["bar"] is not None:
+                    pbar_holder["bar"].write(message, file=sys.stderr)
+                else:
+                    print(message, file=sys.stderr)
+
             if pbar_holder["bar"] is not None:
                 pbar_holder["bar"].close()
                 pbar_holder["bar"] = None
-            if bool(stop_early):
-                return
-            if bool(converged):
-                print(
-                    "Converged after {} iterations!".format(int(i)), file=sys.stderr
-                )
-                print(
-                    "Best fit found: ",
-                    np.asarray(best_fitness),
-                    np.asarray(best_position),
-                    file=sys.stderr,
-                )
-            else:
-                print("Max iteration reached! Stopping.", file=sys.stderr)
 
         def _exit_status(carry):
             (
