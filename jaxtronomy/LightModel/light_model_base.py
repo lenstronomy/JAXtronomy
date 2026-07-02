@@ -24,6 +24,7 @@ _JAXXED_MODELS = [
     "SERSIC_ELLIPSE",
     "SERSIC_ELLIPSE_Q_PHI",
     "SHAPELETS",
+    "UNIFORM",
 ]
 
 
@@ -144,10 +145,10 @@ class LightModelBase(object):
             #     )
 
             #     self.func_list.append(PseudoJaffeEllipse(**profile_kwargs))
-            # elif profile_type == "UNIFORM":
-            #     from lenstronomy.LightModel.Profiles.uniform import Uniform
+            elif profile_type == "UNIFORM":
+                from jaxtronomy.LightModel.Profiles.uniform import Uniform
 
-            #     self.func_list.append(Uniform(**profile_kwargs))
+                self.func_list.append(Uniform(**profile_kwargs))
             # elif profile_type == "POWER_LAW":
             #     from lenstronomy.LightModel.Profiles.power_law import PowerLaw
 
