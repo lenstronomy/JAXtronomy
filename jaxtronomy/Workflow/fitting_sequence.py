@@ -381,6 +381,9 @@ class FittingSequence(object):
         :param n_walkers: integer, number of walkers of emcee (optional, if set, overwrites the walkerRatio input
         :param sigma_scale: scaling of the initial parameter spread relative to the width in the initial settings
         :param threadCount: number of CPU threads. If MPI option is set, threadCount=1
+        :param vectorization_batch_size: int, only relevant for GPU, determines the number of
+            particles/walkers whose logL will be computed simultaneously. None defaults to one
+            particle at a time and 0 means to compute all particles/walkers simultaneously.
         :param init_samples: initial sample from where to start the MCMC process
         :param re_use_samples: bool, if True, re-uses the samples described in init_samples.nOtherwise starts from
          scratch.
@@ -537,6 +540,10 @@ class FittingSequence(object):
         :param threadCount: number of CPU threads. If MPI option is set, threadCount=1
         :param rng_seed: int, seed used for randomness in PSO. If None, a random seed is
             generated.
+        :param vectorization_batch_size: int, only relevant for GPU, determines the
+            number of particles/walkers whose logL will be computed simultaneously. None
+            defaults to one particle at a time and 0 means to compute all
+            particles/walkers simultaneously.
         :return: result of the best fit, the PSO chain of the best fit parameter after
             each iteration [lnlikelihood, parameters, velocities], list of parameters in
             same order as in chain

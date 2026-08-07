@@ -48,6 +48,9 @@ class ImageNoise(object):
                     "Exposure map has not been specified in Noise() class!"
                 )
         else:
+            # cast to native byte order so big-endian (e.g., FITS >f8) inputs are accepted
+            exposure_time = jnp.asarray(exposure_time, dtype=float)
+
             # make sure no negative exposure values are present no dividing by zero
             self.exposure_map = jnp.where(
                 exposure_time <= 10 ** (-10), 10 ** (-10), exposure_time
@@ -63,12 +66,12 @@ class ImageNoise(object):
         else:
             self.background_rms = background_rms
 
-        self.data = jnp.array(image_data)
+        self.data = jnp.array(image_data, dtype=float)
         self.flux_scaling = flux_scaling
 
         if noise_map is not None:
             assert np.shape(noise_map) == np.shape(image_data)
-            self._noise_map = jnp.array(noise_map)
+            self._noise_map = jnp.array(noise_map, dtype=float)
         else:
             self._noise_map = noise_map
             if background_rms is not None and exposure_time is not None:

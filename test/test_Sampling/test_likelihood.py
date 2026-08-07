@@ -91,6 +91,7 @@ class TestLikelihood(object):
         self.kwargs_special = {
             "delta_x_image": [0.1, 0.15],
             "delta_y_image": [0.07, 0.03],
+            "D_dt": 1.1,
         }
 
         kwargs_numerics = {
@@ -154,17 +155,24 @@ class TestLikelihood(object):
             "source_position_likelihood": True,
             "source_position_sigma": 0.1,
             "astrometric_likelihood": True,
+            "time_delay_likelihood": True,
             "check_bounds": False,
         }
         self.kwargs_data_joint = {
             "multi_band_list": [[kwargs_data, kwargs_psf, kwargs_numerics]],
             "multi_band_type": "single-band",
+            "time_delays_measured": [0.5],
+            "time_delays_uncertainties": [0.1],
             "ra_image_list": [[0.4, 0.4]],
             "dec_image_list": [[0.4, 0.4]],
         }
 
         self.param_class = Param(
-            self.kwargs_model, linear_solver=False, num_point_source_list=[2], _jax=True
+            self.kwargs_model,
+            linear_solver=False,
+            num_point_source_list=[2],
+            _jax=True,
+            Ddt_sampling=True,
         )
         self.image_model = ImageModel(
             data_class,
@@ -192,14 +200,6 @@ class TestLikelihood(object):
         self.num_pix = num_pix
 
     def test_raises(self):
-        npt.assert_raises(
-            ValueError,
-            Likelihood,
-            self.kwargs_data_joint,
-            self.kwargs_model,
-            self.param_class,
-            time_delay_likelihood=True,
-        )
         npt.assert_raises(
             ValueError,
             Likelihood,
@@ -376,6 +376,8 @@ class TestLikelihood(object):
     def test_lensmodel_autodifferentiation(self):
         del self.kwargs_data_joint["ra_image_list"]
         del self.kwargs_data_joint["dec_image_list"]
+        del self.kwargs_data_joint["time_delays_measured"]
+        del self.kwargs_data_joint["time_delays_uncertainties"]
         for deflector_profile in JAXXED_DEFLECTOR_PROFILES:
             print(deflector_profile)
             lensModel = LensModel([deflector_profile])
@@ -405,6 +407,8 @@ class TestLikelihood(object):
     def test_lightmodel_autodifferentiation(self):
         del self.kwargs_data_joint["ra_image_list"]
         del self.kwargs_data_joint["dec_image_list"]
+        del self.kwargs_data_joint["time_delays_measured"]
+        del self.kwargs_data_joint["time_delays_uncertainties"]
         for source_profile in JAXXED_SOURCE_PROFILES:
             print(source_profile)
 

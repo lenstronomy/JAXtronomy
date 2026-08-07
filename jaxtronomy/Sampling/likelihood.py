@@ -8,6 +8,7 @@ import numpy as np
 import jaxtronomy.Util.class_creator as class_creator
 from jaxtronomy.Sampling.Likelihoods.image_likelihood import ImageLikelihood
 from jaxtronomy.Sampling.Likelihoods.position_likelihood import PositionLikelihood
+from jaxtronomy.Sampling.Likelihoods.time_delay_likelihood import TimeDelayLikelihood
 
 from lenstronomy.Sampling.Likelihoods.prior_likelihood import PriorLikelihood
 
@@ -125,12 +126,7 @@ class Likelihood(object):
         :param tracer_likelihood: option to perform likelihood on tracer quantity
             derived from imaging or spectroscopy
         """
-        if (
-            time_delay_likelihood
-            or tracer_likelihood
-            or flux_ratio_likelihood
-            or kinematic_2d_likelihood
-        ):
+        if tracer_likelihood or flux_ratio_likelihood or kinematic_2d_likelihood:
             raise ValueError(
                 "tracer, flux_ratio, and kinematic_2d likelihoods are not currently supported and should be set to False."
             )
@@ -278,7 +274,14 @@ class Likelihood(object):
         ) = class_creator.create_class_instances(all_models=True, **kwargs_model)
         self.PointSource = point_source_class
 
-        if self._image_likelihood is True:
+        if self._time_delay_likelihood:
+            self.time_delay_likelihood = TimeDelayLikelihood(
+                lens_model_class=lens_model_class,
+                point_source_class=point_source_class,
+                **kwargs_time_delay
+            )
+
+        if self._image_likelihood:
             kwargs_imaging = {**kwargs_image_likelihood, **kwargs_image_sim}
             self.image_likelihood = ImageLikelihood(
                 kwargs_model=kwargs_model, **kwargs_imaging
@@ -357,11 +360,19 @@ class Likelihood(object):
         if verbose is True:
             jax.debug.print("Prior likelihood = {}", logL_prior)
 
-        if self._image_likelihood is True:
+        if self._image_likelihood:
             logL_image, param = self.image_likelihood.logL(**kwargs_return)
             logL += logL_image
             if verbose is True:
                 jax.debug.print("image logL = {}", logL_image)
+
+        if self._time_delay_likelihood:
+            logL_time_delay = self.time_delay_likelihood.logL(
+                kwargs_lens, kwargs_ps, kwargs_special
+            )
+            logL += logL_time_delay
+            if verbose is True:
+                jax.debug.print("time-delay logL = {}", logL_time_delay)
 
         logL += self._position_likelihood.logL(
             kwargs_lens, kwargs_ps, kwargs_special, verbose=verbose
@@ -413,7 +424,15 @@ class Likelihood(object):
         num_data = 0
         if self._image_likelihood is True:
             num_data += self.image_likelihood.num_data
+        if self._time_delay_likelihood is True:
+            num_data += self.time_delay_likelihood.num_data
         num_data += self._position_likelihood.num_data
+
+        # Not implemented yet
+        # if self._flux_ratio_likelihood is True:
+        #    num_data += self.flux_ratio_likelihood.num_data
+        # if self._tracer_likelihood is True:
+        #    num_data += self.tracer_likelihood.num_data
         return num_data
 
     @property

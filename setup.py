@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 requires = [
-    "lenstronomy==1.14.1",
+    "lenstronomy>=1.14.1",
     "numpy>=2.3.0",
     "jax>=0.10.0",
     "numpyro>=0.21.0",

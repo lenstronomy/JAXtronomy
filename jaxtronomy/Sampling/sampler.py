@@ -265,9 +265,10 @@ def prepare_logL_func(backend, logL_func, threadCount, vectorization_batch_size)
         likelihood.
     :param threadCount: number of threads in the computation, only relevant for CPU
         parallelization
-    :param vectorization_batch_size: int, only relevant for GPU, determines number of
-        particles computed simultaneously. None defaults to one particle at a time and 0
-        means to compute all particles simultaneously.
+    :param vectorization_batch_size: int, only relevant for GPU, determines the number
+        of particles/walkers whose logL will be computed simultaneously. None defaults
+        to one particle at a time and 0 means to compute all particles/walkers
+        simultaneously.
     :returns: a callable function that takes a set of position vectors and returns a set
         of log likelihoods.
     """

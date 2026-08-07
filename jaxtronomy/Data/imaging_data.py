@@ -144,7 +144,8 @@ class ImageData(PixelGrid, ImageNoise):
             raise ValueError(
                 f"New data shape {image_data.shape} should match old data shape {self.data.shape}"
             )
-        self.data = image_data
+        # cast to native byte order so big-endian (e.g., FITS >f8) inputs are accepted
+        self.data = np.asarray(image_data, dtype=np.float64)
 
         # Recompile the log likelihood functions
         self.log_likelihood = jit(self._log_likelihood)

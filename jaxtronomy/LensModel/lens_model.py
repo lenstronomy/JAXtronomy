@@ -84,6 +84,11 @@ class LensModel(object):
             )
         self.lens_model_list = lens_model_list
         self.z_lens = z_lens
+
+        if z_source_convention is None and z_source is not None:
+            z_source_convention = z_source
+        if z_source is None and z_source_convention is not None:
+            z_source = z_source_convention
         self.z_source = z_source
         self._z_source_convention = z_source_convention
         self.redshift_list = lens_redshift_list
@@ -194,6 +199,17 @@ class LensModel(object):
                     alpha_scaling=alpha_scaling,
                 )
                 self.type = "SinglePlane"
+
+        self._ddt_scaling = 1
+        if (
+            self.z_lens is not None
+            and self._z_source_convention is not None
+            and z_source is not None
+        ):
+            ddt_scaling = self._lensCosmo.background.ddt_scaling(
+                self.z_lens, self._z_source_convention, z_source
+            )
+            self._ddt_scaling = ddt_scaling
 
         # Save these for convenience if class reinitialization is required
         self.init_kwargs = {
@@ -589,6 +605,15 @@ class LensModel(object):
         :return: None
         """
         self.lens_model.set_dynamic()
+
+    @property
+    def ddt_scaling(self):
+        """Ratio of time-delay distance between the source redshift and the time-delay
+        distance to the z_source_convention.
+
+        :return:
+        """
+        return self._ddt_scaling
 
     @partial(jit, static_argnums=(0, 4))
     def _deflection_differential(self, x, y, kwargs, k=None, diff=0.00001):
