@@ -119,7 +119,7 @@ class ParticleSwarmOptimizerJIT(object):
         # (the inner PSO bar or a caller's outer bar): tqdm clears the bar, prints
         # the message on its own line, and redraws the bar below it
         tqdm.write("Starting PSO optimization", file=sys.stderr)
-        
+
         global_best_position, global_best_fitness = self.run_iterations(
             init_swarm,
             self.global_best_position,
@@ -208,10 +208,12 @@ class ParticleSwarmOptimizerJIT(object):
             if bool(stop_early):
                 message = None
             elif bool(converged):
-                message = "Converged after {} iterations!\nBest fit found:  {} {}".format(
-                    int(i),
-                    np.asarray(best_fitness),
-                    np.asarray(best_position),
+                message = (
+                    "Converged after {} iterations!\nBest fit found:  {} {}".format(
+                        int(i),
+                        np.asarray(best_fitness),
+                        np.asarray(best_position),
+                    )
                 )
             else:
                 message = "Max iteration reached! Stopping."
