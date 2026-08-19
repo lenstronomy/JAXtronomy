@@ -228,9 +228,7 @@ class EllipticalMultipole(LensProfileBase):
 
     @staticmethod
     @jit
-    def function(
-        x, y, m, a_m, varphi_m, q, phi_ref, center_x=0, center_y=0, r_E=1
-    ):
+    def function(x, y, m, a_m, varphi_m, q, phi_ref, center_x=0, center_y=0, r_E=1):
         """Lensing potential of multipole contribution (for 1 component with m=1, m=3 or
         m=4)
 
@@ -309,20 +307,20 @@ class EllipticalMultipole(LensProfileBase):
 
         func_list = [m_equal_1, m_equal_3, m_equal_4, Multipole.function, error]
 
-        return lax.switch(case, func_list, x, y, m, a_m, varphi_m, center_x, center_y, r_E)
+        return lax.switch(
+            case, func_list, x, y, m, a_m, varphi_m, center_x, center_y, r_E
+        )
 
     @staticmethod
     @jit
-    def derivatives(
-        x, y, m, a_m, varphi_m, q, phi_ref, center_x=0, center_y=0, r_E=1
-    ):
+    def derivatives(x, y, m, a_m, varphi_m, q, phi_ref, center_x=0, center_y=0, r_E=1):
         """Deflection of a multipole contribution (for 1 component with m=1, m=3 or m=4)
 
         :param x: x-coordinate to evaluate function
         :param y: y-coordinate to evaluate function
         :param m: int, multipole order (m=1, m=3 or m=4)
         :param a_m: float, multipole strength
-          :param varphi_m: float, multipole orientation in radian (eccentric anomaly
+        :param varphi_m: float, multipole orientation in radian (eccentric anomaly
             relative to the semi-major axis of the reference ellipses)
         :param q : float, axis ratio of the reference ellipses
         :param phi_ref : position angle (polar coordinates) of the reference ellipses
@@ -408,7 +406,9 @@ class EllipticalMultipole(LensProfileBase):
 
         func_list = [m_equal_1, m_equal_3, m_equal_4, Multipole.derivatives, error]
 
-        f_x, f_y = lax.switch(case, func_list, x, y, m, a_m, varphi_m, center_x, center_y, r_E)
+        f_x, f_y = lax.switch(
+            case, func_list, x, y, m, a_m, varphi_m, center_x, center_y, r_E
+        )
 
         return util.rotate(
             f_x, f_y, -phi_ref
@@ -416,9 +416,7 @@ class EllipticalMultipole(LensProfileBase):
 
     @staticmethod
     @jit
-    def hessian(
-        x, y, m, a_m, varphi_m, q, phi_ref, center_x=0, center_y=0, r_E=1
-    ):
+    def hessian(x, y, m, a_m, varphi_m, q, phi_ref, center_x=0, center_y=0, r_E=1):
         """Hessian of a multipole contribution (for 1 component with m=1, m=3 or m=4)
 
         :param x: x-coordinate to evaluate function
@@ -534,7 +532,9 @@ class EllipticalMultipole(LensProfileBase):
 
         func_list = [m_equal_1, m_equal_3, m_equal_4, Multipole.hessian, error]
 
-        f_xx, f_xy, f_yx, f_yy = lax.switch(case, func_list, x, y, m, a_m, varphi_m, center_x, center_y, r_E)
+        f_xx, f_xy, f_yx, f_yy = lax.switch(
+            case, func_list, x, y, m, a_m, varphi_m, center_x, center_y, r_E
+        )
 
         # rotate back to the original coordinate system
         f_xx_ = (
