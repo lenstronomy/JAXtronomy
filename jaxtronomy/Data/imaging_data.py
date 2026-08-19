@@ -101,6 +101,7 @@ class ImageData(PixelGrid, ImageNoise, AngularSensitivity):
         rot_matrix = np.array([[cos_phi, -sin_phi], [sin_phi, cos_phi]])
         transform_pix2angle_rot = np.dot(transform_pix2angle, rot_matrix)
         PixelGrid.__init__(
+            self,
             nx=nx,
             ny=ny,
             transform_pix2angle=transform_pix2angle_rot,
