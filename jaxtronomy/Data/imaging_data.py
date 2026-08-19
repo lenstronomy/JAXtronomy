@@ -120,7 +120,7 @@ class ImageData(PixelGrid, ImageNoise, AngularSensitivity):
         )
 
         # TODO: Not supported in jaxtronomy
-        #if antenna_primary_beam is not None:
+        # if antenna_primary_beam is not None:
         #    pbx, pby = np.shape(antenna_primary_beam)
         #    if (pbx, pby) != (nx, ny):
         #        raise ValueError(
