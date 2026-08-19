@@ -2,12 +2,13 @@ import numpy as np
 from jax import jit, numpy as jnp
 
 from lenstronomy.Data.pixel_grid import PixelGrid
+from lenstronomy.Data.angular_sensitivity import AngularSensitivity
 from jaxtronomy.Data.image_noise import ImageNoise, covariance_matrix
 
 __all__ = ["ImageData"]
 
 
-class ImageData(PixelGrid, ImageNoise):
+class ImageData(PixelGrid, ImageNoise, AngularSensitivity):
     """Class to handle the data, coordinate system and masking, including convolution
     with various numerical precisions.
 
@@ -101,12 +102,11 @@ class ImageData(PixelGrid, ImageNoise):
         transform_pix2angle_rot = np.dot(transform_pix2angle, rot_matrix)
         PixelGrid.__init__(
             self,
-            nx,
-            ny,
-            transform_pix2angle_rot,
-            ra_at_xy_0 + ra_shift,
-            dec_at_xy_0 + dec_shift,
-            antenna_primary_beam,
+            nx=nx,
+            ny=ny,
+            transform_pix2angle=transform_pix2angle_rot,
+            ra_at_xy_0=ra_at_xy_0 + ra_shift,
+            dec_at_xy_0=dec_at_xy_0 + dec_shift,
         )
         ImageNoise.__init__(
             self,
@@ -118,6 +118,15 @@ class ImageData(PixelGrid, ImageNoise):
             verbose=False,
             flux_scaling=flux_scaling,
         )
+
+        # TODO: Not supported in jaxtronomy
+        # if antenna_primary_beam is not None:
+        #    pbx, pby = np.shape(antenna_primary_beam)
+        #    if (pbx, pby) != (nx, ny):
+        #        raise ValueError(
+        #            "The primary beam should have the same size with the image data!"
+        #        )
+        AngularSensitivity.__init__(self, antenna_primary_beam)
 
         self._logL_constant = log_likelihood_constant
         self._logL_method = likelihood_method

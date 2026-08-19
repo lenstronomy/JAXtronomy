@@ -160,8 +160,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 1,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.4,
+            "phi_ref": -0.1,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -174,8 +175,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 3,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.4,
+            "phi_ref": 0.1,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -188,8 +190,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 4,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.4,
+            "phi_ref": 0.11,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -202,8 +205,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 6,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.9999999999999999999999,
+            "phi_ref": 0.2,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -216,14 +220,15 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 7,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.3,
+            "phi_ref": 0.12,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
         }
         result = self.multipole.function(x, y, **kwargs)
-        npt.assert_array_equal(result, np.ones_like(x) * 1e18)
+        npt.assert_array_equal(result, np.ones_like(x) * np.nan)
 
     def test_derivatives(self):
 
@@ -233,8 +238,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 1,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.4,
+            "phi_ref": -0.1,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -247,8 +253,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 3,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.4,
+            "phi_ref": -0.11,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -261,8 +268,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 4,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.4,
+            "phi_ref": 0.12,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -275,8 +283,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 6,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.9999999999999999999999,
+            "phi_ref": -0.1,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -289,14 +298,15 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 7,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.3,
+            "phi_ref": 0.11,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
         }
         result = self.multipole.derivatives(x, y, **kwargs)
-        npt.assert_array_equal(result, (np.ones_like(x) * 1e18,) * 2)
+        npt.assert_array_equal(result, (np.ones_like(x) * np.nan,) * 2)
 
     def test_hessian(self):
 
@@ -306,8 +316,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 1,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.4,
+            "phi_ref": -0.1,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -320,8 +331,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 3,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.4,
+            "phi_ref": -0.11,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -334,8 +346,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 4,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.4,
+            "phi_ref": 0.12,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -348,8 +361,9 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 6,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.9999999999999999999999,
+            "phi_ref": -0.1,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
@@ -362,14 +376,15 @@ class TestEllipticalMultipole(object):
         kwargs = {
             "m": 7,
             "a_m": 1.4,
-            "phi_m": 1.3,
+            "varphi_m": 1.3,
             "q": 0.3,
+            "phi_ref": 0.1,
             "center_x": 0.1,
             "center_y": -0.3,
             "r_E": 1.3,
         }
         result = self.multipole.hessian(x, y, **kwargs)
-        npt.assert_array_equal(result, (np.ones_like(x) * 1e18,) * 4)
+        npt.assert_array_equal(result, (np.ones_like(x) * np.nan,) * 4)
 
 
 class TestMiscFunctions(object):
