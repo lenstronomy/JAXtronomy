@@ -119,12 +119,13 @@ class ImageData(PixelGrid, ImageNoise, AngularSensitivity):
             flux_scaling=flux_scaling,
         )
 
-        if antenna_primary_beam is not None:
-            pbx, pby = np.shape(antenna_primary_beam)
-            if (pbx, pby) != (nx, ny):
-                raise ValueError(
-                    "The primary beam should have the same size with the image data!"
-                )
+        # TODO: Not supported in jaxtronomy
+        #if antenna_primary_beam is not None:
+        #    pbx, pby = np.shape(antenna_primary_beam)
+        #    if (pbx, pby) != (nx, ny):
+        #        raise ValueError(
+        #            "The primary beam should have the same size with the image data!"
+        #        )
         AngularSensitivity.__init__(self, antenna_primary_beam)
 
         self._logL_constant = log_likelihood_constant
