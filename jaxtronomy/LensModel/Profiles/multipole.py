@@ -3,6 +3,7 @@ __author__ = "lynevdv"
 from jax import jit, numpy as jnp, lax
 
 import jaxtronomy.Util.param_util as param_util
+import jaxtronomy.Util.util as util
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
 
 __all__ = ["Multipole", "EllipticalMultipole"]
@@ -187,16 +188,29 @@ class EllipticalMultipole(LensProfileBase):
 
     m : int, multipole order, (m=1, m=3 or m=4)
     a_m : float, multipole strength
-    phi_m : float, multipole orientation in radian
+    varphi_m : float, multipole orientation in radians
+                (NB: this is NOT a polar angle, but the eccentric anomaly relative to the semi-major axis of the reference ellipses)
     q : axis ratio of the reference ellipses
+    phi_ref : position angle (polar coordinates) of the reference ellipses
     """
 
-    param_names = ["m", "a_m", "phi_m", "q", "center_x", "center_y", "r_E"]
+    param_names = [
+        "m",
+        "a_m",
+        "varphi_m",
+        "q",
+        "phi_ref",
+        "center_x",
+        "center_y",
+        "r_E",
+    ]
+
     lower_limit_default = {
         "m": 1,
         "a_m": 0,
-        "phi_m": -jnp.pi,
+        "varphi_m": -jnp.pi,
         "q": 0.001,
+        "phi_ref": -jnp.pi,
         "center_x": -100,
         "center_y": -100,
         "r_E": 0,
@@ -204,8 +218,9 @@ class EllipticalMultipole(LensProfileBase):
     upper_limit_default = {
         "m": 100,
         "a_m": 100,
-        "phi_m": jnp.pi,
+        "varphi_m": jnp.pi,
         "q": 1,
+        "phi_ref": jnp.pi,
         "center_x": 100,
         "center_y": 100,
         "r_E": 100,
@@ -213,7 +228,9 @@ class EllipticalMultipole(LensProfileBase):
 
     @staticmethod
     @jit
-    def function(x, y, m, a_m, phi_m, q, center_x=0, center_y=0, r_E=1):
+    def function(
+        x, y, m, a_m, varphi_m, q, phi_ref, center_x=0, center_y=0, r_E=1
+    ):
         """Lensing potential of multipole contribution (for 1 component with m=1, m=3 or
         m=4)
 
@@ -221,7 +238,10 @@ class EllipticalMultipole(LensProfileBase):
         :param y: y-coordinate to evaluate function
         :param m: int, multipole order (m=1, m=3 or m=4)
         :param a_m: float, multipole strength
-        :param phi_m: float, multipole orientation in radian
+        :param varphi_m: float, multipole orientation in radian (eccentric anomaly
+            relative to the semi-major axis of the reference ellipses)
+        :param q : float, axis ratio of the reference ellipses
+        :param phi_ref : position angle (polar coordinates) of the reference ellipses
         :param center_x: x-position
         :param center_y: y-position
         :param r_E: float, normalizing radius (only used for odd m, Einstein radius by
@@ -239,6 +259,7 @@ class EllipticalMultipole(LensProfileBase):
         def m_equal_1(x, y, m, a_m, phi_m, center_x, center_y, r_E):
             r, phi = param_util.cart2polar(x, y, center_x=center_x, center_y=center_y)
             r = jnp.maximum(r, 0.000001)
+            phi -= phi_ref
             f_ = (
                 a_m
                 * jnp.sqrt(q)
@@ -254,6 +275,7 @@ class EllipticalMultipole(LensProfileBase):
         def m_equal_3(x, y, m, a_m, phi_m, center_x, center_y, r_E):
             r, phi = param_util.cart2polar(x, y, center_x=center_x, center_y=center_y)
             r = jnp.maximum(r, 0.000001)
+            phi -= phi_ref
             f_ = (
                 a_m
                 * jnp.sqrt(q)
@@ -269,6 +291,7 @@ class EllipticalMultipole(LensProfileBase):
         def m_equal_4(x, y, m, a_m, phi_m, center_x, center_y, r_E):
             r, phi = param_util.cart2polar(x, y, center_x=center_x, center_y=center_y)
             r = jnp.maximum(r, 0.000001)
+            phi -= phi_ref
             f_ = (
                 a_m
                 * jnp.sqrt(q)
@@ -280,24 +303,29 @@ class EllipticalMultipole(LensProfileBase):
             )
             return f_
 
-        # Raising runtime errors is expensive in JAX so we just return 1e18
+        # Raising runtime errors is expensive in JAX so we just return nan
         def error(x, y, m, a_m, phi_m, center_x, center_y, r_E):
-            return jnp.ones_like(x) * 1e18
+            return jnp.ones_like(x) * jnp.nan
 
         func_list = [m_equal_1, m_equal_3, m_equal_4, Multipole.function, error]
 
-        return lax.switch(case, func_list, x, y, m, a_m, phi_m, center_x, center_y, r_E)
+        return lax.switch(case, func_list, x, y, m, a_m, varphi_m, center_x, center_y, r_E)
 
     @staticmethod
     @jit
-    def derivatives(x, y, m, a_m, phi_m, q, center_x=0, center_y=0, r_E=1):
+    def derivatives(
+        x, y, m, a_m, varphi_m, q, phi_ref, center_x=0, center_y=0, r_E=1
+    ):
         """Deflection of a multipole contribution (for 1 component with m=1, m=3 or m=4)
 
         :param x: x-coordinate to evaluate function
         :param y: y-coordinate to evaluate function
         :param m: int, multipole order (m=1, m=3 or m=4)
         :param a_m: float, multipole strength
-        :param phi_m: float, multipole orientation in radian
+          :param varphi_m: float, multipole orientation in radian (eccentric anomaly
+            relative to the semi-major axis of the reference ellipses)
+        :param q : float, axis ratio of the reference ellipses
+        :param phi_ref : position angle (polar coordinates) of the reference ellipses
         :param center_x: x-position
         :param center_y: y-position
         :param r_E: float, normalizing radius (only used for odd m, Einstein radius by
@@ -315,6 +343,7 @@ class EllipticalMultipole(LensProfileBase):
         def m_equal_1(x, y, m, a_m, phi_m, center_x, center_y, r_E):
             r, phi = param_util.cart2polar(x, y, center_x=center_x, center_y=center_y)
             r = jnp.maximum(r, 0.000001)
+            phi -= phi_ref
             alpha_x_1, alpha_y_1 = _alpha_m1_1(r, phi, q, r_E)
             alpha_x_2, alpha_y_2 = _alpha_m1_1(r, phi + jnp.pi / 2, 1 / q, r_E)
             f_x = (
@@ -338,6 +367,7 @@ class EllipticalMultipole(LensProfileBase):
         def m_equal_3(x, y, m, a_m, phi_m, center_x, center_y, r_E):
             r, phi = param_util.cart2polar(x, y, center_x=center_x, center_y=center_y)
             r = jnp.maximum(r, 0.000001)
+            phi -= phi_ref
             alpha_x_1, alpha_y_1 = _alpha_m3_1(r, phi, q, r_E)
             alpha_x_2, alpha_y_2 = _alpha_m3_1(r, phi + jnp.pi / 2, 1 / q, r_E)
             f_x = (
@@ -361,6 +391,7 @@ class EllipticalMultipole(LensProfileBase):
         def m_equal_4(x, y, m, a_m, phi_m, center_x, center_y, r_E):
             r, phi = param_util.cart2polar(x, y, center_x=center_x, center_y=center_y)
             r = jnp.maximum(r, 0.000001)
+            phi -= phi_ref
             F_m4 = _F_m4_1(phi, q=q) * jnp.cos(m * phi_m) + _F_m4_2(phi, q=q) * jnp.sin(
                 m * phi_m
             )
@@ -371,24 +402,33 @@ class EllipticalMultipole(LensProfileBase):
             f_y = a_m * jnp.sqrt(q) * (F_m4 * jnp.sin(phi) + F_m4_prime * jnp.cos(phi))
             return f_x, f_y
 
-        # Raising runtime errors is expensive in JAX so we just return 1e18
+        # Raising runtime errors is expensive in JAX so we just return nans
         def error(x, y, m, a_m, phi_m, center_x, center_y, r_E):
-            return jnp.ones_like(x) * 1e18, jnp.ones_like(x) * 1e18
+            return jnp.ones_like(x) * jnp.nan, jnp.ones_like(x) * jnp.nan
 
         func_list = [m_equal_1, m_equal_3, m_equal_4, Multipole.derivatives, error]
 
-        return lax.switch(case, func_list, x, y, m, a_m, phi_m, center_x, center_y, r_E)
+        f_x, f_y = lax.switch(case, func_list, x, y, m, a_m, varphi_m, center_x, center_y, r_E)
+
+        return util.rotate(
+            f_x, f_y, -phi_ref
+        )  # rotate back to the original coordinate system
 
     @staticmethod
     @jit
-    def hessian(x, y, m, a_m, phi_m, q, center_x=0, center_y=0, r_E=1):
+    def hessian(
+        x, y, m, a_m, varphi_m, q, phi_ref, center_x=0, center_y=0, r_E=1
+    ):
         """Hessian of a multipole contribution (for 1 component with m=1, m=3 or m=4)
 
         :param x: x-coordinate to evaluate function
         :param y: y-coordinate to evaluate function
         :param m: int, multipole order (m=1, m=3 or m=4)
         :param a_m: float, multipole strength
-        :param phi_m: float, multipole orientation in radian
+        :param varphi_m: float, multipole orientation in radian (eccentric anomaly
+            relative to the semi-major axis of the reference ellipses)
+        :param q : float, axis ratio of the reference ellipses
+        :param phi_ref : position angle (polar coordinates) of the reference ellipses
         :param center_x: x-position
         :param center_y: y-position
         :param r_E: float, normalizing radius (not used for Hessian)
@@ -405,6 +445,7 @@ class EllipticalMultipole(LensProfileBase):
         def m_equal_1(x, y, m, a_m, phi_m, center_x, center_y, r_E):
             r, phi = param_util.cart2polar(x, y, center_x=center_x, center_y=center_y)
             r = jnp.maximum(r, 0.000001)
+            phi -= phi_ref
             d2psi_dx2_1, d2psi_dy2_1, d2psi_dxdy_1 = _hessian_m1_1(r, phi, q)
             d2psi_dx2_2, d2psi_dy2_2, d2psi_dxdy_2 = _hessian_m1_1(
                 r, phi + jnp.pi / 2, 1 / q
@@ -438,6 +479,7 @@ class EllipticalMultipole(LensProfileBase):
         def m_equal_3(x, y, m, a_m, phi_m, center_x, center_y, r_E):
             r, phi = param_util.cart2polar(x, y, center_x=center_x, center_y=center_y)
             r = jnp.maximum(r, 0.000001)
+            phi -= phi_ref
             d2psi_dx2_1, d2psi_dy2_1, d2psi_dxdy_1 = _hessian_m3_1(r, phi, q)
             d2psi_dx2_2, d2psi_dy2_2, d2psi_dxdy_2 = _hessian_m3_1(
                 r, phi + jnp.pi / 2, 1 / q
@@ -471,6 +513,7 @@ class EllipticalMultipole(LensProfileBase):
         def m_equal_4(x, y, m, a_m, phi_m, center_x, center_y, r_E):
             r, phi = param_util.cart2polar(x, y, center_x=center_x, center_y=center_y)
             r = jnp.maximum(r, 0.000001)
+            phi -= phi_ref
             phi_ell = jnp.angle(q * r * jnp.cos(phi) + 1j * r * jnp.sin(phi))
             R = jnp.sqrt(q * (r * jnp.cos(phi)) ** 2 + (r * jnp.sin(phi)) ** 2 / q)
 
@@ -480,18 +523,32 @@ class EllipticalMultipole(LensProfileBase):
             f_xy = -jnp.sin(phi) * jnp.cos(phi) * delta_r / r
             return f_xx, f_xy, f_xy, f_yy
 
-        # Raising runtime errors is expensive in JAX so we just return 1e18
+        # Raising runtime errors is expensive in JAX so we just return nans
         def error(x, y, m, a_m, phi_m, center_x, center_y, r_E):
             return (
-                jnp.ones_like(x) * 1e18,
-                jnp.ones_like(x) * 1e18,
-                jnp.ones_like(x) * 1e18,
-                jnp.ones_like(x) * 1e18,
+                jnp.ones_like(x) * jnp.nan,
+                jnp.ones_like(x) * jnp.nan,
+                jnp.ones_like(x) * jnp.nan,
+                jnp.ones_like(x) * jnp.nan,
             )
 
         func_list = [m_equal_1, m_equal_3, m_equal_4, Multipole.hessian, error]
 
-        return lax.switch(case, func_list, x, y, m, a_m, phi_m, center_x, center_y, r_E)
+        f_xx, f_xy, f_yx, f_yy = lax.switch(case, func_list, x, y, m, a_m, varphi_m, center_x, center_y, r_E)
+
+        # rotate back to the original coordinate system
+        f_xx_ = (
+            jnp.cos(phi_ref) ** 2 * f_xx
+            - jnp.sin(2 * phi_ref) * f_xy
+            + jnp.sin(phi_ref) ** 2 * f_yy
+        )
+        f_xy_ = jnp.cos(2 * phi_ref) * f_xy + jnp.sin(2 * phi_ref) * (f_xx - f_yy) / 2
+        f_yy_ = (
+            jnp.sin(phi_ref) ** 2 * f_xx
+            + jnp.sin(2 * phi_ref) * f_xy
+            + jnp.cos(phi_ref) ** 2 * f_yy
+        )
+        return f_xx_, f_xy_, f_xy_, f_yy_
 
 
 @jit
