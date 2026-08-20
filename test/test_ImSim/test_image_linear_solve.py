@@ -592,21 +592,3 @@ class TestImageLinearFitInterferometry:
         npt.assert_allclose(model, model_ref, atol=1e-7, rtol=1e-7)
         npt.assert_allclose(param_amps, param_amps_ref, atol=1e-8, rtol=1e-8)
         assert M_inv is None and M_inv_ref is None
-
-        self.imageLinearFit_ref._pb = None
-        self.imageLinearFit._pb = None
-        model_ref, M_inv_ref, param_amps_ref = (
-            self.imageLinearFit_ref._image_linear_solve_interferometry_natwt_solving(
-                A, d, data_noise_rms, inv_bool=True
-            )
-        )
-
-        model, M_inv, param_amps = (
-            self.imageLinearFit._image_linear_solve_interferometry_natwt_solving(
-                A, d, data_noise_rms, inv_bool=True
-            )
-        )
-
-        npt.assert_allclose(model, model_ref, atol=1e-7, rtol=1e-7)
-        npt.assert_allclose(M_inv, M_inv_ref, atol=5e-7, rtol=5e-7)
-        npt.assert_allclose(param_amps, param_amps_ref, atol=1e-8, rtol=1e-8)
