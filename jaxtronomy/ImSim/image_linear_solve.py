@@ -702,6 +702,7 @@ class ImageLinearFit(ImageModel):
         for i in range(0, n_points):
 
             # Apply primary beam values to the amps of the point sources
+            amp_effective = amp[i]
             if self.Data.primary_beam is not None:
                 x0, y0, M = (
                     self.Data._x_at_radec_0,
@@ -712,9 +713,7 @@ class ImageLinearFit(ImageModel):
                 pb_values = primary_beam_util.primary_beam_value_at_coords(
                     x_pos, y_pos, self.Data.primary_beam
                 )
-                amp_effective = amp[i] * pb_values
-            else:
-                amp_effective = amp[i]
+                amp_effective *= pb_values
 
             # Rendering the unconvolved point source images
             image = self.ImageNumerics.point_source_rendering_unconvolved_for_interferometry(
