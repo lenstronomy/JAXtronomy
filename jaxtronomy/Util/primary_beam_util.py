@@ -4,6 +4,7 @@ from functools import partial
 from jax import jit, numpy as jnp
 from jax.scipy.ndimage import map_coordinates
 
+
 @partial(jit, static_argnums=3)
 def primary_beam_value_at_coords(x_pos, y_pos, primary_beam, order=1):
     """Interpolate the primary beam values at specified pixel coordinates. The

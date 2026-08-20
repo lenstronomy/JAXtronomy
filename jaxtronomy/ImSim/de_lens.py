@@ -35,6 +35,7 @@ def get_param_WLS(A, C_D_inv, d, inv_bool=True):
     image = A.dot(B)
     return B, M_inv, image
 
+
 @partial(jit, static_argnums=2)
 def get_param_WLS_interferometry(M, b, inv_bool=True):
     """Returns the linear parameters and its covariance matrix.
@@ -57,6 +58,7 @@ def get_param_WLS_interferometry(M, b, inv_bool=True):
         param_amps = jnp.where(cond_inv, _solve_stable(M, b), jnp.zeros(b.shape[0]))
         M_inv = None
     return param_amps, M_inv
+
 
 @jit
 def marginalisation_const(M_inv):

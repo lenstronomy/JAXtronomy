@@ -91,7 +91,7 @@ class ImageLinearFit(ImageModel):
         # prepare to use fft convolution for the natwt linear solver
         if self.Data.likelihood_method() == "interferometry_natwt":
             self._convolution = PixelKernelConvolution(
-               kernel=self.PSF.kernel_point_source
+                kernel=self.PSF.kernel_point_source
             )
 
     @partial(jit, static_argnums=(0, 7))
@@ -160,24 +160,24 @@ class ImageLinearFit(ImageModel):
                 self, param, kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps
             )
         elif self.Data.likelihood_method() == "interferometry_natwt":
-           (
-               model,
-               model_error,
-               cov_param,
-               param,
-           ) = self._image_linear_solve_interferometry_natwt(
-               kwargs_lens,
-               kwargs_source,
-               kwargs_lens_light,
-               kwargs_ps,
-               kwargs_extinction,
-               kwargs_special,
-               inv_bool,
-           )
+            (
+                model,
+                model_error,
+                cov_param,
+                param,
+            ) = self._image_linear_solve_interferometry_natwt(
+                kwargs_lens,
+                kwargs_source,
+                kwargs_lens_light,
+                kwargs_ps,
+                kwargs_extinction,
+                kwargs_special,
+                inv_bool,
+            )
         else:
-           raise ValueError(
-               "likelihood_method %s not supported!" % self.Data.likelihood_method()
-           )
+            raise ValueError(
+                "likelihood_method %s not supported!" % self.Data.likelihood_method()
+            )
         return model, model_error, cov_param, param
 
     # def image_pixelbased_solve(
@@ -649,12 +649,12 @@ class ImageLinearFit(ImageModel):
         n_source = len(source_light_response)
 
         # TODO: Implement extinction
-        #extinction = self._extinction.extinction(
+        # extinction = self._extinction.extinction(
         #    x_grid,
         #    y_grid,
         #    kwargs_extinction=kwargs_extinction,
         #    kwargs_special=kwargs_special,
-        #)
+        # )
         lens_light_response, _ = self.LensLightModel.functions_split(
             x_grid, y_grid, kwargs_lens_light
         )
@@ -703,7 +703,11 @@ class ImageLinearFit(ImageModel):
 
             # Apply primary beam values to the amps of the point sources
             if self.Data.primary_beam is not None:
-                x0, y0, M = self.Data._x_at_radec_0, self.Data._y_at_radec_0, self.Data._transform_angle2pix
+                x0, y0, M = (
+                    self.Data._x_at_radec_0,
+                    self.Data._y_at_radec_0,
+                    self.Data._transform_angle2pix,
+                )
                 x_pos, y_pos = util.map_coord2pix(ra_pos[i], dec_pos[i], x0, y0, M)
                 pb_values = primary_beam_util.primary_beam_value_at_coords(
                     x_pos, y_pos, self.Data.primary_beam
@@ -730,7 +734,7 @@ class ImageLinearFit(ImageModel):
         kwargs_extinction=None,
         kwargs_special=None,
         inv_bool=False,
-     ):
+    ):
         """'interferometry_natwt' method does NOT support model_error, cov_param. The
         interferometry linear solver just does the linear solving to get the optimal
         linear amplitudes and apply the marginalized amplitudes to make the model
@@ -823,20 +827,25 @@ class ImageLinearFit(ImageModel):
                 )
             )
             return A_convolved
-        
+
         A_convolved = lax.fori_loop(0, num_of_light, convolve_A, jnp.zeros(A.shape))
-        
+
         def compute_M(it, val):
             i, j, M = val
             M_ij = jnp.where(j < i, M.at[j, i].get(), jnp.sum(A_convolved[j] * A[i]))
             M = M.at[i, j].set(M_ij)
-            
+
             i = jnp.where(j == num_of_light - 1, i + 1, i)
             j = jnp.where(j == num_of_light - 1, 0, j + 1)
 
             return i, j, M
-        
-        _, _, M = lax.fori_loop(0, num_of_light**2, compute_M, (0, 0, jnp.zeros((num_of_light, num_of_light))))
+
+        _, _, M = lax.fori_loop(
+            0,
+            num_of_light**2,
+            compute_M,
+            (0, 0, jnp.zeros((num_of_light, num_of_light))),
+        )
 
         b = jnp.dot(A, d)
         M /= data_noise_rms**2

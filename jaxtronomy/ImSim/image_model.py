@@ -418,11 +418,13 @@ class ImageModel(object):
 
         # multiply with primary beam before convolution
         if apply_primary_beam and self._pb is not None:
-           source_light *= self._pb_1d
+            source_light *= self._pb_1d
         return source_light * self._flux_scaling
 
     @partial(jit, static_argnums=(0, 2, 3, 4))
-    def lens_surface_brightness(self, kwargs_lens_light, unconvolved=False, apply_primary_beam=True, k=None):
+    def lens_surface_brightness(
+        self, kwargs_lens_light, unconvolved=False, apply_primary_beam=True, k=None
+    ):
         """Computes the lens surface brightness distribution.
 
         :param kwargs_lens_light: list of keyword arguments corresponding to different
@@ -443,7 +445,7 @@ class ImageModel(object):
 
         # multiply with primary beam before convolution
         if apply_primary_beam and self._pb is not None:
-           lens_light *= self._pb_1d
+            lens_light *= self._pb_1d
 
         lens_light_final = self.ImageNumerics.re_size_convolve(
             lens_light, unconvolved=unconvolved
@@ -474,8 +476,8 @@ class ImageModel(object):
         :param apply_primary_beam: if True: returns the light distribution affected by
             the interferometry primary beam. This only applies when the class instance
             has a primary beam (for interferometric images).
-        :param k: optional int or tuple of ints, include only the k-th point source model. If None,
-            includes all
+        :param k: optional int or tuple of ints, include only the k-th point source
+            model. If None, includes all
         :return: rendered point source images
         """
         point_source_image = jnp.zeros((self.Data.num_pixel_axes))
@@ -554,7 +556,10 @@ class ImageModel(object):
             )
         if lens_light_add is True:
             model += ImageModel.lens_surface_brightness(
-                self, kwargs_lens_light, unconvolved=unconvolved, apply_primary_beam=apply_primary_beam,
+                self,
+                kwargs_lens_light,
+                unconvolved=unconvolved,
+                apply_primary_beam=apply_primary_beam,
             )
         if point_source_add is True:
             model += ImageModel.point_source(
@@ -784,7 +789,7 @@ class ImageModel(object):
             dec_pos,
             self.Data._x_at_radec_0,
             self.Data._y_at_radec_0,
-            self.Data._transform_angle2pix
+            self.Data._transform_angle2pix,
         )
         pb_values = primary_beam_util.primary_beam_value_at_coords(
             x_pos, y_pos, self._pb

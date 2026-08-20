@@ -595,13 +595,15 @@ class TestImageModel(object):
     def test_point_source_primary_beam_amp_normalization(self):
         ra_pos = np.array([-0.3, -0.5, 0.3, 0.4])
         dec_pos = np.array([-0.5, 0.4, 0.3, -0.3])
-        pb_values_ref = self.image_model_nomask_ref._point_source_primary_beam_amp_normalization(
-            ra_pos,
-            dec_pos
+        pb_values_ref = (
+            self.image_model_nomask_ref._point_source_primary_beam_amp_normalization(
+                ra_pos, dec_pos
+            )
         )
-        pb_values = self.image_model_nomask._point_source_primary_beam_amp_normalization(
-            ra_pos,
-            dec_pos
+        pb_values = (
+            self.image_model_nomask._point_source_primary_beam_amp_normalization(
+                ra_pos, dec_pos
+            )
         )
         npt.assert_array_almost_equal(pb_values, pb_values_ref, decimal=8)
 
