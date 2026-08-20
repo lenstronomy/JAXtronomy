@@ -307,6 +307,17 @@ class TestImageLinearFit(object):
         )
         npt.assert_allclose(error_map, error_map_ref, atol=1e-11, rtol=1e-11)
 
+        # raises error if likelihood method is incorrect
+        self.imageLinearFit.Data._logL_method = "wrong"
+        npt.assert_raises(
+            ValueError,
+            self.imageLinearFit.image_linear_solve,
+            self.kwargs_lens,
+            self.kwargs_source,
+            self.kwargs_lens_light,
+            self.kwargs_ps,
+        )
+
     def test_num_param_linear(self):
         num_param_linear = self.imageLinearFit.num_param_linear(
             self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
@@ -581,3 +592,21 @@ class TestImageLinearFitInterferometry:
         npt.assert_allclose(model, model_ref, atol=1e-7, rtol=1e-7)
         npt.assert_allclose(param_amps, param_amps_ref, atol=1e-8, rtol=1e-8)
         assert M_inv is None and M_inv_ref is None
+
+        self.imageLinearFit_ref._pb = None
+        self.imageLinearFit._pb = None
+        model_ref, M_inv_ref, param_amps_ref = (
+            self.imageLinearFit_ref._image_linear_solve_interferometry_natwt_solving(
+                A, d, data_noise_rms, inv_bool=True
+            )
+        )
+
+        model, M_inv, param_amps = (
+            self.imageLinearFit._image_linear_solve_interferometry_natwt_solving(
+                A, d, data_noise_rms, inv_bool=True
+            )
+        )
+
+        npt.assert_allclose(model, model_ref, atol=1e-7, rtol=1e-7)
+        npt.assert_allclose(M_inv, M_inv_ref, atol=5e-7, rtol=5e-7)
+        npt.assert_allclose(param_amps, param_amps_ref, atol=1e-8, rtol=1e-8)
