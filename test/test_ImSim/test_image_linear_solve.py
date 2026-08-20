@@ -22,17 +22,26 @@ from lenstronomy.Data.psf import PSF
 
 class TestImageLinearFit(object):
     def setup_method(self):
+        self._setup_method(use_primary_beam=False, likelihood_method='diagonal')
+
+    def _setup_method(self, use_primary_beam, likelihood_method):
         sigma_bkg = 0.05  # background noise per pixel
         exp_time = 100  # exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
         num_pix = 100  # cutout pixel size
         delta_pix = 0.05  # pixel size in arcsec (area per pixel = delta_pix**2)
         fwhm = 0.5  # full width half max of PSF
+        supersampling_factor = 2
 
         # PSF specification
 
         kwargs_data = sim_util.data_configure_simple(
             num_pix, delta_pix, exp_time, sigma_bkg, inverse=True
         )
+        if use_primary_beam:
+            kwargs_data["antenna_primary_beam"] = np.ones((num_pix, num_pix)) * 1.1
+            supersampling_factor = 1
+        kwargs_data['likelihood_method'] = likelihood_method
+
         self.kwargs_data = kwargs_data
         data_class = ImageData(**kwargs_data)
         data_class_ref = ImageData_ref(**kwargs_data)
@@ -111,7 +120,7 @@ class TestImageLinearFit(object):
             fixed_magnification_list=[True, False],
         )
         kwargs_numerics = {
-            "supersampling_factor": 2,
+            "supersampling_factor": supersampling_factor,
             "supersampling_convolution": False,
         }
 
@@ -155,6 +164,7 @@ class TestImageLinearFit(object):
         psf_class = PSF(**kwargs_psf)
         data_class = ImageData(**self.kwargs_data)
 
+        # Shapelets profile must be initialized with n_max using profile_kwargs_list
         npt.assert_raises(
             ValueError,
             ImageLinearFit,
@@ -170,12 +180,6 @@ class TestImageLinearFit(object):
             lens_light_model_class=lens_light_model_class,
         )
 
-        data_class = ImageData(
-            likelihood_method="interferometry_natwt", **self.kwargs_data
-        )
-        npt.assert_raises(
-            ValueError, ImageLinearFit, psf_class=psf_class, data_class=data_class
-        )
 
     def test_likelihood_data_given_model(self):
         logL, param = self.imageLinearFit.likelihood_data_given_model(
@@ -257,8 +261,8 @@ class TestImageLinearFit(object):
         npt.assert_allclose(param, param_ref, atol=2e-9, rtol=2e-9)
         assert cov_param is None
 
-        chi2_reduced = self.imageLinearFit.reduced_chi2(model, error_map)
         chi2_reduced_ref = self.imageLinearFit_ref.reduced_chi2(model, error_map)
+        chi2_reduced = self.imageLinearFit.reduced_chi2(model, error_map)
         npt.assert_allclose(chi2_reduced, chi2_reduced_ref, atol=1e-11, rtol=1e-11)
 
         x = np.tile(np.linspace(-1, 1, 50), 50)
@@ -458,3 +462,108 @@ class TestImageLinearFit(object):
         )
         assert pos_bool == pos_bool_ref
         assert pos_bool == True
+
+
+# Same tests but with interferometry_natwt and primary beam
+class TestImageLinearFitInterferometry():
+    def setup_method(self):
+        TestImageLinearFit._setup_method(self, use_primary_beam=True, likelihood_method='interferometry_natwt')
+
+    # Top level test
+    def test_likelihood_data_given_model(self):
+        TestImageLinearFit.test_likelihood_data_given_model(self)
+
+    # Bottom level tests
+    def test_image_linear_solve_interferometry_natwt(self):
+        model_ref, model_error_ref, cov_param_ref, param_ref = (
+            self.imageLinearFit_ref._image_linear_solve_interferometry_natwt(
+                self.kwargs_lens,
+                self.kwargs_source,
+                self.kwargs_lens_light,
+                self.kwargs_ps,
+                None, # kwargs_extinction
+                None, # kwargs_special
+                inv_bool=False
+            )
+        )
+        model, model_error, cov_param, param = (
+            self.imageLinearFit._image_linear_solve_interferometry_natwt(
+                self.kwargs_lens,
+                self.kwargs_source,
+                self.kwargs_lens_light,
+                self.kwargs_ps,
+                None, # kwargs_extinction
+                None, # kwargs_special
+                inv_bool=False
+            )
+        )
+        npt.assert_allclose(model, model_ref, atol=1e-7, rtol=1e-7)
+        npt.assert_allclose(model_error, model_error_ref, atol=1e-12, rtol=1e-12)
+        npt.assert_allclose(param, param_ref, atol=1e-8, rtol=1e-8)
+        assert cov_param is None and cov_param_ref is None
+
+        model_ref, model_error_ref, cov_param_ref, param_ref = (
+            self.imageLinearFit_ref._image_linear_solve_interferometry_natwt(
+                self.kwargs_lens,
+                self.kwargs_source,
+                self.kwargs_lens_light,
+                self.kwargs_ps,
+                None, # kwargs_extinction
+                None, # kwargs_special
+                inv_bool=True
+            )
+        )
+        model, model_error, cov_param, param = (
+            self.imageLinearFit._image_linear_solve_interferometry_natwt(
+                self.kwargs_lens,
+                self.kwargs_source,
+                self.kwargs_lens_light,
+                self.kwargs_ps,
+                None, # kwargs_extinction
+                None, # kwargs_special
+                inv_bool=True
+            )
+        )
+        npt.assert_allclose(model, model_ref, atol=1e-7, rtol=1e-7)
+        npt.assert_allclose(model_error, model_error_ref, atol=1e-12, rtol=1e-12)
+        npt.assert_allclose(cov_param, cov_param_ref, atol=1e-8, rtol=1e-8)
+        npt.assert_allclose(param, param_ref, atol=1e-8, rtol=1e-8)
+
+    def test_linear_response_matrix_interferometry_unconvolved(self):
+        A = self.imageLinearFit.linear_response_matrix_interferometry_unconvolved(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        A_ref = self.imageLinearFit_ref.linear_response_matrix_interferometry_unconvolved(
+            self.kwargs_lens, self.kwargs_source, self.kwargs_lens_light, self.kwargs_ps
+        )
+        npt.assert_allclose(A, A_ref, atol=3e-8, rtol=3e-8)
+
+    def test_image_linear_solve_interferometry_natwt_solving(self):
+        np.random.seed(42)
+        A = np.random.rand(10, 25)
+        d = np.random.rand(25)
+        data_noise_rms = np.random.rand() + 0.01
+
+        model_ref, M_inv_ref, param_amps_ref = self.imageLinearFit_ref._image_linear_solve_interferometry_natwt_solving(
+            A, d, data_noise_rms, inv_bool=True
+        )
+
+        model, M_inv, param_amps = self.imageLinearFit._image_linear_solve_interferometry_natwt_solving(
+            A, d, data_noise_rms, inv_bool=True
+        )
+
+        npt.assert_allclose(model, model_ref, atol=1e-7, rtol=1e-7)
+        npt.assert_allclose(M_inv, M_inv_ref, atol=5e-7, rtol=5e-7)
+        npt.assert_allclose(param_amps, param_amps_ref, atol=1e-8, rtol=1e-8)
+
+        model_ref, M_inv_ref, param_amps_ref = self.imageLinearFit_ref._image_linear_solve_interferometry_natwt_solving(
+            A, d, data_noise_rms, inv_bool=False
+        )
+
+        model, M_inv, param_amps = self.imageLinearFit._image_linear_solve_interferometry_natwt_solving(
+            A, d, data_noise_rms, inv_bool=False
+        )
+
+        npt.assert_allclose(model, model_ref, atol=1e-7, rtol=1e-7)
+        npt.assert_allclose(param_amps, param_amps_ref, atol=1e-8, rtol=1e-8)
+        assert M_inv is None and M_inv_ref is None

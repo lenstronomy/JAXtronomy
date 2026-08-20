@@ -88,6 +88,25 @@ class TestPointSourceRendering(object):
         )
         npt.assert_allclose(image, image_ref, atol=1e-8, rtol=1e-8)
 
+    def test_point_source_rendering_unconvolved_for_interferometry(self):
+
+        amp = [16.435, 10.563]
+        ra_pos, dec_pos = [0.12, 1.345], [1.563, 0.4567]
+        model = self._ps_rendering.point_source_rendering_unconvolved_for_interferometry(ra_pos, dec_pos, amp)
+        model_ref = self._ps_rendering_ref.point_source_rendering_unconvolved_for_interferometry(ra_pos, dec_pos, amp)
+        npt.assert_allclose(model, model_ref, atol=1e-8, rtol=1e-8)
+
+        amp = [92.435, 37.563]
+        ra_pos, dec_pos = [-0.12, 1.55], [2.563, 1.4567]
+        model = self._ps_rendering.point_source_rendering_unconvolved_for_interferometry(ra_pos, dec_pos, amp)
+        model_ref = self._ps_rendering_ref.point_source_rendering_unconvolved_for_interferometry(ra_pos, dec_pos, amp)
+        npt.assert_allclose(model, model_ref, atol=1e-8, rtol=1e-8)
+
+        amp = [73.435, 35.563]
+        ra_pos, dec_pos = [6.12, 5.55], [7.563, 4.4567]
+        model = self._ps_rendering.point_source_rendering_unconvolved_for_interferometry(ra_pos, dec_pos, amp)
+        model_ref = self._ps_rendering_ref.point_source_rendering_unconvolved_for_interferometry(ra_pos, dec_pos, amp)
+        npt.assert_allclose(model, model_ref, atol=1e-8, rtol=1e-8)
 
 # Same tests as above but with supersampling = 3
 class TestPointSourceRenderingSuperSampling(TestPointSourceRendering):
@@ -118,6 +137,10 @@ class TestPointSourceRenderingSuperSampling(TestPointSourceRendering):
         self._ps_rendering_ref = PointSourceRendering_ref(
             pixel_grid, supersampling_factor=None, psf=psf_class
         )
+    
+    def test_point_source_rendering_unconvolved_for_interferometry(self):
+        # supersampling not supported for interformetry
+        npt.assert_raises(ValueError, super().test_point_source_rendering_unconvolved_for_interferometry)
 
 
 class TestRaise(unittest.TestCase):
@@ -145,6 +168,10 @@ class TestRaise(unittest.TestCase):
         )
         with self.assertRaises(ValueError):
             self._ps_rendering.point_source_rendering(
+                ra_pos=[1, 1], dec_pos=[0, 1], amp=[1]
+            )
+        with self.assertRaises(ValueError):
+            self._ps_rendering.point_source_rendering_unconvolved_for_interferometry(
                 ra_pos=[1, 1], dec_pos=[0, 1], amp=[1]
             )
 
