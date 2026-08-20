@@ -5,6 +5,7 @@ from jaxtronomy.LensModel.lens_model import LensModel
 from jaxtronomy.LightModel.light_model import LightModel
 from jaxtronomy.PointSource.point_source import PointSource
 from jaxtronomy.Util import util
+from jaxtronomy.Util import primary_beam_util
 
 from lenstronomy.ImSim.image2source_mapping import Image2SourceMapping
 from lenstronomy.ImSim.differential_extinction import DifferentialExtinction
@@ -141,11 +142,9 @@ class ImageModel(object):
         # conversion of likelihood mask into 1d array
         self._mask1d = util_lenstronomy.image2array(self.likelihood_mask)
 
-        # primary beam is not supported yet
         self._pb = data_class.primary_beam
         if self._pb is not None:
-            raise ValueError("primary beam not supported in jaxtronomy")
-            # self._pb_1d = util.image2array(self._pb)
+            self._pb_1d = util.image2array(self._pb)
         else:
             self._pb_1d = None
 
@@ -220,7 +219,48 @@ class ImageModel(object):
         logL = self.Data.log_likelihood(im_sim, self.likelihood_mask, model_error)
         return logL
 
-    @partial(jit, static_argnums=(0, 5, 6, 7, 8))
+    @partial(jit, static_argnums=0)
+    def variance_map(
+        self,
+        kwargs_lens=None,
+        kwargs_source=None,
+        kwargs_lens_light=None,
+        kwargs_ps=None,
+        kwargs_extinction=None,
+        kwargs_special=None,
+    ):
+        """Map of uncertainty variances per pixel for the given model.
+
+        :param kwargs_lens: list of keyword arguments corresponding to the superposition
+            of different lens profiles
+        :param kwargs_source: list of keyword arguments corresponding to the
+            superposition of different source light profiles
+        :param kwargs_lens_light: list of keyword arguments corresponding to different
+            lens light surface brightness profiles
+        :param kwargs_ps: keyword arguments corresponding to "other" parameters, such as
+            external shear and point source image positions
+        :param kwargs_extinction: list of keyword arguments for extinction model
+        :param kwargs_special: list of special keyword arguments
+        :return: map of uncertainty variances per pixel for the given model
+        """
+        # generate image
+        im_sim = ImageModel.image(
+            self,
+            kwargs_lens,
+            kwargs_source,
+            kwargs_lens_light,
+            kwargs_ps,
+            kwargs_extinction,
+            kwargs_special,
+        )
+        model_error = self._error_map_model(
+            kwargs_lens, kwargs_ps=kwargs_ps, kwargs_special=kwargs_special
+        )
+        c_d = self.Data.C_D_model(im_sim)
+        variance_map = c_d + jnp.abs(model_error)
+        return variance_map
+
+    @partial(jit, static_argnums=(0, 5, 6, 7, 8, 9))
     def source_surface_brightness(
         self,
         kwargs_source,
@@ -228,6 +268,7 @@ class ImageModel(object):
         kwargs_extinction=None,
         kwargs_special=None,
         unconvolved=False,
+        apply_primary_beam=True,
         de_lensed=False,
         k=None,
         update_pixelbased_mapping=True,
@@ -247,6 +288,9 @@ class ImageModel(object):
             point source image in units of arcseconds
         :param unconvolved: if True: returns the unconvolved light distribution (prefect
             seeing)
+        :param apply_primary_beam: if True: returns the light distribution affected by
+            the interferometry primary beam. This only applies when the class instance
+            has a primary beam (for interferometric images).
         :param de_lensed: if True: returns the un-lensed source surface brightness
             profile, otherwise the lensed.
         :param k: integer, if set, will only return the model of the specific index
@@ -261,11 +305,12 @@ class ImageModel(object):
             kwargs_extinction=kwargs_extinction,
             kwargs_special=kwargs_special,
             unconvolved=unconvolved,
+            apply_primary_beam=apply_primary_beam,
             de_lensed=de_lensed,
             k=k,
         )
 
-    @partial(jit, static_argnums=(0, 5, 6, 7))
+    @partial(jit, static_argnums=(0, 5, 6, 7, 8))
     def _source_surface_brightness_analytical(
         self,
         kwargs_source,
@@ -273,6 +318,7 @@ class ImageModel(object):
         kwargs_extinction=None,
         kwargs_special=None,
         unconvolved=False,
+        apply_primary_beam=True,
         de_lensed=False,
         k=None,
     ):
@@ -291,6 +337,9 @@ class ImageModel(object):
             point source image in units of arcseconds
         :param unconvolved: if True: returns the unconvolved light distribution (prefect
             seeing)
+        :param apply_primary_beam: if True: returns the light distribution affected by
+            the interferometry primary beam. This only applies when the class instance
+            has a primary beam (for interferometric images).
         :param de_lensed: if True: returns the un-lensed source surface brightness
             profile, otherwise the lensed.
         :param k: integer, if set, will only return the model of the specific index
@@ -301,6 +350,7 @@ class ImageModel(object):
             kwargs_lens,
             kwargs_extinction,
             kwargs_special=kwargs_special,
+            apply_primary_beam=apply_primary_beam,
             de_lensed=de_lensed,
             k=k,
         )
@@ -310,13 +360,14 @@ class ImageModel(object):
         )
         return source_light_final
 
-    @partial(jit, static_argnums=(0, 5, 6))
+    @partial(jit, static_argnums=(0, 5, 6, 7))
     def _source_surface_brightness_analytical_numerics(
         self,
         kwargs_source,
         kwargs_lens=None,
         kwargs_extinction=None,
         kwargs_special=None,
+        apply_primary_beam=True,
         de_lensed=False,
         k=None,
     ):
@@ -333,6 +384,9 @@ class ImageModel(object):
         :param kwargs_special: optional dict including keys "delta_x_image" and
             "delta_y_image" and array/list values indicating how much to shift each
             point source image in units of arcseconds
+        :param apply_primary_beam: if True: returns the light distribution affected by
+            the interferometry primary beam. This only applies when the class instance
+            has a primary beam (for interferometric images).
         :param de_lensed: if True: returns the un-lensed source surface brightness
             profile, otherwise the lensed.
         :param k: integer, if set, will only return the model of the specific index
@@ -362,19 +416,25 @@ class ImageModel(object):
             #    kwargs_special=kwargs_special,
             # )
 
-        # multiply with primary beam before convolution (not supported yet in jaxtronomy)
-        # if self._pb is not None:
-        #    source_light *= self._pb_1d
+        # multiply with primary beam before convolution
+        if apply_primary_beam and self._pb is not None:
+            source_light *= self._pb_1d
         return source_light * self._flux_scaling
 
-    @partial(jit, static_argnums=(0, 2, 3))
-    def lens_surface_brightness(self, kwargs_lens_light, unconvolved=False, k=None):
+    @partial(jit, static_argnums=(0, 2, 3, 4))
+    def lens_surface_brightness(
+        self, kwargs_lens_light, unconvolved=False, apply_primary_beam=True, k=None
+    ):
         """Computes the lens surface brightness distribution.
 
         :param kwargs_lens_light: list of keyword arguments corresponding to different
             lens light surface brightness profiles
         :param unconvolved: if True, returns unconvolved surface brightness (perfect
             seeing), otherwise convolved with PSF kernel
+        :param apply_primary_beam: if True: returns the light distribution affected by
+            the interferometry primary beam. This only applies when the class instance
+            has a primary beam (for interferometric images).
+        :param k: int or tuple of ints that determine which lens light models to include
         :return: 2d array of surface brightness pixels
         """
 
@@ -383,22 +443,23 @@ class ImageModel(object):
             ra_grid, dec_grid, kwargs_lens_light, k=k
         )
 
-        # multiply with primary beam before convolution (not supported yet in jaxtronomy)
-        # if self._pb is not None:
-        #    lens_light *= self._pb_1d
+        # multiply with primary beam before convolution
+        if apply_primary_beam and self._pb is not None:
+            lens_light *= self._pb_1d
 
         lens_light_final = self.ImageNumerics.re_size_convolve(
             lens_light, unconvolved=unconvolved
         )
         return lens_light_final * self._flux_scaling
 
-    @partial(jit, static_argnums=(0, 4, 5))
+    @partial(jit, static_argnums=(0, 4, 5, 6))
     def point_source(
         self,
         kwargs_ps,
         kwargs_lens=None,
         kwargs_special=None,
         unconvolved=False,
+        apply_primary_beam=True,
         k=None,
     ):
         """Computes the point source positions and paints PSF convolutions on them.
@@ -412,8 +473,11 @@ class ImageModel(object):
             point source image in units of arcseconds
         :param unconvolved: bool, includes point source images if False, excludes ps if
             True
-        :param k: optional int, include only the k-th point source model. If None,
-            includes all
+        :param apply_primary_beam: if True: returns the light distribution affected by
+            the interferometry primary beam. This only applies when the class instance
+            has a primary beam (for interferometric images).
+        :param k: optional int or tuple of ints, include only the k-th point source
+            model. If None, includes all
         :return: rendered point source images
         """
         point_source_image = jnp.zeros((self.Data.num_pixel_axes))
@@ -423,6 +487,14 @@ class ImageModel(object):
         ra_pos, dec_pos = self._displace_astrometry(
             ra_pos, dec_pos, kwargs_special=kwargs_special
         )
+
+        # Scale point source amplitude (amp) by the primary beam response, if applicable.
+        if apply_primary_beam and self._pb is not None:
+            pb_values_at_ps = self._point_source_primary_beam_amp_normalization(
+                ra_pos, dec_pos
+            )
+            amp = amp * pb_values_at_ps
+
         point_source_image += self.ImageNumerics.point_source_rendering(
             ra_pos, dec_pos, amp, unconvolved=unconvolved
         )
@@ -438,6 +510,7 @@ class ImageModel(object):
         kwargs_extinction=None,
         kwargs_special=None,
         unconvolved=False,
+        apply_primary_beam=True,
         source_add=True,
         lens_light_add=True,
         point_source_add=True,
@@ -462,6 +535,9 @@ class ImageModel(object):
             point source image in units of arcseconds
         :param unconvolved: if True: returns the unconvolved light distribution (prefect
             seeing)
+        :param apply_primary_beam: if True: returns the light distribution affected by
+            the interferometry primary beam. This only applies when the class instance
+            has a primary beam (for interferometric images).
         :param source_add: if True, compute source, otherwise without
         :param lens_light_add: if True, compute lens light, otherwise without
         :param point_source_add: if True, add point sources, otherwise without
@@ -476,10 +552,14 @@ class ImageModel(object):
                 kwargs_extinction=kwargs_extinction,
                 kwargs_special=kwargs_special,
                 unconvolved=unconvolved,
+                apply_primary_beam=apply_primary_beam,
             )
         if lens_light_add is True:
             model += ImageModel.lens_surface_brightness(
-                self, kwargs_lens_light, unconvolved=unconvolved
+                self,
+                kwargs_lens_light,
+                unconvolved=unconvolved,
+                apply_primary_beam=apply_primary_beam,
             )
         if point_source_add is True:
             model += ImageModel.point_source(
@@ -488,6 +568,7 @@ class ImageModel(object):
                 kwargs_lens,
                 kwargs_special=kwargs_special,
                 unconvolved=unconvolved,
+                apply_primary_beam=apply_primary_beam,
             )
         return model
 
@@ -692,3 +773,25 @@ class ImageModel(object):
         raise ValueError(
             "Updating data class not supported in jaxtronomy. Create a new instance of ImageModel instead."
         )
+
+    @partial(jit, static_argnums=0)
+    def _point_source_primary_beam_amp_normalization(self, ra_pos, dec_pos):
+        """Interpolate primary beam response values at the point source positions, (only
+        for interferometric images). These values are used to scale the observed point
+        source amplitudes.
+
+        :param ra_pos: RA coordinates of point source(s).
+        :param dec_pos: DEC coordinates of point source(s).
+        :return: Array of primary beam response values at the given (RA, DEC).
+        """
+        x_pos, y_pos = util.map_coord2pix(
+            ra_pos,
+            dec_pos,
+            self.Data._x_at_radec_0,
+            self.Data._y_at_radec_0,
+            self.Data._transform_angle2pix,
+        )
+        pb_values = primary_beam_util.primary_beam_value_at_coords(
+            x_pos, y_pos, self._pb
+        )
+        return pb_values

@@ -36,6 +36,30 @@ def get_param_WLS(A, C_D_inv, d, inv_bool=True):
     return B, M_inv, image
 
 
+@partial(jit, static_argnums=2)
+def get_param_WLS_interferometry(M, b, inv_bool=True):
+    """Returns the linear parameters and its covariance matrix.
+
+    :param M: the interferometric equivalent of the `M` matrix in the
+        `get_param_WLS` function. inverse covariance matrix of the linear
+        parameters, Ns x Ns positive-semi-definite and symmetric (Ns = # parameters)
+    :param b: the interferometric equivalent of the `R` matrix in the
+        `get_param_WLS` function, 1-d Ns
+    :param inv_bool: boolean, whether returning also the covariance matrix of the
+        linear parameters or just solve the linear system
+    :return: param_amps: 1-d array of linear parameter values,
+        M_inv the covariance matrix of linear parameters
+    """
+    cond_inv = jnp.linalg.cond(M) < 5 / EPSILON
+    if inv_bool:
+        M_inv = jnp.where(cond_inv, _stable_inv(M), jnp.zeros_like(M))
+        param_amps = M_inv.dot(b)
+    else:
+        param_amps = jnp.where(cond_inv, _solve_stable(M, b), jnp.zeros(b.shape[0]))
+        M_inv = None
+    return param_amps, M_inv
+
+
 @jit
 def marginalisation_const(M_inv):
     """Get marginalisation constant 1/2 log(M_beta) for flat priors.

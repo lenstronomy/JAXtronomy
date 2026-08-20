@@ -30,10 +30,12 @@ class TestImageModel(object):
         sigma_bkg = 0.05  # background noise per pixel
         exp_time = 100  # exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
         num_pix = 100  # cutout pixel size
+        antenna_primary_beam = np.ones((num_pix, num_pix)) * 1.1
         delta_pix = 0.05  # pixel size in arcsec (area per pixel = delta_pix**2)
         kwargs_data = sim_util.data_configure_simple(
             num_pix, delta_pix, exp_time, sigma_bkg, inverse=True
         )
+
         self.data_class = ImageData(**kwargs_data)
         self.data_class_ref = ImageData_ref(**kwargs_data)
 
@@ -155,7 +157,7 @@ class TestImageModel(object):
         likelihood_mask[25][::3] -= likelihood_mask[25][::3]
         self.likelihood_mask = likelihood_mask
 
-        # Create 2 class instances with likelihood mask and w/o point source
+        # Create 2 class instances with likelihood mask, w/o point source, w/o primary beam
         self.image_model = ImageModel(
             self.data_class,
             self.psf_class_gaussian,
@@ -175,9 +177,13 @@ class TestImageModel(object):
             likelihood_mask=likelihood_mask,
         )
 
-        # Create 2 class instances without likelihood mask and with point source
+        # Create 2 class instances w/o likelihood mask, with point source, with primary beam
+        kwargs_data["antenna_primary_beam"] = antenna_primary_beam
+        self.data_class2 = ImageData(**kwargs_data)
+        self.data_class2_ref = ImageData_ref(**kwargs_data)
+        kwargs_numerics["supersampling_factor"] = 1
         self.image_model_nomask = ImageModel(
-            self.data_class,
+            self.data_class2,
             self.psf_class_gaussian,
             lens_model_class,
             source_model_class,
@@ -186,7 +192,7 @@ class TestImageModel(object):
             kwargs_numerics=kwargs_numerics,
         )
         self.image_model_nomask_ref = ImageModel_ref(
-            self.data_class_ref,
+            self.data_class2_ref,
             self.psf_class_gaussian,
             lens_model_class_ref,
             source_model_class_ref,
@@ -221,14 +227,6 @@ class TestImageModel(object):
             self.psf_class_gaussian,
         )
         assert image_model._flux_scaling == 1
-        assert image_model._pb is None
-        assert image_model._pb_1d is None
-
-        # primary beam not supported
-        self.data_class._pb = np.ones((100, 100))
-        npt.assert_raises(
-            ValueError, ImageModel, self.data_class, self.psf_class_gaussian
-        )
 
     def test_likelihood_data_given_model(self):
         logL = self.image_model.likelihood_data_given_model(
@@ -333,6 +331,23 @@ class TestImageModel(object):
             self.kwargs_ps,
         )
         assert len(grad_log[2]) == len(self.kwargs_ps[2])
+
+    def test_variance_map(self):
+        var_map = self.image_model_nomask.variance_map(
+            self.kwargs_lens2,
+            self.kwargs_source,
+            self.kwargs_lens_light,
+            self.kwargs_ps,
+            kwargs_special=self.kwargs_special,
+        )
+        var_map_ref = self.image_model_nomask_ref.variance_map(
+            self.kwargs_lens2,
+            self.kwargs_source,
+            self.kwargs_lens_light,
+            self.kwargs_ps,
+            kwargs_special=self.kwargs_special,
+        )
+        npt.assert_array_almost_equal(var_map, var_map_ref, decimal=8)
 
     def test_source_surface_brightness(self):
         flux = self.image_model.source_surface_brightness(
@@ -576,6 +591,21 @@ class TestImageModel(object):
         image_ref = self.image_model_ref.array_masked2image(array_ref)
         npt.assert_array_almost_equal(image, image_ref, decimal=8)
         npt.assert_array_almost_equal(image, image_0 * self.likelihood_mask, decimal=8)
+
+    def test_point_source_primary_beam_amp_normalization(self):
+        ra_pos = np.array([-0.3, -0.5, 0.3, 0.4])
+        dec_pos = np.array([-0.5, 0.4, 0.3, -0.3])
+        pb_values_ref = (
+            self.image_model_nomask_ref._point_source_primary_beam_amp_normalization(
+                ra_pos, dec_pos
+            )
+        )
+        pb_values = (
+            self.image_model_nomask._point_source_primary_beam_amp_normalization(
+                ra_pos, dec_pos
+            )
+        )
+        npt.assert_array_almost_equal(pb_values, pb_values_ref, decimal=8)
 
     def test_raises(self):
         # check positive flux not supported in jaxtronomy

@@ -91,9 +91,6 @@ class ImageData(PixelGrid, ImageNoise, AngularSensitivity):
             when modeling multiple exposures that have different magnitude zero points (or flux normalizations) but demand
             the same model normalization
         """
-        if antenna_primary_beam is not None:
-            raise ValueError("primary beam is not supported in jaxtronomy")
-
         nx, ny = np.shape(image_data)
         if transform_pix2angle is None:
             transform_pix2angle = np.array([[1, 0], [0, 1]])
@@ -119,13 +116,12 @@ class ImageData(PixelGrid, ImageNoise, AngularSensitivity):
             flux_scaling=flux_scaling,
         )
 
-        # TODO: Not supported in jaxtronomy
-        # if antenna_primary_beam is not None:
-        #    pbx, pby = np.shape(antenna_primary_beam)
-        #    if (pbx, pby) != (nx, ny):
-        #        raise ValueError(
-        #            "The primary beam should have the same size with the image data!"
-        #        )
+        if antenna_primary_beam is not None:
+            pbx, pby = np.shape(antenna_primary_beam)
+            if (pbx, pby) != (nx, ny):
+                raise ValueError(
+                    "The primary beam should have the same size with the image data!"
+                )
         AngularSensitivity.__init__(self, antenna_primary_beam)
 
         self._logL_constant = log_likelihood_constant
