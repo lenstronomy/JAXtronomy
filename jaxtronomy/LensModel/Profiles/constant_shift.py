@@ -1,0 +1,58 @@
+__author__ = "sibirrer"
+
+from jax import jit, numpy as jnp
+
+from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
+
+__all__ = ["Shift"]
+
+
+class Shift(LensProfileBase):
+    """Lens model with a constant shift of the deflection field."""
+
+    param_names = ["alpha_x", "alpha_y"]
+    lower_limit_default = {"alpha_x": -1000, "alpha_y": -1000}
+    upper_limit_default = {"alpha_x": 1000, "alpha_y": 1000}
+
+    @staticmethod
+    @jit
+    def function(x, y, alpha_x, alpha_y):
+        """
+
+        :param x: coordinate in image plane (angle)
+        :param y: coordinate in image plane (angle)
+        :param alpha_x: shift in x-direction (angle)
+        :param alpha_y: shift in y-direction (angle)
+        :return: lensing potential
+        """
+
+        return alpha_x * x + alpha_y * y
+
+    @staticmethod
+    @jit
+    def derivatives(x, y, alpha_x, alpha_y):
+        """
+
+        :param x: coordinate in image plane (angle)
+        :param y: coordinate in image plane (angle)
+        :param alpha_x: shift in x-direction (angle)
+        :param alpha_y: shift in y-direction (angle)
+        :return: deflection in x- and y-direction
+        """
+        f_x = jnp.ones_like(x) * alpha_x
+        f_y = jnp.ones_like(x) * alpha_y
+        return f_x, f_y
+
+    @staticmethod
+    @jit
+    def hessian(x, y, alpha_x, alpha_y):
+        """
+
+        :param x: coordinate in image plane (angle)
+        :param y: coordinate in image plane (angle)
+        :param alpha_x: shift in x-direction (angle)
+        :param alpha_y: shift in y-direction (angle)
+        :return: hessian elements f_xx, f_xy, f_yx, f_yy
+        """
+        f_xx, f_xy, f_yx, f_yy = 0, 0, 0, 0
+        return f_xx, f_xy, f_yx, f_yy

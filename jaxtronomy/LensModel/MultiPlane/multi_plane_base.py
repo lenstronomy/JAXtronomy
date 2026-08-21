@@ -25,6 +25,9 @@ class MultiPlaneBase(ProfileListBase):
         z_interp_stop=None,
         num_z_interp=100,
         profile_kwargs_list=None,
+        perturber_model_list=None,
+        ra_0=0,
+        dec_0=0,
     ):
         """
         A description of the recursive multi-plane formalism can be found e.g. here: https://arxiv.org/abs/1312.1536
@@ -42,6 +45,12 @@ class MultiPlaneBase(ProfileListBase):
         :param profile_kwargs_list: list of dicts, keyword arguments used to initialize profile classes
             in the same order of the lens_model_list. If any of the profile_kwargs are None, then that
             profile will be initialized using default settings.
+        :param perturber_model_list: list of deflector models that are treated as perturbations
+            (subtract shear and convergence contributions at ra_0/dec_0)
+        :type perturber_model_list: None or list of bools
+        :param ra_0: RA coordinate for which perturber models have zero shear and convergence contributions
+        :param dec_0: DEC coordinate for which perturber models have zero shear and convergence contributions
+            (usually center of the main deflector)
         """
         self._lens_model_list = lens_model_list
 
@@ -70,6 +79,9 @@ class MultiPlaneBase(ProfileListBase):
             lens_redshift_list=lens_redshift_list,
             z_source_convention=z_source_convention,
             profile_kwargs_list=profile_kwargs_list,
+            perturber_model_list=perturber_model_list,
+            ra_0=ra_0,
+            dec_0=dec_0,
         )
 
         if len(self._lens_model_list) < 1:

@@ -22,10 +22,13 @@ class TestLensModel(object):
                 "center_y": 0.0,
                 "e1": 0,
                 "e2": 0,
+            },
+            {
+                "theta_E": 0.111,
             }
         ]
-        self.lensModel = LensModel(["EPL"])
-        self.lensModel_ref = LensModel_ref(["EPL"])
+        self.lensModel = LensModel(["EPL", "SIS"], perturber_model_list=[False, True])
+        self.lensModel_ref = LensModel_ref(["EPL", "SIS"], perturber_model_list=[False, True])
         self.x = np.array([-1.5, -0.3, 1.1, 1.3, 2.7])
         self.y = np.array([-1.1, -0.6, 0.7, 1.2, 1.9])
 
@@ -45,7 +48,7 @@ class TestLensModel(object):
         kwargs = [{"alpha_Rs": 1, "Rs": 0.5, "center_x": 0, "center_y": 0}]
         value = lensModel.potential(self.x, self.y, kwargs)
         value_ref = lensModel_ref.potential(self.x, self.y, kwargs)
-        npt.assert_array_almost_equal(value, value_ref, decimal=6)
+        npt.assert_array_almost_equal(value, value_ref, decimal=7)
 
         lens_model_list = ["SIS", "SIS"]
         lensModel = LensModel(lens_model_list, decouple_multi_plane=True)
@@ -88,28 +91,28 @@ class TestLensModel(object):
         output = lensModel.kappa(self.x, self.y, kwargs=kwargs)
         output_ref = lensModel_ref.kappa(self.x, self.y, kwargs=kwargs)
         npt.assert_array_almost_equal(
-            output, np.ones_like(output) * kappa_ext, decimal=6
+            output, np.ones_like(output) * kappa_ext, decimal=7
         )
-        npt.assert_array_almost_equal(output, output_ref, decimal=6)
+        npt.assert_array_almost_equal(output, output_ref, decimal=7)
 
     def test_potential(self):
         output = self.lensModel.potential(self.x, self.y, kwargs=self.kwargs)
         output_ref = self.lensModel_ref.potential(self.x, self.y, kwargs=self.kwargs)
-        npt.assert_array_almost_equal(output, output_ref, decimal=6)
+        npt.assert_array_almost_equal(output, output_ref, decimal=7)
 
     def test_alpha(self):
         output1, output2 = self.lensModel.alpha(self.x, self.y, kwargs=self.kwargs)
         output1_ref, output2_ref = self.lensModel_ref.alpha(
             self.x, self.y, kwargs=self.kwargs
         )
-        npt.assert_array_almost_equal(output1, output1_ref, decimal=6)
-        npt.assert_array_almost_equal(output2, output2_ref, decimal=6)
+        npt.assert_array_almost_equal(output1, output1_ref, decimal=7)
+        npt.assert_array_almost_equal(output2, output2_ref, decimal=7)
 
         output1_diff, output2_diff = self.lensModel.alpha(
             self.x, self.y, kwargs=self.kwargs, diff=0.00001
         )
-        npt.assert_array_almost_equal(output1_diff, output1, decimal=5)
-        npt.assert_array_almost_equal(output2_diff, output2, decimal=5)
+        npt.assert_array_almost_equal(output1_diff, output1, decimal=7)
+        npt.assert_array_almost_equal(output2_diff, output2, decimal=7)
 
     def test_gamma(self):
         lensModel = LensModel(lens_model_list=["SHEAR"])
@@ -118,17 +121,17 @@ class TestLensModel(object):
         kwargs = [{"gamma1": gamma1, "gamma2": gamma2}]
         e1_out, e2_out = lensModel.gamma(self.x, self.y, kwargs=kwargs)
         e1_out_ref, e2_out_ref = lensModel_ref.gamma(self.x, self.y, kwargs=kwargs)
-        npt.assert_array_almost_equal(e1_out, np.ones_like(e1_out) * gamma1, decimal=6)
-        npt.assert_array_almost_equal(e2_out, np.ones_like(e2_out) * gamma2, decimal=6)
-        npt.assert_array_almost_equal(e1_out, e1_out_ref, decimal=6)
-        npt.assert_array_almost_equal(e2_out, e2_out_ref, decimal=6)
+        npt.assert_array_almost_equal(e1_out, np.ones_like(e1_out) * gamma1, decimal=7)
+        npt.assert_array_almost_equal(e2_out, np.ones_like(e2_out) * gamma2, decimal=7)
+        npt.assert_array_almost_equal(e1_out, e1_out_ref, decimal=7)
+        npt.assert_array_almost_equal(e2_out, e2_out_ref, decimal=7)
 
     def test_magnification(self):
         output = self.lensModel.magnification(self.x, self.y, kwargs=self.kwargs)
         output_ref = self.lensModel_ref.magnification(
             self.x, self.y, kwargs=self.kwargs
         )
-        npt.assert_array_almost_equal(output, output_ref, decimal=6)
+        npt.assert_array_almost_equal(output, output_ref, decimal=7)
 
     def test_flexion(self):
         f_xxx, f_xxy, f_xyy, f_yyy = self.lensModel.flexion(
@@ -137,10 +140,10 @@ class TestLensModel(object):
         f_xxx_ref, f_xxy_ref, f_xyy_ref, f_yyy_ref = self.lensModel_ref.flexion(
             self.x, self.y, kwargs=self.kwargs, hessian_diff=True
         )
-        npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=6)
-        npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=6)
-        npt.assert_array_almost_equal(f_xyy, f_xyy_ref, decimal=6)
-        npt.assert_array_almost_equal(f_yyy, f_yyy_ref, decimal=6)
+        npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=7)
+        npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=7)
+        npt.assert_array_almost_equal(f_xyy, f_xyy_ref, decimal=7)
+        npt.assert_array_almost_equal(f_yyy, f_yyy_ref, decimal=7)
 
         f_xxx, f_xxy, f_xyy, f_yyy = self.lensModel.flexion(
             self.x, self.y, kwargs=self.kwargs, hessian_diff=False
@@ -148,10 +151,10 @@ class TestLensModel(object):
         f_xxx_ref, f_xxy_ref, f_xyy_ref, f_yyy_ref = self.lensModel.flexion(
             self.x, self.y, kwargs=self.kwargs, hessian_diff=False
         )
-        npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=6)
-        npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=6)
-        npt.assert_array_almost_equal(f_xyy, f_xyy_ref, decimal=6)
-        npt.assert_array_almost_equal(f_yyy, f_yyy_ref, decimal=6)
+        npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=7)
+        npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=7)
+        npt.assert_array_almost_equal(f_xyy, f_xyy_ref, decimal=7)
+        npt.assert_array_almost_equal(f_yyy, f_yyy_ref, decimal=7)
 
     def test_ray_shooting(self):
         delta_x, delta_y = self.lensModel.ray_shooting(
@@ -160,8 +163,8 @@ class TestLensModel(object):
         delta_x_ref, delta_y_ref = self.lensModel_ref.ray_shooting(
             self.x, self.y, kwargs=self.kwargs
         )
-        npt.assert_array_almost_equal(delta_x, delta_x_ref, decimal=6)
-        npt.assert_array_almost_equal(delta_y, delta_y_ref, decimal=6)
+        npt.assert_array_almost_equal(delta_x, delta_x_ref, decimal=7)
+        npt.assert_array_almost_equal(delta_y, delta_y_ref, decimal=7)
 
     def test_arrival_time(self):
         z_lens = 0.5
@@ -315,15 +318,15 @@ class TestLensModel(object):
             x, y, kwargs, diff=diff, diff_method="cross"
         )
         f_xx, f_xy, f_yx, f_yy = lens_model.hessian(x, y, kwargs, diff=None)
-        npt.assert_array_almost_equal(f_xx_cr, f_xx, decimal=5)
-        npt.assert_array_almost_equal(f_xy_cr, f_xy, decimal=5)
-        npt.assert_array_almost_equal(f_yx_cr, f_yx, decimal=5)
-        npt.assert_array_almost_equal(f_yy_cr, f_yy, decimal=5)
+        npt.assert_array_almost_equal(f_xx_cr, f_xx, decimal=7)
+        npt.assert_array_almost_equal(f_xy_cr, f_xy, decimal=7)
+        npt.assert_array_almost_equal(f_yx_cr, f_yx, decimal=7)
+        npt.assert_array_almost_equal(f_yy_cr, f_yy, decimal=7)
 
-        npt.assert_array_almost_equal(f_xx_sq, f_xx, decimal=5)
-        npt.assert_array_almost_equal(f_xy_sq, f_xy, decimal=5)
-        npt.assert_array_almost_equal(f_yx_sq, f_yx, decimal=5)
-        npt.assert_array_almost_equal(f_yy_sq, f_yy, decimal=5)
+        npt.assert_array_almost_equal(f_xx_sq, f_xx, decimal=7)
+        npt.assert_array_almost_equal(f_xy_sq, f_xy, decimal=7)
+        npt.assert_array_almost_equal(f_yx_sq, f_yx, decimal=7)
+        npt.assert_array_almost_equal(f_yy_sq, f_yy, decimal=7)
 
     # def test_hessian_z1z2(self):
     #    z_source = 1.5
@@ -360,10 +363,10 @@ class TestLensModel(object):
     #    ) = multi_plane.hessian_z1z2(
     #        z1=z1, z2=z2, theta_x=theta_x, theta_y=theta_y, kwargs_lens=kwargs_lens
     #    )
-    #    npt.assert_array_almost_equal(f_xx, f_xx_expected, decimal=5)
-    #    npt.assert_array_almost_equal(f_xy, f_xy_expected, decimal=5)
-    #    npt.assert_array_almost_equal(f_yx, f_yx_expected, decimal=5)
-    #    npt.assert_array_almost_equal(f_yy, f_yy_expected, decimal=5)
+    #    npt.assert_array_almost_equal(f_xx, f_xx_expected, decimal=7)
+    #    npt.assert_array_almost_equal(f_xy, f_xy_expected, decimal=7)
+    #    npt.assert_array_almost_equal(f_yx, f_yx_expected, decimal=7)
+    #    npt.assert_array_almost_equal(f_yy, f_yy_expected, decimal=7)
 
 
 class TestRaise(unittest.TestCase):
