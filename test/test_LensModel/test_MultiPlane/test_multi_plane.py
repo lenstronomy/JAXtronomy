@@ -30,7 +30,7 @@ class TestMultiPlane(object):
             cosmology_model="FlatwCDM",
             perturber_model_list=perturber_model_list,
             ra_0=0.321,
-            dec_0=-0.123
+            dec_0=-0.123,
         )
 
         self.multiplane_ref = MultiPlane_ref(
@@ -45,7 +45,7 @@ class TestMultiPlane(object):
             cosmology_sampling=False,
             perturber_model_list=perturber_model_list,
             ra_0=0.321,
-            dec_0=-0.123
+            dec_0=-0.123,
         )
 
         kwargs_nfw1 = {"Rs": 1.3, "alpha_Rs": 2.18, "center_x": 0.1, "center_y": -2.1}

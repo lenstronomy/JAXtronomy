@@ -1,6 +1,8 @@
 __author__ = "sibirrer"
 
-from lenstronomy.LensModel.Profiles.perturber_model import PerturberModel as PerturberModel_ref
+from lenstronomy.LensModel.Profiles.perturber_model import (
+    PerturberModel as PerturberModel_ref,
+)
 from lenstronomy.LensModel.Profiles.sis import SIS as SIS_ref
 
 from jaxtronomy.LensModel.Profiles.perturber_model import PerturberModel
@@ -9,6 +11,7 @@ from jaxtronomy.LensModel.Profiles.sis import SIS
 import numpy as np
 import numpy.testing as npt
 import pytest
+
 
 class TestPerturberModel(object):
     """Tests the PerturberModel methods."""

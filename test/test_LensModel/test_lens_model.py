@@ -25,10 +25,12 @@ class TestLensModel(object):
             },
             {
                 "theta_E": 0.111,
-            }
+            },
         ]
         self.lensModel = LensModel(["EPL", "SIS"], perturber_model_list=[False, True])
-        self.lensModel_ref = LensModel_ref(["EPL", "SIS"], perturber_model_list=[False, True])
+        self.lensModel_ref = LensModel_ref(
+            ["EPL", "SIS"], perturber_model_list=[False, True]
+        )
         self.x = np.array([-1.5, -0.3, 1.1, 1.3, 2.7])
         self.y = np.array([-1.1, -0.6, 0.7, 1.2, 1.9])
 
