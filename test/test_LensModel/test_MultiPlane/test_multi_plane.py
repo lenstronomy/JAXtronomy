@@ -14,6 +14,7 @@ class TestMultiPlane(object):
     def setup_method(self):
         z_source = 3.5
         lens_model_list = ["NFW", "NIE", "NFW", "NFW", "NFW"]
+        perturber_model_list = [False, False, False, False, True]
         redshift_list = [0.5, 1.1, 1.1, 1.5, 1.3]
         cosmo = FlatwCDM(H0=70, Om0=0.3, w0=-1)
         self.multiplane = MultiPlane(
@@ -27,6 +28,9 @@ class TestMultiPlane(object):
             cosmo=None,
             cosmology_sampling=False,
             cosmology_model="FlatwCDM",
+            perturber_model_list=perturber_model_list,
+            ra_0=0.321,
+            dec_0=-0.123,
         )
 
         self.multiplane_ref = MultiPlane_ref(
@@ -39,6 +43,9 @@ class TestMultiPlane(object):
             z_lens_convention=0.5,
             cosmo=cosmo,
             cosmology_sampling=False,
+            perturber_model_list=perturber_model_list,
+            ra_0=0.321,
+            dec_0=-0.123,
         )
 
         kwargs_nfw1 = {"Rs": 1.3, "alpha_Rs": 2.18, "center_x": 0.1, "center_y": -2.1}
