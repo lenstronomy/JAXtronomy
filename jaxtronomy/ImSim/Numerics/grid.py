@@ -126,8 +126,9 @@ class AdaptiveGrid(Coordinates1D):
 
     @partial(jit, static_argnums=(0, 2))
     def flux_array2image_low_high(self, flux_array, high_res_return=True):
-        """Returns the low res and high res images. The high res implementation differs
-        from lenstronomy in that non-supersampled pixels also have their values set (in
+        """Returns the low res and high res images.
+
+        The high res implementation differs from lenstronomy in that non-supersampled pixels also have their values set (in
         lenstronomy they are zero).
 
         :param flux_array: 1d array of low and high resolution flux values corresponding
@@ -155,7 +156,6 @@ class AdaptiveGrid(Coordinates1D):
         :param supersampled_values: values of the supersampled sub-pixels
         :return: 2d image
         """
-
         array = jnp.zeros_like(self._x_grid)
         array = array.at[self._low_res_indexes1d].set(low_res_values)
         array_low_res_partial = self._average_subgrid(supersampled_values)
@@ -164,8 +164,9 @@ class AdaptiveGrid(Coordinates1D):
 
     @partial(jit, static_argnums=0)
     def _high_res_image(self, low_res_values, supersampled_values):
-        """Returns the high res image. This implementation differs from lenstronomy in
-        that non-supersampled pixels also have their values set (in lenstronomy they are
+        """Returns the high res image.
+
+        This implementation differs from lenstronomy in that non-supersampled pixels also have their values set (in lenstronomy they are
         zero).
 
         :param low_res_values: 1d array of non supersampled values corresponding to

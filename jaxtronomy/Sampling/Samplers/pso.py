@@ -9,9 +9,10 @@ __all__ = ["ParticleSwarmOptimizer"]
 
 
 class ParticleSwarmOptimizer(PSO_lenstronomy):
-    """Optimizer using a swarm of particles. Same as the PSO from lenstronomy, but the
-    input log likelihood function is assumed to be parallelized across CPU cores (e.g.
-    pmap(f)).
+    """Optimizer using a swarm of particles.
+
+    Same as the PSO from lenstronomy, but the input log likelihood function is assumed
+    to be parallelized across CPU cores (e.g. pmap(f)).
 
     The PSO algorithm in this class does not happen within JIT, since jit(pmap(f)) is
     generally not recommended and can lead to unwanted side effects (see discussion at

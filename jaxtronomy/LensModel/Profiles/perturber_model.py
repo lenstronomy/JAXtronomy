@@ -37,7 +37,6 @@ class PerturberModel(LensProfileBase):
         :param kwargs: keyword arguments for the profile class supplied at initialization
         :return: lensing potential of perturber with the first and second order contributions subtracted
         """
-
         f_ = self._profile.function(x, y, **kwargs)
         alpha_x, alpha_y = self._profile.derivatives(self._ra_0, self._dec_0, **kwargs)
         f_xx, f_xy, f_yx, f_yy = self._profile.hessian(
