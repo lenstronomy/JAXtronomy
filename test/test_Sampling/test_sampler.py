@@ -1,4 +1,5 @@
 import pytest
+import os
 import numpy as np, numpy.testing as npt
 import lenstronomy.Util.simulation_util as sim_util
 from lenstronomy.ImSim.image_model import ImageModel
@@ -171,6 +172,45 @@ class TestSampler(object):
         assert len(samples) == n_walkers * n_run
         assert len(dist) == len(samples)
 
+        # test backend filename and starting from backend
+        # 1) run a chain specifiying a backup file name
+        backend_filename = "test_mcmc_emcee.h5"
+        samples_1, dist_1 = self.sampler.mcmc_emcee(
+            n_walkers,
+            n_run,
+            n_burn,
+            mean_start,
+            sigma_start,
+            backend_filename=backend_filename,
+        )
+        assert len(samples_1) == n_walkers * n_run
+        # 2) run a chain starting from the backup of previous run
+        samples_2, dist_2 = self.sampler.mcmc_emcee(
+            n_walkers,
+            int(n_run * 1.5),
+            n_burn,
+            mean_start,
+            sigma_start,
+            backend_filename=backend_filename,
+            start_from_backend=True,
+        )
+        assert len(samples_2) == len(samples_1) + n_walkers * int(n_run * 1.5)
+        assert len(dist_2) == len(samples_2)
+
+        # 3) reset the backend by setting start_from_backend false
+        samples_3, dist_3 = self.sampler.mcmc_emcee(
+            n_walkers,
+            n_run,
+            n_burn,
+            mean_start,
+            sigma_start,
+            backend_filename=backend_filename,
+            start_from_backend=False,
+        )
+        assert len(samples_3) == len(samples_1)
+        assert len(dist_3) == len(samples_3)
+        os.remove(backend_filename)  # remove the backup file created above
+
         # check that an error is raised when mpi is true
         npt.assert_raises(
             ValueError,
@@ -195,28 +235,6 @@ class TestSampler(object):
             threadCount=2,
         )
 
-        # starting from backend is not supported
-        npt.assert_raises(
-            ValueError,
-            self.sampler.mcmc_emcee,
-            n_walkers,
-            n_run,
-            n_burn,
-            mean_start,
-            sigma_start,
-            start_from_backend=True,
-        )
-        npt.assert_raises(
-            ValueError,
-            self.sampler.mcmc_emcee,
-            n_walkers,
-            n_run,
-            n_burn,
-            mean_start,
-            sigma_start,
-            backend_filename="sjd",
-        )
-
         # check that a warning is raised when the number of MCMC walkers is not divisible by
         # two times the number of CPU devices for parallelization
         npt.assert_warns(
@@ -236,13 +254,17 @@ class TestSampler(object):
             "fake_backend",
             self.Likelihood.logL,
             threadCount=1,
+            vectorization_batch_size=0,
         )
 
         def logL_func(args):
             return args**2 - 4
 
         new_logL_func = prepare_logL_func(
-            backend="gpu", logL_func=logL_func, threadCount=1
+            backend="gpu",
+            logL_func=logL_func,
+            threadCount=None,
+            vectorization_batch_size=0,
         )
 
         x = np.array([[1, 2], [3, 4]])
@@ -251,7 +273,10 @@ class TestSampler(object):
         npt.assert_allclose(expected, logL, atol=1e-16, rtol=1e-16)
 
         new_logL_func = prepare_logL_func(
-            backend="cpu", logL_func=logL_func, threadCount=1
+            backend="cpu",
+            logL_func=logL_func,
+            threadCount=1,
+            vectorization_batch_size=None,
         )
         logL = new_logL_func(x)
         npt.assert_allclose(expected, logL, atol=1e-16, rtol=1e-16)

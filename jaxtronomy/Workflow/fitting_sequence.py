@@ -14,6 +14,7 @@ from lenstronomy.Sampling.Samplers.nautilus_sampler import NautilusSampler
 from lenstronomy.Sampling.Samplers.cobaya_sampler import CobayaSampler
 
 import copy
+import jax
 import numpy as np
 import lenstronomy.Util.analysis_util as analysis_util
 
@@ -99,6 +100,10 @@ class FittingSequence(object):
         """
         chain_list = []
         for i, fitting in enumerate(fitting_list):
+            # clear the cache of compiled functions before each iteration to free up memory
+            # since a new Likelihood class is created each time, functions will have to be recompiled anyways
+            jax.clear_caches()
+
             fitting_type = fitting[0]
             kwargs = fitting[1]
 
@@ -357,6 +362,7 @@ class FittingSequence(object):
         n_walkers=None,
         sigma_scale=1,
         threadCount=1,
+        vectorization_batch_size=None,
         init_samples=None,
         re_use_samples=True,
         sampler_type="emcee",
@@ -375,6 +381,9 @@ class FittingSequence(object):
         :param sigma_scale: scaling of the initial parameter spread relative to the
             width in the initial settings
         :param threadCount: number of CPU threads. If MPI option is set, threadCount=1
+        :param vectorization_batch_size: int, only relevant for GPU, determines the number of
+            particles/walkers whose logL will be computed simultaneously. None defaults to one
+            particle at a time and 0 means to compute all particles/walkers simultaneously.
         :param init_samples: initial sample from where to start the MCMC process
         :param re_use_samples: bool, if True, re-uses the samples described in
             init_samples.nOtherwise starts from scratch.
@@ -445,6 +454,7 @@ class FittingSequence(object):
                 sigma_start,
                 mpi=self._mpi,
                 threadCount=threadCount,
+                vectorization_batch_size=vectorization_batch_size,
                 progress=progress,
                 initpos=initpos,
                 backend_filename=backend_filename,
@@ -521,6 +531,7 @@ class FittingSequence(object):
         sigma_scale=1,
         print_key="PSO",
         threadCount=1,
+        vectorization_batch_size=None,
     ):
         """Particle Swarm Optimization.
 
@@ -532,6 +543,10 @@ class FittingSequence(object):
         :param threadCount: number of CPU threads. If MPI option is set, threadCount=1
         :param rng_seed: int, seed used for randomness in PSO. If None, a random seed is
             generated.
+        :param vectorization_batch_size: int, only relevant for GPU, determines the
+            number of particles/walkers whose logL will be computed simultaneously. None
+            defaults to one particle at a time and 0 means to compute all
+            particles/walkers simultaneously.
         :return: result of the best fit, the PSO chain of the best fit parameter after
             each iteration [lnlikelihood, parameters, velocities], list of parameters in
             same order as in chain
@@ -559,6 +574,7 @@ class FittingSequence(object):
             upper_start,
             init_pos=init_pos,
             threadCount=threadCount,
+            vectorization_batch_size=vectorization_batch_size,
             mpi=self._mpi,
             print_key=print_key,
             verbose=self._verbose,

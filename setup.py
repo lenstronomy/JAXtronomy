@@ -1,13 +1,13 @@
 from setuptools import setup, find_packages
 
 requires = [
-    "lenstronomy>=1.13.6",
-    "numpy>=2.0.0",
+    "lenstronomy>=1.14.1",
+    "numpy>=2.3.0",
     "jax>=0.10.0",
     "numpyro>=0.21.0",
     "optax>=0.2.5",
     "tqdm",
-    "scipy",
+    "scipy>=1.16",
     "dynesty",
     "zeus-mcmc",
     "cobaya",
@@ -19,7 +19,7 @@ readme = open("README.rst").read()
 
 setup(
     name="jaxtronomy",
-    version="0.1.3",
+    version="0.1.4",
     python_requires=">=3.11",
     url="https://github.com/lenstronomy/JAXtronomy",
     author="jaxtronomy developers",
@@ -37,5 +37,7 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
     ],
 )

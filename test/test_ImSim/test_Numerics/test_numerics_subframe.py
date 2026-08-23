@@ -7,7 +7,7 @@ import lenstronomy.Util.kernel_util as kernel_util
 
 from jaxtronomy.ImSim.Numerics.convolution import (
     PixelKernelConvolution,
-    SubgridKernelConvolution,
+    PartialSubgridKernelConvolution,
     GaussianConvolution,
 )
 from jaxtronomy.ImSim.Numerics.grid import RegularGrid
@@ -172,7 +172,7 @@ class TestNumericsSubFrame(object):
             convolution_type="fft",
         )
         assert numerics.grid_supersampling_factor == 5
-        assert isinstance(numerics.convolution_class, SubgridKernelConvolution)
+        assert isinstance(numerics.convolution_class, PartialSubgridKernelConvolution)
         assert isinstance(numerics.grid_class, RegularGrid)
 
         numerics_ref = NumericsSubFrame_ref(
@@ -305,13 +305,6 @@ class TestNumericsSubFrame(object):
             pixel_grid=self.pixel_grid,
             psf=self.psf_class_none,
             compute_mode="incorrect",
-        )
-        npt.assert_raises(
-            ValueError,
-            NumericsSubFrame,
-            pixel_grid=self.pixel_grid,
-            psf=self.psf_class_none,
-            compute_mode="adaptive",
         )
         self.psf_class_none.psf_type = "incorrect"
         npt.assert_raises(

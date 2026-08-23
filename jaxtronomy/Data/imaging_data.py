@@ -2,12 +2,13 @@ import numpy as np
 from jax import jit, numpy as jnp
 
 from lenstronomy.Data.pixel_grid import PixelGrid
+from lenstronomy.Data.angular_sensitivity import AngularSensitivity
 from jaxtronomy.Data.image_noise import ImageNoise, covariance_matrix
 
 __all__ = ["ImageData"]
 
 
-class ImageData(PixelGrid, ImageNoise):
+class ImageData(PixelGrid, ImageNoise, AngularSensitivity):
     """Class to handle the data, coordinate system and masking, including convolution
     with various numerical precisions.
 
@@ -90,9 +91,6 @@ class ImageData(PixelGrid, ImageNoise):
             when modeling multiple exposures that have different magnitude zero points (or flux normalizations) but demand
             the same model normalization
         """
-        if antenna_primary_beam is not None:
-            raise ValueError("primary beam is not supported in jaxtronomy")
-
         nx, ny = np.shape(image_data)
         if transform_pix2angle is None:
             transform_pix2angle = np.array([[1, 0], [0, 1]])
@@ -101,12 +99,11 @@ class ImageData(PixelGrid, ImageNoise):
         transform_pix2angle_rot = np.dot(transform_pix2angle, rot_matrix)
         PixelGrid.__init__(
             self,
-            nx,
-            ny,
-            transform_pix2angle_rot,
-            ra_at_xy_0 + ra_shift,
-            dec_at_xy_0 + dec_shift,
-            antenna_primary_beam,
+            nx=nx,
+            ny=ny,
+            transform_pix2angle=transform_pix2angle_rot,
+            ra_at_xy_0=ra_at_xy_0 + ra_shift,
+            dec_at_xy_0=dec_at_xy_0 + dec_shift,
         )
         ImageNoise.__init__(
             self,
@@ -118,6 +115,14 @@ class ImageData(PixelGrid, ImageNoise):
             verbose=False,
             flux_scaling=flux_scaling,
         )
+
+        if antenna_primary_beam is not None:
+            pbx, pby = np.shape(antenna_primary_beam)
+            if (pbx, pby) != (nx, ny):
+                raise ValueError(
+                    "The primary beam should have the same size with the image data!"
+                )
+        AngularSensitivity.__init__(self, antenna_primary_beam)
 
         self._logL_constant = log_likelihood_constant
         self._logL_method = likelihood_method
@@ -144,7 +149,8 @@ class ImageData(PixelGrid, ImageNoise):
             raise ValueError(
                 f"New data shape {image_data.shape} should match old data shape {self.data.shape}"
             )
-        self.data = image_data
+        # cast to native byte order so big-endian (e.g., FITS >f8) inputs are accepted
+        self.data = np.asarray(image_data, dtype=np.float64)
 
         # Recompile the log likelihood functions
         self.log_likelihood = jit(self._log_likelihood)

@@ -23,7 +23,9 @@ class Test_ImageData_noisemap(object):
             "likelihood_method": "incorrect",
         }
         npt.assert_raises(ValueError, ImageData, **kwargs_data)
-        npt.assert_raises(ValueError, ImageData, antenna_primary_beam=5, **kwargs_data)
+        npt.assert_raises(
+            ValueError, ImageData, antenna_primary_beam=np.ones((2, 2)), **kwargs_data
+        )
 
     def test_log_likelihood(self):
         model = np.tile(np.array([0.3, -0.1, 0.4, 0.7, -0.9]), (self.num_pix, 2))

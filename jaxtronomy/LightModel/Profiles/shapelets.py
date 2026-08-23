@@ -412,12 +412,13 @@ class ShapeletSetStatic(object):
 
         n1 = 0
         n2 = 0
+        f_ = jnp.zeros((len(amp), x.size), dtype=float)
 
-        for i in range(len(amp)):
-            f_.append(jnp.nan_to_num(amp[i] * phi_x[n1] * phi_y[n2]))
-            if n1 == 0:
-                n1, n2 = n2 + 1, 0
-            else:
-                n1, n2 = n1 - 1, n2 + 1
+        def body_fun(i, val):
+            f_, n1, n2 = val
+            f_ = f_.at[i].set(amp.at[i].get() * phi_x.at[n1].get() * phi_y.at[n2].get())
+            n1, n2 = jnp.where(n1 == 0, n2 + 1, n1 - 1), jnp.where(n1 == 0, 0, n2 + 1)
+            return f_, n1, n2
 
-        return f_
+        f_ = lax.fori_loop(0, self.num_param, body_fun, (f_, n1, n2))[0]
+        return jnp.nan_to_num(f_)

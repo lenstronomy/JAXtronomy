@@ -33,6 +33,29 @@ class TestDeLens(object):
         assert cov_error is None
         assert cov_error_ref is None
 
+    def test_get_param_WLS_interferometry(self):
+        np.random.seed(4242)
+        M = np.random.rand(25, 25)
+        b = np.random.rand(25)
+
+        param_amps_ref, M_inv_ref = de_lens_ref.get_param_WLS_interferometry(
+            M, b, inv_bool=True
+        )
+        param_amps, M_inv = de_lens.get_param_WLS_interferometry(M, b, inv_bool=True)
+        npt.assert_allclose(param_amps, param_amps_ref, atol=1e-8, rtol=1e-8)
+        npt.assert_allclose(M_inv, M_inv_ref, atol=1e-8, rtol=1e-8)
+
+        np.random.seed(1234)
+        M = np.random.rand(25, 25)
+        b = np.random.rand(25)
+
+        param_amps_ref, M_inv_ref = de_lens_ref.get_param_WLS_interferometry(
+            M, b, inv_bool=False
+        )
+        param_amps, M_inv = de_lens.get_param_WLS_interferometry(M, b, inv_bool=False)
+        npt.assert_allclose(param_amps, param_amps_ref, atol=1e-8, rtol=1e-8)
+        assert M_inv_ref is None and M_inv is None
+
     def test_wls_stability(self):
         A = np.array([[1, 2, 3], [3, 2, 1]]).T
         C_D_inv = np.array([0, 0, 0])

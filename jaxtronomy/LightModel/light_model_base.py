@@ -16,44 +16,15 @@ _JAXXED_MODELS = [
     "CORE_SERSIC",
     "GAUSSIAN",
     "GAUSSIAN_ELLIPSE",
+    "MGE_SET",
+    "MGE_SET_ELLIPSE",
     "MULTI_GAUSSIAN",
     "MULTI_GAUSSIAN_ELLIPSE",
     "SERSIC",
     "SERSIC_ELLIPSE",
     "SERSIC_ELLIPSE_Q_PHI",
     "SHAPELETS",
-]
-
-_MODELS_SUPPORTED = [
-    "GAUSSIAN",
-    "GAUSSIAN_ELLIPSE",
-    "ELLIPSOID",
-    "MULTI_GAUSSIAN",
-    "MULTI_GAUSSIAN_ELLIPSE",
-    "SERSIC",
-    "SERSIC_ELLIPSE",
-    "SERSIC_ELLIPSE_Q_PHI",
-    "CORE_SERSIC",
-    "SHAPELETS",
-    "SHAPELETS_POLAR",
-    "SHAPELETS_POLAR_EXP",
-    "SHAPELETS_ELLIPSE",
-    "HERNQUIST",
-    "HERNQUIST_ELLIPSE",
-    "PJAFFE",
-    "PJAFFE_ELLIPSE",
     "UNIFORM",
-    "POWER_LAW",
-    "NIE",
-    "CHAMELEON",
-    "DOUBLE_CHAMELEON",
-    "TRIPLE_CHAMELEON",
-    "INTERPOL",
-    "SLIT_STARLETS",
-    "SLIT_STARLETS_GEN2",
-    "LINEAR",
-    "LINEAR_ELLIPSE",
-    "LINE_PROFILE",
 ]
 
 
@@ -88,6 +59,14 @@ class LightModelBase(object):
             #     from lenstronomy.LightModel.Profiles.ellipsoid import Ellipsoid
 
             #     self.func_list.append(Ellipsoid(**profile_kwargs))
+            elif profile_type == "MGE_SET":
+                from jaxtronomy.LightModel.Profiles.mge_set import MGESet
+
+                self.func_list.append(MGESet(**profile_kwargs))
+            elif profile_type == "MGE_SET_ELLIPSE":
+                from jaxtronomy.LightModel.Profiles.mge_ellipse import MGEEllipse
+
+                self.func_list.append(MGEEllipse(**profile_kwargs))
             elif profile_type == "MULTI_GAUSSIAN":
                 from jaxtronomy.LightModel.Profiles.gaussian import MultiGaussian
 
@@ -166,10 +145,10 @@ class LightModelBase(object):
             #     )
 
             #     self.func_list.append(PseudoJaffeEllipse(**profile_kwargs))
-            # elif profile_type == "UNIFORM":
-            #     from lenstronomy.LightModel.Profiles.uniform import Uniform
+            elif profile_type == "UNIFORM":
+                from jaxtronomy.LightModel.Profiles.uniform import Uniform
 
-            #     self.func_list.append(Uniform(**profile_kwargs))
+                self.func_list.append(Uniform(**profile_kwargs))
             # elif profile_type == "POWER_LAW":
             #     from lenstronomy.LightModel.Profiles.power_law import PowerLaw
 
@@ -318,16 +297,27 @@ class LightModelBase(object):
                 if model in [
                     "SERSIC",
                     "SERSIC_ELLIPSE",
+                    "SERSIC_ELLIPSE_FLEXION",
                     "INTERPOL",
                     "GAUSSIAN",
                     "GAUSSIAN_ELLIPSE",
                     "MULTI_GAUSSIAN",
                     "MULTI_GAUSSIAN_ELLIPSE",
+                    "MGE_SET",
+                    "MGE_SET_ELLIPSE",
                     "LINE_PROFILE",
+                    "HERNQUIST",
+                    "HERNQUIST_ELLIPSE",
+                    "PL_SERSIC",
                 ]:
                     kwargs_new = kwargs_list_standard[i].copy()
                     if norm is True:
-                        if model in ["MULTI_GAUSSIAN", "MULTI_GAUSSIAN_ELLIPSE"]:
+                        if model in [
+                            "MULTI_GAUSSIAN",
+                            "MULTI_GAUSSIAN_ELLIPSE",
+                            "MGE_SET",
+                            "MGE_SET_ELLIPSE",
+                        ]:
                             new_amp = jnp.array(kwargs_new["amp"])
                             new = {"amp": new_amp / jnp.sum(new_amp)}
                         else:

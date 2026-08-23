@@ -18,8 +18,8 @@ class PointSource(object):
         additional_images_list=None,
         flux_from_point_source_list=None,
         magnification_limit=None,
-        save_cache=False,
-        kwargs_lens_eqn_solver=None,
+        save_cache=False,  # Deprecated in JAXtronomy
+        kwargs_lens_eqn_solver=None,  # Currently unused in JAXtronomy
         index_lens_model_list=None,
         point_source_frame_list=None,
         redshift_list=None,
@@ -113,6 +113,18 @@ class PointSource(object):
         self._kwargs_lens_eqn_solver = kwargs_lens_eqn_solver
         self._magnification_limit = magnification_limit
         self._save_cache = save_cache
+
+        self._init_kwargs = {
+            "point_source_type_list": point_source_type_list,
+            "lens_model": lens_model,
+            "fixed_magnification_list": fixed_magnification_list,
+            "additional_images_list": additional_images_list,
+            "flux_from_point_source_list": flux_from_point_source_list,
+            "magnification_limit": magnification_limit,
+            "index_lens_model_list": index_lens_model_list,
+            "point_source_frame_list": point_source_frame_list,
+            "redshift_list": redshift_list,
+        }
 
     def update_search_window(
         self,

@@ -1,9 +1,9 @@
-lenstronomy @ https://github.com/lenstronomy/lenstronomy/archive/refs/heads/main.zip
-numpy>=2.0.0
+lenstronomy>=1.14.1
+numpy>=2.3.0
 jax>=0.10.0
 numpyro>=0.21.0
 optax>=0.2.5
-scipy
+scipy>=1.16
 tqdm
 
 # samplers for FittingSequence

@@ -17,6 +17,9 @@ class SinglePlane(ProfileListBase):
         lens_redshift_list=None,
         z_source_convention=None,
         alpha_scaling=1,
+        perturber_model_list=None,
+        ra_0=0,
+        dec_0=0,
     ):
         """
 
@@ -25,6 +28,12 @@ class SinglePlane(ProfileListBase):
             in the same order of the lens_model_list. If any of the profile_kwargs are None, then that
             profile will be initialized using default settings.
         :param alpha_scaling: scaling factor of deflection angle relative to z_source_convention
+        :param perturber_model_list: list of deflector models that are treated as perturbations
+            (subtract shear and convergence contributions at ra_0/dec_0)
+        :type perturber_model_list: None or list of bools
+        :param ra_0: RA coordinate for which perturber models have zero shear and convergence contributions
+        :param dec_0: DEC coordinate for which perturber models have zero shear and convergence contributions
+            (usually center of the main deflector)
         """
         self._alpha_scaling = alpha_scaling
         ProfileListBase.__init__(
@@ -33,6 +42,9 @@ class SinglePlane(ProfileListBase):
             profile_kwargs_list=profile_kwargs_list,
             lens_redshift_list=lens_redshift_list,
             z_source_convention=z_source_convention,
+            perturber_model_list=perturber_model_list,
+            ra_0=ra_0,
+            dec_0=dec_0,
         )
 
     @partial(jit, static_argnums=(0, 4))

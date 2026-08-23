@@ -9,11 +9,22 @@ class TestLinearBasis(object):
         n_max = 3
 
         self.linear_basis = LinearBasis(
-            light_model_list=["SERSIC", "MULTI_GAUSSIAN", "SHAPELETS"],
-            profile_kwargs_list=[{}, {}, {"n_max": n_max}],
+            light_model_list=[
+                "SERSIC",
+                "MULTI_GAUSSIAN",
+                "SHAPELETS",
+                "MGE_SET_ELLIPSE",
+            ],
+            profile_kwargs_list=[{}, {}, {"n_max": n_max}, {"n_comp": 5}],
         )
         self.linear_basis_ref = LinearBasis_ref(
-            light_model_list=["SERSIC", "MULTI_GAUSSIAN", "SHAPELETS"]
+            light_model_list=[
+                "SERSIC",
+                "MULTI_GAUSSIAN",
+                "SHAPELETS",
+                "MGE_SET_ELLIPSE",
+            ],
+            profile_kwargs_list=[{}, {}, {}, {"n_comp": 5}],
         )
 
         kwargs_sersic = {
@@ -33,7 +44,20 @@ class TestLinearBasis(object):
             "center_x": -0.1,
             "center_y": -0.2,
         }
-        self.kwargs_list = [kwargs_sersic, kwargs_multi_gaussian, kwargs_shapelets]
+        kwargs_mge = {
+            "sigma_min": 0.5,
+            "sigma_width": 13.4,
+            "e1": 0.3,
+            "e2": -0.45,
+            "center_x": 0.1,
+            "center_y": -12.3,
+        }
+        self.kwargs_list = [
+            kwargs_sersic,
+            kwargs_multi_gaussian,
+            kwargs_shapelets,
+            kwargs_mge,
+        ]
 
     def test_functions_split(self):
         x = np.tile(np.linspace(-5, 5, 50), 50)
@@ -43,18 +67,16 @@ class TestLinearBasis(object):
             x, y, self.kwargs_list
         )
         npt.assert_allclose(response, response_ref, atol=1e-12, rtol=1e-12)
-        assert n == n_ref == 14
+        assert n == n_ref
 
     def test_num_param_linear(self):
         param_list = self.linear_basis.num_param_linear_list(self.kwargs_list)
         param_list_ref = self.linear_basis_ref.num_param_linear_list(self.kwargs_list)
         npt.assert_array_equal(param_list, param_list_ref)
 
-        assert (
-            self.linear_basis.num_param_linear(self.kwargs_list)
-            == self.linear_basis_ref.num_param_linear(self.kwargs_list)
-            == 14
-        )
+        assert self.linear_basis.num_param_linear(
+            self.kwargs_list
+        ) == self.linear_basis_ref.num_param_linear(self.kwargs_list)
 
         param_list = self.linear_basis.num_param_linear(
             self.kwargs_list, list_return=True
@@ -65,16 +87,17 @@ class TestLinearBasis(object):
         npt.assert_array_equal(param_list, param_list_ref)
 
     def test_update_linear(self):
-        param = np.arange(1, 15, 1)
+        param = np.arange(1, 20, 1)
         i = 0
         kwargs_list, i_new = self.linear_basis.update_linear(param, i, self.kwargs_list)
         kwargs_list_ref, i_new_ref = self.linear_basis_ref.update_linear(
             param, i, self.kwargs_list
         )
-        assert i_new == i_new_ref == 14
+        assert i_new == i_new_ref
         npt.assert_array_equal(kwargs_list[0]["amp"], kwargs_list_ref[0]["amp"])
         npt.assert_array_equal(kwargs_list[1]["amp"], kwargs_list_ref[1]["amp"])
         npt.assert_array_equal(kwargs_list[2]["amp"], kwargs_list_ref[2]["amp"])
+        npt.assert_array_equal(kwargs_list[3]["amp"], kwargs_list_ref[3]["amp"])
 
     def test_add_fixed_linear(self):
         linear_basis = LinearBasis(light_model_list=["SERSIC", "SERSIC_ELLIPSE"])

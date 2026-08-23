@@ -1,4 +1,4 @@
-from jax import jit, numpy as jnp, tree_util
+from jax import jit, numpy as jnp
 from jax.scipy import signal
 import numpy as np
 
@@ -7,48 +7,26 @@ from lenstronomy.Util import kernel_util
 from jaxtronomy.Util import image_util, util
 from functools import partial
 
-from lenstronomy.Util.package_util import exporter
 
-export, __all__ = exporter()
-
-
-@export
 class PixelKernelConvolution(object):
-    """Class to compute convolutions for a given pixelized kernel (fft, grid)"""
+    """Class to compute convolutions for a given pixelized kernel (fft, grid).
 
-    def __init__(self, kernel, convolution_type="fft_static"):
+    convolution_type="fft_static" does not result in a speedup in JAXtronomy, thus it is
+    not implemented.
+    """
+
+    def __init__(self, kernel=None, convolution_type="fft"):
         """
 
-        :param kernel: 2d array, convolution kernel
+        :param kernel: 2d array, convolution kernel, can also be supplied at runtime
         :param convolution_type: string, 'fft', 'grid', mode of 2d convolution
         """
+        if kernel is not None:
+            kernel = jnp.asarray(kernel, dtype=float)
         self._kernel = kernel
         if convolution_type not in ["fft", "grid"]:
-            if convolution_type == "fft_static":
-                self.fftconvolve_static = jit(
-                    partial(signal.fftconvolve, in2=kernel, mode="same")
-                )
-            else:
-                raise ValueError(
-                    "convolution_type %s not supported!" % convolution_type
-                )
+            raise ValueError("convolution_type %s not supported!" % convolution_type)
         self.convolution_type = convolution_type
-
-    # --------------------------------------------------------------------------------
-    # The following two methods are required to allow the JAX compiler to recognize
-    # this class. Methods involving the self variable can be jit-decorated.
-    # Class methods will need to be recompiled each time a variable in the aux_data
-    # changes to a new value (but there's no need to recompile if it changes to a previous value)
-    def _tree_flatten(self):
-        children = (self._kernel,)
-        aux_data = {"convolution_type": self.convolution_type}
-        return (children, aux_data)
-
-    @classmethod
-    def _tree_unflatten(cls, aux_data, children):
-        return cls(*children, **aux_data)
-
-    # ---------------------------------------------------------------------------------
 
     def pixel_kernel(self, num_pix=None):
         """Access pixelated kernel.
@@ -70,22 +48,26 @@ class PixelKernelConvolution(object):
             self._kernel.T, convolution_type=self.convolution_type
         )
 
-    @jit
-    def convolution2d(self, image):
+    @partial(jit, static_argnums=0)
+    def convolution2d(self, image, kernel=None):
         """
 
         :param image: 2d array (image) to be convolved
         :return: fft convolution
         """
+        if kernel is None:
+            kernel = self._kernel
         if self.convolution_type == "fft":
-            image_conv = signal.fftconvolve(image, self._kernel, mode="same")
-        elif self.convolution_type == "fft_static":
-            image_conv = self.fftconvolve_static(image)
+            image_conv = signal.fftconvolve(image, kernel, mode="same")
+        elif self.convolution_type == "grid":
+            image_conv = signal.convolve2d(image, kernel, mode="same")
         else:
-            image_conv = signal.convolve2d(image, self._kernel, mode="same")
+            raise ValueError(
+                "convolution_type %s not supported!" % self.convolution_type
+            )
         return image_conv
 
-    @jit
+    @partial(jit, static_argnums=0)
     def re_size_convolve(self, image_low_res, image_high_res=None):
         """
 
@@ -96,17 +78,20 @@ class PixelKernelConvolution(object):
         return self.convolution2d(image_low_res)
 
 
-@export
 class SubgridKernelConvolution(object):
     """Class to compute the convolution on a supersampled grid with partial convolution
-    computed on the regular grid."""
+    computed on the regular grid.
+
+    For high resolution convolution, one single convolution is performed using the high
+    resolution kernel and high resolution image.
+    """
 
     def __init__(
         self,
         kernel_supersampled,
         supersampling_factor,
         supersampling_kernel_size=None,
-        convolution_type="fft_static",
+        convolution_type="fft",
     ):
         """
 
@@ -165,6 +150,141 @@ class SubgridKernelConvolution(object):
         return image_resized_conv
 
 
+class PartialSubgridKernelConvolution(object):
+    """Class to compute the convolution on a supersampled grid with partial convolution
+    computed on the regular grid.
+
+    For high resolution convolution, rather than performing one single convolution over
+    the entire image, N^2 low-resolution convolutions are performed and summed, where N
+    is the supersampling factor. On CPU, this is a performance boost over performing one
+    high resolution convolution. This class is effectively the same as lenstronomy's
+    SubgridNumbaConvolution, but with FFT instead of real space convolution.
+    """
+
+    def __init__(
+        self,
+        kernel_supersampled,
+        supersampling_factor,
+        supersampling_kernel_size=None,
+        convolution_type="fft",
+    ):
+        """
+
+        :param kernel_supersampled: kernel in supersampled pixels
+        :param supersampling_factor: supersampling factor relative to the image pixel grid
+        :param supersampling_kernel_size: number of pixels (in units of the image pixels) that are convolved with the
+         supersampled kernel
+        """
+        self._supersampling_factor = supersampling_factor
+        if supersampling_kernel_size is None:
+            kernel_low_res, kernel_high_res = np.zeros((3, 3)), kernel_supersampled
+            self._low_res_convolution = False
+        else:
+            kernel_low_res, kernel_high_res = kernel_util.split_kernel(
+                kernel_supersampled,
+                supersampling_kernel_size,
+                self._supersampling_factor,
+            )
+            self._low_res_convolution = True
+        self._kernel_low_res = kernel_low_res
+
+        self._kernel_high_res_ij = []
+        for i in range(supersampling_factor):
+            for j in range(supersampling_factor):
+                # compute shifted psf kernel
+                kernel = self._partial_kernel(kernel_high_res, i, j)
+                self._kernel_high_res_ij.append(jnp.asarray(kernel, dtype=float))
+
+        self._conv = PixelKernelConvolution(kernel=None, convolution_type="fft")
+
+    @partial(jit, static_argnums=0)
+    def re_size_convolve(self, image_low_res, image_high_res):
+        """
+
+        :param image_low_res: 2d array, image at native resolution
+        :param image_high_res: 2d array, supersampled image
+        :return: convolved and re-sized image
+        """
+        image_conv = jnp.zeros(image_low_res.shape)
+
+        count = 0
+        for i in range(self._supersampling_factor):
+            for j in range(self._supersampling_factor):
+                image_select = self._partial_image(image_high_res, i, j)
+                image_conv += self._conv.convolution2d(
+                    image_select, self._kernel_high_res_ij[count]
+                )
+                count += 1
+
+        if self._low_res_convolution is True:
+            image_conv += self._conv.convolution2d(image_low_res, self._kernel_low_res)
+        return image_conv
+
+    @partial(jit, static_argnums=0)
+    def convolution2d(self, image):
+        """
+
+        :param image: 2d array (high resoluton image) to be convolved and re-sized
+        :return: convolved image
+        """
+        n_rows, n_cols = image.shape
+        n_rows = int(n_rows / self._supersampling_factor)
+        n_cols = int(n_cols / self._supersampling_factor)
+        image_conv = jnp.zeros((n_rows, n_cols))
+
+        count = 0
+        for i in range(self._supersampling_factor):
+            for j in range(self._supersampling_factor):
+                image_ij = self._partial_image(image, i, j)
+                image_conv += self._conv.convolution2d(
+                    image_ij, self._kernel_high_res_ij[count]
+                )
+                count += 1
+
+        if self._low_res_convolution is True:
+            image_resized = image_util.re_size(image, self._supersampling_factor)
+            image_conv += self._conv.convolution2d(
+                image_resized, kernel=self._kernel_low_res
+            )
+        return image_conv
+
+    def _partial_image(self, image_high_res, i, j):
+        """
+
+        :param image_high_res: 2d array supersampled
+        :param i: index of super-sampled position in first axis
+        :param j: index of super-sampled position in second axis
+        :return: 2d array only selected the specific supersampled position within a regular pixel
+        """
+        return image_high_res[
+            i :: self._supersampling_factor, j :: self._supersampling_factor
+        ]
+
+    def _partial_kernel(self, kernel_super, i, j):
+        """
+
+        :param kernel_super: supersampled kernel
+        :param i: index of super-sampled position in first axis
+        :param j: index of super-sampled position in second axis
+        :return: effective kernel rebinned to regular grid resulting from the supersampled position (i,j)
+        """
+        n = len(kernel_super)
+        kernel_size = int(round(n / float(self._supersampling_factor) + 1.5))
+        if kernel_size % 2 == 0:
+            kernel_size += 1
+        n_match = kernel_size * self._supersampling_factor
+        kernel_super_match = np.zeros((n_match, n_match))
+        delta = int((n_match - n - self._supersampling_factor) / 2) + 1
+        i0 = delta  # index where to start kernel for i=0
+        j0 = delta  # index where to start kernel for j=0  (should be symmetric)
+        kernel_super_match[i0 + i : i0 + i + n, j0 + j : j0 + j + n] = kernel_super
+        # kernel_super_match = image_util.cut_edges(kernel_super_match, numPix=n)
+        kernel = image_util.re_size(
+            kernel_super_match, factor=self._supersampling_factor
+        )
+        return kernel
+
+
 class GaussianConvolution(object):
     """Class to perform a convolution consisting of multiple 2d Gaussians.
 
@@ -208,9 +328,7 @@ class GaussianConvolution(object):
         # Even though kernel_radius is already an int, we need to apply int because of some JAX nonsense
         self._pad_width = int(kernel_radius)
 
-        self.PixelKernelConv = PixelKernelConvolution(
-            kernel, convolution_type="fft_static"
-        )
+        self.PixelKernelConv = PixelKernelConvolution(kernel, convolution_type="fft")
 
     @partial(jit, static_argnums=0)
     def convolution2d(self, image):
@@ -268,10 +386,3 @@ class GaussianConvolution(object):
         kernel = gaussian.function(x, y, amp=1, sigma=self._sigma_scaled)
         kernel = util.array2image(kernel)
         return kernel / jnp.sum(kernel)
-
-
-tree_util.register_pytree_node(
-    PixelKernelConvolution,
-    PixelKernelConvolution._tree_flatten,
-    PixelKernelConvolution._tree_unflatten,
-)

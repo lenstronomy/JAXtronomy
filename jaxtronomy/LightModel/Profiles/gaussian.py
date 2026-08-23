@@ -1,4 +1,4 @@
-from jax import jit, numpy as jnp
+from jax import jit, lax, numpy as jnp
 import jaxtronomy.Util.param_util as param_util
 
 
@@ -208,10 +208,19 @@ class MultiGaussian(object):
         :param center_y: center of profile
         :return: list of arrays of surface brightness
         """
-        f_list = []
-        for i in range(len(amp)):
-            f_list.append(Gaussian.function(x, y, amp[i], sigma[i], center_x, center_y))
-        return f_list
+        amp = jnp.asarray(amp, dtype=float)
+        sigma = jnp.asarray(sigma, dtype=float)
+        f_list = jnp.zeros((len(amp), x.size), dtype=float)
+
+        def body_fun(i, f_list):
+            f_list = f_list.at[i].set(
+                Gaussian.function(
+                    x, y, amp.at[i].get(), sigma.at[i].get(), center_x, center_y
+                )
+            )
+            return f_list
+
+        return lax.fori_loop(0, len(amp), body_fun, f_list)
 
     @staticmethod
     @jit
@@ -313,12 +322,17 @@ class MultiGaussianEllipse(object):
         x_, y_ = param_util.transform_e1e2_product_average(
             x, y, e1, e2, center_x, center_y
         )
-        f_list = []
-        for i in range(len(amp)):
-            f_list.append(
-                Gaussian.function(x_, y_, amp[i], sigma[i], center_x=0, center_y=0)
+        amp = jnp.asarray(amp, dtype=float)
+        sigma = jnp.asarray(sigma, dtype=float)
+        f_list = jnp.zeros((len(amp), x.size), dtype=float)
+
+        def body_fun(i, f_list):
+            f_list = f_list.at[i].set(
+                Gaussian.function(x_, y_, amp.at[i].get(), sigma.at[i].get())
             )
-        return f_list
+            return f_list
+
+        return lax.fori_loop(0, len(amp), body_fun, f_list)
 
     @staticmethod
     @jit

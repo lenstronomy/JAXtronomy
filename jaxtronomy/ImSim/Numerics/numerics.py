@@ -1,6 +1,7 @@
-from jaxtronomy.ImSim.Numerics.grid import RegularGrid
+from jaxtronomy.ImSim.Numerics.grid import RegularGrid, AdaptiveGrid
 from jaxtronomy.ImSim.Numerics.convolution import (
     SubgridKernelConvolution,
+    PartialSubgridKernelConvolution,
     PixelKernelConvolution,
     GaussianConvolution,
 )
@@ -8,7 +9,7 @@ from jaxtronomy.ImSim.Numerics.point_source_rendering import PointSourceRenderin
 
 from lenstronomy.Util import util as util_lenstronomy
 from lenstronomy.Util import kernel_util
-from jax import jit
+from jax import jit, default_backend
 import numpy as np
 from functools import partial
 
@@ -36,12 +37,16 @@ class Numerics(PointSourceRendering):
         convolution_kernel_size=None,
         convolution_type="fft",
         truncation_conv=None,
+        backend=None,
     ):
         """
 
         :param pixel_grid: PixelGrid() class instance
         :param psf: PSF() class instance
-        :param compute_mode: options are: 'regular'. 'adaptive' is not supported in JAXtronomy
+        :param compute_mode: options are: 'regular', 'adaptive'. NOTE: adaptive compute mode differs from lenstronomy
+            in that only the ray shooting is done adaptively in JAXtronomy whereas lenstronomy also performs convolution
+            adaptively. Additionally, while lenstronomy's adaptive compute mode is incompatible with "GAUSSIAN" psf type,
+            in JAXtronomy they are compatible.
         :param supersampling_factor: int, factor of higher resolution sub-pixel sampling of surface brightness
         :param supersampling_convolution: bool, if True, performs (part of) the convolution on the super-sampled
             grid/pixels
@@ -51,12 +56,9 @@ class Numerics(PointSourceRendering):
             Pixels indicated with True will be used to perform the surface brightness computation (and possible lensing
             ray-shooting). Pixels marked as False will be assigned a flux value of zero (or ignored in the adaptive
             convolution)
-        :param supersampled_indexes: 2d boolean array (only used in mode='adaptive') of pixels to be supersampled (in
-            surface brightness and if supersampling_convolution=True also in convolution). All other pixels not set to =True
-            will not be super-sampled.
-        :param compute_indexes: 2d boolean array (only used in compute_mode='adaptive'), marks pixel that the response after
-            convolution is computed (all others =0). This can be set to likelihood_mask in the Likelihood module for
-            consistency.
+        :param supersampled_indexes: 2d boolean array (only used in mode='adaptive') of pixels to be supersampled for ray shooting.
+            All other pixels set to False will not be supersampled for ray shooting
+        :param compute_indexes: unused in JAXtronomy due to lack of adaptive convolution
         :param point_source_supersampling_factor: super-sampling resolution of the point source placing
         :param convolution_kernel_size: int, odd number, size of convolution kernel before supersampling. If None, takes size of point_source_kernel
             Only relevant for psf type PIXEL
@@ -64,17 +66,16 @@ class Numerics(PointSourceRendering):
         :param truncation_conv: Truncation used for the construction of the convolution kernels (only relevant for Gaussian convolution). By default,
             the truncation from the psf class will be used. Can be overwritten so that different PSFs are used for
             convolution and point source rendering.
+        :param backend: "gpu" or "cpu". If None, calls jax.default_backend(). If "gpu", high resolution FFT is done once
+            on the high resolution grid, and if "cpu", splits it up into many low resolution FFTs
         """
-        if compute_mode != "regular":
-            if compute_mode == "adaptive":
-                raise ValueError(
-                    "AdaptiveConvolution not implemented in Jaxtronomy. Please use lenstronomy instead."
-                )
-            else:
-                raise ValueError(
-                    'compute_mode specified as %s not valid. Options are "regular" and "adaptive" (adaptive only supported in lenstronomy)'
-                )
-        # if no super sampling, turn the supersampling convolution off
+        if backend is None:
+            backend = default_backend()
+        backend = backend.lower()
+        if compute_mode not in ["regular", "adaptive"]:
+            raise ValueError(
+                'compute_mode specified as %s not valid. Options are "regular" and "adaptive" (adaptive only supported in lenstronomy)'
+            )
         self._psf_type = psf.psf_type
         if not isinstance(supersampling_factor, int):
             raise TypeError(
@@ -87,28 +88,50 @@ class Numerics(PointSourceRendering):
         nx, ny = pixel_grid.num_pixel_axes
         transform_pix2angle = pixel_grid.transform_pix2angle
         ra_at_xy_0, dec_at_xy_0 = pixel_grid.radec_at_xy_0
-        # This is only used for adaptive convolution which is not implemented in JAXtronomy
-        # if supersampled_indexes is None:
-        #    supersampled_indexes = np.zeros((nx, ny), dtype=bool)
-        self._grid = RegularGrid(
-            nx,
-            ny,
-            transform_pix2angle,
-            ra_at_xy_0,
-            dec_at_xy_0,
-            supersampling_factor,
-            flux_evaluate_indexes,
-        )
+        if supersampled_indexes is None:
+            supersampled_indexes = np.zeros((nx, ny), dtype=bool)
+        if compute_mode == "adaptive":
+            self._grid = AdaptiveGrid(
+                nx,
+                ny,
+                transform_pix2angle,
+                ra_at_xy_0,
+                dec_at_xy_0,
+                supersampled_indexes,
+                supersampling_factor,
+                flux_evaluate_indexes,
+            )
+        else:
+            self._grid = RegularGrid(
+                nx,
+                ny,
+                transform_pix2angle,
+                ra_at_xy_0,
+                dec_at_xy_0,
+                supersampling_factor,
+                flux_evaluate_indexes,
+            )
         if self._psf_type == "PIXEL":
-            if supersampling_convolution is True:
+            if supersampling_convolution:
                 kernel_super = psf.kernel_point_source_supersampled(
                     supersampling_factor
                 )
                 if convolution_kernel_size is not None:
+                    kernel_super = psf.kernel_point_source_supersampled(
+                        supersampling_factor
+                    )
                     kernel_super = self._supersampling_cut_kernel(
                         kernel_super, convolution_kernel_size, supersampling_factor
                     )
-                self._conv = SubgridKernelConvolution(
+                if backend == "gpu":
+                    # For supersampled convolution, does one big FFT convolution
+                    ConvolutionClass = SubgridKernelConvolution
+                else:
+                    # For supersampled convolution, splits grid and kernel into subgrids and subkernels
+                    # to do many smaller FFT convolutions; faster on CPU
+                    ConvolutionClass = PartialSubgridKernelConvolution
+
+                self._conv = ConvolutionClass(
                     kernel_super,
                     supersampling_factor,
                     supersampling_kernel_size=supersampling_kernel_size,
@@ -149,7 +172,7 @@ class Numerics(PointSourceRendering):
             supersampling_factor=point_source_supersampling_factor,
             psf=psf,
         )
-        if supersampling_convolution is True:
+        if supersampling_convolution:
             self._high_res_return = True
         else:
             self._high_res_return = False
@@ -163,17 +186,15 @@ class Numerics(PointSourceRendering):
         :param unconvolved: boolean, if True, does not apply a convolution
         :return: convolved image on regular pixel grid, 2d array
         """
-        # add supersampled region to lower resolution on
-        image_low_res, image_high_res_partial = self._grid.flux_array2image_low_high(
+        # add supersampled region to lower resolution one
+        image_low_res, image_high_res = self._grid.flux_array2image_low_high(
             flux_array, high_res_return=self._high_res_return
         )
         if unconvolved is True or self._psf_type == "NONE":
             image_conv = image_low_res
         else:
             # convolve low res grid and high res grid
-            image_conv = self._conv.re_size_convolve(
-                image_low_res, image_high_res_partial
-            )
+            image_conv = self._conv.re_size_convolve(image_low_res, image_high_res)
         return image_conv * self._pixel_width**2
 
     @property

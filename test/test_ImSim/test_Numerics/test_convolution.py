@@ -5,6 +5,7 @@ import numpy.testing as npt
 from jaxtronomy.ImSim.Numerics.convolution import (
     PixelKernelConvolution,
     SubgridKernelConvolution,
+    PartialSubgridKernelConvolution,
     GaussianConvolution,
 )
 from lenstronomy.ImSim.Numerics.convolution import (
@@ -63,25 +64,6 @@ class TestPixelKernelConvolution(object):
         image_convolved = pixel_conv.convolution2d(self.model)
         image_convolved_ref = pixel_conv_ref.convolution2d(self.model)
         npt.assert_almost_equal(image_convolved, image_convolved_ref, decimal=7)
-
-    def test_convolve2d_fft_static(self):
-        kernel = np.ones((3, 3)) * 2
-        kernel[1, 1] = 1
-        kernel = kernel / np.sum(kernel)
-
-        pixel_conv = PixelKernelConvolution(
-            kernel=kernel, convolution_type="fft_static"
-        )
-        pixel_conv_ref = PixelKernelConvolution_ref(
-            kernel=kernel, convolution_type="fft_static"
-        )
-        image_convolved = pixel_conv.convolution2d(self.model)
-        image_convolved_ref = pixel_conv_ref.convolution2d(self.model)
-        npt.assert_almost_equal(image_convolved, image_convolved_ref, decimal=5)
-
-        image_convolved = pixel_conv.convolution2d(self.model * 2 + 0.1)
-        image_convolved_ref = pixel_conv_ref.convolution2d(self.model * 2 + 0.1)
-        npt.assert_almost_equal(image_convolved, image_convolved_ref, decimal=5)
 
     def test_convolve2d_incorrect(self):
         kernel = np.ones((3, 3)) * 2
@@ -175,7 +157,8 @@ class TestSubgridKernelConvolution(object):
             model_subgrid_conv, model_subgrid_conv_ref, decimal=6
         )
 
-    def test_convolve2d_low_res(self):
+    def test_convolve2d_with_low_res(self):
+        # include supersampling_kernel_size
         subgrid_conv_split = SubgridKernelConvolution(
             self.kernel_sub,
             self.supersampling_factor,
@@ -215,8 +198,120 @@ class TestSubgridKernelConvolution(object):
 
         npt.assert_array_almost_equal(re_size_conv, re_size_conv_ref, decimal=6)
 
-    def test_re_size_convolve_low_res(self):
+    def test_re_size_convolve_with_low_res(self):
+        # include supersampling_kernel_size
         subgrid_conv = SubgridKernelConvolution(
+            self.kernel_sub,
+            self.supersampling_factor,
+            supersampling_kernel_size=5,
+            convolution_type="fft",
+        )
+        re_size_conv = subgrid_conv.re_size_convolve(self.model, self.model_sub)
+
+        subgrid_conv_ref = SubgridKernelConvolution_ref(
+            self.kernel_sub,
+            self.supersampling_factor,
+            supersampling_kernel_size=5,
+            convolution_type="fft",
+        )
+        re_size_conv_ref = subgrid_conv_ref.re_size_convolve(self.model, self.model_sub)
+
+        npt.assert_array_almost_equal(re_size_conv, re_size_conv_ref, decimal=6)
+
+
+class TestPartialSubgridKernelConvolution(object):
+    def setup_method(self):
+        self.supersampling_factor = 3
+        lightModel = LightModel(light_model_list=["GAUSSIAN"])
+        self.delta_pix = 1.6534
+        x, y = util.make_grid(30, delta_pix=self.delta_pix)
+        x_sub, y_sub = util.make_grid(
+            30 * self.supersampling_factor,
+            delta_pix=self.delta_pix / self.supersampling_factor,
+        )
+        kwargs = [{"amp": 31.235, "sigma": 2, "center_x": 0, "center_y": 0}]
+        flux = lightModel.surface_brightness(x, y, kwargs)
+        self.model = util.array2image(flux)
+        flux_sub = lightModel.surface_brightness(x_sub, y_sub, kwargs)
+        self.model_sub = util.array2image(flux_sub)
+
+        x, y = util.make_grid(5, delta_pix=self.delta_pix)
+        kwargs_kernel = [{"amp": 21, "sigma": 1, "center_x": 0, "center_y": 0}]
+        kernel = lightModel.surface_brightness(x, y, kwargs_kernel)
+        self.kernel = util.array2image(kernel) / np.sum(kernel)
+
+        x_sub, y_sub = util.make_grid(
+            5 * self.supersampling_factor,
+            delta_pix=self.delta_pix / self.supersampling_factor,
+        )
+        kernel_sub = lightModel.surface_brightness(x_sub, y_sub, kwargs_kernel)
+        self.kernel_sub = util.array2image(kernel_sub) / np.sum(kernel_sub)
+
+    def test_convolve2d(self):
+        subgrid_conv = PartialSubgridKernelConvolution(
+            self.kernel_sub,
+            self.supersampling_factor,
+            supersampling_kernel_size=None,
+            convolution_type="fft",
+        )
+        model_subgrid_conv = subgrid_conv.convolution2d(self.model_sub)
+
+        subgrid_conv_ref = SubgridKernelConvolution_ref(
+            self.kernel_sub,
+            self.supersampling_factor,
+            supersampling_kernel_size=None,
+            convolution_type="fft",
+        )
+        model_subgrid_conv_ref = subgrid_conv_ref.convolution2d(self.model_sub)
+
+        npt.assert_array_almost_equal(
+            model_subgrid_conv, model_subgrid_conv_ref, decimal=6
+        )
+
+    def test_convolve2d_with_low_res(self):
+        # include supersampling_kernel_size
+        subgrid_conv_split = PartialSubgridKernelConvolution(
+            self.kernel_sub,
+            self.supersampling_factor,
+            supersampling_kernel_size=5,
+            convolution_type="fft",
+        )
+        model_subgrid_conv = subgrid_conv_split.convolution2d(self.model_sub)
+
+        subgrid_conv_split_ref = SubgridKernelConvolution_ref(
+            self.kernel_sub,
+            self.supersampling_factor,
+            supersampling_kernel_size=5,
+            convolution_type="fft",
+        )
+        model_subgrid_conv_ref = subgrid_conv_split_ref.convolution2d(self.model_sub)
+
+        npt.assert_array_almost_equal(
+            model_subgrid_conv, model_subgrid_conv_ref, decimal=6
+        )
+
+    def test_re_size_convolve(self):
+        subgrid_conv = PartialSubgridKernelConvolution(
+            self.kernel_sub,
+            self.supersampling_factor,
+            supersampling_kernel_size=None,
+            convolution_type="fft",
+        )
+        re_size_conv = subgrid_conv.re_size_convolve(self.model, self.model_sub)
+
+        subgrid_conv_ref = SubgridKernelConvolution_ref(
+            self.kernel_sub,
+            self.supersampling_factor,
+            supersampling_kernel_size=None,
+            convolution_type="fft",
+        )
+        re_size_conv_ref = subgrid_conv_ref.re_size_convolve(self.model, self.model_sub)
+
+        npt.assert_array_almost_equal(re_size_conv, re_size_conv_ref, decimal=6)
+
+    def test_re_size_convolve_with_low_res(self):
+        # include supersampling_kernel_size
+        subgrid_conv = PartialSubgridKernelConvolution(
             self.kernel_sub,
             self.supersampling_factor,
             supersampling_kernel_size=5,
