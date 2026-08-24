@@ -265,7 +265,9 @@ class TestSinglePlane(object):
         profile_kwargs_list = [None] * len(_JAXXED_MODELS)
         perturber_kwargs = {"profile": "SIS", "ra_0": 0.1, "dec_0": -0.1}
         profile_kwargs_list[_JAXXED_MODELS.index("PERTURBER")] = perturber_kwargs
-        lensModel = SinglePlane(lens_model_list=_JAXXED_MODELS, profile_kwargs_list=profile_kwargs_list)
+        lensModel = SinglePlane(
+            lens_model_list=_JAXXED_MODELS, profile_kwargs_list=profile_kwargs_list
+        )
         for profile in lensModel.func_list:
             assert jaxtronomy.__name__ in profile.__module__
 
