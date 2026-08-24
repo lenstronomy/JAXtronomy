@@ -10,7 +10,7 @@ class PerturberModel(LensProfileBase):
     """Class to use a lens Profile and subtract shear and convergence contribution such
     that at specific point there are only higher-order contributions."""
 
-    def __init__(self, profile, ra_0, dec_0):
+    def __init__(self, profile, ra_0=0, dec_0=0):
         """
 
         :param profile: LensModel.profile class
