@@ -28,7 +28,9 @@ class TestLensModel(object):
             },
         ]
         perturber_kwargs = {"profile": "SIS", "ra_0": 0.1, "dec_0": -0.1}
-        self.lensModel = LensModel(["EPL", "PERTURBER"], profile_kwargs_list=[None, perturber_kwargs])
+        self.lensModel = LensModel(
+            ["EPL", "PERTURBER"], profile_kwargs_list=[None, perturber_kwargs]
+        )
         self.lensModel_ref = LensModel_ref(
             ["EPL", "PERTURBER"], profile_kwargs_list=[None, perturber_kwargs]
         )
