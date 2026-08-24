@@ -34,9 +34,6 @@ class MultiPlane(object):
         distance_ratio_sampling=False,
         cosmology_sampling=False,
         cosmology_model="FlatLambdaCDM",
-        perturber_model_list=None,
-        ra_0=0,
-        dec_0=0,
     ):
         """
 
@@ -69,13 +66,6 @@ class MultiPlane(object):
             distance ratios to update T_ij value in multi-lens plane computation.
         :param cosmology_sampling: bool, if True, will use sampled cosmology
         :param cosmology_model: str, name of the cosmology model to use for
-        :param perturber_model_list: list of deflector models that are treated as
-            perturbations (subtract shear and convergence contributions at ra_0/dec_0)
-        :type perturber_model_list: None or list of bools
-        :param ra_0: RA coordinate for which perturber models have zero shear and
-            convergence contributions
-        :param dec_0: DEC coordinate for which perturber models have zero shear and
-            convergence contributions (usually center of the main deflector)
         """
         self.cosmology_sampling = cosmology_sampling
         self.cosmology_model = cosmology_model
@@ -119,9 +109,6 @@ class MultiPlane(object):
             "distance_ratio_sampling": distance_ratio_sampling,
             "cosmology_sampling": cosmology_sampling,
             "cosmology_model": cosmology_model,
-            "perturber_model_list": perturber_model_list,
-            "ra_0": ra_0,
-            "dec_0": dec_0,
         }
         if z_source_convention is None:
             z_source_convention = z_source
@@ -153,9 +140,6 @@ class MultiPlane(object):
             z_interp_stop=z_interp_stop,
             num_z_interp=num_z_interp,
             profile_kwargs_list=profile_kwargs_list,
-            perturber_model_list=perturber_model_list,
-            ra_0=ra_0,
-            dec_0=dec_0,
         )
         self._z_source = z_source
         self._set_source_distances(z_source)

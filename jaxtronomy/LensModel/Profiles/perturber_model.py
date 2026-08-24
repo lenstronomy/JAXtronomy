@@ -10,7 +10,7 @@ class PerturberModel(LensProfileBase):
     """Class to use a lens Profile and subtract shear and convergence contribution such
     that at specific point there are only higher-order contributions."""
 
-    def __init__(self, profile, ra_0, dec_0):
+    def __init__(self, profile, ra_0=0, dec_0=0):
         """
 
         :param profile: LensModel.profile class
@@ -19,6 +19,10 @@ class PerturberModel(LensProfileBase):
             (usually center of the main deflector)
         """
         super(PerturberModel, self).__init__()
+        if isinstance(profile, str):
+            from jaxtronomy.LensModel.profile_list_base import lens_class
+
+            profile = lens_class(profile)
         self._profile = profile
         self._ra_0 = ra_0
         self._dec_0 = dec_0

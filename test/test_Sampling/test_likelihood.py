@@ -380,9 +380,18 @@ class TestLikelihood(object):
         del self.kwargs_data_joint["time_delays_uncertainties"]
         for deflector_profile in JAXXED_DEFLECTOR_PROFILES:
             print(deflector_profile)
-            lensModel = LensModel([deflector_profile])
+
+            profile_kwargs_list = [None]
+            if deflector_profile == "PERTURBER":
+                perturber_kwargs = {"profile": "SIS", "ra_0": 0.1, "dec_0": -0.1}
+                profile_kwargs_list = [perturber_kwargs]
+
+            lensModel = LensModel(
+                [deflector_profile], profile_kwargs_list=profile_kwargs_list
+            )
             kwargs_model = {
                 "lens_model_list": [deflector_profile],
+                "lens_profile_kwargs_list": profile_kwargs_list,
                 "lens_light_model_list": [],
                 "source_light_model_list": [],
             }

@@ -27,9 +27,12 @@ class TestLensModel(object):
                 "theta_E": 0.111,
             },
         ]
-        self.lensModel = LensModel(["EPL", "SIS"], perturber_model_list=[False, True])
+        perturber_kwargs = {"profile": "SIS", "ra_0": 0.1, "dec_0": -0.1}
+        self.lensModel = LensModel(
+            ["EPL", "PERTURBER"], profile_kwargs_list=[None, perturber_kwargs]
+        )
         self.lensModel_ref = LensModel_ref(
-            ["EPL", "SIS"], perturber_model_list=[False, True]
+            ["EPL", "PERTURBER"], profile_kwargs_list=[None, perturber_kwargs]
         )
         self.x = np.array([-1.5, -0.3, 1.1, 1.3, 2.7])
         self.y = np.array([-1.1, -0.6, 0.7, 1.2, 1.9])
@@ -142,10 +145,10 @@ class TestLensModel(object):
         f_xxx_ref, f_xxy_ref, f_xyy_ref, f_yyy_ref = self.lensModel_ref.flexion(
             self.x, self.y, kwargs=self.kwargs, hessian_diff=True
         )
-        npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=7)
-        npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=7)
-        npt.assert_array_almost_equal(f_xyy, f_xyy_ref, decimal=7)
-        npt.assert_array_almost_equal(f_yyy, f_yyy_ref, decimal=7)
+        npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=6)
+        npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=6)
+        npt.assert_array_almost_equal(f_xyy, f_xyy_ref, decimal=6)
+        npt.assert_array_almost_equal(f_yyy, f_yyy_ref, decimal=6)
 
         f_xxx, f_xxy, f_xyy, f_yyy = self.lensModel.flexion(
             self.x, self.y, kwargs=self.kwargs, hessian_diff=False

@@ -440,7 +440,14 @@ class TestSinglePlaneLOS(object):
         npt.assert_raises(
             ValueError, SinglePlaneLOS, lens_model_list=lens_model_list, index_los=0
         )
-        lensModel = SinglePlaneLOS(lens_model_list=_JAXXED_MODELS, index_los=0)
+        profile_kwargs_list = [None] * len(_JAXXED_MODELS)
+        perturber_kwargs = {"profile": "SIS", "ra_0": 0.1, "dec_0": -0.1}
+        profile_kwargs_list[_JAXXED_MODELS.index("PERTURBER")] = perturber_kwargs
+        lensModel = SinglePlaneLOS(
+            lens_model_list=_JAXXED_MODELS,
+            profile_kwargs_list=profile_kwargs_list,
+            index_los=0,
+        )
 
 
 class TestRaise(unittest.TestCase):
