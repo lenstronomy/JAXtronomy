@@ -627,7 +627,7 @@ def lens_class(
     #     from lenstronomy.LensModel.Profiles.pemd import PEMD
 
     #     return PEMD(**profile_kwargs)
-    elif lens_type == "PEMD":
+    elif lens_type == "PERTURBER":
         from jaxtronomy.LensModel.Profiles.perturber_model import PerturberModel
 
         return PerturberModel(**profile_kwargs)
