@@ -262,7 +262,10 @@ class TestSinglePlane(object):
     def test_profile_list_base(self):
         # this tests the giant elif statement in profile_list_base
 
-        lensModel = SinglePlane(lens_model_list=_JAXXED_MODELS)
+        profile_kwargs_list = [None] * len(_JAXXED_MODELS)
+        perturber_kwargs = {"profile": "SIS", "ra_0": 0.1, "dec_0": -0.1}
+        profile_kwargs_list[_JAXXED_MODELS.index("PERTURBER")] = perturber_kwargs
+        lensModel = SinglePlane(lens_model_list=_JAXXED_MODELS, profile_kwargs_list=profile_kwargs_list)
         for profile in lensModel.func_list:
             assert jaxtronomy.__name__ in profile.__module__
 
