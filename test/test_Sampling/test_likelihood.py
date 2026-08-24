@@ -391,6 +391,7 @@ class TestLikelihood(object):
             )
             kwargs_model = {
                 "lens_model_list": [deflector_profile],
+                "lens_profile_kwargs_list": profile_kwargs_list,
                 "lens_light_model_list": [],
                 "source_light_model_list": [],
             }
