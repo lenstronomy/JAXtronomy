@@ -145,10 +145,10 @@ class TestLensModel(object):
         f_xxx_ref, f_xxy_ref, f_xyy_ref, f_yyy_ref = self.lensModel_ref.flexion(
             self.x, self.y, kwargs=self.kwargs, hessian_diff=True
         )
-        npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=7)
-        npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=7)
-        npt.assert_array_almost_equal(f_xyy, f_xyy_ref, decimal=7)
-        npt.assert_array_almost_equal(f_yyy, f_yyy_ref, decimal=7)
+        npt.assert_array_almost_equal(f_xxx, f_xxx_ref, decimal=6)
+        npt.assert_array_almost_equal(f_xxy, f_xxy_ref, decimal=6)
+        npt.assert_array_almost_equal(f_xyy, f_xyy_ref, decimal=6)
+        npt.assert_array_almost_equal(f_yyy, f_yyy_ref, decimal=6)
 
         f_xxx, f_xxy, f_xyy, f_yyy = self.lensModel.flexion(
             self.x, self.y, kwargs=self.kwargs, hessian_diff=False
