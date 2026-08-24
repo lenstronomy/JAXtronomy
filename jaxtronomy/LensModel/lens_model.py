@@ -39,9 +39,6 @@ class LensModel(object):
         decouple_multi_plane=False,
         kwargs_multiplane_model=None,
         distance_ratio_sampling=False,
-        perturber_model_list=None,
-        ra_0=0,
-        dec_0=0,
         cosmology_sampling=False,
         cosmology_model="FlatLambdaCDM",
     ):
@@ -72,12 +69,6 @@ class LensModel(object):
             profile will be initialized using default settings.
         :param distance_ratio_sampling: bool, if True, will use sampled
             distance ratios to update T_ij value in multi-lens plane computation. Not supported in JAXtronomy.
-        :param perturber_model_list: list of deflector models that are treated as perturbations
-            (subtract shear and convergence contributions at ra_0/dec_0)
-        :type perturber_model_list: None or list of bools
-        :param ra_0: RA coordinate for which perturber models have zero shear and convergence contributions
-        :param dec_0: DEC coordinate for which perturber models have zero shear and convergence contributions
-            (usually center of the main deflector)
         :param cosmology_sampling: bool, if True, will use sampled cosmology
             to update T_ij value in multi-lens plane computation. Not supported in JAXtronomy.
         :param cosmology_model: str, name of the cosmology model to be used. Default is 'FlatLambdaCDM'.
@@ -158,9 +149,6 @@ class LensModel(object):
                     cosmo_interp=cosmo_interp,
                     z_interp_stop=z_interp_stop,
                     num_z_interp=num_z_interp,
-                    perturber_model_list=perturber_model_list,
-                    ra_0=ra_0,
-                    dec_0=dec_0,
                     **kwargs_multiplane_model
                 )
                 self.type = "MultiPlaneDecoupled"
@@ -177,9 +165,6 @@ class LensModel(object):
                     num_z_interp=num_z_interp,
                     distance_ratio_sampling=distance_ratio_sampling,
                     profile_kwargs_list=profile_kwargs_list,
-                    perturber_model_list=perturber_model_list,
-                    ra_0=ra_0,
-                    dec_0=dec_0,
                 )
                 self.type = "MultiPlane"
         else:
@@ -212,9 +197,6 @@ class LensModel(object):
                     z_source_convention=z_source_convention,
                     profile_kwargs_list=profile_kwargs_list,
                     alpha_scaling=alpha_scaling,
-                    perturber_model_list=perturber_model_list,
-                    ra_0=ra_0,
-                    dec_0=dec_0,
                 )
                 self.type = "SinglePlane"
 

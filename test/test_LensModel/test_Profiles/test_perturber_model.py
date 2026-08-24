@@ -3,10 +3,7 @@ __author__ = "sibirrer"
 from lenstronomy.LensModel.Profiles.perturber_model import (
     PerturberModel as PerturberModel_ref,
 )
-from lenstronomy.LensModel.Profiles.sis import SIS as SIS_ref
-
 from jaxtronomy.LensModel.Profiles.perturber_model import PerturberModel
-from jaxtronomy.LensModel.Profiles.sis import SIS
 
 import numpy as np
 import numpy.testing as npt
@@ -17,8 +14,8 @@ class TestPerturberModel(object):
     """Tests the PerturberModel methods."""
 
     def setup_method(self):
-        self.PerturberModel = PerturberModel(SIS(), ra_0=0.1, dec_0=-0.2)
-        self.PerturberModel_ref = PerturberModel_ref(SIS_ref(), ra_0=0.1, dec_0=-0.2)
+        self.PerturberModel = PerturberModel("SIS", ra_0=0.1, dec_0=-0.2)
+        self.PerturberModel_ref = PerturberModel_ref("SIS", ra_0=0.1, dec_0=-0.2)
         self.kwargs_lens = {"theta_E": 1.3123}
 
     def test_function(self):

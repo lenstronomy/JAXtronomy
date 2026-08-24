@@ -24,14 +24,15 @@ class TestSinglePlane(object):
     """Tests the Single Plane lens model routines."""
 
     def setup_method(self):
+        perturber_kwargs = {"profile": "SIS", "ra_0": 0.1, "dec_0": -0.1}
         self.lensModel = SinglePlane(
-            ["EPL", "SIS", "SHEAR"],
-            perturber_model_list=[False, True, False],
+            ["EPL", "PERTURBER", "SHEAR"],
+            profile_kwargs_list=[None, perturber_kwargs, None],
             alpha_scaling=1.1,
         )
         self.lensModel_ref = SinglePlane_ref(
-            ["EPL", "SIS", "SHEAR"],
-            perturber_model_list=[False, True, False],
+            ["EPL", "PERTURBER", "SHEAR"],
+            profile_kwargs_list=[None, perturber_kwargs, None],
             alpha_scaling=1.1,
         )
 

@@ -26,6 +26,7 @@ _JAXXED_MODELS = [
     "NFW",
     "NFW_ELLIPSE_CSE",
     "NIE",
+    "PERTURBER",
     "PJAFFE",
     "PJAFFE_ELLIPSE_POTENTIAL",
     "SHEAR",
@@ -102,6 +103,7 @@ _SUPPORTED_MODELS = [
     "NIE_POTENTIAL",
     "NIE_SIMPLE",
     "PEMD",
+    "PERTURBER",
     "PJAFFE",
     "PJAFFE_ELLIPSE_POTENTIAL",
     "POINT_MASS",
@@ -166,9 +168,6 @@ class ProfileListBase(object):
         profile_kwargs_list=None,
         lens_redshift_list=None,
         z_source_convention=None,
-        perturber_model_list=None,
-        ra_0=0,
-        dec_0=0,
     ):
         """
 
@@ -176,21 +175,12 @@ class ProfileListBase(object):
         :param profile_kwargs_list: list of dicts, keyword arguments used to initialize profile classes
             in the same order of the lens_model_list. If any of the profile_kwargs are None, then that
             profile will be initialized using default settings.
-        :param perturber_model_list: list of deflector models that are treated as perturbations
-            (subtract shear and convergence contributions at ra_0/dec_0)
-        :type perturber_model_list: None or list of bools
-        :param ra_0: RA coordinate for which perturber models have zero shear and convergence contributions
-        :param dec_0: DEC coordinate for which perturber models have zero shear and convergence contributions
-            (usually center of the main deflector)
         """
         self.func_list = self._load_model_instances(
             lens_model_list,
             profile_kwargs_list=profile_kwargs_list,
             lens_redshift_list=lens_redshift_list,
             z_source_convention=z_source_convention,
-            perturber_model_list=perturber_model_list,
-            ra_0=ra_0,
-            dec_0=dec_0,
         )
         self._num_func = len(self.func_list)
         self._model_list = lens_model_list
@@ -206,16 +196,11 @@ class ProfileListBase(object):
         profile_kwargs_list=None,
         lens_redshift_list=None,
         z_source_convention=None,
-        perturber_model_list=None,
-        ra_0=0,
-        dec_0=0,
     ):
         if lens_redshift_list is None:
             lens_redshift_list = [None] * len(lens_model_list)
         if profile_kwargs_list is None:
             profile_kwargs_list = [{} for _ in range(len(lens_model_list))]
-        if perturber_model_list is None:
-            perturber_model_list = [False] * len(lens_model_list)
 
         func_list = []
         imported_classes = []
@@ -247,12 +232,6 @@ class ProfileListBase(object):
                         (lens_type, profile_kwargs_list[i])
                     )
                     lensmodel_class = imported_classes[index]
-            if perturber_model_list[i] is True:
-                from jaxtronomy.LensModel.Profiles.perturber_model import (
-                    PerturberModel,
-                )
-
-                lensmodel_class = PerturberModel(lensmodel_class, ra_0, dec_0)
 
             func_list.append(lensmodel_class)
         return func_list
@@ -648,6 +627,10 @@ def lens_class(
     #     from lenstronomy.LensModel.Profiles.pemd import PEMD
 
     #     return PEMD(**profile_kwargs)
+    elif lens_type == "PEMD":
+        from jaxtronomy.LensModel.Profiles.perturber_model import PerturberModel
+
+        return PerturberModel(**profile_kwargs)
     elif lens_type == "PJAFFE":
         from jaxtronomy.LensModel.Profiles.pseudo_jaffe import PseudoJaffe
 
