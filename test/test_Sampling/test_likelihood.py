@@ -381,7 +381,7 @@ class TestLikelihood(object):
         for deflector_profile in JAXXED_DEFLECTOR_PROFILES:
             print(deflector_profile)
 
-            profile_kwargs_list = {}
+            profile_kwargs_list = [None]
             if deflector_profile == "PERTURBER":
                 perturber_kwargs = {"profile": "SIS", "ra_0": 0.1, "dec_0": -0.1}
                 profile_kwargs_list = [perturber_kwargs]
