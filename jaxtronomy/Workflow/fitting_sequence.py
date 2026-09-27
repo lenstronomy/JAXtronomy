@@ -950,7 +950,7 @@ class FittingSequence(object):
 
         # We have to use lenstronomy's likelihood class since the jit-compiled JAX
         # version does not do in-place updates on external dictionaries
-        im_sim_class = self.likelihood_class_lenstronomy.image_likelihood.im_sim
+        im_sim_class = self.likelihood_class_lenstronomy.image_likelihood.imSim
 
         # Call linear solver to obtain amplitudes; the function update_linear_kwargs
         # is called inside, which automatically updates all dictionaries
