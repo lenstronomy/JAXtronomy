@@ -389,6 +389,7 @@ class FittingSequence(object):
         progress=True,
         backend_filename=None,
         start_from_backend=False,
+        flatten_chains=True,
         **kwargs_zeus,
     ):
         """MCMC routine.
@@ -412,6 +413,9 @@ class FittingSequence(object):
         :param start_from_backend: if True, start from the state saved in `backup_filename`.
          O therwise, create a new backup file with name `backup_filename` (any already existing file is overwritten!).
         :type start_from_backend: bool
+        :param flatten_chains: If true, flattens MCMC chains to have shape [n_run * n_walkers, ndim]. Otherwise,
+            unflattened MCMC chains will have shape [n_run, n_walkers, ndim]
+        :type flatten_chains: bool
         :param kwargs_zeus: zeus-specific kwargs
         :return: list of output arguments, e.g. MCMC samples, parameter names, logL distances of all samples specified
          by the specific sampler used
@@ -456,6 +460,7 @@ class FittingSequence(object):
                 progress=progress,
                 initpos=initpos,
                 backend_filename=backend_filename,
+                flatten_chains=flatten_chains,
                 **kwargs_zeus,
             )
             output = [sampler_type, samples, param_list, dist]
@@ -474,6 +479,7 @@ class FittingSequence(object):
                 initpos=initpos,
                 backend_filename=backend_filename,
                 start_from_backend=start_from_backend,
+                flatten_chains=flatten_chains,
             )
             output = [sampler_type, samples, param_list, dist]
 
