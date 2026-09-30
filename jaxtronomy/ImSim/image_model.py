@@ -500,7 +500,7 @@ class ImageModel(object):
         )
         return point_source_image * self._flux_scaling
 
-    @partial(jit, static_argnums=(0, 7, 8, 9, 10))
+    @partial(jit, static_argnums=(0, 7, 8, 9, 10, 11))
     def image(
         self,
         kwargs_lens=None,
@@ -544,7 +544,7 @@ class ImageModel(object):
         :return: 2d array of surface brightness pixels of the simulation
         """
         model = jnp.zeros(self.Data.num_pixel_axes)
-        if source_add is True:
+        if source_add:
             model += ImageModel.source_surface_brightness(
                 self,
                 kwargs_source,
@@ -554,14 +554,14 @@ class ImageModel(object):
                 unconvolved=unconvolved,
                 apply_primary_beam=apply_primary_beam,
             )
-        if lens_light_add is True:
+        if lens_light_add:
             model += ImageModel.lens_surface_brightness(
                 self,
                 kwargs_lens_light,
                 unconvolved=unconvolved,
                 apply_primary_beam=apply_primary_beam,
             )
-        if point_source_add is True:
+        if point_source_add:
             model += ImageModel.point_source(
                 self,
                 kwargs_ps,
