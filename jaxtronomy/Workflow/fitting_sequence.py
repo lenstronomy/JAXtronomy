@@ -2,7 +2,7 @@ from jaxtronomy.Sampling.likelihood import Likelihood
 from jaxtronomy.Sampling.Samplers.optax import OptaxMinimizer
 from jaxtronomy.Sampling.sampler import Sampler
 
-# Import SingeBandMultiModel from lenstronomy for PsfFitting
+from lenstronomy.Sampling.likelihood import Likelihood as Likelihood_lenstronomy
 from lenstronomy.ImSim.MultiBand.single_band_multi_model import SingleBandMultiModel
 from lenstronomy.Workflow.psf_fitting import PsfFitting
 from lenstronomy.Workflow.alignment_matching import AlignmentFitting
@@ -130,6 +130,9 @@ class FittingSequence(object):
 
             elif fitting_type == "set_param_value":
                 self.set_param_value(**kwargs)
+
+            elif fitting_type == "set_amplitudes":
+                self.set_amplitudes()
 
             elif fitting_type == "fix_not_computed":
                 self.fix_not_computed(**kwargs)
@@ -338,6 +341,21 @@ class FittingSequence(object):
         )
         return likelihood_class
 
+    @property
+    def likelihood_class_lenstronomy(self):
+        """
+
+        :return: Likelihood() class instance reflecting the current state of FittingSequence
+        """
+        kwargs_likelihood = self._updateManager.kwargs_likelihood
+        likelihood_class = Likelihood_lenstronomy(
+            self.kwargs_data_joint,
+            self._updateManager.kwargs_model,
+            self.param_class,
+            **kwargs_likelihood,
+        )
+        return likelihood_class
+
     def simplex(self, n_iterations, method="Nelder-Mead"):
         """Downhill simplex optimization using the Nelder-Mead algorithm.
 
@@ -371,6 +389,7 @@ class FittingSequence(object):
         progress=True,
         backend_filename=None,
         start_from_backend=False,
+        flatten_chains=True,
         **kwargs_zeus,
     ):
         """MCMC routine.
@@ -394,6 +413,9 @@ class FittingSequence(object):
         :param start_from_backend: if True, start from the state saved in `backup_filename`.
          O therwise, create a new backup file with name `backup_filename` (any already existing file is overwritten!).
         :type start_from_backend: bool
+        :param flatten_chains: If true, flattens MCMC chains to have shape [n_run * n_walkers, ndim]. Otherwise,
+            unflattened MCMC chains will have shape [n_run, n_walkers, ndim]
+        :type flatten_chains: bool
         :param kwargs_zeus: zeus-specific kwargs
         :return: list of output arguments, e.g. MCMC samples, parameter names, logL distances of all samples specified
          by the specific sampler used
@@ -438,6 +460,7 @@ class FittingSequence(object):
                 progress=progress,
                 initpos=initpos,
                 backend_filename=backend_filename,
+                flatten_chains=flatten_chains,
                 **kwargs_zeus,
             )
             output = [sampler_type, samples, param_list, dist]
@@ -456,6 +479,7 @@ class FittingSequence(object):
                 initpos=initpos,
                 backend_filename=backend_filename,
                 start_from_backend=start_from_backend,
+                flatten_chains=flatten_chains,
             )
             output = [sampler_type, samples, param_list, dist]
 
@@ -725,8 +749,8 @@ class FittingSequence(object):
         kwargs_temp = self.best_fit(bijective=False)
 
         # Since psf_iteration happens through lenstronomy, we have to convert
-        # all JAX arrays stored on GPU into numpy arrays stored on cpu
-        kwargs_temp_cpu = jax.tree.map(jax.device_get, kwargs_temp)
+        # all JAX arrays back into numpy arrays to avoid conflict with numba
+        kwargs_temp_numpy = jax.tree.map(jax.device_get, kwargs_temp)
 
         if compute_bands is None:
             compute_bands = [True] * len(self.multi_band_list)
@@ -745,7 +769,7 @@ class FittingSequence(object):
                 psf_iter = PsfFitting(image_model_class=image_model)
 
                 kwargs_psf = psf_iter.update_iterative(
-                    kwargs_psf, kwargs_params=kwargs_temp_cpu, **kwargs_psf_iter
+                    kwargs_psf, kwargs_params=kwargs_temp_numpy, **kwargs_psf_iter
                 )
                 self.multi_band_list[band_index][1] = kwargs_psf
                 self._psf_iteration_memory.append(
@@ -909,6 +933,52 @@ class FittingSequence(object):
             change_sigma_lens_light=change_sigma_lens_light,
         )
         return 0
+
+    def set_amplitudes(self):
+        """Overwrites all current amplitude parameters with values obtained from calling
+        the linear solver on the current parameter state.
+
+        For multi-band fitting, any light models present in multiple bands will have its
+        amplitude parameter set to the result from calling the linear solver on the last
+        band that it is present in.
+        """
+
+        # Extract kwargs from current parameter state (and convert JAX arrays to numpy to avoid conflicts with numba)
+        kwargs_temp = self.best_fit()
+        kwargs_temp_numpy = jax.tree.map(jax.device_get, kwargs_temp)
+
+        kwargs_lens = kwargs_temp_numpy["kwargs_lens"]
+        kwargs_source = kwargs_temp_numpy["kwargs_source"]
+        kwargs_lens_light = kwargs_temp_numpy["kwargs_lens_light"]
+        kwargs_ps = kwargs_temp_numpy["kwargs_ps"]
+        kwargs_special = kwargs_temp_numpy["kwargs_special"]
+        kwargs_extinction = kwargs_temp_numpy["kwargs_extinction"]
+        kwargs_tracer_source = kwargs_temp_numpy["kwargs_tracer_source"]
+
+        # We have to use lenstronomy's likelihood class since the jit-compiled JAX
+        # version does not do in-place updates on external dictionaries
+        im_sim_class = self.likelihood_class_lenstronomy.image_likelihood.imSim
+
+        # Call linear solver to obtain amplitudes; the function update_linear_kwargs
+        # is called inside, which automatically updates all dictionaries
+        im_sim_class.image_linear_solve(
+            kwargs_lens,
+            kwargs_source,
+            kwargs_lens_light,
+            kwargs_ps,
+            kwargs_extinction,
+            kwargs_special,
+        )
+        self._updateManager.update_param_state(
+            kwargs_lens,
+            kwargs_source,
+            kwargs_lens_light,
+            kwargs_ps,
+            kwargs_special,
+            kwargs_extinction,
+            kwargs_tracer_source,
+        )
+        print("updated kwargs:", self.best_fit())
 
     def set_param_value(self, **kwargs):
         """Set a parameter to a specific value. `kwargs` are below.

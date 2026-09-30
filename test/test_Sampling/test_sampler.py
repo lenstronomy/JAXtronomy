@@ -182,6 +182,7 @@ class TestSampler(object):
             mean_start,
             sigma_start,
             backend_filename=backend_filename,
+            flatten_chains=True,
         )
         assert len(samples_1) == n_walkers * n_run
         # 2) run a chain starting from the backup of previous run
@@ -193,8 +194,11 @@ class TestSampler(object):
             sigma_start,
             backend_filename=backend_filename,
             start_from_backend=True,
+            flatten_chains=False,
         )
-        assert len(samples_2) == len(samples_1) + n_walkers * int(n_run * 1.5)
+        assert len(samples_2) == len(samples_1) / n_walkers + n_run * 1.5
+        assert np.shape(dist_2)[0] == n_run * 2.5
+        assert np.shape(dist_2)[1] == n_walkers
         assert len(dist_2) == len(samples_2)
 
         # 3) reset the backend by setting start_from_backend false

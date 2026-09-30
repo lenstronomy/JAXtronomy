@@ -139,6 +139,7 @@ class Sampler(Sampler_lenstronomy):
         initpos=None,
         backend_filename=None,
         start_from_backend=False,
+        flatten_chains=True,
     ):
         """Run MCMC with emcee. For details, please have a look at the documentation of
         the emcee packager.
@@ -170,6 +171,9 @@ class Sampler(Sampler_lenstronomy):
         :param start_from_backend: if True, start from the state saved in `backup_filename`.
          Otherwise, create a new backup file with name `backup_filename` (any already existing file is overwritten!).
         :type start_from_backend: bool
+        :param flatten_chains: If true, flattens MCMC chains to have shape [n_run * n_walkers, ndim]. Otherwise,
+            unflattened MCMC chains will have shape [n_run, n_walkers, ndim]
+        :type flatten_chains: bool
         :return: samples, ln likelihood value of samples
         :rtype: numpy 2d array, numpy 1d array
         """
@@ -244,8 +248,8 @@ class Sampler(Sampler_lenstronomy):
         )
 
         sampler.run_mcmc(initpos, n_run_eff, progress=progress)
-        flat_samples = sampler.get_chain(discard=n_burn, thin=1, flat=True)
-        dist = sampler.get_log_prob(flat=True, discard=n_burn, thin=1)
+        flat_samples = sampler.get_chain(discard=n_burn, thin=1, flat=flatten_chains)
+        dist = sampler.get_log_prob(flat=flatten_chains, discard=n_burn, thin=1)
         print("Computing the MCMC...")
         print("Number of walkers = ", n_walkers)
         print("Burn-in iterations: ", n_burn)
