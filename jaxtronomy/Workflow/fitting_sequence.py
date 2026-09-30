@@ -132,7 +132,7 @@ class FittingSequence(object):
                 self.set_param_value(**kwargs)
 
             elif fitting_type == "set_amplitudes":
-                self.set_amplitudes()            
+                self.set_amplitudes()
 
             elif fitting_type == "fix_not_computed":
                 self.fix_not_computed(**kwargs)
@@ -936,10 +936,11 @@ class FittingSequence(object):
 
     def set_amplitudes(self):
         """Overwrites all current amplitude parameters with values obtained from calling
-        the linear solver on the current parameter state. For multi-band fitting, any
-        light models present in multiple bands will have its amplitude parameter set
-        to the result from calling the linear solver on the last band that it is
-        present in.
+        the linear solver on the current parameter state.
+
+        For multi-band fitting, any light models present in multiple bands will have its
+        amplitude parameter set to the result from calling the linear solver on the last
+        band that it is present in.
         """
 
         # Extract kwargs from current parameter state (and convert JAX arrays to numpy to avoid conflicts with numba)
