@@ -7,10 +7,11 @@ __all__ = ["ParticleSwarmOptimizerJIT"]
 
 
 class ParticleSwarmOptimizerJIT(object):
-    """Optimizer using a swarm of particles. Same as the PSO from lenstronomy, but the
-    entire computation happens within JIT. This class is intended to be used for GPU so
-    that there are no memory transfer overheads between GPU and CPU since the entire
-    computation happens on GPU.
+    """Optimizer using a swarm of particles.
+
+    Same as the PSO from lenstronomy, but the entire computation happens within JIT.
+    This class is intended to be used for GPU so that there are no memory transfer
+    overheads between GPU and CPU since the entire computation happens on GPU.
 
     The input log likelihood function is assumed to be vectorized.
     """
@@ -45,7 +46,7 @@ class ParticleSwarmOptimizerJIT(object):
     def _init_swarm(self):
         """Initiate the swarm.
 
-        :return: `None`
+        :return:`None`
         """
         swarm_positions = np.zeros((self.particleCount, self.param_count))
         for i in range(self.particleCount):
@@ -63,11 +64,11 @@ class ParticleSwarmOptimizerJIT(object):
         """Set the global best particle.
 
         :param position: position of the new global best
-        :type position: `list` or `ndarray`
+        :type position:`list` or `ndarray`
         :param velocity: unused, kept to maintain identical API as lenstronomy
         :param fitness: fitness of the new global best
-        :type fitness: `float`
-        :return: `None`
+        :type fitness:`float`
+        :return:`None`
         """
         self.global_best_position = jnp.asarray(position, dtype=float)
         self.global_best_fitness = fitness
@@ -147,26 +148,27 @@ class ParticleSwarmOptimizerJIT(object):
         rng_seed=0,
         verbose=True,
     ):
-        """Launches the PSO. Yields the complete swarm per iteration.
+        """Launches the PSO.
 
-        :param max_iter: maximum iterations
-        :param global_best_position: 1d array of size len(args); the initial values for
-            the best particle position
-        :param global_best_fitness: float; the initial value for the best particle
-            fitness
-        :param c1: cognitive weight
-        :param c2: social weight
-        :param p: float between 0 and 1, determines the percentage of particles to use
-            to compute swarm fit and position convergence
-        :param m: stop criterion tolerance; average fitness of best p% particles must be
-            within m of the global best fitness
-        :param n: stop criterion tolerance; positions of best p% of particles must be
-            within n euclidean distance of the global best position
-        :param early_stop_tolerance: float or None; if set, will terminate the PSO early
-            if |2 * global_best_fitness| < early_stop_tolerance. This takes priority
-            over the fitness and spatial convergence criteria.
-        :param verbose: if True, prints out the iteration number as the loop progresses
-        :type verbose: boolean
+        Yields the complete swarm per iteration.
+                :param max_iter: maximum iterations
+                :param global_best_position: 1d array of size len(args); the initial values for
+                    the best particle position
+                :param global_best_fitness: float; the initial value for the best particle
+                    fitness
+                :param c1: cognitive weight
+                :param c2: social weight
+                :param p: float between 0 and 1, determines the percentage of particles to use
+                    to compute swarm fit and position convergence
+                :param m: stop criterion tolerance; average fitness of best p% particles must be
+                    within m of the global best fitness
+                :param n: stop criterion tolerance; positions of best p% of particles must be
+                    within n euclidean distance of the global best position
+                :param early_stop_tolerance: float or None; if set, will terminate the PSO early
+                    if |2 * global_best_fitness| < early_stop_tolerance. This takes priority
+                    over the fitness and spatial convergence criteria.
+                :param verbose: if True, prints out the iteration number as the loop progresses
+                :type verbose: boolean
         """
         key = jax.random.PRNGKey(rng_seed)
 
@@ -368,7 +370,6 @@ class ParticleSwarmOptimizerJIT(object):
             within m of the global best fitness
         :rtype: bool
         """
-
         best_sort = jnp.sort(personal_best_fitnesses)[::-1]
         mean_fit = jnp.mean(best_sort[1 : int(self.particleCount * p)])
         return jnp.abs(global_best_fitness - mean_fit) < m
@@ -394,7 +395,6 @@ class ParticleSwarmOptimizerJIT(object):
             of the global best position
         :rtype: bool
         """
-
         sort_by_fitness_indices = jnp.argsort(swarm_fitnesses)
         sorted_positions = swarm_positions[sort_by_fitness_indices][
             0 : int(self.particleCount * p)
@@ -412,6 +412,5 @@ class ParticleSwarmOptimizerJIT(object):
         :return: whether the chi squared is within the chi squared tolerance
         :rtype: bool
         """
-
         chi_square = -2 * global_best_fitness
         return chi_square < chi_square_tolerance

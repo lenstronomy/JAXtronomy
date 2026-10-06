@@ -30,7 +30,6 @@ class MultiPlaneBulk(ProfileListBase):
         :param cosmo: instance of astropy cosmology. If None, an instance will be created based off of cosmology_model
         :param cosmology_model: string, used to initialize an instance of astropy cosmology if one was not already provided
         """
-
         self.unique_lens_model_list = unique_lens_model_list
         if isinstance(profile_kwargs_list, list):
             profile_kwargs_list += [{}]
@@ -239,7 +238,6 @@ class MultiPlaneBulkStatic(ProfileListBase):
         :param profile_kwargs_list: list of dictionaries, keyword arguments used to intiialize different lens model profiles
         :param cosmology_model: string, used to initialize an instance of astropy cosmology if one was not already provided
         """
-
         if profile_kwargs_list is None:
             profile_kwargs_list = [{}] * len(lens_model_list)
 
@@ -308,7 +306,6 @@ class MultiPlaneBulkStatic(ProfileListBase):
         :return: all_kwargs, dictionary of JAX or numpy arrays, containing all
             parameters for all lens models
         """
-
         all_kwargs = {}
 
         kwargs_lens = [kwargs_lens[index] for index in self.sorted_indices]
@@ -406,7 +403,6 @@ def _sort_lists_by_redshift(lens_redshift_list, *other_lists):
     :param other_lists: other lists to be sorted
     :returns: same as the inputs but sorted by increasing redshift
     """
-
     lens_redshift_list = np.array(lens_redshift_list)
     sorted_indices = np.argsort(lens_redshift_list)
 
