@@ -122,8 +122,10 @@ class MultiLinear(MultiDataBase):
         linear_prior=None,
         check_positive_flux=False,
     ):
-        """Computes the likelihood of the data given a model. This is specified with the
-        non-linear parameters and a linear inversion and prior marginalisation.
+        """Computes the likelihood of the data given a model.
+
+        This is specified with the non-linear parameters and a linear inversion and
+        prior marginalisation.
 
         :param kwargs_lens: list of keyword arguments for the mass profiles
         :param kwargs_source: list of keyword arguments for the source light profiles
