@@ -53,7 +53,6 @@ class ImageModel(object):
             Indicates whether PSF error map is used for the point source model stated as the index.
         :param kwargs_pixelbased: kwargs for pixelbased solver; not supported in jaxtronomy. Must be None
         """
-
         self.type = "single-band"
         self.num_bands = 1
         self.PSF = psf_class
@@ -437,7 +436,6 @@ class ImageModel(object):
         :param k: int or tuple of ints that determine which lens light models to include
         :return: 2d array of surface brightness pixels
         """
-
         ra_grid, dec_grid = self.ImageNumerics.coordinates_evaluate
         lens_light = self.LensLightModel.surface_brightness(
             ra_grid, dec_grid, kwargs_lens_light, k=k

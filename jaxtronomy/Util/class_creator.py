@@ -381,7 +381,6 @@ def create_im_sim(
      that they get overwritten by the linear solver solution.
     :return: MultiBand class instance
     """
-
     if multi_band_type == "multi-linear":
         from jaxtronomy.ImSim.MultiBand.multi_linear import MultiLinear
 

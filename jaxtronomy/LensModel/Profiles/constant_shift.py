@@ -25,7 +25,6 @@ class Shift(LensProfileBase):
         :param alpha_y: shift in y-direction (angle)
         :return: lensing potential
         """
-
         return alpha_x * x + alpha_y * y
 
     @staticmethod

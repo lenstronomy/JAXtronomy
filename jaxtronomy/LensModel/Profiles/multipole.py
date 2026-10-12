@@ -56,7 +56,6 @@ class Multipole(LensProfileBase):
         :param r_E: float, normalizing radius (only used for the m=1, Einstein radius by default)
         :return: lensing potential
         """
-
         r, phi = param_util.cart2polar(x, y, center_x=center_x, center_y=center_y)
 
         def m_equal_1(r, phi, a_m, phi_m):
@@ -136,7 +135,6 @@ class Multipole(LensProfileBase):
         :param r_E: float, normalizing radius (not used for Hessian)
         :return: f_xx, f_xy, f_yx, f_yy
         """
-
         r, phi = param_util.cart2polar(x, y, center_x=center_x, center_y=center_y)
         r = jnp.maximum(r, 0.000001)
 
@@ -246,7 +244,6 @@ class EllipticalMultipole(LensProfileBase):
             default)
         :return: lensing potential
         """
-
         case = jnp.where(m == 1, 0, 4)
         case = jnp.where(m == 3, 1, case)
         case = jnp.where(m == 4, 2, case)
@@ -330,7 +327,6 @@ class EllipticalMultipole(LensProfileBase):
             default)
         :return: deflection angles alpha_x, alpha_y
         """
-
         case = jnp.where(m == 1, 0, 4)
         case = jnp.where(m == 3, 1, case)
         case = jnp.where(m == 4, 2, case)
@@ -432,7 +428,6 @@ class EllipticalMultipole(LensProfileBase):
         :param r_E: float, normalizing radius (not used for Hessian)
         :return: f_xx, f_xy, f_yx, f_yy
         """
-
         case = jnp.where(m == 1, 0, 4)
         case = jnp.where(m == 3, 1, case)
         case = jnp.where(m % 2 == 0, 2, case)
