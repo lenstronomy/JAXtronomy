@@ -277,10 +277,11 @@ class LightModelBase(object):
 
     @partial(jit, static_argnums=(0, 2, 3))
     def total_flux(self, kwargs_list, norm=False, k=None):
-        """Computes the total flux of each individual light profile. This allows to
-        estimate the total flux as well as lenstronomy amp to magnitude conversions. Not
-        all models are supported. The units are linked to the data to be modelled with
-        associated noise properties (default is count/s).
+        """Computes the total flux of each individual light profile.
+
+        This allows to estimate the total flux as well as lenstronomy amp to magnitude
+        conversions. Not all models are supported. The units are linked to the data to
+        be modelled with associated noise properties (default is count/s).
 
         :param kwargs_list: list of keyword arguments corresponding to the light
             profiles. The 'amp' parameter can be missing.
@@ -335,8 +336,9 @@ class LightModelBase(object):
 
     @property
     def param_name_list(self):
-        """Returns the list of all parameter names. Should be used outside of JIT.
+        """Returns the list of all parameter names.
 
+        Should be used outside of JIT.
         :return: list of lists of strings (for each light model separately)
         """
         name_list = []
@@ -346,8 +348,9 @@ class LightModelBase(object):
 
     @property
     def param_name_list_latex(self):
-        """Returns the list of all parameter names in LateX style. Should be used
-        outside of JIT.
+        """Returns the list of all parameter names in LateX style.
+
+        Should be used outside of JIT.
 
         :return: list of lists of strings (for each light model separately)
         """
@@ -368,7 +371,6 @@ class LightModelBase(object):
         :return: None or raise ValueError with error message of what parameter is not
             supported.
         """
-
         name_list = self.param_name_list
         if len(kwargs_list) != len(name_list):
             raise ValueError(

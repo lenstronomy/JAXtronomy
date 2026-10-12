@@ -19,7 +19,6 @@ class Null(LensProfileBase):
         :param x: x position
         :param y: y position
         """
-
         return jnp.zeros_like(x)
 
     @staticmethod
@@ -30,7 +29,6 @@ class Null(LensProfileBase):
         :param x: x position
         :param y: y position
         """
-
         return jnp.zeros_like(x), jnp.zeros_like(y)
 
     @staticmethod
@@ -41,7 +39,6 @@ class Null(LensProfileBase):
         :param x: x position
         :param y: y position
         """
-
         return (
             jnp.zeros_like(x),
             jnp.zeros_like(x),
