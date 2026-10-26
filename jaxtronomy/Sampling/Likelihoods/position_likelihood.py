@@ -369,11 +369,11 @@ class PositionLikelihood(object):
 def image2source_covariance(A, Sigma_theta):
     """Computes error covariance in the source plane.
 
-    :param A: 2d array, Hessian lensing matrix
+    :param A: 2d array, lensing Jacobian, A_ij = d beta_i / d theta_j
     :param Sigma_theta: 2d array, image plane covariance matrix of uncertainties
     """
-    ATSigma = jnp.matmul(A.T, Sigma_theta)
-    return jnp.matmul(ATSigma, A)
+    ASigma = jnp.matmul(A, Sigma_theta)
+    return jnp.matmul(ASigma, A.T)
 
 
 @jit
