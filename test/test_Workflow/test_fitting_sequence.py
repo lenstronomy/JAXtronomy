@@ -1212,8 +1212,6 @@ class TestFittingSequence(object):
             "lens_model_list": lens_model_list,
             "source_light_model_list": source_model_list,
             "lens_light_model_list": lens_light_model_list,
-            "source_light_profile_kwargs_list": [{"n_max": 1}],
-            "lens_light_profile_kwargs_list": [{"n_max": 1}],
         }
 
         multi_band_list = [[kwargs_data, kwargs_psf_gaussian, kwargs_numerics]]
