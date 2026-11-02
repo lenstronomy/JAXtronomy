@@ -3,6 +3,43 @@ from jax import jit
 from jaxtronomy.LightModel.Profiles.shapelets import ShapeletSetStatic
 from jaxtronomy.Util import param_util
 
+class ShapeletSetEllipse(object):
+    """This definition is required for lenstronomy's Param class, but all computations
+    should be rerouted to ShapeletSetEllipseStatic where n_max is declared at initialization.
+    """
+
+    param_names = ["amp", "n_max", "beta", "e1", "e2", "center_x", "center_y"]
+    lower_limit_default = {
+        "amp": -100,
+        "beta": 0.01,
+        "e1": -0.6,
+        "e2": -0.6,
+        "center_x": -100,
+        "center_y": -100,
+    }
+    upper_limit_default = {
+        "amp": 100,
+        "beta": 100,
+        "e1": 0.6,
+        "e2": 0.6,
+        "center_x": 100,
+        "center_y": 100,
+    }
+
+    def __init__(self):
+        pass
+
+    def function(self, *args, **kwargs):
+        raise NotImplementedError(
+            "Computations involving Shapelets should be rerouted to the ShapeletSetEllipseStatic() class" \
+            "by supplying n_max at initialization"
+        )
+    
+    def function_split(self, *args, **kwargs):
+        raise NotImplementedError(
+            "Computations involving Shapelets should be rerouted to the ShapeletSetEllipseStatic() class" \
+            "by supplying n_max at initialization"
+        )
 
 class ShapeletSetEllipseStatic(object):
     """Cartesian shapelets with elliptical axis ratios.
@@ -30,6 +67,7 @@ class ShapeletSetEllipseStatic(object):
 
     def __init__(self, n_max):
         self._shapelet_set = ShapeletSetStatic(n_max=n_max)
+        self.num_param = self._shapelet_set.num_param
 
     @partial(jit, static_argnums=0)
     def function(

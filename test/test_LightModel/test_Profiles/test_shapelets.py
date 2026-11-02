@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import unittest
 import numpy.testing as npt
 
 from jaxtronomy.LightModel.Profiles.shapelets import (
@@ -184,11 +185,10 @@ class TestShapelets_NoStableCut(object):
 class TestShapeletSet(object):
 
     def setup_method(self):
-        self.shapeletset = ShapeletSet()
         self.shapeletset_ref = ShapeletSet_ref()
-        self.shapeletset_static_off = ShapeletSetStatic(n_max=-1)
-        self.shapeletset_static4 = ShapeletSetStatic(n_max=4)
-        self.shapeletset_static12 = ShapeletSetStatic(n_max=12)
+        self.shapeletset_off = ShapeletSetStatic(n_max=-1)
+        self.shapeletset4 = ShapeletSetStatic(n_max=4)
+        self.shapeletset12 = ShapeletSetStatic(n_max=12)
 
     def test_init(self):
         npt.assert_raises(ValueError, ShapeletSetStatic, 5.5)
@@ -202,9 +202,7 @@ class TestShapeletSet(object):
 
         n_max = -1
         amp = []
-        result = self.shapeletset_static_off.function(
-            x, y, amp, n_max, beta, center_x, center_y
-        )
+        result = self.shapeletset_off.function(x, y, amp, beta, center_x, center_y)
         result_ref = self.shapeletset_ref.function(
             x, y, amp, n_max, beta, center_x, center_y
         )
@@ -213,31 +211,25 @@ class TestShapeletSet(object):
         n_max = 4
         num_param = int((n_max + 1) * (n_max + 2) / 2)
         amp = np.linspace(1.0, 100.0, num_param)
-        result = self.shapeletset.function(x, y, amp, n_max, beta, center_x, center_y)
+        result = self.shapeletset4.function(x, y, amp, beta, center_x, center_y)
         result_ref = self.shapeletset_ref.function(
             x, y, amp, n_max, beta, center_x, center_y
         )
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        result = self.shapeletset_static4.function(x, y, amp, beta, center_x, center_y)
-        npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
-
         n_max = 12
         num_param = int((n_max + 1) * (n_max + 2) / 2)
         amp = np.linspace(1.0, 100.0, num_param)
-        result = self.shapeletset.function(y, x, amp, n_max, beta, center_x, center_y)
+        result = self.shapeletset12.function(y, x, amp, beta, center_x, center_y)
         result_ref = self.shapeletset_ref.function(
             y, x, amp, n_max, beta, center_x, center_y
         )
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
 
-        result = self.shapeletset_static12.function(y, x, amp, beta, center_x, center_y)
-        npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
-
         amp = np.linspace(1.0, 100.0, num_param + 1)
         npt.assert_raises(
             ValueError,
-            self.shapeletset_static12.function,
+            self.shapeletset12.function,
             x,
             y,
             amp,
@@ -247,7 +239,7 @@ class TestShapeletSet(object):
         )
         npt.assert_raises(
             ValueError,
-            self.shapeletset_static12.function_split,
+            self.shapeletset12.function_split,
             x,
             y,
             amp,
@@ -265,8 +257,8 @@ class TestShapeletSet(object):
 
         n_max = -1
         amp = []
-        result = self.shapeletset_static_off.function_split(
-            x, y, amp, n_max, beta, center_x, center_y
+        result = self.shapeletset_off.function_split(
+            x, y, amp, beta, center_x, center_y
         )
         result_ref = self.shapeletset_ref.function_split(
             x, y, amp, n_max, beta, center_x, center_y
@@ -276,9 +268,7 @@ class TestShapeletSet(object):
         n_max = 4
         num_param = int((n_max + 1) * (n_max + 2) / 2)
         amp = np.linspace(1.0, 100.0, num_param)
-        result = self.shapeletset_static4.function_split(
-            x, y, amp, beta, center_x, center_y
-        )
+        result = self.shapeletset4.function_split(x, y, amp, beta, center_x, center_y)
         result_ref = self.shapeletset_ref.function_split(
             x, y, amp, n_max, beta, center_x, center_y
         )
@@ -287,13 +277,20 @@ class TestShapeletSet(object):
         n_max = 12
         num_param = int((n_max + 1) * (n_max + 2) / 2)
         amp = np.linspace(1.0, 100.0, num_param)
-        result = self.shapeletset_static12.function_split(
-            y, x, amp, beta, center_x, center_y
-        )
+        result = self.shapeletset12.function_split(y, x, amp, beta, center_x, center_y)
         result_ref = self.shapeletset_ref.function_split(
             y, x, amp, n_max, beta, center_x, center_y
         )
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
+
+
+class TestRaise(unittest.TestCase):
+    def test_raise(self):
+        shapelet = ShapeletSet()
+        with self.assertRaises(NotImplementedError):
+            shapelet.function()
+        with self.assertRaises(NotImplementedError):
+            shapelet.function_split()
 
 
 if __name__ == "__main__":

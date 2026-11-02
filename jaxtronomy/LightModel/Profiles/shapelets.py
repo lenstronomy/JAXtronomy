@@ -223,10 +223,8 @@ class Shapelets(object):
 
 
 class ShapeletSet(object):
-    """Class to operate on entire shapelet set limited by a maximal polynomial order
-    n_max, such that n1 + n2 <= n_max.
-
-    This class is not compatible with linear solver.
+    """This definition is required for lenstronomy's Param class, but all computations
+    should be rerouted to ShapeletSetEllipseStatic where n_max is declared at initialization.
     """
 
     param_names = ["amp", "n_max", "beta", "center_x", "center_y"]
@@ -246,51 +244,19 @@ class ShapeletSet(object):
     }
 
     def __init__(self):
-        self.shapelets = Shapelets(precalc=True)
+        pass
 
-    @partial(jit, static_argnums=(0,))
-    def function(self, x, y, amp, n_max, beta, center_x=0, center_y=0):
-        """NOTE: The number of loops is determined based off of len(amp) instead of n_max
-        for autodifferentiation to work. As long as len(amp) equals (n_max + 1) * (n_max + 2) / 2,
-        this function will work correctly and identically to lenstronomy. However if there is
-        any user error, the behaviour of this function will differ from lenstronomy.
-        For performance reasons, we do not include any runtime checks of len(amp) and n_max.
-
-        :param x: float or 1d array of x-coordinates
-        :param y: float or 1d array of y-coordinates
-        :param amp: 1d array of amplitudes in pre-defined order of shapelet basis functions
-            amp[0] corresponds to (n1, n2) = (0, 0), amp[1] corresponds to (n1, n2) = (1, 0)
-            amp[2] corresponds to (n1, n2) = (0, 1), amp[3] corresponds to (n1, n2) = (2, 0)
-            amp[4] corresponds to (n1, n2) = (1, 1), amp[5] corresponds to (n1, n2) = (0, 2)
-            amp[6] corresponds to (n1, n2) = (3, 0), etc
-            len(amp) should be equal to (n_max + 1) * (n_max + 2) / 2
-        :param beta: shapelet scale
-        :param n_max: int, maximum order in Hermite polynomial. Although this argument is unused here,
-            inonsistencies with len(amp) can lead to incorrect behaviour in e.g. Lightparam and Param classes.
-        :param center_x: shapelet center
-        :param center_y: shapelet center
-        :return: surface brightness of combined shapelet set
-        """
-        x_shape = x.shape
-        x = jnp.atleast_1d(x)
-        f_ = jnp.zeros_like(x)
-        amp = jnp.array(amp)
-
-        n_order = int((-3 + np.sqrt(9 + 8 * (len(amp) - 1))) / 2)
-        phi_x, phi_y = self.shapelets.pre_calc(x, y, beta, n_order, center_x, center_y)
-
-        n1 = 0
-        n2 = 0
-
-        def body_fun(i, val):
-            f_, n1, n2 = val
-            f_ += amp.at[i].get() * phi_x.at[n1].get() * phi_y.at[n2].get()
-            n1, n2 = jnp.where(n1 == 0, n2 + 1, n1 - 1), jnp.where(n1 == 0, 0, n2 + 1)
-            return f_, n1, n2
-
-        f_ = lax.fori_loop(0, len(amp), body_fun, (f_, n1, n2))[0]
-        f_ = f_.reshape(x_shape)
-        return jnp.nan_to_num(f_)
+    def function(self, *args, **kwargs):
+        raise NotImplementedError(
+            "Computations involving Shapelets should be rerouted to the ShapeletSetStatic() class" \
+            "by supplying n_max at initialization"
+        )
+    
+    def function_split(self, *args, **kwargs):
+        raise NotImplementedError(
+            "Computations involving Shapelets should be rerouted to the ShapeletSetStatic() class" \
+            "by supplying n_max at initialization"
+        )
 
 
 class ShapeletSetStatic(object):

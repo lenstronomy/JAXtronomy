@@ -1,8 +1,10 @@
 import numpy as np
 import pytest
+import unittest
 import numpy.testing as npt
 
 from jaxtronomy.LightModel.Profiles.shapelets_ellipse import (
+    ShapeletSetEllipse,
     ShapeletSetEllipseStatic as ShapeletSetStatic,
 )
 from lenstronomy.LightModel.Profiles.shapelets_ellipse import (
@@ -100,6 +102,15 @@ class TestShapeletSet(object):
             y, x, amp, n_max, beta, e1, e2, center_x, center_y
         )
         npt.assert_allclose(result, result_ref, atol=1e-12, rtol=1e-12)
+
+
+class TestRaise(unittest.TestCase):
+    def test_raise(self):
+        shapelet = ShapeletSetEllipse()
+        with self.assertRaises(NotImplementedError):
+            shapelet.function()
+        with self.assertRaises(NotImplementedError):
+            shapelet.function_split()
 
 
 if __name__ == "__main__":
