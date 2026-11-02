@@ -10,7 +10,7 @@ class ShapeletSetEllipseStatic(object):
     The shapelet order must be declared at initialization.
     """
 
-    param_names = ["amp", "n_max", "beta", "e1", "e2", "center_x", "center_y"]
+    param_names = ["amp", "beta", "e1", "e2", "center_x", "center_y"]
     lower_limit_default = {
         "amp": -100,
         "beta": 0.01,

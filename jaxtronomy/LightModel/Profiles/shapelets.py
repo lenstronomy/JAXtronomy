@@ -230,17 +230,15 @@ class ShapeletSetStatic(object):
     will not work.
     """
 
-    param_names = ["amp", "n_max", "beta", "center_x", "center_y"]
+    param_names = ["amp", "beta", "center_x", "center_y"]
     lower_limit_default = {
         "amp": -100,
-        "n_max": 1,
         "beta": 0.01,
         "center_x": -100,
         "center_y": -100,
     }
     upper_limit_default = {
         "amp": 100,
-        "n_max": 20,
         "beta": 100,
         "center_x": 100,
         "center_y": 100,
