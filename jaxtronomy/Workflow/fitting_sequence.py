@@ -312,7 +312,7 @@ class FittingSequence(object):
         # set n_max at initialization. Required for jaxtronomy
         light_model_list = kwargs_model_copy.get("source_light_model_list", [])
 
-        for shapelet_profile in ["SHAPELETS, SHAPELETS_ELLIPSE"]:
+        for shapelet_profile in ["SHAPELETS", "SHAPELETS_ELLIPSE"]:
             if shapelet_profile in light_model_list:
                 index = light_model_list.index(shapelet_profile)
                 num_profiles = len(light_model_list)
