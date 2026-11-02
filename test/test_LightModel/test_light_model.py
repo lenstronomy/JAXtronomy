@@ -184,7 +184,6 @@ class TestRaise(unittest.TestCase):
         with self.assertRaises(ValueError):
             # missing n_max at initialization
             lighModel = LightModel(light_model_list=["SHAPELETS_ELLIPSE"])
-        
 
 
 if __name__ == "__main__":

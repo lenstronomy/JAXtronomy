@@ -200,9 +200,7 @@ class TestShapeletSet(object):
 
         n_max = -1
         amp = []
-        result = self.shapeletset_off.function(
-            x, y, amp, beta, center_x, center_y
-        )
+        result = self.shapeletset_off.function(x, y, amp, beta, center_x, center_y)
         result_ref = self.shapeletset_ref.function(
             x, y, amp, n_max, beta, center_x, center_y
         )
@@ -268,9 +266,7 @@ class TestShapeletSet(object):
         n_max = 4
         num_param = int((n_max + 1) * (n_max + 2) / 2)
         amp = np.linspace(1.0, 100.0, num_param)
-        result = self.shapeletset4.function_split(
-            x, y, amp, beta, center_x, center_y
-        )
+        result = self.shapeletset4.function_split(x, y, amp, beta, center_x, center_y)
         result_ref = self.shapeletset_ref.function_split(
             x, y, amp, n_max, beta, center_x, center_y
         )
@@ -279,9 +275,7 @@ class TestShapeletSet(object):
         n_max = 12
         num_param = int((n_max + 1) * (n_max + 2) / 2)
         amp = np.linspace(1.0, 100.0, num_param)
-        result = self.shapeletset12.function_split(
-            y, x, amp, beta, center_x, center_y
-        )
+        result = self.shapeletset12.function_split(y, x, amp, beta, center_x, center_y)
         result_ref = self.shapeletset_ref.function_split(
             y, x, amp, n_max, beta, center_x, center_y
         )

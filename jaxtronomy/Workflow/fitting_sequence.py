@@ -317,11 +317,14 @@ class FittingSequence(object):
                 index = light_model_list.index(shapelet_profile)
                 num_profiles = len(light_model_list)
                 profile_kwargs_list = kwargs_model_copy.get(
-                    "source_light_profile_kwargs_list", [{} for _ in range(num_profiles)]
+                    "source_light_profile_kwargs_list",
+                    [{} for _ in range(num_profiles)],
                 )
                 n_max = self._updateManager.fixed_kwargs[1][index]["n_max"]
                 profile_kwargs_list[index] = {"n_max": n_max}
-                kwargs_model_copy["source_light_profile_kwargs_list"] = profile_kwargs_list
+                kwargs_model_copy["source_light_profile_kwargs_list"] = (
+                    profile_kwargs_list
+                )
 
             light_model_list = kwargs_model_copy.get("lens_light_model_list", [])
             if shapelet_profile in light_model_list:
@@ -332,7 +335,9 @@ class FittingSequence(object):
                 )
                 n_max = self._updateManager.fixed_kwargs[2][index]["n_max"]
                 profile_kwargs_list[index] = {"n_max": n_max}
-                kwargs_model_copy["lens_light_profile_kwargs_list"] = profile_kwargs_list
+                kwargs_model_copy["lens_light_profile_kwargs_list"] = (
+                    profile_kwargs_list
+                )
 
         kwargs_likelihood = self._updateManager.kwargs_likelihood
         likelihood_class = Likelihood(

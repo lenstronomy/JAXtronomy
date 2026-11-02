@@ -102,6 +102,7 @@ def test_transform_e1e2_product_average_rotate():
     npt.assert_almost_equal(x_, x_ref, decimal=8)
     npt.assert_almost_equal(y_, y_ref, decimal=8)
 
+
 def test_transform_e1e2_product_average():
     e1 = 0.01
     e2 = -0.03

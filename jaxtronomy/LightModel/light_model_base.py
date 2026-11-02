@@ -99,8 +99,10 @@ class LightModelBase(object):
 
             elif profile_type == "SHAPELETS":
                 if profile_kwargs.get("n_max", None) is None:
-                    raise ValueError("Shapelet profile must have n_max provided at initialization in JAXtronomy")
-                
+                    raise ValueError(
+                        "Shapelet profile must have n_max provided at initialization in JAXtronomy"
+                    )
+
                 from jaxtronomy.LightModel.Profiles.shapelets import (
                     ShapeletSetStatic,
                 )
@@ -109,8 +111,10 @@ class LightModelBase(object):
 
             elif profile_type == "SHAPELETS_ELLIPSE":
                 if profile_kwargs.get("n_max", None) is None:
-                    raise ValueError("Elliptical Shapelet profile must have n_max provided at initialization in JAXtronomy")
-                
+                    raise ValueError(
+                        "Elliptical Shapelet profile must have n_max provided at initialization in JAXtronomy"
+                    )
+
                 from jaxtronomy.LightModel.Profiles.shapelets_ellipse import (
                     ShapeletSetEllipseStatic,
                 )
