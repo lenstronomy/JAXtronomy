@@ -1151,6 +1151,8 @@ class TestFittingSequence(object):
             {
                 "amp": [10.0, 10.0, 10.0],
                 "beta": 0.4,
+                "e1": 0.1,
+                "e2": -0.1,
                 "center_x": 0.3,
                 "center_y": 0.0,
             }
@@ -1159,6 +1161,8 @@ class TestFittingSequence(object):
             {
                 "amp": [1.0, 1.0, 1.0],
                 "beta": 0.4,
+                "e1": 0.1,
+                "e2": 0.1,
                 "center_x": 0.2,
                 "center_y": 0.2,
             }
