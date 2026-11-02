@@ -224,8 +224,8 @@ class Shapelets(object):
 
 class ShapeletSet(object):
     """This definition is required for lenstronomy's Param class, but all computations
-    should be rerouted to ShapeletSetEllipseStatic where n_max is declared at initialization.
-    """
+    should be rerouted to ShapeletSetEllipseStatic where n_max is declared at
+    initialization."""
 
     param_names = ["amp", "n_max", "beta", "center_x", "center_y"]
     lower_limit_default = {
@@ -248,13 +248,13 @@ class ShapeletSet(object):
 
     def function(self, *args, **kwargs):
         raise NotImplementedError(
-            "Computations involving Shapelets should be rerouted to the ShapeletSetStatic() class" \
+            "Computations involving Shapelets should be rerouted to the ShapeletSetStatic() class"
             "by supplying n_max at initialization"
         )
-    
+
     def function_split(self, *args, **kwargs):
         raise NotImplementedError(
-            "Computations involving Shapelets should be rerouted to the ShapeletSetStatic() class" \
+            "Computations involving Shapelets should be rerouted to the ShapeletSetStatic() class"
             "by supplying n_max at initialization"
         )
 

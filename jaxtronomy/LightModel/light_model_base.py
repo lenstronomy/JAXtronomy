@@ -102,9 +102,9 @@ class LightModelBase(object):
                     from jaxtronomy.LightModel.Profiles.shapelets import (
                         ShapeletSet,
                     )
-    
-                    self.func_list.append(ShapeletSet(**profile_kwargs))                    
-                
+
+                    self.func_list.append(ShapeletSet(**profile_kwargs))
+
                 else:
                     from jaxtronomy.LightModel.Profiles.shapelets import (
                         ShapeletSetStatic,
@@ -117,9 +117,9 @@ class LightModelBase(object):
                     from jaxtronomy.LightModel.Profiles.shapelets_ellipse import (
                         ShapeletSetEllipse,
                     )
-    
-                    self.func_list.append(ShapeletSetEllipse(**profile_kwargs))                    
-                
+
+                    self.func_list.append(ShapeletSetEllipse(**profile_kwargs))
+
                 else:
                     from jaxtronomy.LightModel.Profiles.shapelets_ellipse import (
                         ShapeletSetEllipseStatic,
