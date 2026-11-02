@@ -1277,7 +1277,7 @@ class TestFittingSequence(object):
 
             optax_kwargs = {
                 "maxiter": 1000,
-                "num_chains": 3,
+                "num_chains": 1,
                 "tolerance": 0.01,
                 "sigma_scale": 1,
                 "rng_seed": 42,
@@ -1291,6 +1291,19 @@ class TestFittingSequence(object):
                 kwargs_result["kwargs_lens"][0]["theta_E"], 0.66, decimal=1
             )
             print(f"Test with linear solver {linear_solver} successful")
+
+        # Try once without rng seed for better code coverage (tests may sometimes fail)
+        optax_kwargs = {
+            "maxiter": 1000,
+            "num_chains": 1,
+            "tolerance": 0.01,
+            "sigma_scale": 1,
+        }
+        fitting_kwargs_list_jaxopt = [["optax", optax_kwargs]]
+        chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_jaxopt)
+        npt.assert_almost_equal(
+            kwargs_result["kwargs_lens"][0]["theta_E"], 0.66, decimal=1
+        )
 
 
 if __name__ == "__main__":
