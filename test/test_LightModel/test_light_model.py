@@ -67,6 +67,11 @@ class TestLightModel(object):
         ]
         for index in MGE_indices:
             profile_kwargs_list[index] = {"n_comp": 5}
+        shapelet_indices = [
+            _JAXXED_MODELS.index(model) for model in ["SHAPELETS", "SHAPELETS_ELLIPSE"]
+        ]
+        for index in shapelet_indices:
+            profile_kwargs_list[index] = {"n_max": 3}
         lightModel = LightModel(
             light_model_list=_JAXXED_MODELS, profile_kwargs_list=profile_kwargs_list
         )

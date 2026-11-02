@@ -1003,7 +1003,7 @@ class TestFittingSequence(object):
 
         lens_model_class = LensModel(lens_model_list)
 
-        # Shapelet parameters in the initial simulation for the source
+        # Sersic parameters in the initial simulation for the source
         kwargs_shapelets = {
             "amp": [16.0, 15.0, 14.0],
             "beta": 0.5,
@@ -1011,18 +1011,18 @@ class TestFittingSequence(object):
             "center_y": 0.0,
         }
         kwargs_shapelets_ellipse = {
-            "amp": [12.0, 15.5, 14.3],
+            "amp": [16.0, 15.0, 14.0],
             "beta": 0.5,
-            "e1": 0.1,
-            "e2": -0.238,
+            "e1": 0.213,
+            "e2": -0.12873,
             "center_x": 0.1,
             "center_y": 0.0,
         }
-        source_model_list = ["SHAPELETS", "SHAPELETS_ELLIPSE"]
-        kwargs_source = [kwargs_shapelets, kwargs_shapelets_ellipse]
+        source_model_list = ["SHAPELETS_ELLIPSE"]
+        kwargs_source = [kwargs_shapelets_ellipse]
 
         source_model_class = LightModel(
-            source_model_list, profile_kwargs_list=[{"n_max": 1}] * 2
+            source_model_list, profile_kwargs_list=[{"n_max": 1}]
         )
 
         lens_light_model_list = ["SHAPELETS"]
@@ -1066,7 +1066,6 @@ class TestFittingSequence(object):
         kwargs_numerics = {
             "supersampling_factor": 1,
             "supersampling_convolution": False,
-            "convolution_type": "fft_static",
         }
 
         image_model = ImageModel(
@@ -1213,6 +1212,8 @@ class TestFittingSequence(object):
             "lens_model_list": lens_model_list,
             "source_light_model_list": source_model_list,
             "lens_light_model_list": lens_light_model_list,
+            "source_light_profile_kwargs_list": [{"n_max": 1}],
+            "lens_light_profile_kwargs_list": [{"n_max": 1}],
         }
 
         multi_band_list = [[kwargs_data, kwargs_psf_gaussian, kwargs_numerics]]
