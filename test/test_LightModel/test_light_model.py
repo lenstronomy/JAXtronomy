@@ -67,11 +67,6 @@ class TestLightModel(object):
         ]
         for index in MGE_indices:
             profile_kwargs_list[index] = {"n_comp": 5}
-        shapelet_indices = [
-            _JAXXED_MODELS.index(model) for model in ["SHAPELETS", "SHAPELETS_ELLIPSE"]
-        ]
-        for index in shapelet_indices:
-            profile_kwargs_list[index] = {"n_max": 3}
         lightModel = LightModel(
             light_model_list=_JAXXED_MODELS, profile_kwargs_list=profile_kwargs_list
         )
@@ -183,12 +178,6 @@ class TestRaise(unittest.TestCase):
             lightmodel = LightModel(
                 light_model_list=["SERSIC"], source_redshift_list=[1, 3]
             )
-        with self.assertRaises(ValueError):
-            # missing n_max at initialization
-            lighModel = LightModel(light_model_list=["SHAPELETS"])
-        with self.assertRaises(ValueError):
-            # missing n_max at initialization
-            lighModel = LightModel(light_model_list=["SHAPELETS_ELLIPSE"])
 
 
 if __name__ == "__main__":

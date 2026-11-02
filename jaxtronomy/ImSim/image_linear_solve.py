@@ -50,6 +50,30 @@ class ImageLinearFit(ImageModel):
         :param kwargs_pixelbased: keyword arguments with various settings related to the pixel-based solver
          (see SLITronomy documentation) being applied to the point sources.
         """
+        # SHAPELETS nmax must be set at initialization for linear solver
+        for shapelet_profile in ["SHAPELETS", "SHAPELETS_ELLIPSE"]:
+            if (
+                source_model_class is not None
+                and shapelet_profile in source_model_class.profile_type_list
+            ):
+                index = source_model_class.profile_type_list.index(shapelet_profile)
+                shapelet = source_model_class.func_list[index]
+                if not hasattr(shapelet, "num_param"):
+                    raise ValueError(
+                        f"{shapelet_profile} n_max must be set at initialization. Use profile_kwargs_list when initializing LightModel.\n"
+                        "If using kwargs_model, see documentation of source_light_profile_kwargs_list in class_creator.create_class_instances()"
+                    )
+            if (
+                lens_light_model_class is not None
+                and shapelet_profile in lens_light_model_class.profile_type_list
+            ):
+                index = lens_light_model_class.profile_type_list.index(shapelet_profile)
+                shapelet = lens_light_model_class.func_list[index]
+                if not hasattr(shapelet, "num_param"):
+                    raise ValueError(
+                        f"{shapelet_profile} n_max must be set at initialization. Use profile_kwargs_list when initializing LightModel.\n"
+                        "If using kwargs_model, see documentation of lens_light_profile_kwargs_list in class_creator.create_class_instances()"
+                    )
 
         super(ImageLinearFit, self).__init__(
             data_class,

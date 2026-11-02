@@ -152,6 +152,34 @@ class TestImageLinearFit(object):
         data_class.update_data(image_sim)
         data_class_ref.update_data(image_sim)
 
+    def test_init(self):
+        source_model_class = LightModel(["SHAPELETS"])
+        lens_light_model_class = LightModel(["SERSIC", "SHAPELETS_ELLIPSE"])
+        kwargs_psf = {
+            "psf_type": "GAUSSIAN",
+            "fwhm": 0.5,
+            "truncation": 5,
+            "pixel_size": 0.05,
+        }
+        psf_class = PSF(**kwargs_psf)
+        data_class = ImageData(**self.kwargs_data)
+
+        # Shapelets profile must be initialized with n_max using profile_kwargs_list
+        npt.assert_raises(
+            ValueError,
+            ImageLinearFit,
+            data_class=data_class,
+            psf_class=psf_class,
+            source_model_class=source_model_class,
+        )
+        npt.assert_raises(
+            ValueError,
+            ImageLinearFit,
+            data_class=data_class,
+            psf_class=psf_class,
+            lens_light_model_class=lens_light_model_class,
+        )
+
     def test_likelihood_data_given_model(self):
         logL, param = self.imageLinearFit.likelihood_data_given_model(
             self.kwargs_lens,
