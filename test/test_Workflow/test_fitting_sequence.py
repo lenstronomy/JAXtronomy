@@ -1003,18 +1003,26 @@ class TestFittingSequence(object):
 
         lens_model_class = LensModel(lens_model_list)
 
-        # Sersic parameters in the initial simulation for the source
+        # Shapelet parameters in the initial simulation for the source
         kwargs_shapelets = {
             "amp": [16.0, 15.0, 14.0],
             "beta": 0.5,
             "center_x": 0.1,
             "center_y": 0.0,
         }
-        source_model_list = ["SHAPELETS"]
-        kwargs_source = [kwargs_shapelets]
+        kwargs_shapelets_ellipse = {
+            "amp": [12.0, 15.5, 14.3],
+            "beta": 0.5,
+            "e1": 0.1,
+            "e2": -0.238,
+            "center_x": 0.1,
+            "center_y": 0.0,
+        }
+        source_model_list = ["SHAPELETS", "SHAPELETS_ELLIPSE"]
+        kwargs_source = [kwargs_shapelets, kwargs_shapelets_ellipse]
 
         source_model_class = LightModel(
-            source_model_list, profile_kwargs_list=[{"n_max": 1}]
+            source_model_list, profile_kwargs_list=[{"n_max": 1}] * 2
         )
 
         lens_light_model_list = ["SHAPELETS"]

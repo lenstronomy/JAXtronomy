@@ -178,6 +178,13 @@ class TestRaise(unittest.TestCase):
             lightmodel = LightModel(
                 light_model_list=["SERSIC"], source_redshift_list=[1, 3]
             )
+        with self.assertRaises(ValueError):
+            # missing n_max at initialization
+            lighModel = LightModel(light_model_list=["SHAPELETS"])
+        with self.assertRaises(ValueError):
+            # missing n_max at initialization
+            lighModel = LightModel(light_model_list=["SHAPELETS_ELLIPSE"])
+        
 
 
 if __name__ == "__main__":

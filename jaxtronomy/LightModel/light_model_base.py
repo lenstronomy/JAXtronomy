@@ -24,6 +24,7 @@ _JAXXED_MODELS = [
     "SERSIC_ELLIPSE",
     "SERSIC_ELLIPSE_Q_PHI",
     "SHAPELETS",
+    "SHAPELETS_ELLIPSE",
     "UNIFORM",
 ]
 
@@ -97,22 +98,24 @@ class LightModelBase(object):
                 self.func_list.append(CoreSersic(**profile_kwargs))
 
             elif profile_type == "SHAPELETS":
-                if profile_kwargs.get("n_max", None) is not None:
-                    from jaxtronomy.LightModel.Profiles.shapelets import (
-                        ShapeletSetStatic,
-                    )
+                if profile_kwargs.get("n_max", None) is None:
+                    raise ValueError("Shapelet profile must have n_max provided at initialization in JAXtronomy")
+                
+                from jaxtronomy.LightModel.Profiles.shapelets import (
+                    ShapeletSetStatic,
+                )
 
-                    self.func_list.append(ShapeletSetStatic(**profile_kwargs))
-                else:
-                    from jaxtronomy.LightModel.Profiles.shapelets import ShapeletSet
+                self.func_list.append(ShapeletSetStatic(**profile_kwargs))
 
-                    self.func_list.append(ShapeletSet(**profile_kwargs))
-            # elif profile_type == "SHAPELETS_ELLIPSE":
-            #     from lenstronomy.LightModel.Profiles.shapelets_ellipse import (
-            #         ShapeletSetEllipse,
-            #     )
+            elif profile_type == "SHAPELETS_ELLIPSE":
+                if profile_kwargs.get("n_max", None) is None:
+                    raise ValueError("Elliptical Shapelet profile must have n_max provided at initialization in JAXtronomy")
+                
+                from jaxtronomy.LightModel.Profiles.shapelets_ellipse import (
+                    ShapeletSetEllipseStatic,
+                )
 
-            #     self.func_list.append(ShapeletSetEllipse(**profile_kwargs))
+                self.func_list.append(ShapeletSetEllipseStatic(**profile_kwargs))
             # elif profile_type == "SHAPELETS_POLAR":
             #     from lenstronomy.LightModel.Profiles.shapelets_polar import (
             #         ShapeletSetPolar,

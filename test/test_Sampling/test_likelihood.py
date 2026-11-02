@@ -433,10 +433,10 @@ class TestLikelihood(object):
         for source_profile in JAXXED_SOURCE_PROFILES:
             print(source_profile)
 
-            if source_profile == "SHAPELETS":
+            if source_profile in ["SHAPELETS", "SHAPELETS_ELLIPSE"]:
                 source_light_profile_kwargs_list = [{"n_max": 1}]
             elif source_profile in ["MGE_SET", "MGE_SET_ELLIPSE"]:
-                source_light_profile_kwargs_list = [{"n_comp": 5}]
+                source_light_profile_kwargs_list = [{"n_comp": 3}]
             else:
                 source_light_profile_kwargs_list = [{}]
 
@@ -465,6 +465,7 @@ class TestLikelihood(object):
                     "MGE_SET",
                     "MGE_SET_ELLIPSE",
                     "SHAPELETS",
+                    "SHAPELETS_ELLIPSE",
                 ] and key in ["amp", "sigma"]:
                     kwargs_source[key] = [float(val)] * 3
                 else:
