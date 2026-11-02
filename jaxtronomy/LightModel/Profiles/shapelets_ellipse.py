@@ -6,7 +6,7 @@ from jaxtronomy.Util import param_util
 
 class ShapeletSetEllipseStatic(object):
     """Cartesian shapelets with elliptical axis ratios.
-    
+
     The shapelet order must be declared at initialization.
     """
 
@@ -32,7 +32,9 @@ class ShapeletSetEllipseStatic(object):
         self._shapelet_set = ShapeletSetStatic(n_max=n_max)
 
     @partial(jit, static_argnums=0)
-    def function(self, x, y, amp, beta, e1, e2, center_x=0, center_y=0, *args, **kwargs):
+    def function(
+        self, x, y, amp, beta, e1, e2, center_x=0, center_y=0, *args, **kwargs
+    ):
         """
 
         :param x: x-coordinates
@@ -48,12 +50,12 @@ class ShapeletSetEllipseStatic(object):
         x_, y_ = param_util.transform_e1e2_product_average_rotate(
             x, y, e1, e2, center_x=center_x, center_y=center_y
         )
-        return self._shapelet_set.function(
-            x_, y_, amp, beta, center_x=0, center_y=0
-        )
+        return self._shapelet_set.function(x_, y_, amp, beta, center_x=0, center_y=0)
 
     @partial(jit, static_argnums=0)
-    def function_split(self, x, y, amp, beta, e1, e2, center_x=0, center_y=0, *args, **kwargs):
+    def function_split(
+        self, x, y, amp, beta, e1, e2, center_x=0, center_y=0, *args, **kwargs
+    ):
         """Splits shapelet set in list of individual shapelet basis function responses.
 
         :param x: x-coordinates

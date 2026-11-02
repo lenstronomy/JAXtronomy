@@ -98,6 +98,7 @@ def ellipticity2phi_q(e1, e2):
     q = (1 - c) / (1 + c)
     return phi, q
 
+
 @jit
 def transform_e1e2_product_average_rotate(x, y, e1, e2, center_x, center_y):
     """Maps the coordinates x, y with eccentricities e1 e2 into a new elliptical
@@ -122,6 +123,7 @@ def transform_e1e2_product_average_rotate(x, y, e1, e2, center_x, center_y):
     xt1 = cos_phi * x_shift + sin_phi * y_shift
     xt2 = -sin_phi * x_shift + cos_phi * y_shift
     return xt1 * jnp.sqrt(q), xt2 / jnp.sqrt(q)
+
 
 @jit
 def transform_e1e2_product_average(x, y, e1, e2, center_x, center_y):

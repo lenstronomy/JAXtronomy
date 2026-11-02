@@ -152,7 +152,6 @@ class TestImageLinearFit(object):
         data_class.update_data(image_sim)
         data_class_ref.update_data(image_sim)
 
-
     def test_likelihood_data_given_model(self):
         logL, param = self.imageLinearFit.likelihood_data_given_model(
             self.kwargs_lens,
