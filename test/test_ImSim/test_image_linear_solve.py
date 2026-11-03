@@ -154,7 +154,7 @@ class TestImageLinearFit(object):
 
     def test_init(self):
         source_model_class = LightModel(["SHAPELETS"])
-        lens_light_model_class = LightModel(["SERSIC", "SHAPELETS"])
+        lens_light_model_class = LightModel(["SERSIC", "SHAPELETS_ELLIPSE"])
         kwargs_psf = {
             "psf_type": "GAUSSIAN",
             "fwhm": 0.5,

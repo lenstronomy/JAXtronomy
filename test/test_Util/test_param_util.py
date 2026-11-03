@@ -77,11 +77,37 @@ def test_ellipticity2phi_q():
     npt.assert_array_almost_equal(q, q_ref, decimal=8)
 
 
+def test_transform_e1e2_product_average_rotate():
+    e1 = 0.01
+    e2 = -0.03
+    x = 0.0
+    y = 1.0547356
+    x_, y_ = param_util.transform_e1e2_product_average_rotate(
+        x, y, e1, e2, center_x=-0.3, center_y=0.4
+    )
+    x_ref, y_ref = param_util_ref.transform_e1e2_product_average_rotate(
+        x, y, e1, e2, center_x=-0.3, center_y=0.4
+    )
+    npt.assert_almost_equal(x_, x_ref, decimal=8)
+    npt.assert_almost_equal(y_, y_ref, decimal=8)
+
+    e1 = 0.0
+    e2 = 0.0
+    x_, y_ = param_util.transform_e1e2_product_average_rotate(
+        x, y, e1, e2, center_x=-0.3, center_y=0.4
+    )
+    x_ref, y_ref = param_util_ref.transform_e1e2_product_average_rotate(
+        x, y, e1, e2, center_x=-0.3, center_y=0.4
+    )
+    npt.assert_almost_equal(x_, x_ref, decimal=8)
+    npt.assert_almost_equal(y_, y_ref, decimal=8)
+
+
 def test_transform_e1e2_product_average():
     e1 = 0.01
     e2 = -0.03
     x = 0.0
-    y = 1.0
+    y = 1.0547356
     x_, y_ = param_util.transform_e1e2_product_average(
         x, y, e1, e2, center_x=-0.3, center_y=0.4
     )

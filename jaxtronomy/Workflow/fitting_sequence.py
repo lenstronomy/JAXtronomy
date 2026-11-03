@@ -308,29 +308,35 @@ class FittingSequence(object):
         """
         kwargs_model_copy = copy.deepcopy(self._updateManager.kwargs_model)
 
-        # Here we extract n_max from kwargs_fixed and place it into profile_kwargs_list so that
-        # n_max is set at initialization. Required for jaxtronomy
-        light_model_list = kwargs_model_copy.get("source_light_model_list", [])
-        if "SHAPELETS" in light_model_list:
-            index = light_model_list.index("SHAPELETS")
-            num_profiles = len(light_model_list)
-            profile_kwargs_list = kwargs_model_copy.get(
-                "source_light_profile_kwargs_list", [{} for _ in range(num_profiles)]
-            )
-            n_max = self._updateManager.fixed_kwargs[1][index]["n_max"]
-            profile_kwargs_list[index] = {"n_max": n_max}
-            kwargs_model_copy["source_light_profile_kwargs_list"] = profile_kwargs_list
+        # If Shapelets are present, extract n_max from kwargs_fixed, place into profile_kwargs_list to
+        # set n_max at initialization. Required for jaxtronomy
+        for shapelet_profile in ["SHAPELETS", "SHAPELETS_ELLIPSE"]:
+            light_model_list = kwargs_model_copy.get("source_light_model_list", [])
+            if shapelet_profile in light_model_list:
+                index = light_model_list.index(shapelet_profile)
+                num_profiles = len(light_model_list)
+                profile_kwargs_list = kwargs_model_copy.get(
+                    "source_light_profile_kwargs_list",
+                    [{} for _ in range(num_profiles)],
+                )
+                n_max = self._updateManager.fixed_kwargs[1][index]["n_max"]
+                profile_kwargs_list[index] = {"n_max": n_max}
+                kwargs_model_copy["source_light_profile_kwargs_list"] = (
+                    profile_kwargs_list
+                )
 
-        light_model_list = kwargs_model_copy.get("lens_light_model_list", [])
-        if "SHAPELETS" in light_model_list:
-            index = light_model_list.index("SHAPELETS")
-            num_profiles = len(light_model_list)
-            profile_kwargs_list = kwargs_model_copy.get(
-                "lens_light_profile_kwargs_list", [{} for _ in range(num_profiles)]
-            )
-            n_max = self._updateManager.fixed_kwargs[2][index]["n_max"]
-            profile_kwargs_list[index] = {"n_max": n_max}
-            kwargs_model_copy["lens_light_profile_kwargs_list"] = profile_kwargs_list
+            light_model_list = kwargs_model_copy.get("lens_light_model_list", [])
+            if shapelet_profile in light_model_list:
+                index = light_model_list.index(shapelet_profile)
+                num_profiles = len(light_model_list)
+                profile_kwargs_list = kwargs_model_copy.get(
+                    "lens_light_profile_kwargs_list", [{} for _ in range(num_profiles)]
+                )
+                n_max = self._updateManager.fixed_kwargs[2][index]["n_max"]
+                profile_kwargs_list[index] = {"n_max": n_max}
+                kwargs_model_copy["lens_light_profile_kwargs_list"] = (
+                    profile_kwargs_list
+                )
 
         kwargs_likelihood = self._updateManager.kwargs_likelihood
         likelihood_class = Likelihood(
